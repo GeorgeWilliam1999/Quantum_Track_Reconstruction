@@ -14,7 +14,7 @@ set -euo pipefail
 # ----------------------------------------------------------------------
 CONDA_PREFIX="/data/bfys/gscriven/conda"
 CONDA="$CONDA_PREFIX/bin/conda"
-ENV_NAME="Velo_Toy_Tester"
+ENV_NAME="Q_env"
 
 BASE_DIR="/data/bfys/gscriven/velo_scan"
 PYTHON_SCRIPT="$BASE_DIR/scripts/run_batch.py"
@@ -56,7 +56,7 @@ export MPLBACKEND=Agg
 echo ""
 echo "[INFO] Starting batch $BATCH ..."
 
-"$CONDA" run --no-banner -n "$ENV_NAME" python "$PYTHON_SCRIPT" \
+"$CONDA" run -n "$ENV_NAME" python "$PYTHON_SCRIPT" \
     --batch "$BATCH" \
     --runs-dir "$RUNS_DIR" \
     --params "$RUNS_DIR/params.csv"

@@ -1,0 +1,62 @@
+{
+  "run_name": "velo_scan",
+  "description": "Full Cartesian hyperparameter scan (supervisor instructions)",
+  "grid": {
+    "sigma_scatt_rad": [
+      0.0,
+      0.0001,
+      0.0002,
+      0.0003,
+      0.0005,
+      0.001
+    ],
+    "sigma_res_mm": [
+      0.0,
+      0.01,
+      0.02,
+      0.05
+    ],
+    "scale": [
+      3,
+      4,
+      5
+    ],
+    "drop_rate": [
+      0.0,
+      0.01,
+      0.02
+    ],
+    "noise_fraction": [
+      0.0,
+      0.0001,
+      0.001,
+      0.01
+    ],
+    "n_tracks": [
+      5,
+      10,
+      20,
+      50,
+      100
+    ]
+  },
+  "defaults": {
+    "sigma_scatt": 0.0001,
+    "sigma_res": 0.01,
+    "drop": 0.0,
+    "noise": 0.0,
+    "scale": 5
+  },
+  "geometry": {
+    "n_modules": 26,
+    "z_spacing_mm": 33.0,
+    "half_xy_mm": 40.0,
+    "z_first_mm": 100.0,
+    "phi_max_rad": 0.2,
+    "theta_max_rad": 0.2
+  },
+  "repeats_per_config": 50,
+  "events_per_batch": 50,
+  "total_events": 216000,
+  "total_batches": 4320
+}
