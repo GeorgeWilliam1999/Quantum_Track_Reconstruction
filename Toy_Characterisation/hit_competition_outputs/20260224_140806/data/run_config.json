@@ -1,0 +1,22 @@
+{
+  "epsilon": 0.0004247940677551889,
+  "gamma": 1.5,
+  "delta": 1.0,
+  "baseline": 0.4,
+  "threshold": 0.7,
+  "dz_mm": 33.0,
+  "sigma_res": 0.0,
+  "sigma_scatt": 0.0001,
+  "scale": 3.0,
+  "track_densities": [
+    5,
+    10,
+    20,
+    30,
+    50,
+    75,
+    100,
+    150
+  ],
+  "n_repeats": 5
+}
