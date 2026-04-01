@@ -1,0 +1,21 @@
+universe        = vanilla
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/condor_pipeline/condor/run_worker.sh
+
+initialdir      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/condor_pipeline
+
+should_transfer_files = NO
+
+output = $(resultsdir)/logs/job.$(Cluster).$(Process).out
+error  = $(resultsdir)/logs/job.$(Cluster).$(Process).err
+log    = $(resultsdir)/logs/condor.$(Cluster).log
+
++UseOS          = "el9"
++JobCategory    = "short"
+
+request_cpus    = 1
+request_memory  = 4 GB
+request_disk    = 1 GB
+
+arguments = $(params_file) $(resultsdir)
+
+queue params_file from $(batches_file)
