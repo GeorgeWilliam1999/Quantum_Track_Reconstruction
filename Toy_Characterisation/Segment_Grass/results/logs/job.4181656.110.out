@@ -1,0 +1,10 @@
+==========================================
+ Segment-Grass Worker: job_00110
+ Params: /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Segment_Grass/results/params/job_00110.json
+ Output: /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Segment_Grass/results/job_00110
+ Host:   wn-pijl-003.nikhef.nl
+ Date:   Thu Apr  2 01:22:03 CEST 2026
+==========================================
+Job 110 complete: angle=±0.1, n_trk=20, ghost=0.0, drop=0.1
+
+Worker job_00110 finished at Thu Apr  2 01:22:55 CEST 2026

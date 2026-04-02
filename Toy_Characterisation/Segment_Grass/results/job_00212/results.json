@@ -1,0 +1,47 @@
+{
+  "params": {
+    "job_id": 212,
+    "angle": 0.1,
+    "n_tracks": 100,
+    "ghost_rate": 0.3,
+    "drop_rate": 0.1,
+    "n_repeats": 10
+  },
+  "n_events": 10,
+  "occ_mean": 191.976,
+  "occ_std": 60.182930226657014,
+  "occ_max": 256,
+  "n_anomalous_occ": 6000,
+  "frac_anomalous_occ": 1.0,
+  "mean_n_clipped": 0.0,
+  "mean_n_ghost_hits": 150.0,
+  "mean_n_dropped": 50.0,
+  "mean_n_segments": 57592.8,
+  "mean_true_activation": 0.9878533624569978,
+  "mean_false_activation": 0.4000065189541502,
+  "reco_metrics": {
+    "efficiency": {
+      "mean": 0.72,
+      "std": 0.030331501776206204
+    },
+    "ghost_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "clone_fraction": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "n_reco": {
+      "mean": 72.0,
+      "std": 3.03315017762062
+    }
+  },
+  "hits_per_mod_mean": {
+    "0": 117.5,
+    "1": 119.8,
+    "2": 122.8,
+    "3": 117.7,
+    "4": 122.2
+  }
+}
