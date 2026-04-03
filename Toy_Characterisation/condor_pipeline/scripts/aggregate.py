@@ -121,6 +121,9 @@ def aggregate(results_dir):
     if "hc_scatt_hist" in tasks:
         _agg_hc_scatt_hist(tasks["hc_scatt_hist"], agg_dir)
 
+    if "param_opt" in tasks:
+        _agg_param_opt(tasks["param_opt"], agg_dir)
+
     # Save the run summary alongside aggregated data
     save_json(run_summary, agg_dir / "run_summary.json")
 
@@ -294,6 +297,69 @@ def _agg_hc_scatt_hist(jobs, agg_dir):
 
     np.savez_compressed(str(agg_dir / "hc_scatt_hist.npz"), **arrays)
     print(f"  hc_scatt_hist: aggregated {len(jobs)} jobs")
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  param_opt: merge all parameter-optimisation results into a flat
+#  CSV-friendly table + JSON
+# ═══════════════════════════════════════════════════════════════════
+def _agg_param_opt(jobs, agg_dir):
+    import csv
+
+    # Metric keys produced by the worker (mean ± SE pairs)
+    METRIC_KEYS = [
+        'm_reconstruction_efficiency',
+        'm_ghost_rate',
+        'm_clone_fraction_total',
+        'm_clone_fraction_among_matched',
+        'm_purity_all_matched',
+        'm_purity_primary_only',
+        'm_hit_efficiency_mean',
+        'm_hit_efficiency_weighted',
+        'hit_purity_mean_primary',
+        'hit_efficiency_mean_primary',
+        'hit_efficiency_weighted_primary',
+    ]
+
+    rows = []
+    for jd, data in jobs:
+        row = {
+            "angle":             data["angle"],
+            "n_tracks":          data["n_tracks"],
+            "scale":             data["scale"],
+            "theta_d":           data["theta_d"],
+            "measurement_error": data["measurement_error"],
+            "collision_noise":   data["collision_noise"],
+            "convolution":       data["convolution"],
+            "epsilon":           data["epsilon"],
+            "n_repeats":         data["n_repeats"],
+        }
+        # Add all metric mean/SE pairs
+        for mk in METRIC_KEYS:
+            row[f"{mk}_mean"] = data.get(f"{mk}_mean", data.get("eff_mean", 0.0) if mk == 'm_reconstruction_efficiency' else 0.0)
+            row[f"{mk}_se"]   = data.get(f"{mk}_se", 0.0)
+        rows.append(row)
+
+    # Sort for readable output
+    rows.sort(key=lambda r: (
+        r["angle"], r["n_tracks"], r["convolution"],
+        r["scale"], r["theta_d"] or 0,
+        r["measurement_error"], r["collision_noise"],
+    ))
+
+    # Save as JSON
+    save_json({"results": rows}, agg_dir / "param_opt.json")
+
+    # Save as CSV for easy pandas loading
+    csv_path = agg_dir / "param_opt.csv"
+    if rows:
+        fieldnames = list(rows[0].keys())
+        with open(csv_path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+
+    print(f"  param_opt: aggregated {len(jobs)} jobs → param_opt.json + param_opt.csv")
 
 
 def main():

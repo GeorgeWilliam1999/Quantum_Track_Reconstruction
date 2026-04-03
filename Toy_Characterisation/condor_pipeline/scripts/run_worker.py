@@ -24,12 +24,16 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from helpers import (
-    make_geometry, safe_generate, compute_epsilon,
+    make_geometry, generate_event, safe_generate, compute_epsilon,
     collect_segment_pair_angles, label_segments, build_hit_to_segments,
     build_and_solve, reconstruct_and_validate,
     SIGMA_RES, SIGMA_SCATT, DZ_MM, SCALE, GAMMA, DELTA,
     BASELINE, THRESHOLD, EPSILON, N_MODULES,
+    SimpleHamiltonianFast,
 )
+
+from lhcb_velo_toy.solvers import get_tracks
+from lhcb_velo_toy.analysis import EventValidator
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -417,6 +421,106 @@ def run_hc_scatt_hist(params, outdir):
 
 
 # ═══════════════════════════════════════════════════════════════════
+#  Task: param_opt
+#  Hamiltonian parameter optimisation sweep.
+#  Sweeps over (k, theta_d, measurement_error, collision_noise,
+#  convolution) and measures reco metrics for each (angle, n_tracks).
+# ═══════════════════════════════════════════════════════════════════
+def run_param_opt(params, outdir):
+    angle       = params["angle"]
+    n_tracks    = params["n_tracks"]
+    k           = params["scale"]
+    theta_d     = params["theta_d"]          # None for step mode
+    meas_err    = params["measurement_error"]
+    coll_noise  = params["collision_noise"]
+    conv        = params["convolution"]
+    n_repeats   = params["n_repeats"]
+
+    # Compute epsilon from the paper formula
+    eps = compute_epsilon(meas_err, coll_noise, DZ_MM, scale=k)
+
+    geo = make_geometry()
+
+    # Metric keys to extract from EventValidator.compute_metrics()
+    METRIC_KEYS = [
+        'm_reconstruction_efficiency',
+        'm_ghost_rate',
+        'm_clone_fraction_total',
+        'm_clone_fraction_among_matched',
+        'm_purity_all_matched',
+        'm_purity_primary_only',
+        'm_hit_efficiency_mean',
+        'm_hit_efficiency_weighted',
+        'hit_purity_mean_primary',
+        'hit_efficiency_mean_primary',
+        'hit_efficiency_weighted_primary',
+    ]
+
+    per_repeat = []
+    for rep in range(n_repeats):
+        # Generate event with the specified physics parameters
+        _, event = generate_event(
+            geo, n_tracks,
+            measurement_error=meas_err,
+            collision_noise=coll_noise,
+            phi_max=angle, theta_max=angle,
+        )
+
+        # Build Hamiltonian with the job's hyperparameters
+        ham = SimpleHamiltonianFast(
+            epsilon=eps,
+            gamma=GAMMA,
+            delta=DELTA,
+            theta_d=theta_d if theta_d is not None else 1e-4,
+        )
+        ham.construct_hamiltonian(event, convolution=conv)
+        x = ham.solve_classicaly()
+
+        # Reconstruct and validate using full LHCb metrics
+        reco_tracks = get_tracks(ham, x, event, threshold=THRESHOLD)
+        if len(reco_tracks) == 0:
+            row = {mk: 0.0 for mk in METRIC_KEYS}
+        else:
+            val = EventValidator(event, reco_tracks)
+            full_metrics = val.compute_metrics()
+            row = {mk: float(full_metrics.get(mk, 0.0)) for mk in METRIC_KEYS}
+
+        row.update({
+            'repeat':     rep,
+            'n_reco':     len(reco_tracks),
+            'n_truth':    len(event.tracks),
+            'n_segments': ham.n_segments,
+        })
+        per_repeat.append(row)
+
+        # Reset segments for next repeat
+        ham.segments = None
+        ham.segments_grouped = None
+
+    # Aggregate across repeats: mean ± SE for every metric key
+    summary = {}
+    for mk in METRIC_KEYS:
+        vals = np.array([r[mk] for r in per_repeat])
+        summary[f'{mk}_mean'] = float(np.mean(vals))
+        summary[f'{mk}_se']   = float(se(vals))
+
+    save_json({
+        'task':              'param_opt',
+        'angle':             angle,
+        'n_tracks':          n_tracks,
+        'scale':             k,
+        'theta_d':           theta_d,
+        'measurement_error': meas_err,
+        'collision_noise':   coll_noise,
+        'convolution':       conv,
+        'epsilon':           eps,
+        'n_repeats':         n_repeats,
+        **summary,
+        'per_repeat':        per_repeat,
+    }, outdir / "results.json")
+
+
+# ═══════════════════════════════════════════════════════════════════
 #  Dispatcher
 # ═══════════════════════════════════════════════════════════════════
 TASK_DISPATCH = {
@@ -427,6 +531,7 @@ TASK_DISPATCH = {
     'hc_roc':           run_hc_roc,
     'hc_scatt':         run_hc_scatt,
     'hc_scatt_hist':    run_hc_scatt_hist,
+    'param_opt':        run_param_opt,
 }
 
 

@@ -1,0 +1,255 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\title{Hit-Competition Study at High Track Density\\\large Derived from \texttt{hit\_competition\_study.ipynb}}
+\author{Quantum Track Reconstruction}
+\date{\today}
+
+% Existing figure roots from completed runs.
+\newcommand{\runfigdirA}{hit_competition_outputs/20260225_115618/figures}
+\newcommand{\runfigdirB}{hit_competition_outputs/20260224_140806/figures}
+
+% Include a figure only if the file exists.
+\newcommand{\safeincludegraphics}[2][]{%
+  \IfFileExists{#2}{\includegraphics[#1]{#2}}{%
+    \fbox{\parbox[c][0.23\textheight][c]{0.9\linewidth}{\centering Missing figure:\\ \texttt{\detokenize{#2}}}}%
+  }%
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document summarizes the notebook
+\texttt{Toy\_Characterisation/hit\_competition\_study.ipynb}, which tests
+whether the Hamiltonian coupling term $\gamma$ suppresses false competing
+segments as track density increases. The study proceeds through six stages:
+(1) hit occupancy, (2) activation spectrum separation, (3) per-hit
+competition behavior, (4) track-level reconstruction quality, (5)
+threshold-sensitivity curves, and (6) segment-level scattering sweeps. The
+workflow is designed for high-density stress testing and saves all artifacts by
+run timestamp under \texttt{hit\_competition\_outputs/}.
+\end{abstract}
+
+\section{Goal and Hypothesis}
+The classical solve of the linear system $Ax=b$ yields segment activations
+$x_i \in [0,1]$. Segments sharing a hit are coupled through the Hamiltonian.
+The central hypothesis is:
+\begin{quote}
+As occupancy increases, true segments remain near or above the operating
+threshold, while false competitors are suppressed by the competition structure
+encoded in $A$.
+\end{quote}
+
+The notebook evaluates this mechanism at multiple event densities and angular
+phase-space settings.
+
+\section{Configuration and Definitions}
+\subsection{Detector and Event Generation}
+The notebook uses a 5-module planar geometry with module spacing
+$\Delta z = 33\,\mathrm{mm}$ and symmetric angular generation windows
+$\phi_{\max}=\theta_{\max}\in\{0.2,\,0.1,\,0.04\}\,\mathrm{rad}$.
+A density sweep is performed over
+\[
+N_\text{tracks}\in\{5,10,20,30,50,75,100,150\}
+\]
+with repeated event generation per point.
+
+\subsection{Hamiltonian Parameters}
+The baseline parameter set is
+\[
+\sigma_{\mathrm{res}}=0,\quad
+\sigma_{\mathrm{scatt}}=10^{-4}\,\mathrm{rad},\quad
+\gamma=1.5,\quad
+\delta=1.0,
+\]
+and
+\[
+\varepsilon=\sqrt{2\theta_s^2 + 12\theta_r^2 + 2\theta_{\min}^2},
+\quad
+\theta_s=s\,\sigma_{\mathrm{scatt}},
+\quad
+\theta_r=\arctan\!\left(\frac{s\,\sigma_{\mathrm{res}}}{\Delta z}\right),
+\]
+with scale $s=3$. The activation operating point is
+\[
+\text{baseline}=\frac{\delta}{\delta+\gamma},
+\qquad
+\text{threshold}=\frac{1+\text{baseline}}{2}.
+\]
+
+\section{Analysis Workflow}
+\subsection{Step 1: Hit Occupancy}
+For each generated event, the study builds a map
+\texttt{hit\_id} $\to$ candidate segment indices and records occupancy
+statistics (mean, median, max, spread). This quantifies combinatorial pressure
+and validates the expected scaling for internal layers.
+
+\subsection{Step 2: Activation Spectrum (True vs False)}
+Each candidate segment is labeled true/false from ground-truth track adjacency.
+The solved activations $x_i$ are then compared between classes, including:
+\begin{itemize}[leftmargin=1.5em]
+  \item fraction of true segments above threshold,
+  \item fraction of false segments above threshold,
+  \item separation statistic from pooled variance.
+\end{itemize}
+This step directly measures whether ambiguity suppression degrades at high
+occupancy.
+
+\subsection{Step 3: Per-Hit Competition Curves}
+For contested hits (shared by multiple segments), the notebook compares:
+\begin{itemize}[leftmargin=1.5em]
+  \item true segment activation $x_{\text{true}}$,
+  \item summed false competitor load $\sum_j x_{\text{false},j}$,
+  \item number of competitors.
+\end{itemize}
+Scatter and summary curves test whether true segments remain robust under
+increasing local competition.
+
+\subsection{Step 4: Track-Level Reconstruction Quality}
+An end-to-end chain
+\texttt{generate $\to$ construct Hamiltonian $\to$ solve $\to$ get\_tracks $\to$ validate}
+is run for each density and angle. Metrics include:
+\begin{itemize}[leftmargin=1.5em]
+  \item reconstruction efficiency,
+  \item ghost rate,
+  \item clone fraction.
+\end{itemize}
+Truth and reconstructed events are also exported as JSON snapshots.
+
+\subsection{Step 5: Threshold Sensitivity (ROC-like)}
+Thresholds are swept over
+\[
+\tau\in[0.2,0.9]
+\]
+at representative densities. For each $\tau$, efficiency and ghost rate are
+computed, giving operating curves and highlighting the default threshold point.
+
+\subsection{Step 6: Segment-Level Scattering Sweep}
+A second scan varies multiple-scattering strength by factors
+$1\times$, $2\times$, and $4\times$ (with corresponding $\varepsilon$ values),
+across event sizes 10 to 100 tracks. Reported metrics:
+\begin{itemize}[leftmargin=1.5em]
+  \item segment efficiency,
+  \item segment false rate,
+  \item true/false segment-pair counts,
+  \item accepted true/false pairs with $\theta\le\varepsilon$.
+\end{itemize}
+Additional histograms compare true and false pairwise-angle distributions for
+fixed-size high-density ensembles.
+
+\section{Produced Artifacts}
+Each run creates a timestamped directory:
+\begin{center}
+\texttt{hit\_competition\_outputs/<RUN\_TAG>/\{data,figures,events\}}
+\end{center}
+Typical figures (saved when corresponding steps are executed):
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{step1\_occupancy\_comparison.png}
+  \item \texttt{step1\_occupancy\_histograms.png}
+  \item \texttt{step2\_activation\_spectra.png}
+  \item \texttt{step2\_activation\_summary.png}
+  \item \texttt{step3\_competition\_scatter.png}
+  \item \texttt{step3\_competition\_summary.png}
+  \item \texttt{step4\_reco\_quality.png}
+  \item \texttt{step5\_roc\_by\_angle.png}
+  \item \texttt{step5\_threshold\_curves.png}
+  \item \texttt{step6\_scattering\_comparison.png}
+  \item \texttt{step6\_acceptance\_histograms.png}
+\end{itemize}
+
+\section{Representative Figures}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \safeincludegraphics[width=\linewidth]{\runfigdirA/step1_occupancy_comparison.png}
+    \caption{Step 1 occupancy comparison.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \safeincludegraphics[width=\linewidth]{\runfigdirA/step2_activation_summary.png}
+    \caption{Step 2 activation separation summary.}
+  \end{subfigure}
+  \caption{Occupancy and activation-separation diagnostics.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \safeincludegraphics[width=\linewidth]{\runfigdirA/step3_competition_summary.png}
+    \caption{Step 3 per-hit competition summary.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \safeincludegraphics[width=\linewidth]{\runfigdirB/step4_reco_quality.png}
+    \caption{Step 4 track-level quality.}
+  \end{subfigure}
+  \caption{Competition behavior and end-to-end reconstruction quality.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \safeincludegraphics[width=\linewidth]{seg_eff_1mrad.png}
+    \caption{Segment efficiency reference plot.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \safeincludegraphics[width=\linewidth]{seg_hist_1mrad.png}
+    \caption{Segment-angle histogram reference plot.}
+  \end{subfigure}
+  \caption{Additional segment-level reference outputs available in the study directory.}
+\end{figure}
+
+\section{Interpretation Guide}
+The notebook supports the following checks:
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Combinatorics scaling}: occupancy trends with density and angle
+  indicate where overlap becomes severe.
+  \item \textbf{Activation robustness}: true/false spectrum separation indicates
+  whether competition suppression remains effective.
+  \item \textbf{Operational envelope}: ROC-like curves identify threshold headroom
+  as density increases.
+  \item \textbf{Physics stress response}: scattering sweeps quantify sensitivity of
+  segment-level acceptance and contamination.
+\end{enumerate}
+
+\section{Reproducibility Notes}
+\begin{itemize}[leftmargin=1.5em]
+  \item The notebook can either compute fresh results or load a previous run via
+  \texttt{LOAD\_RUN}.
+  \item All JSON summaries are saved in the run's \texttt{data/} directory.
+  \item To display figures from another run, update
+  \texttt{\textbackslash runfigdirA} and \texttt{\textbackslash runfigdirB} at the top of this file.
+\end{itemize}
+
+\section{Conclusion}
+This study provides a structured, multi-level validation of hit-competition
+handling in the Hamiltonian reconstruction approach. By combining local
+(occupancy and per-hit competition), intermediate (segment activations), and
+global (track-level metrics and threshold scans) diagnostics across density,
+angle phase space, and scattering strength, the notebook establishes a clear
+framework for quantifying high-density robustness.
+
+\end{document}

@@ -1,26 +1,46 @@
-\contentsline {section}{\numberline {1}Executive Summary}{3}{section.1}%
-\contentsline {section}{\numberline {2}Study Configuration}{3}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Geometry and Physics Parameters}{3}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Scan Settings}{4}{subsection.2.2}%
-\contentsline {section}{\numberline {3}The Hamiltonian Linear System}{4}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Segment Construction}{4}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Matrix Structure}{4}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Idealised Analytic Solution}{5}{subsection.3.3}%
-\contentsline {paragraph}{False segments (uncoupled):}{5}{section*.4}%
-\contentsline {paragraph}{True segments (chain-coupled):}{5}{section*.5}%
-\contentsline {section}{\numberline {4}Observed Anomaly at $\pm 0.04$\,rad, 75 Tracks}{5}{section.4}%
-\contentsline {section}{\numberline {5}Root Cause: Near-Coincident Track Degeneracy}{6}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Cross-Segment Angle Amplification}{6}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Probability of a Near-Coincident Pair}{7}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Effect on the Linear System}{8}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Conjugate Gradient Divergence}{8}{subsection.5.4}%
-\contentsline {section}{\numberline {6}Why the Dip is Localised at 75 Tracks}{8}{section.6}%
-\contentsline {section}{\numberline {7}Step\nobreakspace {}3 Confirmation: Competition Analysis}{9}{section.7}%
-\contentsline {section}{\numberline {8}Comparison Across Angle Settings}{10}{section.8}%
-\contentsline {section}{\numberline {9}Mathematical Summary of the Failure Mode}{10}{section.9}%
-\contentsline {paragraph}{Normal operation.}{10}{section*.16}%
-\contentsline {paragraph}{Near-coincident operation.}{11}{section*.17}%
-\contentsline {section}{\numberline {10}Impact on Step 2 Separation Metric}{11}{section.10}%
-\contentsline {section}{\numberline {11}Conclusions}{11}{section.11}%
-\contentsline {section}{\numberline {A}Numerical Data Tables}{12}{appendix.A}%
-\contentsline {section}{\numberline {B}Step\nobreakspace {}3 Competition Data at $\pm 0.04$\,rad}{13}{appendix.B}%
+\contentsline {section}{Notation and Symbols}{3}{section*.2}%
+\contentsline {section}{\numberline {1}Executive Summary}{6}{section.1}%
+\contentsline {section}{\numberline {2}Study Configuration}{6}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Geometry and Physics Parameters}{6}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Scan Settings}{6}{subsection.2.2}%
+\contentsline {section}{\numberline {3}The Hamiltonian Linear System}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Segment Construction}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Matrix Structure}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Idealised Analytic Solution}{8}{subsection.3.3}%
+\contentsline {paragraph}{False segments (uncoupled):}{8}{section*.12}%
+\contentsline {paragraph}{True segments (chain-coupled):}{8}{section*.13}%
+\contentsline {section}{\numberline {4}Observed Anomaly at $\pm 0.04$\,rad, 75 Tracks}{8}{section.4}%
+\contentsline {section}{\numberline {5}Theoretical Background: Condition Numbers and Gershgorin Discs}{10}{section.5}%
+\contentsline {subsection}{\numberline {5.1}The Condition Number}{10}{subsection.5.1}%
+\contentsline {paragraph}{Interpretation.}{10}{section*.17}%
+\contentsline {paragraph}{Iterative solver convergence.}{10}{section*.18}%
+\contentsline {subsection}{\numberline {5.2}Gershgorin's Circle Theorem}{11}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Application to the Hamiltonian}{11}{subsection.5.3}%
+\contentsline {paragraph}{Sign convention.}{11}{section*.19}%
+\contentsline {paragraph}{Isolated track ($n_\text {seg} = 4$).}{11}{section*.20}%
+\contentsline {paragraph}{Two well-separated tracks.}{11}{section*.21}%
+\contentsline {paragraph}{Two near-coincident tracks ($\Delta \phi _\text {eff} < \varepsilon /f_\text {amp}$).}{12}{section*.22}%
+\contentsline {section}{\numberline {6}Root Cause: Near-Coincident Track Degeneracy}{12}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Cross-Segment Angle Amplification}{12}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Segment Construction and the Coupling Criterion}{14}{subsection.6.2}%
+\contentsline {paragraph}{Stage 1: Cartesian segment generation.}{14}{section*.24}%
+\contentsline {paragraph}{Stage 2: Pairwise coupling via the angle test.}{14}{section*.25}%
+\contentsline {paragraph}{How the cross-path kink angle is determined.}{14}{section*.26}%
+\contentsline {subsection}{\numberline {6.3}Why Two Tracks Suffice}{15}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Probability of a Near-Coincident Pair}{15}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Effect on the Linear System}{16}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Structural Mechanism of the Condition Number Spike}{16}{subsection.6.6}%
+\contentsline {subsection}{\numberline {6.7}Matrix Indefiniteness}{17}{subsection.6.7}%
+\contentsline {paragraph}{$\gamma $ sensitivity.}{18}{section*.29}%
+\contentsline {paragraph}{Condition number measurement artefact.}{18}{section*.30}%
+\contentsline {subsection}{\numberline {6.8}Conjugate Gradient Divergence}{18}{subsection.6.8}%
+\contentsline {section}{\numberline {7}Why the Dip is Localised at 75 Tracks}{21}{section.7}%
+\contentsline {section}{\numberline {8}Step\nobreakspace {}3 Confirmation: Competition Analysis}{21}{section.8}%
+\contentsline {section}{\numberline {9}Comparison Across Angle Settings}{21}{section.9}%
+\contentsline {section}{\numberline {10}Mathematical Summary of the Failure Mode}{22}{section.10}%
+\contentsline {paragraph}{Normal operation.}{22}{section*.39}%
+\contentsline {paragraph}{Near-coincident operation.}{22}{section*.40}%
+\contentsline {section}{\numberline {11}Impact on Step 2 Separation Metric}{22}{section.11}%
+\contentsline {section}{\numberline {12}Conclusions}{23}{section.12}%
+\contentsline {section}{\numberline {A}Numerical Data Tables}{24}{appendix.A}%
+\contentsline {section}{\numberline {B}Step\nobreakspace {}3 Competition Data at $\pm 0.04$\,rad}{24}{appendix.B}%
