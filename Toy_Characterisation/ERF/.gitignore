@@ -1,0 +1,6 @@
+# Large run outputs — do not version (mirrors other studies: 0 tracked .pkl)
+results/
+logs/
+__pycache__/
+*.pkl
+.ipynb_checkpoints/
