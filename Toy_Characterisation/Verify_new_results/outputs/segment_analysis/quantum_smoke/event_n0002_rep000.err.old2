@@ -1,0 +1,11 @@
+n_trk=2 rep=0
+Traceback (most recent call last):
+  File "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_event.py", line 248, in main
+    result = run_job(args.n_trk, args.rep, args.shots, args.device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_event.py", line 147, in run_job
+    ev = _safe_generate(n_trk,
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_event.py", line 135, in _safe_generate
+    raise RuntimeError(f"Failed to generate event for n_trk={n_trk}: {last_err}")
+RuntimeError: Failed to generate event for n_trk=2: StateEventGenerator.__init__() got an unexpected keyword argument 'geometry'

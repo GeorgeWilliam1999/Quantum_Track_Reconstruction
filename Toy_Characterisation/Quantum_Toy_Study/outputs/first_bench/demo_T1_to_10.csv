@@ -1,0 +1,31 @@
+n_tracks,algorithm,n_seg,ran,n_reco,efficiency,ghost,purity,fidelity,time_s
+1,Classical (solve_direct),2,True,1,1.0,0.0,1.0,1.0,0.00671643391251564
+1,HHL (full),2,True,0,0.0,0.0,0.0,,0.7958778557367623
+1,OneBitHHL,2,True,1,1.0,0.0,1.0,0.9999055054830013,0.1598151819780469
+2,Classical (solve_direct),8,True,1,0.0,1.0,0.0,1.0,0.00014137616381049156
+2,HHL (full),8,True,0,0.0,0.0,0.0,,0.7970788078382611
+2,OneBitHHL,8,True,2,1.0,0.0,1.0,0.7996825237099099,0.17427003616467118
+3,Classical (solve_direct),18,True,1,0.0,1.0,0.0,1.0,0.0001840563490986824
+3,HHL (full),18,True,0,0.0,0.0,0.0,,13.411783323157579
+3,OneBitHHL,18,True,3,1.0,0.0,1.0,0.6845595532679565,0.20349427592009306
+4,Classical (solve_direct),32,True,1,0.0,1.0,0.0,1.0,0.000881971325725317
+4,HHL (full),32,True,1,0.0,1.0,0.0,0.36328563284715615,13.836467898916453
+4,OneBitHHL,32,True,3,0.5,0.3333333333333333,1.0,0.6877573555186456,0.24613304296508431
+5,Classical (solve_direct),50,True,1,0.0,1.0,0.0,1.0,0.00028412602841854095
+5,HHL (full),50,False,0,,,,,
+5,OneBitHHL,50,False,0,,,,,
+6,Classical (solve_direct),72,True,1,0.0,1.0,0.0,1.0,0.00011352356523275375
+6,HHL (full),72,False,0,,,,,
+6,OneBitHHL,72,False,0,,,,,
+7,Classical (solve_direct),98,True,1,0.0,1.0,0.0,1.0,0.00011144997552037239
+7,HHL (full),98,False,0,,,,,
+7,OneBitHHL,98,False,0,,,,,
+8,Classical (solve_direct),128,True,1,0.0,1.0,0.0,1.0,0.00011951522901654243
+8,HHL (full),128,False,0,,,,,
+8,OneBitHHL,128,False,0,,,,,
+9,Classical (solve_direct),162,True,1,0.0,1.0,0.0,1.0,0.00016082311049103737
+9,HHL (full),162,False,0,,,,,
+9,OneBitHHL,162,False,0,,,,,
+10,Classical (solve_direct),200,True,1,0.0,1.0,0.0,1.0,0.00013486389070749283
+10,HHL (full),200,False,0,,,,,
+10,OneBitHHL,200,False,0,,,,,

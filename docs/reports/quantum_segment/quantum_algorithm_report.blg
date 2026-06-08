@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2020)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: quantum_algorithm_report.aux
+The style file: unsrtnat.bst
+Database file #1: refs.bib
+You've used 5 entries,
+            2481 wiz_defined-function locations,
+            587 strings with 5431 characters,
+and the built_in function-call counts, 1747 in all, are:
+= -- 153
+> -- 65
+< -- 6
++ -- 28
+- -- 18
+* -- 101
+:= -- 272
+add.period$ -- 19
+call.type$ -- 5
+change.case$ -- 10
+chr.to.int$ -- 5
+cite$ -- 5
+duplicate$ -- 94
+empty$ -- 174
+format.name$ -- 26
+if$ -- 382
+int.to.chr$ -- 1
+int.to.str$ -- 6
+missing$ -- 3
+newline$ -- 37
+num.names$ -- 15
+pop$ -- 49
+preamble$ -- 1
+purify$ -- 5
+quote$ -- 0
+skip$ -- 67
+stack$ -- 0
+substring$ -- 52
+swap$ -- 19
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 35
+warning$ -- 0
+while$ -- 14
+width$ -- 0
+write$ -- 78

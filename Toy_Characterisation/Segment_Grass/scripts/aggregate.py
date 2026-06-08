@@ -71,6 +71,17 @@ def aggregate(results_dir: str):
             "mean_true_activation": r.get("mean_true_activation", 0.0),
             "mean_false_activation": r.get("mean_false_activation", 0.0),
             "hits_per_mod_mean": r["hits_per_mod_mean"],
+            # Selected-segment corpus
+            "occ_sel_mean": r.get("occ_sel_mean", 0.0),
+            "occ_sel_std": r.get("occ_sel_std", 0.0),
+            "n_anomalous_occ_sel": r.get("n_anomalous_occ_sel", 0),
+            "frac_anomalous_occ_sel": r.get("frac_anomalous_occ_sel", 0.0),
+            "mean_n_segments_sel": r.get("mean_n_segments_sel", 0.0),
+            "mean_n_true_sel": r.get("mean_n_true_sel", 0.0),
+            "mean_n_false_sel": r.get("mean_n_false_sel", 0.0),
+            "mean_true_activation_sel": r.get("mean_true_activation_sel", 0.0),
+            "mean_false_activation_sel": r.get("mean_false_activation_sel", 0.0),
+            "hits_sel_per_mod_mean": r.get("hits_sel_per_mod_mean", {}),
         }
 
     # Save aggregated
@@ -109,6 +120,21 @@ def aggregate(results_dir: str):
         }
         for m in range(5):
             row[f"hits_mod{m}_mean"] = r["hits_per_mod_mean"].get(str(m), 0)
+        # Selected-segment corpus
+        row.update({
+            "occ_sel_mean": r.get("occ_sel_mean", 0.0),
+            "occ_sel_std": r.get("occ_sel_std", 0.0),
+            "n_anomalous_occ_sel": r.get("n_anomalous_occ_sel", 0),
+            "frac_anomalous_occ_sel": r.get("frac_anomalous_occ_sel", 0.0),
+            "mean_n_segments_sel": r.get("mean_n_segments_sel", 0.0),
+            "mean_n_true_sel": r.get("mean_n_true_sel", 0.0),
+            "mean_n_false_sel": r.get("mean_n_false_sel", 0.0),
+            "mean_true_activation_sel": r.get("mean_true_activation_sel", 0.0),
+            "mean_false_activation_sel": r.get("mean_false_activation_sel", 0.0),
+        })
+        for m in range(5):
+            row[f"hits_sel_mod{m}_mean"] = r.get(
+                "hits_sel_per_mod_mean", {}).get(str(m), 0)
         rows.append(row)
 
     with open(agg_dir / "sweep_flat.json", "w") as f:

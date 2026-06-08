@@ -1,0 +1,10 @@
+{
+  "total_jobs": 112,
+  "completed": 112,
+  "failed": 0,
+  "missing": 0,
+  "tasks_found": {
+    "verify_scatt": 56,
+    "verify_res": 56
+  }
+}

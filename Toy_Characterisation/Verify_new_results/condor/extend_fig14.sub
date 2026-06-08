@@ -1,0 +1,21 @@
+universe        = vanilla
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor/run_fig14_extend.sh
+
+initialdir      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results
+
+should_transfer_files = NO
+
+output = $(outdir)/logs/job.$(Cluster).$(Process).out
+error  = $(outdir)/logs/job.$(Cluster).$(Process).err
+log    = $(outdir)/logs/condor.$(Cluster).log
+
++UseOS          = "el9"
++JobCategory    = "medium"
+
+request_cpus    = 2
+request_memory  = 32 GB
+request_disk    = 2 GB
+
+arguments = $(n) $(rep) $(outdir)
+
+queue n, rep from $(params_file)

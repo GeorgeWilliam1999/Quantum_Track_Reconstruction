@@ -1,0 +1,46 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{onebqf}
+\citation{simpleham}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Motivation}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Code parity audit}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Falsifying the obvious suspects}{2}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Padding to $2^n$ (rejected at machine precision)}{2}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Shot noise (rejected by statevector simulation)}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Surviving suspect: the rejection notch}{2}{subsection.3.3}\protected@file@percent }
+\newlabel{eq:weight}{{1}{2}{Surviving suspect: the rejection notch}{equation.3.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Parameter scan}{2}{section.4}\protected@file@percent }
+\newlabel{sec:scan}{{4}{2}{Parameter scan}{section.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Result at the corrected operating point}{2}{section.5}\protected@file@percent }
+\newlabel{sec:fix}{{5}{2}{Result at the corrected operating point}{section.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces $\gamma $ scan at fixed event, $\delta {=}1$, $\varepsilon {=}2\,\mathrm  {m}\mathrm  {rad}$, $n_\mathrm  {trk}{=}2$. ``At notch'' = number of eigenvalues with $|\varphi - 0.5| < 10^{-6}$. Statevector simulation, no shot noise. Source: \texttt  {outputs/quantum\_segment\_analysis/gamma\_sweep\_ntrk2.csv}.\relax }}{3}{table.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:gamma}{{1}{3}{$\gamma $ scan at fixed event, $\delta {=}1$, $\varepsilon {=}\SI {2}{\milli \radian }$, $n_\mathrm {trk}{=}2$. ``At notch'' = number of eigenvalues with $|\varphi - 0.5| < 10^{-6}$. Statevector simulation, no shot noise. Source: \texttt {outputs/quantum\_segment\_analysis/gamma\_sweep\_ntrk2.csv}.\relax }{table.caption.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Statevector OneBitHHL at $\gamma {=}1$, $\delta {=}1$, $\varepsilon {=}2\,\mathrm  {m}\mathrm  {rad}$, five reps per $n_\mathrm  {trk}$. Errors are SEM. Source: \texttt  {outputs/quantum\_segment\_analysis/sweep\_statevector\_gamma1.csv}.\relax }}{3}{table.caption.3}\protected@file@percent }
+\newlabel{tab:fix}{{2}{3}{Statevector OneBitHHL at $\gamma {=}1$, $\delta {=}1$, $\varepsilon {=}\SI {2}{\milli \radian }$, five reps per $n_\mathrm {trk}$. Errors are SEM. Source: \texttt {outputs/quantum\_segment\_analysis/sweep\_statevector\_gamma1.csv}.\relax }{table.caption.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Why the original $\gamma {=}3$ failed}{3}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{3}{section.7}\protected@file@percent }
+\bibcite{onebqf}{1}
+\bibcite{simpleham}{2}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces (a)\nobreakspace  {}Spectrum of $A$ overlaid on the OneBitHHL kept-weight kernel $w(\varphi ){=}\qopname  \relax o{cos}^2(\pi \varphi )$; eight eigenvalues sit on the rejection notch $\varphi = 0.5$ for every $\gamma $ (these are the kernel of $B = A_{00} I - A$, the ``noise'' null-space). The other eight cluster at phases that depend on $\gamma $ and control whether the algorithm preserves or destroys the signal subspace. (b)\nobreakspace  {}Segment efficiency, fidelity and post-selection probability as a function of $\gamma $. The plateau eff$_Q = 1$ on $\gamma \in [0.1, 2]$ shows the algorithm reaches the perfect classical answer once the spectrum sits inside the kept lobe; at the user choice $\gamma {=}3$ (dashed grey line) the spectrum begins to fall back into the notch and a quarter of the signal is lost.\relax }}{4}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:gamma}{{1}{4}{(a)~Spectrum of $A$ overlaid on the OneBitHHL kept-weight kernel $w(\varphi ){=}\cos ^2(\pi \varphi )$; eight eigenvalues sit on the rejection notch $\varphi = 0.5$ for every $\gamma $ (these are the kernel of $B = A_{00} I - A$, the ``noise'' null-space). The other eight cluster at phases that depend on $\gamma $ and control whether the algorithm preserves or destroys the signal subspace. (b)~Segment efficiency, fidelity and post-selection probability as a function of $\gamma $. The plateau eff$_Q = 1$ on $\gamma \in [0.1, 2]$ shows the algorithm reaches the perfect classical answer once the spectrum sits inside the kept lobe; at the user choice $\gamma {=}3$ (dashed grey line) the spectrum begins to fall back into the notch and a quarter of the signal is lost.\relax }{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Reproducibility.}{4}{section*.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Head-to-head comparison of the user's broken regime $\gamma {=}3$ (red) and the corrected $\gamma {=}1$ (green). At $\gamma {=}1$ the quantum solver achieves \emph  {perfect} segment efficiency and purity for every track multiplicity, with classical-vs-quantum cosine $> 0.84$. At $\gamma {=}3$ a quarter of the signal eigenspace sits in the rejection notch and is wiped out. Note that at $\gamma {=}1$ the \emph  {classical} purity collapses (panel\nobreakspace  {}c, blue dashed) because the Hopfield fixed point $\delta /(\gamma +\delta ) = 0.5 > \tau $ activates every segment; the OneBitHHL filter restores purity by projecting onto the surviving signal eigenspace --- a regime where the quantum solver is genuinely better than the classical iteration.\relax }}{5}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:fix}{{2}{5}{Head-to-head comparison of the user's broken regime $\gamma {=}3$ (red) and the corrected $\gamma {=}1$ (green). At $\gamma {=}1$ the quantum solver achieves \emph {perfect} segment efficiency and purity for every track multiplicity, with classical-vs-quantum cosine $> 0.84$. At $\gamma {=}3$ a quarter of the signal eigenspace sits in the rejection notch and is wiped out. Note that at $\gamma {=}1$ the \emph {classical} purity collapses (panel~c, blue dashed) because the Hopfield fixed point $\delta /(\gamma +\delta ) = 0.5 > \tau $ activates every segment; the OneBitHHL filter restores purity by projecting onto the surviving signal eigenspace --- a regime where the quantum solver is genuinely better than the classical iteration.\relax }{figure.caption.4}{}}
+\gdef \@abspage@last{5}

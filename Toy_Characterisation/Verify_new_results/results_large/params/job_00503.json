@@ -1,0 +1,17 @@
+{
+  "job_id": 503,
+  "task": "large_reco",
+  "n_tracks": 250,
+  "event_idx": 3,
+  "phi_max": 0.2,
+  "sigma_scatt": 0.0001,
+  "sigma_res": 0.005,
+  "gamma": 3.0,
+  "delta": 1.0,
+  "scale": 3.0,
+  "dz_mm": 33.0,
+  "n_modules": 5,
+  "z_first": 20.0,
+  "half_x": 50.0,
+  "half_y": 50.0
+}

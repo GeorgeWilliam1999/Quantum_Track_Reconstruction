@@ -1,0 +1,35 @@
+\begin{thebibliography}{4}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Stimpfl-Abele and Garrido(1991)]{stimpfl_garrido}
+G.~Stimpfl-Abele and L.~Garrido.
+\newblock Fast track finding with neural networks.
+\newblock In \emph{Computer Physics Communications}, volume~64, pages 46--56,
+  1991.
+\newblock Original Hopfield-style segment energy formulation.
+
+\bibitem[collaboration(2025)]{velo_toy}
+LHCb VeLo Toy~Model collaboration.
+\newblock {lhcb\_velo\_toy}: a planar velo event-generation and hamiltonian
+  track-reconstruction toy package.
+\newblock \texttt{LHCb\_VeLo\_Toy\_Model} v2.0.0, HEAD \texttt{13ef495}, 2025.
+\newblock [REF NEEDED: published reference if any].
+
+\bibitem[Funke et~al.(2025)]{Funke2025}
+D.~Funke et~al.
+\newblock Quantum and quantum-inspired algorithms for track reconstruction in
+  lhcb.
+\newblock \emph{[REF NEEDED]}, 2025.
+\newblock Original §14e operating point and segment-level paper figures.
+
+\bibitem[{Qiskit contributors}(2024)]{qiskit}
+{Qiskit contributors}.
+\newblock Qiskit: an open-source framework for quantum computing, 2024.
+\newblock Version 2.2.0; \texttt{qiskit-aer} 0.17.2 statevector / sampling
+  simulators.
+
+\end{thebibliography}

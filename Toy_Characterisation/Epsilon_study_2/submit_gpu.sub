@@ -1,0 +1,34 @@
+# ============================================================
+# Epsilon_study_2 — GPU quantum jobs (T≥400, AerSimulator CUDA)
+#
+# Mirrors Verify_new_results/condor_obqf/submit_gpu.sub.
+# Caller supplies via -append:
+#   PARAMS_CSV   absolute path to CSV with the queue rows (16 columns)
+#   LOGDIR       absolute path for condor out/err/log streams
+#   MEM_GB       requested memory
+# ============================================================
+
+universe        = vanilla
++UseOS          = "el9"
++JobCategory    = "long"
+
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/_shared/run_worker.sh
+arguments       = "$(n_trk) $(rep) $(sigma_res) $(sigma_scatt) $(phi_max) $(hit_ineff) $(convolution) $(erf_sigma) $(epsilon) $(gamma) $(delta) $(tau_default) $(run_quantum) $(tag) $(outdir) $(device)"
+
+request_cpus    = 1
+request_gpus    = 1
+request_memory  = $(MEM_GB) GB
+request_disk    = 8 GB
+
+requirements    = (GPUs_Capability >= 7.0)
+
+should_transfer_files = NO
+getenv = True
+
+output = $(LOGDIR)/$(tag)_$(Cluster)_$(Process).out
+error  = $(LOGDIR)/$(tag)_$(Cluster)_$(Process).err
+log    = $(LOGDIR)/$(tag)_$(Cluster).log
+
++MaxRuntime = 86400
+
+queue n_trk, rep, sigma_res, sigma_scatt, phi_max, hit_ineff, convolution, erf_sigma, epsilon, gamma, delta, tau_default, run_quantum, tag, outdir, device from $(PARAMS_CSV)

@@ -1,0 +1,30 @@
+# ============================================================
+# Rethreshold submit: re-run trackers on existing pickles at τ*
+# ============================================================
+# Usage:
+#   condor_submit -append "PARAMS_CSV=/…/params_seg14e_tauopt.csv" \
+#                 -append "LOGDIR=/…/logs_tauopt" \
+#                 condor_obqf/submit_rethreshold.sub
+# ============================================================
+
+universe        = vanilla
++UseOS          = "el9"
++JobCategory    = "short"
+
+initialdir      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results
+
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_rethreshold.sh
+arguments       = "$(n_trk) $(rep) $(readout) $(tau_rel) $(srcdir) $(outdir)"
+
+request_cpus    = 1
+request_memory  = 8 GB
+request_disk    = 2 GB
+
+should_transfer_files   = NO
+getenv                  = True
+
+output = $(LOGDIR)/rethr_$(Cluster)_$(Process).out
+error  = $(LOGDIR)/rethr_$(Cluster)_$(Process).err
+log    = $(LOGDIR)/rethr_$(Cluster).log
+
+queue n_trk, rep, readout, tau_rel, srcdir, outdir from $(PARAMS_CSV)

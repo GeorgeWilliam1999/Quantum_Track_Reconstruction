@@ -1,0 +1,47 @@
+# ============================================================
+# §18d/e — condor GPU submit (1BQF, medium-to-large n with drop_rate + gamma)
+# ============================================================
+# Expects -append:
+#   PARAMS_CSV  : abs path to CSV (n_trk, rep, shots, device, drop_rate, gamma, readout)
+#   RESULTSDIR  : abs path for per-event pickles
+#   LOGDIR      : abs path for condor streams
+# ============================================================
+
+universe        = vanilla
++UseOS          = "el9"
++JobCategory    = "long"
+
+initialdir      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results
+
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_worker.sh
+arguments       = "$(n_trk) $(rep) $(shots) $(device) $(RESULTSDIR) $(drop_rate) $(gamma) $(readout)"
+
+request_cpus    = 1
+# Sparse-A refactor (May 2026): OneBQF.__init__ no longer materialises
+# O(n_seg^2) dense A_padded / B matrices. Statevector itself stays small
+# (n_qubits = ceil(log2(n_seg)) + ~2, so 24 qubits ~ 256 MB fp32) so a
+# single GPU comfortably handles T up to ~2000. We keep the multi-GPU
+# auto-detect in run_event.py as a safety net but always request 1 GPU.
+request_gpus    = 1
+
+# Host memory now dominated by event + sparse Hamiltonian + Qiskit/Aer
+# transient buffers, NOT a dense A. Tighten the tiers accordingly.
+#   T <  150 ->  16 GB
+#   T <  500 ->  32 GB
+#   T < 1500 ->  64 GB
+#   T >= 1500 -> 128 GB
+request_memory  = ifThenElse(int($(n_trk)) >= 1500, 131072, \
+                  ifThenElse(int($(n_trk)) >=  500,  65536, \
+                  ifThenElse(int($(n_trk)) >=  150,  32768, 16384)))
+request_disk    = 8 GB
+
+requirements    = (GPUs_Capability >= 7.0)
+
+should_transfer_files   = NO
+getenv                  = True
+
+output = $(LOGDIR)/obqf_gpu_$(Cluster)_$(Process).out
+error  = $(LOGDIR)/obqf_gpu_$(Cluster)_$(Process).err
+log    = $(LOGDIR)/obqf_gpu_$(Cluster).log
+
+queue n_trk, rep, shots, device, drop_rate, gamma, readout from $(PARAMS_CSV)

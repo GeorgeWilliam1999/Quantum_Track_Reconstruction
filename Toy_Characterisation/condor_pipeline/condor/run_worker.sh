@@ -36,7 +36,7 @@ export MPLBACKEND=Agg
 export PYTHONPATH="$BASE_DIR/scripts:${PYTHONPATH:-}"
 
 # Run the worker
-"$CONDA" run --no-banner -n "$ENV_NAME" python "$WORKER_SCRIPT" \
+"$CONDA" run -n "$ENV_NAME" python "$WORKER_SCRIPT" \
     --params-json "$PARAMS_JSON" \
     --outdir "$JOB_OUTDIR"
 

@@ -1,0 +1,40 @@
+{
+  "total_jobs": 112,
+  "task_counts": {
+    "verify_scatt": 56,
+    "verify_res": 56
+  },
+  "parameters": {
+    "angle_settings": [
+      0.02,
+      0.2
+    ],
+    "track_counts": [
+      10,
+      20,
+      50,
+      100
+    ],
+    "n_events": 20,
+    "sigma_scatt_values": [
+      5e-05,
+      0.0001,
+      0.0002,
+      0.0004,
+      0.0006,
+      0.0008,
+      0.001
+    ],
+    "sigma_res_fixed": 0.0,
+    "sigma_res_values": [
+      0.0,
+      0.005,
+      0.01,
+      0.015,
+      0.02,
+      0.03,
+      0.05
+    ],
+    "sigma_scatt_fixed": 0.0001
+  }
+}

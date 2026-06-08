@@ -1,0 +1,22 @@
+universe        = vanilla
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor/run_worker_large.sh
+
+initialdir      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results
+
+should_transfer_files = NO
+
+output = $(resultsdir)/logs/job.$(Cluster).$(Process).out
+error  = $(resultsdir)/logs/job.$(Cluster).$(Process).err
+log    = $(resultsdir)/logs/condor.$(Cluster).log
+
++UseOS          = "el9"
++JobCategory    = "medium"
+
+# Large events need more resources than small-event jobs
+request_cpus    = 4
+request_memory  = 16 GB
+request_disk    = 2 GB
+
+arguments = $(params_file) $(resultsdir)
+
+queue params_file from $(batches_file)

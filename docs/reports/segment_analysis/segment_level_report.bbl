@@ -1,0 +1,76 @@
+\begin{thebibliography}{9}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Hopfield(1982)]{Hopfield:1982}
+J.~J. Hopfield.
+\newblock Neural networks and physical systems with emergent collective
+  computational abilities.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 79\penalty0
+  (8):\penalty0 2554--2558, 1982.
+\newblock \doi{10.1073/pnas.79.8.2554}.
+
+\bibitem[Denby(1988)]{Denby:1988}
+B.~Denby.
+\newblock Neural networks and cellular automata in experimental high energy
+  physics.
+\newblock \emph{Computer Physics Communications}, 49\penalty0 (3):\penalty0
+  429--448, 1988.
+\newblock \doi{10.1016/0010-4655(88)90004-5}.
+
+\bibitem[Peterson(1989)]{Peterson:1989}
+C.~Peterson.
+\newblock Track finding with neural networks.
+\newblock \emph{Nuclear Instruments and Methods A}, 279\penalty0 (3):\penalty0
+  537--545, 1989.
+\newblock \doi{10.1016/0168-9002(89)91300-4}.
+
+\bibitem[Stimpfl-Abele and Garrido(1991)]{Stimpfl-Abele:1991}
+G.~Stimpfl-Abele and L.~Garrido.
+\newblock Fast track finding with neural networks.
+\newblock \emph{Computer Physics Communications}, 64\penalty0 (1):\penalty0
+  46--56, 1991.
+\newblock \doi{10.1016/0010-4655(91)90048-P}.
+
+\bibitem[Funcke et~al.(2023)Funcke, Hartung, Jansen, K\"uhn, Schneider,
+  Stornati, and Wang]{Funcke:2023:qtracking}
+L.~Funcke, T.~Hartung, K.~Jansen, S.~K\"uhn, M.~Schneider, P.~Stornati, and
+  X.~Wang.
+\newblock Studying quantum algorithms for particle track reconstruction in the
+  luxe experiment.
+\newblock \emph{Journal of Physics: Conference Series}, 2438:\penalty0 012127,
+  2023.
+\newblock \doi{10.1088/1742-6596/2438/1/012127}.
+
+\bibitem[Nilles et~al.(2023)Nilles, Chamberlain, Dietrich, and
+  Schmitt]{Nilles:2023:qtracking}
+M.~Nilles, J.~Chamberlain, F.~Dietrich, and S.~Schmitt.
+\newblock A quantum algorithm for track reconstruction in the lhcb vertex
+  detector.
+\newblock 2023.
+\newblock [REF NEEDED -- placeholder, replace with actual OBQF reference].
+
+\bibitem[Lam et~al.(2015)Lam, Pitrou, and Seibert]{Lam:2015:numba}
+S.~K. Lam, A.~Pitrou, and S.~Seibert.
+\newblock Numba: a {LLVM}-based {Python} {JIT} compiler.
+\newblock In \emph{Proceedings of the Second Workshop on the LLVM Compiler
+  Infrastructure in HPC}, 2015.
+\newblock \doi{10.1145/2833157.2833162}.
+
+\bibitem[{LHCb Collaboration}(2013)]{LHCbVELO:TDR}
+{LHCb Collaboration}.
+\newblock {LHCb VELO Upgrade Technical Design Report}.
+\newblock Technical Report CERN-LHCC-2013-021; LHCB-TDR-013, CERN, 2013.
+\newblock URL \url{https://cds.cern.ch/record/1624070}.
+
+\bibitem[Lehoucq et~al.(1998)Lehoucq, Sorensen, and Yang]{Lehoucq:1998:arpack}
+R.~B. Lehoucq, D.~C. Sorensen, and C.~Yang.
+\newblock {ARPACK} users' guide: Solution of large-scale eigenvalue problems
+  with implicitly restarted arnoldi methods.
+\newblock 1998.
+\newblock \doi{10.1137/1.9780898719628}.
+
+\end{thebibliography}

@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────
+# Large simulation data — too large for GitHub (kept on /data)
+# ─────────────────────────────────────────────────────────────
+*.pkl
+*.pickle
+*.pkl.gz
+*.gz
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.root
+*.parquet
+
+# Large raw event-data dumps (kept on /data, regenerable)
+Toy_Characterisation/Epsilon_study_2/results/eps2_angles.csv
+
+# HTCondor per-job scratch output (regenerable; keep run_summary.json + batches.txt)
+Toy_Characterisation/condor_pipeline/results_opt/job_*/
+
+# ─────────────────────────────────────────────────────────────
+# HTCondor job logs / scheduler output
+# ─────────────────────────────────────────────────────────────
+*.out
+*.err
+*.log
+**/logs/
+
+# ─────────────────────────────────────────────────────────────
+# Python
+# ─────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ipynb_checkpoints/
+
+# ─────────────────────────────────────────────────────────────
+# Editor / agent / OS cruft
+# ─────────────────────────────────────────────────────────────
+.vscode/
+.claude/
+.DS_Store
+
+# Embedded OneBQF clones (tracked in their own forks)
+OneBQF_repo/
+Toy_Characterisation/Quantum_Toy_Study/OneBQF/

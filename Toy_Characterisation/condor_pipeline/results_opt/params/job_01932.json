@@ -1,0 +1,12 @@
+{
+  "task": "param_opt",
+  "job_id": 1932,
+  "angle": 0.04,
+  "n_tracks": 100,
+  "scale": 20,
+  "theta_d": 0.01,
+  "measurement_error": 0.05,
+  "collision_noise": 5e-05,
+  "convolution": true,
+  "n_repeats": 3
+}

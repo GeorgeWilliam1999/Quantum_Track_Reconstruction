@@ -1,0 +1,28 @@
+         319823 function calls (318355 primitive calls) in 0.371 seconds
+
+   Ordered by: cumulative time
+   List reduced from 858 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       11    0.004    0.000    1.537    0.140 aer_compiler.py:875(_assemble_op)
+        1    0.000    0.000    0.266    0.266 generate_preset_pass_manager.py:40(generate_preset_pass_manager)
+      158    0.026    0.000    0.246    0.002 aerbackend.py:237(target)
+        1    0.004    0.004    0.241    0.241 generate_preset_pass_manager.py:323(_parse_basis_gates)
+      161    0.001    0.000    0.173    0.001 base_events.py:1922(_run_once)
+      162    0.001    0.000    0.113    0.001 events.py:86(_run)
+    15484    0.026    0.000    0.111    0.000 target.py:356(add_instruction)
+      162    0.000    0.000    0.099    0.001 {method 'run' of '_contextvars.Context' objects}
+      158    0.000    0.000    0.096    0.001 ioloop.py:750(_run_callback)
+      159    0.016    0.000    0.094    0.001 __init__.py:48(get_standard_gate_name_mapping)
+      162    0.001    0.000    0.093    0.001 zmqstream.py:573(_handle_events)
+      158    0.000    0.000    0.091    0.001 zmqstream.py:684(<lambda>)
+       53    0.002    0.000    0.084    0.002 backend.py:143(operation_names)
+    15484    0.066    0.000    0.075    0.000 {function Target.add_instruction at 0x7f56fdf32340}
+       39    0.000    0.000    0.049    0.001 base_tasks.py:72(execute)
+       40    0.000    0.000    0.049    0.001 __init__.py:1529(info)
+       40    0.000    0.000    0.049    0.001 __init__.py:1660(_log)
+       40    0.000    0.000    0.049    0.001 __init__.py:1686(handle)
+       40    0.000    0.000    0.049    0.001 __init__.py:1746(callHandlers)
+       40    0.000    0.000    0.048    0.001 __init__.py:1011(handle)
+
+

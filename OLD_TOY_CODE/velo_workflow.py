@@ -90,6 +90,7 @@ def parse_n_particles(config_str: str) -> list:
 # Shared helpers
 # =====================================================================
 
+# OLD 
 def epsilon_window(meas_err, coll_noise, dz, scale, theta_min):
     theta_s = scale * coll_noise
     theta_r = np.arctan((scale * meas_err) / dz) if dz != 0 else 0.0

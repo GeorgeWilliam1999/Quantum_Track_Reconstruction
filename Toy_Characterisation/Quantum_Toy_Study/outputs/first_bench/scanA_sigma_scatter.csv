@@ -1,0 +1,91 @@
+param,value,event,algorithm,n_seg,ran,efficiency,ghost,purity,fidelity,time_s
+sigma_scatter,1e-05,0,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0003979490138590336
+sigma_scatter,1e-05,0,HHL (full),18,True,0.0,0.0,0.0,,14.917524928692728
+sigma_scatter,1e-05,0,OneBitHHL,18,True,1.0,0.0,1.0,0.6811757244906177,0.25850296718999743
+sigma_scatter,1e-05,1,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0001652417704463005
+sigma_scatter,1e-05,1,HHL (full),18,True,0.0,0.0,0.0,,14.184673951938748
+sigma_scatter,1e-05,1,OneBitHHL,18,True,1.0,0.0,1.0,0.6848532748708284,0.20862581301480532
+sigma_scatter,1e-05,2,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0007831454277038574
+sigma_scatter,1e-05,2,HHL (full),18,True,0.0,1.0,0.0,0.41382993959025416,14.186435790266842
+sigma_scatter,1e-05,2,OneBitHHL,18,True,1.0,0.0,1.0,0.684735858446299,0.19860662799328566
+sigma_scatter,1e-05,3,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00011588865891098976
+sigma_scatter,1e-05,3,HHL (full),18,True,0.0,0.0,0.0,,14.869243751745671
+sigma_scatter,1e-05,3,OneBitHHL,18,True,1.0,0.0,1.0,0.685064125693066,0.20326040405780077
+sigma_scatter,1e-05,4,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0001156982034444809
+sigma_scatter,1e-05,4,HHL (full),18,True,0.0,0.0,0.0,,15.57870206842199
+sigma_scatter,1e-05,4,OneBitHHL,18,True,1.0,0.0,1.0,0.6830192431695709,0.21947154495865107
+sigma_scatter,5e-05,0,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0002569137141108513
+sigma_scatter,5e-05,0,HHL (full),18,True,0.0,0.0,0.0,,16.281709033064544
+sigma_scatter,5e-05,0,OneBitHHL,18,True,1.0,0.0,1.0,0.6849933789730673,0.24755743565037847
+sigma_scatter,5e-05,1,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0001279008574783802
+sigma_scatter,5e-05,1,HHL (full),18,True,0.0,0.0,0.0,,14.954348411411047
+sigma_scatter,5e-05,1,OneBitHHL,18,True,1.0,0.0,1.0,0.6836037715055261,0.20832967478781939
+sigma_scatter,5e-05,2,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0002870108000934124
+sigma_scatter,5e-05,2,HHL (full),18,True,0.0,0.0,0.0,,17.698106030002236
+sigma_scatter,5e-05,2,OneBitHHL,18,True,1.0,0.0,1.0,0.6843324131963628,0.23686427529901266
+sigma_scatter,5e-05,3,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0003337091766297817
+sigma_scatter,5e-05,3,HHL (full),18,True,0.0,0.0,0.0,,15.322884812951088
+sigma_scatter,5e-05,3,OneBitHHL,18,True,1.0,0.0,1.0,0.6842169123846364,0.22082199389114976
+sigma_scatter,5e-05,4,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00023363018408417702
+sigma_scatter,5e-05,4,HHL (full),18,True,0.0,1.0,0.0,0.3987883150085214,17.580935447011143
+sigma_scatter,5e-05,4,OneBitHHL,18,True,1.0,0.0,1.0,0.6847150308609739,0.228189327288419
+sigma_scatter,0.0001,0,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00011985562741756439
+sigma_scatter,0.0001,0,HHL (full),18,True,0.0,0.0,0.0,,16.025181582197547
+sigma_scatter,0.0001,0,OneBitHHL,18,True,1.0,0.0,1.0,0.6857404324365002,0.2307523670606315
+sigma_scatter,0.0001,1,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00024580303579568863
+sigma_scatter,0.0001,1,HHL (full),18,True,0.0,0.0,0.0,,18.32243182370439
+sigma_scatter,0.0001,1,OneBitHHL,18,True,1.0,0.0,1.0,0.6854058333863512,0.23917089076712728
+sigma_scatter,0.0001,2,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00036062905564904213
+sigma_scatter,0.0001,2,HHL (full),18,True,0.0,0.0,0.0,,15.623627569060773
+sigma_scatter,0.0001,2,OneBitHHL,18,True,1.0,0.0,1.0,0.6849144611487007,0.26126525504514575
+sigma_scatter,0.0001,3,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00043010013177990913
+sigma_scatter,0.0001,3,HHL (full),18,True,0.0,0.0,0.0,,16.32476511504501
+sigma_scatter,0.0001,3,OneBitHHL,18,True,1.0,0.0,1.0,0.6845265192741543,0.24395531695336103
+sigma_scatter,0.0001,4,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0003785332664847374
+sigma_scatter,0.0001,4,HHL (full),18,True,0.0,0.0,0.0,,16.54197338875383
+sigma_scatter,0.0001,4,OneBitHHL,18,True,1.0,0.0,1.0,0.6833379252342298,0.24956414522603154
+sigma_scatter,0.0002,0,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00032831914722919464
+sigma_scatter,0.0002,0,HHL (full),18,True,0.0,0.0,0.0,,16.208779477048665
+sigma_scatter,0.0002,0,OneBitHHL,18,True,1.0,0.0,1.0,0.6856083846129699,0.23160429671406746
+sigma_scatter,0.0002,1,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0014735357835888863
+sigma_scatter,0.0002,1,HHL (full),18,True,0.0,0.0,0.0,,19.555544815957546
+sigma_scatter,0.0002,1,OneBitHHL,18,True,1.0,0.0,1.0,0.6843885377239786,0.28353291330859065
+sigma_scatter,0.0002,2,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0004292191006243229
+sigma_scatter,0.0002,2,HHL (full),18,True,0.0,0.0,0.0,,16.40628464287147
+sigma_scatter,0.0002,2,OneBitHHL,18,True,1.0,0.0,1.0,0.6836991799800008,0.27980914805084467
+sigma_scatter,0.0002,3,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00046777212992310524
+sigma_scatter,0.0002,3,HHL (full),18,True,0.0,0.0,0.0,,17.52519858814776
+sigma_scatter,0.0002,3,OneBitHHL,18,True,1.0,0.0,1.0,0.6808560260617733,0.2676455629989505
+sigma_scatter,0.0002,4,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00015534274280071259
+sigma_scatter,0.0002,4,HHL (full),18,True,0.0,0.0,0.0,,17.55735161481425
+sigma_scatter,0.0002,4,OneBitHHL,18,True,1.0,0.0,1.0,0.6839564864337322,0.24411806417629123
+sigma_scatter,0.0005,0,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00034342706203460693
+sigma_scatter,0.0005,0,HHL (full),18,True,0.0,1.0,0.0,0.4138299395902845,16.807726033963263
+sigma_scatter,0.0005,0,OneBitHHL,18,True,1.0,0.0,1.0,0.6838855307432674,0.25689740059897304
+sigma_scatter,0.0005,1,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00025392789393663406
+sigma_scatter,0.0005,1,HHL (full),18,True,0.0,0.0,0.0,,16.682152225170285
+sigma_scatter,0.0005,1,OneBitHHL,18,True,0.3333333333333333,0.5,1.0,0.7877184430175678,0.2841549962759018
+sigma_scatter,0.0005,2,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00035147229209542274
+sigma_scatter,0.0005,2,HHL (full),18,True,0.0,1.0,0.0,0.3987883150089602,17.855323053896427
+sigma_scatter,0.0005,2,OneBitHHL,18,True,1.0,0.0,1.0,0.684974009636849,0.24069219268858433
+sigma_scatter,0.0005,3,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00014305999502539635
+sigma_scatter,0.0005,3,HHL (full),18,True,0.0,0.0,0.0,,16.6010559219867
+sigma_scatter,0.0005,3,OneBitHHL,18,True,1.0,0.0,1.0,0.6845319338720479,0.24136142386123538
+sigma_scatter,0.0005,4,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00030198879539966583
+sigma_scatter,0.0005,4,HHL (full),18,True,0.0,1.0,0.0,0.3987883150085214,16.831661588978022
+sigma_scatter,0.0005,4,OneBitHHL,18,True,1.0,0.0,1.0,0.6848812282605815,0.27043676096946
+sigma_scatter,0.001,0,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00012780120596289635
+sigma_scatter,0.001,0,HHL (full),18,True,0.0,0.0,0.0,,16.57082039117813
+sigma_scatter,0.001,0,OneBitHHL,18,True,1.0,0.0,1.0,0.6850076920232646,0.25750525388866663
+sigma_scatter,0.001,1,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00035784393548965454
+sigma_scatter,0.001,1,HHL (full),18,True,0.0,0.0,0.0,,16.956370511092246
+sigma_scatter,0.001,1,OneBitHHL,18,True,1.0,0.0,1.0,0.6837224295529089,0.273621573112905
+sigma_scatter,0.001,2,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00033958861604332924
+sigma_scatter,0.001,2,HHL (full),18,True,0.0,0.0,0.0,,17.595550485420972
+sigma_scatter,0.001,2,OneBitHHL,18,True,1.0,0.0,1.0,0.6851002886841496,0.2522505121305585
+sigma_scatter,0.001,3,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0005777077749371529
+sigma_scatter,0.001,3,HHL (full),18,True,0.0,0.0,0.0,,18.578271944075823
+sigma_scatter,0.001,3,OneBitHHL,18,True,0.3333333333333333,0.5,1.0,0.7814524713497377,0.2650136318989098
+sigma_scatter,0.001,4,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00036550918594002724
+sigma_scatter,0.001,4,HHL (full),18,True,0.0,0.0,0.0,,17.106127401813865
+sigma_scatter,0.001,4,OneBitHHL,18,True,0.3333333333333333,0.5,1.0,0.7796047857404808,0.27881939709186554

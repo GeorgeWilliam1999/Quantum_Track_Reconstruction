@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2020)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: generalisability_mini_report.aux
+The style file: unsrt.bst
+Database file #1: refs.bib
+Warning--empty journal in Lehoucq:1998:arpack
+You've used 26 entries,
+            1791 wiz_defined-function locations,
+            629 strings with 7490 characters,
+and the built_in function-call counts, 5954 in all, are:
+= -- 542
+> -- 223
+< -- 2
++ -- 86
+- -- 60
+* -- 421
+:= -- 929
+add.period$ -- 76
+call.type$ -- 26
+change.case$ -- 25
+chr.to.int$ -- 0
+cite$ -- 27
+duplicate$ -- 246
+empty$ -- 614
+format.name$ -- 60
+if$ -- 1313
+int.to.chr$ -- 0
+int.to.str$ -- 26
+missing$ -- 24
+newline$ -- 131
+num.names$ -- 26
+pop$ -- 64
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 110
+stack$ -- 0
+substring$ -- 505
+swap$ -- 45
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 1
+while$ -- 63
+width$ -- 28
+write$ -- 278
+(There was 1 warning)

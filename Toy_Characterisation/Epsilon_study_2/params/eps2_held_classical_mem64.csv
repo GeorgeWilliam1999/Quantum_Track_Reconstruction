@@ -1,0 +1,7 @@
+700,1,0.01,0.0001,0.2,0.0,0,0.0001,0.0031777035588293387,3.0,1.0,0.35,0,eps2_sr0.01_ss0.0001,/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Epsilon_study_2/results/sensitivity/sr0.01_ss0.0001
+700,2,0.01,0.0001,0.2,0.0,0,0.0001,0.0031777035588293387,3.0,1.0,0.35,0,eps2_sr0.01_ss0.0001,/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Epsilon_study_2/results/sensitivity/sr0.01_ss0.0001
+700,0,0.01,0.0005,0.2,0.0,0,0.0001,0.003797077811659467,3.0,1.0,0.35,0,eps2_sr0.01_ss0.0005,/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Epsilon_study_2/results/sensitivity/sr0.01_ss0.0005
+700,1,0.01,0.0005,0.2,0.0,0,0.0001,0.003797077811659467,3.0,1.0,0.35,0,eps2_sr0.01_ss0.0005,/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Epsilon_study_2/results/sensitivity/sr0.01_ss0.0005
+700,2,0.01,0.0005,0.2,0.0,0,0.0001,0.003797077811659467,3.0,1.0,0.35,0,eps2_sr0.01_ss0.0005,/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Epsilon_study_2/results/sensitivity/sr0.01_ss0.0005
+700,1,0.0,0.0001,0.2,0.0,0,0.0001,0.0004247940677551889,3.0,1.0,0.35,0,eps2_sr0_ss0.0001,/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Epsilon_study_2/results/sensitivity/sr0_ss0.0001
+700,2,0.0,0.0005,0.2,0.0,0,0.0001,0.002121426406925303,3.0,1.0,0.35,0,eps2_sr0_ss0.0005,/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Epsilon_study_2/results/sensitivity/sr0_ss0.0005

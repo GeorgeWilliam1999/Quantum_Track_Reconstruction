@@ -1,0 +1,151 @@
+param,value,event,algorithm,n_seg,ran,efficiency,ghost,purity,fidelity,time_s
+n_tracks,1,0,Classical (solve_direct),2,True,1.0,0.0,1.0,1.0,0.00033493107184767723
+n_tracks,1,0,HHL (full),2,True,0.0,0.0,0.0,,0.39588505029678345
+n_tracks,1,0,OneBitHHL,2,True,1.0,0.0,1.0,0.9997682421326226,0.1808661869727075
+n_tracks,1,1,Classical (solve_direct),2,True,1.0,0.0,1.0,1.0,0.0013724761083722115
+n_tracks,1,1,HHL (full),2,True,0.0,0.0,0.0,,0.3656862648203969
+n_tracks,1,1,OneBitHHL,2,True,1.0,0.0,1.0,0.9998301048500531,0.17617025831714272
+n_tracks,1,2,Classical (solve_direct),2,True,1.0,0.0,1.0,1.0,0.0010524732060730457
+n_tracks,1,2,HHL (full),2,True,0.0,0.0,0.0,,0.3708574492484331
+n_tracks,1,2,OneBitHHL,2,True,1.0,0.0,1.0,0.9999914903046462,0.17512785410508513
+n_tracks,1,3,Classical (solve_direct),2,True,1.0,0.0,1.0,1.0,0.0011942805722355843
+n_tracks,1,3,HHL (full),2,True,0.0,0.0,0.0,,0.40059132780879736
+n_tracks,1,3,OneBitHHL,2,True,1.0,0.0,1.0,1.0000000000000002,0.17168846307322383
+n_tracks,1,4,Classical (solve_direct),2,True,1.0,0.0,1.0,1.0,0.001047343946993351
+n_tracks,1,4,HHL (full),2,True,0.0,0.0,0.0,,0.4110537339001894
+n_tracks,1,4,OneBitHHL,2,True,1.0,0.0,1.0,0.9999992200489367,0.18392182467505336
+n_tracks,2,0,Classical (solve_direct),8,True,0.0,1.0,0.0,1.0,0.0011937986128032207
+n_tracks,2,0,HHL (full),8,True,0.0,0.0,0.0,,0.8023581118322909
+n_tracks,2,0,OneBitHHL,8,True,1.0,0.0,1.0,0.799167704894516,0.178958002012223
+n_tracks,2,1,Classical (solve_direct),8,True,0.0,1.0,0.0,1.0,0.0011165840551257133
+n_tracks,2,1,HHL (full),8,True,0.0,0.0,0.0,,0.758040321059525
+n_tracks,2,1,OneBitHHL,8,True,1.0,0.0,1.0,0.7995113543959129,0.1776804239489138
+n_tracks,2,2,Classical (solve_direct),8,True,0.0,1.0,0.0,1.0,0.0011187284253537655
+n_tracks,2,2,HHL (full),8,True,0.0,0.0,0.0,,5.6499358168803155
+n_tracks,2,2,OneBitHHL,8,True,1.0,0.0,1.0,0.7996153201657205,0.20971093093976378
+n_tracks,2,3,Classical (solve_direct),8,True,0.0,1.0,0.0,1.0,0.001258120872080326
+n_tracks,2,3,HHL (full),8,True,0.0,0.0,0.0,,0.7905201353132725
+n_tracks,2,3,OneBitHHL,8,True,1.0,0.0,1.0,0.7994395776362835,0.19955556513741612
+n_tracks,2,4,Classical (solve_direct),8,True,0.0,1.0,0.0,1.0,0.0015003373846411705
+n_tracks,2,4,HHL (full),8,True,0.0,0.0,0.0,,0.7941036778502166
+n_tracks,2,4,OneBitHHL,8,True,1.0,0.0,1.0,0.7997402667273382,0.1983893672004342
+n_tracks,3,0,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0015402920544147491
+n_tracks,3,0,HHL (full),18,True,0.0,0.0,0.0,,13.313494995702058
+n_tracks,3,0,OneBitHHL,18,True,1.0,0.0,1.0,0.6856565367260585,0.24455546122044325
+n_tracks,3,1,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00021423399448394775
+n_tracks,3,1,HHL (full),18,True,0.0,0.0,0.0,,17.33716836804524
+n_tracks,3,1,OneBitHHL,18,True,1.0,0.0,1.0,0.6851857608055555,0.24393373914062977
+n_tracks,3,2,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00025654397904872894
+n_tracks,3,2,HHL (full),18,True,0.0,0.0,0.0,,16.831612449139357
+n_tracks,3,2,OneBitHHL,18,True,1.0,0.0,1.0,0.6838793370800683,0.24040203401818871
+n_tracks,3,3,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.0003547980450093746
+n_tracks,3,3,HHL (full),18,True,0.0,0.0,0.0,,12.60713165299967
+n_tracks,3,3,OneBitHHL,18,True,1.0,0.0,1.0,0.6842473706248524,0.22475818498060107
+n_tracks,3,4,Classical (solve_direct),18,True,0.0,1.0,0.0,1.0,0.00026017986238002777
+n_tracks,3,4,HHL (full),18,True,0.0,0.0,0.0,,17.53583090007305
+n_tracks,3,4,OneBitHHL,18,True,1.0,0.0,1.0,0.6809933472327403,0.27882429491728544
+n_tracks,4,0,Classical (solve_direct),32,True,0.0,1.0,0.0,1.0,0.0003012167289853096
+n_tracks,4,0,HHL (full),32,True,0.0,0.0,0.0,,18.26004820689559
+n_tracks,4,0,OneBitHHL,32,True,1.0,0.0,1.0,0.60894557639369,0.2365615968592465
+n_tracks,4,1,Classical (solve_direct),32,True,0.0,1.0,0.0,1.0,0.00028229178860783577
+n_tracks,4,1,HHL (full),32,True,0.0,0.0,0.0,,17.029740774072707
+n_tracks,4,1,OneBitHHL,32,True,1.0,0.0,1.0,0.6096507222144507,0.25508973095566034
+n_tracks,4,2,Classical (solve_direct),32,True,0.0,1.0,0.0,1.0,0.00036715157330036163
+n_tracks,4,2,HHL (full),32,True,0.0,0.0,0.0,,13.056382403243333
+n_tracks,4,2,OneBitHHL,32,True,1.0,0.0,1.0,0.6087306608289358,0.23435794515535235
+n_tracks,4,3,Classical (solve_direct),32,True,0.0,1.0,0.0,1.0,0.00012132897973060608
+n_tracks,4,3,HHL (full),32,True,0.0,0.0,0.0,,17.29656601930037
+n_tracks,4,3,OneBitHHL,32,True,1.0,0.0,1.0,0.6085073651020184,0.25909625086933374
+n_tracks,4,4,Classical (solve_direct),32,True,0.0,1.0,0.0,1.0,0.00045678019523620605
+n_tracks,4,4,HHL (full),32,True,0.0,0.0,0.0,,17.796163470949978
+n_tracks,4,4,OneBitHHL,32,True,1.0,0.0,1.0,0.6089965867721192,0.25443309312686324
+n_tracks,5,0,Classical (solve_direct),50,True,0.0,1.0,0.0,1.0,0.0001270999200642109
+n_tracks,5,0,HHL (full),50,False,,,,,
+n_tracks,5,0,OneBitHHL,50,False,,,,,
+n_tracks,5,1,Classical (solve_direct),50,True,0.0,1.0,0.0,1.0,9.909598156809807e-05
+n_tracks,5,1,HHL (full),50,False,,,,,
+n_tracks,5,1,OneBitHHL,50,False,,,,,
+n_tracks,5,2,Classical (solve_direct),50,True,0.0,1.0,0.0,1.0,9.147264063358307e-05
+n_tracks,5,2,HHL (full),50,False,,,,,
+n_tracks,5,2,OneBitHHL,50,False,,,,,
+n_tracks,5,3,Classical (solve_direct),50,True,0.0,1.0,0.0,1.0,8.435873314738274e-05
+n_tracks,5,3,HHL (full),50,False,,,,,
+n_tracks,5,3,OneBitHHL,50,False,,,,,
+n_tracks,5,4,Classical (solve_direct),50,True,0.0,1.0,0.0,1.0,8.848682045936584e-05
+n_tracks,5,4,HHL (full),50,False,,,,,
+n_tracks,5,4,OneBitHHL,50,False,,,,,
+n_tracks,6,0,Classical (solve_direct),72,True,0.0,1.0,0.0,1.0,0.00010681105777621269
+n_tracks,6,0,HHL (full),72,False,,,,,
+n_tracks,6,0,OneBitHHL,72,False,,,,,
+n_tracks,6,1,Classical (solve_direct),72,True,0.0,1.0,0.0,1.0,9.324587881565094e-05
+n_tracks,6,1,HHL (full),72,False,,,,,
+n_tracks,6,1,OneBitHHL,72,False,,,,,
+n_tracks,6,2,Classical (solve_direct),72,True,0.0,1.0,0.0,1.0,9.249383583664894e-05
+n_tracks,6,2,HHL (full),72,False,,,,,
+n_tracks,6,2,OneBitHHL,72,False,,,,,
+n_tracks,6,3,Classical (solve_direct),72,True,0.0,1.0,0.0,1.0,9.713321924209595e-05
+n_tracks,6,3,HHL (full),72,False,,,,,
+n_tracks,6,3,OneBitHHL,72,False,,,,,
+n_tracks,6,4,Classical (solve_direct),72,True,0.0,1.0,0.0,1.0,9.6071045845747e-05
+n_tracks,6,4,HHL (full),72,False,,,,,
+n_tracks,6,4,OneBitHHL,72,False,,,,,
+n_tracks,7,0,Classical (solve_direct),98,True,0.0,1.0,0.0,1.0,0.00017141317948698997
+n_tracks,7,0,HHL (full),98,False,,,,,
+n_tracks,7,0,OneBitHHL,98,False,,,,,
+n_tracks,7,1,Classical (solve_direct),98,True,0.0,1.0,0.0,1.0,9.72631387412548e-05
+n_tracks,7,1,HHL (full),98,False,,,,,
+n_tracks,7,1,OneBitHHL,98,False,,,,,
+n_tracks,7,2,Classical (solve_direct),98,True,0.0,1.0,0.0,1.0,9.882589802145958e-05
+n_tracks,7,2,HHL (full),98,False,,,,,
+n_tracks,7,2,OneBitHHL,98,False,,,,,
+n_tracks,7,3,Classical (solve_direct),98,True,0.0,1.0,0.0,1.0,9.752390906214714e-05
+n_tracks,7,3,HHL (full),98,False,,,,,
+n_tracks,7,3,OneBitHHL,98,False,,,,,
+n_tracks,7,4,Classical (solve_direct),98,True,0.0,1.0,0.0,1.0,9.811483323574066e-05
+n_tracks,7,4,HHL (full),98,False,,,,,
+n_tracks,7,4,OneBitHHL,98,False,,,,,
+n_tracks,8,0,Classical (solve_direct),128,True,0.0,1.0,0.0,1.0,0.00010860525071620941
+n_tracks,8,0,HHL (full),128,False,,,,,
+n_tracks,8,0,OneBitHHL,128,False,,,,,
+n_tracks,8,1,Classical (solve_direct),128,True,0.0,1.0,0.0,1.0,0.00011385511606931686
+n_tracks,8,1,HHL (full),128,False,,,,,
+n_tracks,8,1,OneBitHHL,128,False,,,,,
+n_tracks,8,2,Classical (solve_direct),128,True,0.0,1.0,0.0,1.0,0.00010356586426496506
+n_tracks,8,2,HHL (full),128,False,,,,,
+n_tracks,8,2,OneBitHHL,128,False,,,,,
+n_tracks,8,3,Classical (solve_direct),128,True,0.0,1.0,0.0,1.0,0.00010478682816028595
+n_tracks,8,3,HHL (full),128,False,,,,,
+n_tracks,8,3,OneBitHHL,128,False,,,,,
+n_tracks,8,4,Classical (solve_direct),128,True,0.0,1.0,0.0,1.0,0.00010595005005598068
+n_tracks,8,4,HHL (full),128,False,,,,,
+n_tracks,8,4,OneBitHHL,128,False,,,,,
+n_tracks,9,0,Classical (solve_direct),162,True,0.0,1.0,0.0,1.0,0.0001230323687195778
+n_tracks,9,0,HHL (full),162,False,,,,,
+n_tracks,9,0,OneBitHHL,162,False,,,,,
+n_tracks,9,1,Classical (solve_direct),162,True,0.0,1.0,0.0,1.0,0.00011732103303074837
+n_tracks,9,1,HHL (full),162,False,,,,,
+n_tracks,9,1,OneBitHHL,162,False,,,,,
+n_tracks,9,2,Classical (solve_direct),162,True,0.0,1.0,0.0,1.0,0.00010682083666324615
+n_tracks,9,2,HHL (full),162,False,,,,,
+n_tracks,9,2,OneBitHHL,162,False,,,,,
+n_tracks,9,3,Classical (solve_direct),162,True,0.0,1.0,0.0,1.0,0.0001108488067984581
+n_tracks,9,3,HHL (full),162,False,,,,,
+n_tracks,9,3,OneBitHHL,162,False,,,,,
+n_tracks,9,4,Classical (solve_direct),162,True,0.0,1.0,0.0,1.0,0.00013066595420241356
+n_tracks,9,4,HHL (full),162,False,,,,,
+n_tracks,9,4,OneBitHHL,162,False,,,,,
+n_tracks,10,0,Classical (solve_direct),200,True,0.0,1.0,0.0,1.0,0.00012751109898090363
+n_tracks,10,0,HHL (full),200,False,,,,,
+n_tracks,10,0,OneBitHHL,200,False,,,,,
+n_tracks,10,1,Classical (solve_direct),200,True,0.0,1.0,0.0,1.0,0.00012087775394320488
+n_tracks,10,1,HHL (full),200,False,,,,,
+n_tracks,10,1,OneBitHHL,200,False,,,,,
+n_tracks,10,2,Classical (solve_direct),200,True,0.0,1.0,0.0,1.0,0.00012894300743937492
+n_tracks,10,2,HHL (full),200,False,,,,,
+n_tracks,10,2,OneBitHHL,200,False,,,,,
+n_tracks,10,3,Classical (solve_direct),200,True,0.0,1.0,0.0,1.0,0.00018024956807494164
+n_tracks,10,3,HHL (full),200,False,,,,,
+n_tracks,10,3,OneBitHHL,200,False,,,,,
+n_tracks,10,4,Classical (solve_direct),200,True,0.0,1.0,0.0,1.0,0.00012984499335289001
+n_tracks,10,4,HHL (full),200,False,,,,,
+n_tracks,10,4,OneBitHHL,200,False,,,,,

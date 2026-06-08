@@ -1,0 +1,12 @@
+n_trk=2 rep=0
+Traceback (most recent call last):
+  File "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_event.py", line 257, in main
+    result = run_job(args.n_trk, args.rep, args.shots, args.device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_event.py", line 159, in run_job
+    n_hits = sum(len(m.hits) for m in ev.modules)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_event.py", line 159, in <genexpr>
+    n_hits = sum(len(m.hits) for m in ev.modules)
+                     ^^^^^^
+AttributeError: 'Module' object has no attribute 'hits'

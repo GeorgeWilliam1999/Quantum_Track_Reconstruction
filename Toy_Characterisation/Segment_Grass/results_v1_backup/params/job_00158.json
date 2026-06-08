@@ -1,0 +1,8 @@
+{
+  "job_id": 158,
+  "angle": 0.1,
+  "n_tracks": 50,
+  "ghost_rate": 0.1,
+  "drop_rate": 0.1,
+  "n_repeats": 10
+}

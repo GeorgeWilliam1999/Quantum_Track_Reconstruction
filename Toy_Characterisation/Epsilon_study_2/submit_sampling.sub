@@ -1,0 +1,32 @@
+# ============================================================
+# HTCondor submit for Epsilon_study_2 sampling-mode jobs.
+# Identical to _shared/submit_base.sub except the queue line
+# includes a 16th column ``shots`` passed to run_worker.sh.
+#
+# Caller supplies via -append:
+#   PARAMS_CSV   absolute path to CSV with the queue rows
+#   LOGDIR       absolute path for condor out/err/log streams
+#   MEM_GB       requested memory (default 16)
+# ============================================================
+
+universe        = vanilla
++UseOS          = "el9"
++JobCategory    = "medium"
+
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/_shared/run_worker.sh
+arguments       = "$(n_trk) $(rep) $(sigma_res) $(sigma_scatt) $(phi_max) $(hit_ineff) $(convolution) $(erf_sigma) $(epsilon) $(gamma) $(delta) $(tau_default) $(run_quantum) $(tag) $(outdir) $(shots)"
+
+request_cpus    = 2
+request_memory  = $(MEM_GB) GB
+request_disk    = 4 GB
+
+should_transfer_files = NO
+getenv = True
+
+output = $(LOGDIR)/$(tag)_$(Cluster)_$(Process).out
+error  = $(LOGDIR)/$(tag)_$(Cluster)_$(Process).err
+log    = $(LOGDIR)/$(tag)_$(Cluster).log
+
++MaxRuntime = 86400
+
+queue n_trk, rep, sigma_res, sigma_scatt, phi_max, hit_ineff, convolution, erf_sigma, epsilon, gamma, delta, tau_default, run_quantum, tag, outdir, shots from $(PARAMS_CSV)

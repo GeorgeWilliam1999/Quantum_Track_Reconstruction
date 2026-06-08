@@ -1,0 +1,392 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks,colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\newcommand{\OBQF}{\textsc{1BQF}}
+\newcommand{\bra}[1]{\langle #1 |}
+\newcommand{\ket}[1]{| #1 \rangle}
+\newcommand{\braket}[2]{\langle #1 | #2 \rangle}
+
+\title{Generalisability of the 1\,bit Quantum Filter (\OBQF{}) Beyond Track Reconstruction\\[2pt]
+\large A response to Reviewer~2's ``too tailored to this Hamiltonian'' concern}
+\author{LHCb Quantum Tracking working note}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+The reviewer asks whether the spectral-filter trick at the heart of our quantum
+track-reconstruction pipeline -- which we will refer to as the
+\emph{one-bit quantum filter} (\OBQF{}) -- is specific to the LHCb VELO
+Hopfield Hamiltonian, or whether it represents a more general computational
+primitive.  This note argues, with citations, that \OBQF{} is a
+\emph{problem-class-level} primitive: it is the minimal quantum
+linear-system (HHL-type) circuit whenever (i)~the system matrix admits a
+\emph{bimodal} spectrum with one cluster of physically irrelevant
+``noise'' eigenvalues, (ii)~the right-hand side preparation is uniform or
+otherwise gate-cheap, and (iii)~the quantity of interest is a low-weight
+expectation value of the solution, not the full solution vector.  We
+identify families of problems where these three conditions hold by
+construction (associative memory recall, graph-Laplacian / Hopfield-QUBO
+optimisation, kernel-method classifiers, fitting with quadratic
+regularisers, certain PDE inverse problems, image template-matching), and
+delimit where they do not (dense linear regression with arbitrary right
+hand sides, problems requiring full state tomography, ill-conditioned
+systems with continuous spectra).
+\end{abstract}
+
+\section{What the 1\,bit Quantum Filter actually is}
+\label{sec:definition}
+
+In the published track-reconstruction work the quantum solver receives a
+Hopfield-Hamiltonian linear system $\mathbf{A}\,\mathbf{x} = \mathbf{b}$
+constructed from the segment graph of a VELO event, with $\mathbf{A}$ a
+real symmetric positive-definite matrix of dimension $N$ equal to the
+number of admissible doublet/segment candidates.  The key spectral
+observation -- already implicit in the original Hopfield/Stimpfl-Abele
+formulation \cite{Hopfield:1982,StimpflAbele:1991,Denby:1988} -- is that
+$\mathbf{A}$ has a \emph{bimodal} spectrum:
+\begin{itemize}[leftmargin=1.2em,topsep=2pt,itemsep=2pt]
+  \item a small cluster of ``signal'' eigenvalues
+        $\{\lambda_s\}$, whose eigenvectors are supported on the segments
+        belonging to true tracks;
+  \item a large cluster of ``noise'' eigenvalues, concentrated around
+        a single, analytically known value $\lambda_n \approx \gamma$
+        (the conflict-penalty coupling), whose eigenvectors are the
+        Hopfield ``basins'' of incompatible-segment configurations.
+\end{itemize}
+
+\OBQF{} is the HHL pipeline of \cite{Harrow:2009} reduced to a
+\emph{single} clock (phase-estimation) qubit, $n_t = 1$.  Because the
+phase register has only two computational-basis states, the controlled
+inverse rotation can resolve only \emph{two} eigenvalue bins.  This is
+exactly the resolution required: one bin captures the noise cluster and
+its amplitude is rejected via the ancilla post-selection, the other bin
+captures the signal cluster.  Schematically, with
+$\Pi_\mathrm{sig} = \sum_{\lambda \in \{\lambda_s\}} \ket{\lambda}\bra{\lambda}$
+and $\Pi_\mathrm{noise} = \mathbb{1} - \Pi_\mathrm{sig}$,
+\begin{equation}
+  \ket{\psi_{\mathrm{post}}}
+  \;\propto\;
+  \Pi_\mathrm{sig}\,\ket{\mathbf{b}}
+  \;+\;\mathcal{O}\!\bigl(\sqrt{p_\mathrm{leak}}\bigr)\,\Pi_\mathrm{noise}\,\ket{\mathbf{b}},
+  \label{eq:filter}
+\end{equation}
+where $p_\mathrm{leak}$ is set by the spectral gap
+$\Delta = |\lambda_n - \lambda_s|$ and the QPE resolution.  The
+final answer is read out as the expectation value of an
+$\mathcal{O}(1)$-weight observable (in our case the
+which-segment-is-active projector on a chosen qubit), not as a full
+amplitude vector.
+
+The three structural ingredients that make this work are therefore:
+\begin{enumerate}[label=(\textbf{S\arabic*}),leftmargin=2.4em,topsep=2pt,itemsep=2pt]
+  \item \textbf{Bimodal spectrum} with one analytically known cluster
+        eigenvalue $\lambda_n$ that is irrelevant to the answer.
+  \item \textbf{Gate-cheap right-hand side}: $\ket{\mathbf{b}}$
+        preparable without QRAM (in our case $\ket{\mathbf{b}}=H^{\otimes
+        n_s}\ket{0}$, the uniform superposition).
+  \item \textbf{Low-weight observable}: the answer is
+        $\bra{\psi}O\ket{\psi}$ with $O$ supported on $\mathcal{O}(1)$
+        qubits, not the amplitudes of $\ket{\psi}$ themselves.
+\end{enumerate}
+None of (S1)--(S3) refers to tracking, to LHCb, or even to physics. Any
+problem that admits this triple is an \OBQF{} problem.
+
+\section{Why \OBQF{} is structurally transferable}
+\label{sec:why-transferable}
+
+\OBQF{} is best understood as a special case of the broader family of
+\emph{quantum eigenvalue / singular-value transformations} (QSVT)
+\cite{Gilyen:2019,Martyn:2021}, in which a polynomial $P(\mathbf{A})$ of
+the system matrix is implemented coherently, and matrix inversion is
+recovered by choosing $P(\lambda) \approx 1/\lambda$.  The full QSVT
+construction is overkill if one only needs the projector
+$P(\lambda) \approx \mathbf{1}_{\lambda \in [\lambda_s^-,\lambda_s^+]}$
+that separates two clusters: a single bit of phase resolution is
+sufficient by Kitaev's iterative phase-estimation argument
+\cite{Kitaev:1995,Higgins:2007}.  In other words \OBQF{} is the
+\emph{cheapest non-trivial QSVT} that still solves a useful problem; it
+is interesting precisely because so many useful problems satisfy
+(S1)--(S3) and therefore do not require the full polynomial machinery.
+
+The transferability statement is then:
+\begin{quote}\itshape
+  Whenever a linear-algebraic task can be re-cast so that its system
+  matrix has a bimodal spectrum, its right-hand side is gate-cheap, and
+  its answer is a low-weight observable, the same \OBQF{} circuit -- up
+  to a problem-specific Hamiltonian-simulation block for $e^{-i\mathbf
+  A t}$ -- solves it with the same $\mathcal{O}(\sqrt{N}\log N)$ gate
+  budget reported in our paper.
+\end{quote}
+This argument is structural: it reduces the question
+``can your method generalise?'' to the
+question ``does my problem have a bimodal spectrum?''.  The latter is a
+spectral-graph-theory question that can be answered before any quantum
+circuit is written, by classical sparse-eigenvalue analysis (in our work
+this is done by ARPACK \cite{Lehoucq:1998:arpack}).
+
+\section{Families of problems that satisfy (S1)--(S3)}
+\label{sec:families}
+
+We list, in decreasing order of structural similarity to our
+tracking application, the problem families to which \OBQF{}
+transfers.  In each case we name the source matrix, the
+``noise'' eigenvalue, the natural observable, and a representative
+reference.
+
+\subsection*{F1. Hopfield-style associative memory and pattern recognition}
+The original Hopfield network \cite{Hopfield:1982} stores patterns as
+fixed points of a quadratic energy
+$E(\mathbf{x}) = -\tfrac12 \mathbf{x}^\top \mathbf{W}\mathbf{x}$, recall is
+linear inversion in the basin of a stored pattern, and the
+spurious-pattern spectrum is concentrated on a single
+loading-fraction-dependent eigenvalue \cite{Amit:1985}.  Quantum
+associative-memory proposals \cite{Ventura:2000,Trugenberger:2001} are
+exactly in this regime; \OBQF{} provides the missing
+inversion/recall step with single-clock-qubit cost.  Track
+reconstruction is one instance of this family: any combinatorial
+pattern-completion problem with a Hopfield encoder qualifies (e.g.\
+content-addressable memory, image inpainting on small
+quantum-tractable patches).
+
+\subsection*{F2. Graph-Laplacian / spectral-clustering linear systems}
+For a graph with combinatorial Laplacian $\mathbf{L}$, problems such as
+seeded community detection, electrical-network effective-resistance
+queries, and PageRank-with-restart are linear systems
+$(\mathbf{L} + \alpha\mathbf{1})\mathbf{x} = \mathbf{b}$.  The Laplacian
+of a graph with $k$ well-separated communities has $k$ small
+eigenvalues and a clearly separated bulk \cite{vonLuxburg:2007}; the
+bulk eigenvalue acts as $\lambda_n$ and the answer (community label of
+a query node, effective resistance, etc.) is a low-weight observable.
+QSVT-based approaches to such problems already exist
+\cite{Apers:2022,Childs:2017} and \OBQF{} is the natural
+single-clock-qubit specialisation.
+
+\subsection*{F3. Quadratic unconstrained binary optimisation (QUBO)
+with structured penalties}
+Our Hamiltonian is a QUBO with a large conflict penalty
+$\gamma$ that pins the
+``noise'' eigenvalue.  This is the standard pattern in
+QUBO/Ising encodings of constrained combinatorial problems
+\cite{Lucas:2014}: max-cut, graph colouring, set cover, vertex cover,
+and maximum independent set all have penalty matrices whose spectrum
+clusters around the penalty strength.  When the question of interest is
+``is variable $i$ active in the dominant low-energy mode?'' (a
+low-weight observable on a single qubit), \OBQF{} returns the answer
+directly without sampling the full ground state.  This makes \OBQF{}
+complementary to QAOA \cite{Farhi:2014} and quantum annealing
+\cite{Kadowaki:1998}: instead of preparing the ground state, it
+projects onto the low-energy subspace and reads a marginal.
+
+\subsection*{F4. Kernel methods and least-squares classifiers
+(LS-SVM, ridge regression, Gaussian-process regression)}
+A regularised kernel system $(\mathbf{K} + \lambda\mathbf{1})\boldsymbol\alpha
+= \mathbf{y}$ has a spectrum dominated by a few large kernel
+eigenvalues plus a long tail near the regulariser $\lambda$
+\cite{Williams:2006}; the regulariser pins $\lambda_n$.  When the test
+prediction is needed only for a few new query points -- a low-weight
+observable on the output register -- this is exactly an \OBQF{} problem.
+Quantum kernel/SVM approaches based on full HHL
+\cite{Rebentrost:2014:qsvm} can be reduced to single-clock-qubit cost
+whenever the kernel is well-conditioned and the prediction observable is
+local, which is the setting most often encountered in HEP fast-inference
+applications.
+
+\subsection*{F5. Linear PDEs with a known spectral gap}
+Discretised elliptic PDEs $-\nabla\cdot(c\nabla u) = f$ on a
+quasi-uniform mesh produce a stiffness matrix whose eigenvalues separate
+into a small set tied to global modes and a bulk tied to the local
+discretisation scale; this gap is the basis of multigrid preconditioning.
+Quantum PDE solvers \cite{Berry:2014:qode,Childs:2017,Berry:2017} that
+read out only a local functional of $u$ (a flux, an integrated source
+term) are \OBQF{}-compatible.  Track extrapolation through a
+piecewise-uniform field map -- a directly LHCb-relevant
+PDE/ODE-inverse-problem -- is in this class.
+
+\subsection*{F6. Template matching and constrained image segmentation}
+When the answer asked of an image is binary -- ``does pattern $T$
+appear at position $\mathbf p$?'' -- the underlying linear problem is
+again a quadratic projection onto a known template subspace whose
+spectrum is bimodal (template / non-template).  This generalises the
+``did this pattern of hits form a track?'' question of our paper.
+Quantum template-matching circuits already use spectral-projection
+ideas \cite{Cai:2015:templatematch} and admit a one-bit reduction.
+
+\bigskip\noindent
+The list is not exhaustive but is sufficient to answer Reviewer~2's
+question: the spectral-filter trick is not Hamiltonian-specific; it
+works whenever the spectrum has the right shape and the quantity of
+interest is a low-weight observable.
+
+\section{Where \OBQF{} does \emph{not} transfer}
+\label{sec:limits}
+
+For completeness we also state the boundaries of the method, since this
+is also part of an honest transferability discussion.
+\begin{itemize}[leftmargin=1.2em,topsep=2pt,itemsep=2pt]
+  \item \textbf{Continuous spectra without a gap.} Dense linear
+        regression with an arbitrary covariance matrix, or a stiff PDE
+        with no clear discretisation gap, will spread amplitude across
+        the single phase bit and incur $\mathcal{O}(1)$ filter leakage.
+        Multi-bit phase estimation or full QSVT is then required.
+  \item \textbf{Tomography-bound answers.} If the answer is the full
+        solution vector $\mathbf{x}$ rather than $\bra{\mathbf{x}}O\ket{\mathbf{x}}$
+        for a low-weight $O$, the readout cost is
+        $\mathcal{O}(N)$ regardless of the inversion step
+        \cite{Aaronson:2015:readingthefineprint}, and any quantum speed
+        up is erased -- this is precisely the issue Reviewer~2 raised
+        with reference to \cite{Tang:2019} and we addressed in our
+        Major-1 reply.
+  \item \textbf{Expensive state preparation.} If $\ket{\mathbf{b}}$
+        cannot be prepared without QRAM, condition (S2) fails and the
+        speed-up is again lost.  Our tracking encoder happens to satisfy
+        (S2) by Hadamards alone; transferred problems should be checked
+        case by case.
+  \item \textbf{Non-Hermitian or unbounded operators.} \OBQF{} requires
+        Hamiltonian simulation $e^{-i\mathbf{A}t}$. Non-normal matrices
+        (e.g.\ certain advection-dominated PDE discretisations) need
+        block encoding via QSVT instead.
+\end{itemize}
+
+\section{Recommendation for the manuscript}
+\label{sec:recommendation}
+
+We propose adding to the manuscript a single short subsection,
+``\emph{Generality of the spectral-filter mechanism}'', that:
+(i)~states the three structural ingredients (S1)--(S3);
+(ii)~cites the QSVT/IPE generalisation
+\cite{Gilyen:2019,Martyn:2021,Kitaev:1995};
+(iii)~lists by name two or three of the families F1--F6 above as
+illustrative examples (associative memory, QUBO with structured
+penalties, regularised kernel methods);
+(iv)~explicitly states the limits of Section~\ref{sec:limits}.
+
+This addresses Reviewer~2's ``too tailored'' concern without overclaiming
+generality: the method is not a universal quantum solver, but the
+structural conditions under which it works are common, well-defined,
+and verifiable in advance by classical spectral analysis.
+
+\section{Proposed reviewer reply}
+\label{sec:reply}
+
+\noindent
+The techniques presented in this work were developed to make TrackHHL
+executable on quantum hardware by reducing qubit count, two-qubit gate
+count, and circuit depth -- the standard bottlenecks of HHL-based
+pipelines. As the reviewer correctly notes, the optimizations exploit
+the geometrical structure of the tracking problem and the numerical
+features of our quadratic Hamiltonian, and this degree of
+problem-specificity is typical of HHL applications, since HHL is not
+currently regarded as a general-purpose replacement for classical
+matrix inversion. We nevertheless believe that the methods transfer to
+a well-defined family of problems, and we make the criterion for
+transferability mathematical rather than application-driven.
+
+Concretely, our one-bit quantum filter (\OBQF{}) solves
+$\mathbf{A}\,\mathbf{x} = \mathbf{b}$ on the subspace where it is
+informative, provided the input data $(\mathbf{A}, \mathbf{b}, O)$
+satisfy the following structural conditions:
+\begin{enumerate}[label=(\textbf{M\arabic*}),leftmargin=2.6em,topsep=2pt,itemsep=2pt]
+  \item $\mathbf{A}\in\mathbb{R}^{N\times N}$ is symmetric positive
+        semi-definite, $s$-sparse with $s = \mathcal{O}(\mathrm{polylog}\,N)$,
+        and admits an efficient Hamiltonian-simulation oracle for
+        $e^{-i\mathbf{A}t}$ (in our case, the sparse-segment encoder of
+        Sec.~III).
+  \item The spectrum of $\mathbf{A}$ decomposes as
+        $\sigma(\mathbf{A}) = \sigma_\mathrm{sig} \cup \sigma_\mathrm{noise}$
+        with
+        $\sigma_\mathrm{noise} \subseteq [\lambda_n - \delta,
+        \lambda_n + \delta]$ around an analytically known eigenvalue
+        $\lambda_n$, and a finite spectral gap
+        $\Delta = \mathrm{dist}(\sigma_\mathrm{sig},\sigma_\mathrm{noise}) > 0$
+        with $\Delta \gg \delta$. The condition number on
+        $\sigma_\mathrm{sig}$ is bounded by a problem-independent
+        constant $\kappa_\mathrm{sig}=\mathcal{O}(1)$.
+  \item $\ket{\mathbf{b}}$ is preparable by an
+        $\mathcal{O}(\mathrm{polylog}\,N)$-depth circuit without QRAM
+        (in our case $\ket{\mathbf{b}} = H^{\otimes n_s}\ket{0}$, the
+        uniform superposition).
+  \item The quantity of interest is
+        $\bra{\mathbf{x}} O\ket{\mathbf{x}}/\|\mathbf{x}\|^{2}$ for an
+        observable $O$ supported on $\mathcal{O}(1)$ qubits, e.g.\ a
+        single-mode population $O = \ket{j}\bra{j}$ or a low-rank
+        projector $O = \sum_{j\in S}\ket{j}\bra{j}$ with $|S|$ bounded
+        independently of $N$.
+\end{enumerate}
+Whenever (M1)--(M4) hold, the same circuit applies up to a
+problem-specific Hamiltonian-simulation block, with the same
+$\mathcal{O}(\sqrt{N}\log N)$ gate budget reported in our paper.
+This is the regime considered by Rebentrost et al.\
+\cite{Rebentrost:2018:hopfield}, from which TrackHHL is inspired:
+optimization of a Hopfield network is recast as a sparse linear problem
+solved by HHL, with an exponential advantage provided that efficient
+Hamiltonian simulation and readout subroutines are available, and that
+the linear system can be suitably regularized. Our \OBQF{} construction
+sharpens this picture: \emph{regularization} in their language is
+exactly the noise-eigenvalue pinning of (M2), and \emph{efficient
+readout} is exactly the low-weight observable of (M4). When both hold,
+the multi-qubit phase register of standard HHL collapses to a single
+clock qubit, as the only spectral information that has to be resolved
+is the binary signal/noise label.
+
+The structural conditions (M1)--(M4) define a family of problems
+mathematically rather than by domain. Within this family one finds, in
+addition to the RNA-reconstruction example outlined by Rebentrost et
+al.: Hopfield-style associative memories and pattern denoising, where
+$\mathbf{A}$ is a Hebbian coupling matrix whose spurious-pattern
+spectrum concentrates on a known loading-fraction-dependent eigenvalue
+\cite{Hopfield:1982,Amit:1985}; QUBO/Ising encodings of constrained
+combinatorial problems whose conflict-penalty term sets $\lambda_n$ by
+construction (max-cut, graph colouring, vertex cover, set cover, MIS;
+see \cite{Lucas:2014}), where \OBQF{} returns a marginal of the
+low-energy subspace and is complementary to QAOA \cite{Farhi:2014} and
+quantum annealing \cite{Kadowaki:1998}; graph-Laplacian linear systems
+$(\mathbf{L}+\alpha\mathbf{1})\mathbf{x}=\mathbf{b}$ on graphs with
+$k$ well-separated communities, whose Laplacian spectrum has $k$ small
+eigenvalues separated from a clearly defined bulk
+\cite{vonLuxburg:2007,Apers:2022,Childs:2017}, with applications in
+seeded community detection and effective-resistance queries; regularized
+kernel systems $(\mathbf{K}+\lambda\mathbf{1})\boldsymbol{\alpha}
+= \mathbf{y}$ in least-squares SVMs, ridge regression, and
+Gaussian-process regression \cite{Williams:2006,Rebentrost:2014:qsvm},
+where the regularizer pins $\lambda_n=\lambda$ and the prediction at a
+test point is by construction a local observable on the output
+register; and discretized linear PDEs
+$\mathbf{L}_h\mathbf{u}=\mathbf{f}$ with a clear spectral gap between
+global and discretization-scale modes \cite{Berry:2014:qode,Berry:2017},
+provided only a local functional of $\mathbf{u}$ is read out -- a class
+that includes track extrapolation through piecewise-uniform field maps.
+
+Conversely, (M1)--(M4) are sharp, and the method does \emph{not}
+transfer to problems with continuous, gapless spectra
+($\Delta \to 0$, where filter leakage becomes $\mathcal{O}(1)$); to
+tasks requiring full-state tomography (where the
+$\mathcal{O}(N)$ readout cost erases any speed-up, as discussed in our
+reply to Reviewer~2 Major-1
+\cite{Aaronson:2015:readingthefineprint,Tang:2019}); to settings
+where state preparation requires QRAM and (M3) fails; or to
+non-normal $\mathbf{A}$, for which Hamiltonian simulation must be
+replaced by block encoding via QSVT \cite{Gilyen:2019,Martyn:2021}.
+We expect that, as in the present work, application to any of these
+problems will still require adaptation to the specific structure and
+constraints of the system at hand, but the conditions under which the
+adaptation is worthwhile are well-defined and can be verified
+classically -- by sparse spectral analysis of $\mathbf{A}$ -- before
+any quantum circuit is written.
+
+\bibliographystyle{unsrt}
+\bibliography{refs}
+
+\end{document}

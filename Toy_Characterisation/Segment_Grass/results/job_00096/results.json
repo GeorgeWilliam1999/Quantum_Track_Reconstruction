@@ -8,21 +8,31 @@
     "n_repeats": 10
   },
   "n_events": 10,
-  "occ_mean": 190.96641604010026,
-  "occ_std": 59.354165824924266,
-  "occ_max": 251,
-  "n_anomalous_occ": 5985,
+  "occ_mean": 189.77089678510998,
+  "occ_std": 58.45347231279345,
+  "occ_max": 250,
+  "n_anomalous_occ": 5910,
   "frac_anomalous_occ": 1.0,
-  "mean_n_clipped": 1.2,
-  "mean_n_ghost_hits": 99.7,
+  "mean_n_clipped": 7.1,
+  "mean_n_ghost_hits": 98.3,
   "mean_n_dropped": 0.0,
-  "mean_n_segments": 57146.7,
-  "mean_true_activation": 1.0892034391945902,
-  "mean_false_activation": 0.4000028194875933,
+  "mean_n_segments": 56077.3,
+  "mean_true_activation": 1.0805171201522303,
+  "mean_false_activation": 0.4000076622022366,
+  "occ_sel_mean": 1.594391383865068,
+  "occ_sel_std": 0.4910094364185248,
+  "occ_sel_max": 2,
+  "n_anomalous_occ_sel": 0,
+  "frac_anomalous_occ_sel": 0.0,
+  "mean_n_segments_sel": 392.3,
+  "mean_n_true_sel": 392.3,
+  "mean_n_false_sel": 0.0,
+  "mean_true_activation_sel": 1.0809390935944794,
+  "mean_false_activation_sel": 0.0,
   "reco_metrics": {
     "efficiency": {
-      "mean": 1.0,
-      "std": 0.0
+      "mean": 0.998,
+      "std": 0.0060000000000000045
     },
     "ghost_rate": {
       "mean": 0.0,
@@ -33,15 +43,22 @@
       "std": 0.0
     },
     "n_reco": {
-      "mean": 100.0,
-      "std": 0.0
+      "mean": 99.8,
+      "std": 0.6
     }
   },
   "hits_per_mod_mean": {
-    "0": 123.2,
-    "1": 120.3,
-    "2": 120.1,
-    "3": 117.4,
-    "4": 117.5
+    "0": 120.4,
+    "1": 117.3,
+    "2": 119.8,
+    "3": 119.2,
+    "4": 114.3
+  },
+  "hits_sel_per_mod_mean": {
+    "0": 99.8,
+    "1": 99.8,
+    "2": 99.8,
+    "3": 99.8,
+    "4": 92.9
   }
 }

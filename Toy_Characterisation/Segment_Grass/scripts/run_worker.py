@@ -96,7 +96,7 @@ def run_job(params, outdir):
     # Accumulators
     all_pv_z          = []
     all_n_clipped     = []
-    all_occ           = []           # flat list of occupancy values
+    all_occ           = []           # flat list of occupancy values (full corpus)
     all_occ_by_mod    = defaultdict(list)
     all_hits_per_mod  = defaultdict(list)
     all_true_x        = []
@@ -105,6 +105,15 @@ def run_job(params, outdir):
     all_n_segments    = []
     all_n_ghost_hits  = []
     all_n_dropped     = []
+    # Selected-segment corpus (segments with x_i > THRESHOLD) ──
+    all_occ_sel          = []
+    all_occ_sel_by_mod   = defaultdict(list)
+    all_hits_sel_per_mod = defaultdict(list)
+    all_true_x_sel       = []
+    all_false_x_sel      = []
+    all_n_segments_sel   = []
+    all_n_true_sel       = []
+    all_n_false_sel      = []
 
     for rep in range(n_repeats):
         # Generate clean event
@@ -169,6 +178,32 @@ def run_job(params, outdir):
         all_true_x.extend(x[is_true].tolist())
         all_false_x.extend(x[~is_true].tolist())
 
+        # ── Selected-segment corpus (x > THRESHOLD) ───────────────
+        is_selected = x > THRESHOLD
+        n_sel = int(is_selected.sum())
+        all_n_segments_sel.append(n_sel)
+        all_n_true_sel.append(int((is_selected & is_true).sum()))
+        all_n_false_sel.append(int((is_selected & ~is_true).sum()))
+        all_true_x_sel.extend(x[is_selected & is_true].tolist())
+        all_false_x_sel.extend(x[is_selected & ~is_true].tolist())
+
+        # Per-hit occupancy restricted to selected segments
+        # (hits with zero selected segments are excluded from the corpus)
+        h2s_sel = defaultdict(int)
+        for seg_idx in np.flatnonzero(is_selected):
+            fid, tid = ham._segment_to_hit_ids[seg_idx]
+            h2s_sel[fid] += 1
+            h2s_sel[tid] += 1
+        # Per-module hit count in selected corpus
+        hits_sel_per_mod = defaultdict(int)
+        for hid, occ_sel in h2s_sel.items():
+            mod = hit_mod[hid]
+            all_occ_sel.append(occ_sel)
+            all_occ_sel_by_mod[mod].append(occ_sel)
+            hits_sel_per_mod[mod] += 1
+        for m in range(N_MODULES):
+            all_hits_sel_per_mod[m].append(hits_sel_per_mod[m])
+
         # Reconstruction
         try:
             reco_tracks = get_tracks(ham, x, event, threshold=THRESHOLD)
@@ -208,6 +243,17 @@ def run_job(params, outdir):
         n_segments=np.array(all_n_segments),
         n_ghost_hits=np.array(all_n_ghost_hits),
         n_dropped=np.array(all_n_dropped),
+        # Selected-segment corpus
+        occ_sel_all=np.array(all_occ_sel),
+        **{f"occ_sel_mod{m}": np.array(all_occ_sel_by_mod[m])
+           for m in range(N_MODULES)},
+        **{f"hits_sel_mod{m}": np.array(all_hits_sel_per_mod[m])
+           for m in range(N_MODULES)},
+        true_x_sel=np.array(all_true_x_sel),
+        false_x_sel=np.array(all_false_x_sel),
+        n_segments_sel=np.array(all_n_segments_sel),
+        n_true_sel=np.array(all_n_true_sel),
+        n_false_sel=np.array(all_n_false_sel),
     )
 
     # Summary JSON
@@ -226,6 +272,11 @@ def run_job(params, outdir):
     true_x_arr = np.array(all_true_x)
     false_x_arr = np.array(all_false_x)
 
+    occ_sel_arr = np.array(all_occ_sel)
+    expected_sel = {1, 2}
+    n_anomalous_sel = int(np.sum(~np.isin(occ_sel_arr, list(expected_sel)))) \
+        if len(occ_sel_arr) > 0 else 0
+
     summary = {
         "params": params,
         "n_events": n_repeats,
@@ -243,9 +294,30 @@ def run_job(params, outdir):
             if len(true_x_arr) > 0 else 0.0,
         "mean_false_activation": float(np.mean(false_x_arr))
             if len(false_x_arr) > 0 else 0.0,
+        # Selected-segment corpus summary
+        "occ_sel_mean": float(np.mean(occ_sel_arr))
+            if len(occ_sel_arr) > 0 else 0.0,
+        "occ_sel_std": float(np.std(occ_sel_arr))
+            if len(occ_sel_arr) > 0 else 0.0,
+        "occ_sel_max": int(np.max(occ_sel_arr))
+            if len(occ_sel_arr) > 0 else 0,
+        "n_anomalous_occ_sel": n_anomalous_sel,
+        "frac_anomalous_occ_sel": float(n_anomalous_sel / len(occ_sel_arr))
+            if len(occ_sel_arr) > 0 else 0.0,
+        "mean_n_segments_sel": float(np.mean(all_n_segments_sel)),
+        "mean_n_true_sel": float(np.mean(all_n_true_sel)),
+        "mean_n_false_sel": float(np.mean(all_n_false_sel)),
+        "mean_true_activation_sel": float(np.mean(all_true_x_sel))
+            if len(all_true_x_sel) > 0 else 0.0,
+        "mean_false_activation_sel": float(np.mean(all_false_x_sel))
+            if len(all_false_x_sel) > 0 else 0.0,
         "reco_metrics": mean_metrics,
         "hits_per_mod_mean": {
             str(m): float(np.mean(all_hits_per_mod[m]))
+            for m in range(N_MODULES)
+        },
+        "hits_sel_per_mod_mean": {
+            str(m): float(np.mean(all_hits_sel_per_mod[m]))
             for m in range(N_MODULES)
         },
     }

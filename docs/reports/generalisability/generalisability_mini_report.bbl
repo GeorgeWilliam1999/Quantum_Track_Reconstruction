@@ -1,0 +1,144 @@
+\begin{thebibliography}{10}
+
+\bibitem{Hopfield:1982}
+J.~J. Hopfield.
+\newblock Neural networks and physical systems with emergent collective
+  computational abilities.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  79(8):2554--2558, 1982.
+
+\bibitem{StimpflAbele:1991}
+G.~Stimpfl-Abele and L.~Garrido.
+\newblock Fast track finding with neural networks.
+\newblock {\em Computer Physics Communications}, 64(1):46--56, 1991.
+
+\bibitem{Denby:1988}
+B.~Denby.
+\newblock Neural networks and cellular automata in experimental high energy
+  physics.
+\newblock {\em Computer Physics Communications}, 49(3):429--448, 1988.
+
+\bibitem{Harrow:2009}
+A.~W. Harrow, A.~Hassidim, and S.~Lloyd.
+\newblock Quantum algorithm for linear systems of equations.
+\newblock {\em Physical Review Letters}, 103(15):150502, 2009.
+
+\bibitem{Gilyen:2019}
+A.~Gily{\'e}n, Y.~Su, G.~H. Low, and N.~Wiebe.
+\newblock Quantum singular value transformation and beyond: exponential
+  improvements for quantum matrix arithmetics.
+\newblock In {\em Proceedings of the 51st Annual ACM SIGACT Symposium on Theory
+  of Computing (STOC '19)}, pages 193--204, 2019.
+
+\bibitem{Martyn:2021}
+J.~M. Martyn, Z.~M. Rossi, A.~K. Tan, and I.~L. Chuang.
+\newblock Grand unification of quantum algorithms.
+\newblock {\em PRX Quantum}, 2(4):040203, 2021.
+
+\bibitem{Kitaev:1995}
+A.~Yu. Kitaev.
+\newblock Quantum measurements and the {Abelian} stabilizer problem, 1995.
+
+\bibitem{Higgins:2007}
+B.~L. Higgins, D.~W. Berry, S.~D. Bartlett, H.~M. Wiseman, and G.~J. Pryde.
+\newblock Entanglement-free heisenberg-limited phase estimation.
+\newblock {\em Nature}, 450:393--396, 2007.
+
+\bibitem{Lehoucq:1998:arpack}
+R.~B. Lehoucq, D.~C. Sorensen, and C.~Yang.
+\newblock {ARPACK} users' guide: Solution of large-scale eigenvalue problems
+  with implicitly restarted arnoldi methods.
+\newblock 1998.
+
+\bibitem{Amit:1985}
+D.~J. Amit, H.~Gutfreund, and H.~Sompolinsky.
+\newblock Spin-glass models of neural networks.
+\newblock {\em Physical Review A}, 32(2):1007--1018, 1985.
+
+\bibitem{Ventura:2000}
+D.~Ventura and T.~Martinez.
+\newblock Quantum associative memory.
+\newblock {\em Information Sciences}, 124(1--4):273--296, 2000.
+
+\bibitem{Trugenberger:2001}
+C.~A. Trugenberger.
+\newblock Probabilistic quantum memories.
+\newblock {\em Physical Review Letters}, 87(6):067901, 2001.
+
+\bibitem{vonLuxburg:2007}
+U.~von Luxburg.
+\newblock A tutorial on spectral clustering.
+\newblock {\em Statistics and Computing}, 17(4):395--416, 2007.
+
+\bibitem{Apers:2022}
+S.~Apers and R.~de~Wolf.
+\newblock Quantum speedup for graph sparsification, cut approximation and
+  {Laplacian} solving.
+\newblock {\em SIAM Journal on Computing}, 51(6):1703--1742, 2022.
+
+\bibitem{Childs:2017}
+A.~M. Childs, R.~Kothari, and R.~D. Somma.
+\newblock Quantum algorithm for systems of linear equations with exponentially
+  improved dependence on precision.
+\newblock {\em SIAM Journal on Computing}, 46(6):1920--1950, 2017.
+
+\bibitem{Lucas:2014}
+A.~Lucas.
+\newblock {Ising} formulations of many {NP} problems.
+\newblock {\em Frontiers in Physics}, 2:5, 2014.
+
+\bibitem{Farhi:2014}
+E.~Farhi, J.~Goldstone, and S.~Gutmann.
+\newblock A quantum approximate optimization algorithm, 2014.
+
+\bibitem{Kadowaki:1998}
+T.~Kadowaki and H.~Nishimori.
+\newblock Quantum annealing in the transverse {Ising} model.
+\newblock {\em Physical Review E}, 58(5):5355--5363, 1998.
+
+\bibitem{Williams:2006}
+C.~K.~I. Williams and C.~E. Rasmussen.
+\newblock {\em Gaussian Processes for Machine Learning}.
+\newblock MIT Press, 2006.
+
+\bibitem{Rebentrost:2014:qsvm}
+P.~Rebentrost, M.~Mohseni, and S.~Lloyd.
+\newblock Quantum support vector machine for big data classification.
+\newblock {\em Physical Review Letters}, 113(13):130503, 2014.
+
+\bibitem{Berry:2014:qode}
+D.~W. Berry.
+\newblock High-order quantum algorithm for solving linear differential
+  equations.
+\newblock {\em Journal of Physics A: Mathematical and Theoretical},
+  47(10):105301, 2014.
+
+\bibitem{Berry:2017}
+D.~W. Berry, A.~M. Childs, A.~Ostrander, and G.~Wang.
+\newblock Quantum algorithm for linear differential equations with
+  exponentially improved dependence on precision.
+\newblock {\em Communications in Mathematical Physics}, 356:1057--1081, 2017.
+
+\bibitem{Cai:2015:templatematch}
+X.-D. Cai et~al.
+\newblock Entanglement-based machine learning on a quantum computer, 2015.
+\newblock [VERIFY: replace with definitive quantum template-matching /
+  pattern-recognition reference before submission].
+
+\bibitem{Aaronson:2015:readingthefineprint}
+S.~Aaronson.
+\newblock Read the fine print.
+\newblock {\em Nature Physics}, 11:291--293, 2015.
+
+\bibitem{Tang:2019}
+E.~Tang.
+\newblock A quantum-inspired classical algorithm for recommendation systems.
+\newblock In {\em Proceedings of the 51st Annual ACM SIGACT Symposium on Theory
+  of Computing (STOC '19)}, pages 217--228, 2019.
+
+\bibitem{Rebentrost:2018:hopfield}
+P.~Rebentrost, T.~R. Bromley, C.~Weedbrook, and S.~Lloyd.
+\newblock Quantum {Hopfield} neural network.
+\newblock {\em Physical Review A}, 98(4):042308, 2018.
+
+\end{thebibliography}

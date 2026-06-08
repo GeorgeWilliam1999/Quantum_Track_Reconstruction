@@ -1,0 +1,41 @@
+{
+  "total_jobs": 1944,
+  "convolution": true,
+  "parameters": {
+    "scale_values": [
+      1,
+      2,
+      3,
+      5,
+      10,
+      20
+    ],
+    "theta_d_values": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1
+    ],
+    "measurement_errors": [
+      0.0,
+      0.01,
+      0.05
+    ],
+    "collision_noises": [
+      5e-05,
+      0.0001,
+      0.0004
+    ],
+    "angle_settings": [
+      0.2,
+      0.1,
+      0.04
+    ],
+    "track_counts": [
+      10,
+      50,
+      100
+    ],
+    "n_repeats": 3
+  }
+}

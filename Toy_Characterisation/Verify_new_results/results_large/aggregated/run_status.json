@@ -1,0 +1,9 @@
+{
+  "total_jobs": 8,
+  "completed": 8,
+  "failed": 0,
+  "missing": 0,
+  "tasks_found": {
+    "reco_large": 8
+  }
+}

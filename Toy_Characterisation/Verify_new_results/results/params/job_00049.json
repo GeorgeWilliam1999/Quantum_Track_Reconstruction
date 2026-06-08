@@ -1,0 +1,9 @@
+{
+  "task": "verify_scatt",
+  "job_id": 49,
+  "angle": 0.2,
+  "n_tracks": 20,
+  "sigma_scatt": 0.0008,
+  "sigma_res": 0.0,
+  "n_events": 20
+}

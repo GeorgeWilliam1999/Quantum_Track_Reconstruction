@@ -1,0 +1,37 @@
+# ============================================================
+# Segment-level statevector OneBitHHL submit file.
+# One job per row of the CSV (columns: n_trk, rep, gamma, delta, eps, tau, save_vec).
+#
+# Caller must supply via -append:
+#   PARAMS_CSV   absolute path to CSV
+#   RESULTSDIR   absolute path where pickles land
+#   LOGDIR       absolute path for condor out/err/log streams
+# ============================================================
+
+universe        = vanilla
++UseOS          = "el9"
++JobCategory    = "medium"
+
+initialdir      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results
+
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_segment_worker.sh
+arguments       = "$(n_trk) $(rep) $(gamma) $(delta) $(eps) $(tau) $(RESULTSDIR) $(save_vec)"
+
+# Per-job resources — scale up for big jobs (high n_trk).
+# Memory grows roughly with 2^(log2(n_seg)+2) complex amplitudes; n_trk=500 → ~2^21 ≈ 32 MB
+# Circuit construction memory and CPU are the limiting factor; budget generously.
+request_cpus    = 2
+request_memory  = 24 GB
+request_disk    = 4 GB
+
+should_transfer_files = NO
+getenv = True
+
+output = $(LOGDIR)/seg_$(Cluster)_$(Process).out
+error  = $(LOGDIR)/seg_$(Cluster)_$(Process).err
+log    = $(LOGDIR)/seg_$(Cluster).log
+
+# Allow long jobs at high n_trk (default categories may be capped).
++MaxRuntime = 86400
+
+queue n_trk, rep, gamma, delta, eps, tau, save_vec from $(PARAMS_CSV)

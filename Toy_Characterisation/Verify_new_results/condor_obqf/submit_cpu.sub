@@ -1,0 +1,47 @@
+# ============================================================
+# §18b — condor CPU submit (1BQF, small-to-large n)
+# ============================================================
+# Expects the caller to pass, via -append on command line:
+#   PARAMS_CSV   absolute path to the CSV of (n_trk, rep, shots, device, drop_rate, gamma, readout)
+#   RESULTSDIR   absolute path where per-event pickles will land
+#   LOGDIR       absolute path for condor out/err/log streams
+#
+# Usage:
+#   condor_submit -append "PARAMS_CSV=/…/params_cpu.csv" \
+#                 -append "RESULTSDIR=/…/results_cpu" \
+#                 -append "LOGDIR=/…/logs_cpu" \
+#                 condor_obqf/submit_cpu.sub
+# ============================================================
+
+universe        = vanilla
++UseOS          = "el9"
++JobCategory    = "long"
+
+initialdir      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results
+
+# The worker
+executable      = /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Verify_new_results/condor_obqf/run_worker.sh
+arguments       = "$(n_trk) $(rep) $(shots) $(device) $(RESULTSDIR) $(drop_rate) $(gamma) $(readout)"
+
+# Resources — CPU single-slot; memory tiers match GPU submit
+#   T <  150 ->  16 GB
+#   T <  500 ->  32 GB
+#   T < 1500 ->  64 GB
+#   T >= 1500 -> 256 GB  (CPU nodes can exceed GPU-node limits)
+request_cpus    = 1
+request_memory  = ifThenElse(int($(n_trk)) >= 1500, 262144, \
+                  ifThenElse(int($(n_trk)) >=  500,  65536, \
+                  ifThenElse(int($(n_trk)) >=  150,  32768, 16384)))
+request_disk    = 4 GB
+
+# File transfer: worker reads only the toy package + script
+should_transfer_files   = NO
+getenv                  = True
+
+# Streams
+output = $(LOGDIR)/obqf_cpu_$(Cluster)_$(Process).out
+error  = $(LOGDIR)/obqf_cpu_$(Cluster)_$(Process).err
+log    = $(LOGDIR)/obqf_cpu_$(Cluster).log
+
+# Submit one job per row of the CSV (columns: n_trk, rep, shots, device, drop_rate, gamma, readout)
+queue n_trk, rep, shots, device, drop_rate, gamma, readout from $(PARAMS_CSV)

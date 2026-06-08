@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2025.12.2)  2 APR 2026 01:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2025.12.2)  6 MAY 2026 14:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -462,41 +462,41 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {/usr/share/texlive/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}]
-<figures//fig2_clipping_probability.pdf, id=95, 569.4697pt x 351.52919pt>
+<figures//fig2_clipping_probability.pdf, id=123, 569.4697pt x 351.52919pt>
 File: figures//fig2_clipping_probability.pdf Graphic file (type pdf)
 <use figures//fig2_clipping_probability.pdf>
 Package pdftex.def Info: figures//fig2_clipping_probability.pdf  used on input 
 line 165.
 (pdftex.def)             Requested size: 386.96027pt x 238.87576pt.
  [2]
-<figures//fig1_event_displays.pdf, id=109, 1001.1421pt x 407.75021pt>
+<figures//fig1_event_displays.pdf, id=137, 1001.1421pt x 407.75021pt>
 File: figures//fig1_event_displays.pdf Graphic file (type pdf)
 <use figures//fig1_event_displays.pdf>
 Package pdftex.def Info: figures//fig1_event_displays.pdf  used on input line 2
 12.
 (pdftex.def)             Requested size: 455.24411pt x 185.41464pt.
  [3 <./figures//fig2_clipping_probability.pdf>]
-<figures//fig4_track_diagnosis.pdf, id=263, 898.85188pt x 762.51752pt>
+<figures//fig4_track_diagnosis.pdf, id=291, 898.85188pt x 762.51752pt>
 File: figures//fig4_track_diagnosis.pdf Graphic file (type pdf)
 <use figures//fig4_track_diagnosis.pdf>
 Package pdftex.def Info: figures//fig4_track_diagnosis.pdf  used on input line 
 239.
 (pdftex.def)             Requested size: 455.24411pt x 386.19109pt.
  [4 <./figures//fig1_event_displays.pdf>]
-<figures//fig5_occupancy_vs_pvz.pdf, id=431, 713.0508pt x 568.79689pt>
+<figures//fig5_occupancy_vs_pvz.pdf, id=459, 713.0508pt x 568.79689pt>
 File: figures//fig5_occupancy_vs_pvz.pdf Graphic file (type pdf)
 <use figures//fig5_occupancy_vs_pvz.pdf>
 Package pdftex.def Info: figures//fig5_occupancy_vs_pvz.pdf  used on input line
  258.
 (pdftex.def)             Requested size: 386.96027pt x 308.68195pt.
  [5 <./figures//fig4_track_diagnosis.pdf>]
-<figures//fig3_occupancy_comparison.pdf, id=638, 1147.50961pt x 338.81454pt>
+<figures//fig3_occupancy_comparison.pdf, id=666, 1147.50961pt x 338.81454pt>
 File: figures//fig3_occupancy_comparison.pdf Graphic file (type pdf)
 <use figures//fig3_occupancy_comparison.pdf>
 Package pdftex.def Info: figures//fig3_occupancy_comparison.pdf  used on input 
 line 276.
 (pdftex.def)             Requested size: 455.24411pt x 134.41188pt.
-<figures//fig6_hits_per_module.pdf, id=640, 1147.51024pt x 269.26283pt>
+<figures//fig6_hits_per_module.pdf, id=668, 1147.51024pt x 269.26283pt>
 File: figures//fig6_hits_per_module.pdf Graphic file (type pdf)
 <use figures//fig6_hits_per_module.pdf>
 Package pdftex.def Info: figures//fig6_hits_per_module.pdf  used on input line 
@@ -504,12 +504,12 @@ Package pdftex.def Info: figures//fig6_hits_per_module.pdf  used on input line
 (pdftex.def)             Requested size: 455.24411pt x 106.81985pt.
  [6 <./figures//fig5_occupancy_vs_pvz.pdf> <./figures//fig3_occupancy_compariso
 n.pdf>]
-<figures//occ_hist_clean.pdf, id=845, 1182.84084pt x 592.63712pt>
+<figures//occ_hist_clean.pdf, id=874, 1182.84084pt x 592.63712pt>
 File: figures//occ_hist_clean.pdf Graphic file (type pdf)
 <use figures//occ_hist_clean.pdf>
 Package pdftex.def Info: figures//occ_hist_clean.pdf  used on input line 325.
 (pdftex.def)             Requested size: 455.24411pt x 228.08913pt.
-<figures//occ_hist_comparison_angle0.2.pdf, id=846, 1291.24583pt x 371.49092pt>
+<figures//occ_hist_comparison_angle0.2.pdf, id=875, 1291.24583pt x 371.49092pt>
 
 File: figures//occ_hist_comparison_angle0.2.pdf Graphic file (type pdf)
 <use figures//occ_hist_comparison_angle0.2.pdf>
@@ -517,13 +517,13 @@ Package pdftex.def Info: figures//occ_hist_comparison_angle0.2.pdf  used on inp
 ut line 335.
 (pdftex.def)             Requested size: 455.24411pt x 130.9704pt.
  [7 <./figures//fig6_hits_per_module.pdf> <./figures//occ_hist_clean.pdf>]
-<figures//heatmap_anomalous_occ.pdf, id=1036, 1281.35378pt x 740.03117pt>
+<figures//heatmap_anomalous_occ.pdf, id=1064, 1281.35378pt x 740.03117pt>
 File: figures//heatmap_anomalous_occ.pdf Graphic file (type pdf)
 <use figures//heatmap_anomalous_occ.pdf>
 Package pdftex.def Info: figures//heatmap_anomalous_occ.pdf  used on input line
  355.
 (pdftex.def)             Requested size: 455.24411pt x 262.9218pt.
-<figures//heatmap_efficiency.pdf, id=1038, 1281.03018pt x 740.03117pt>
+<figures//heatmap_efficiency.pdf, id=1066, 1281.03018pt x 740.03117pt>
 File: figures//heatmap_efficiency.pdf Graphic file (type pdf)
 <use figures//heatmap_efficiency.pdf>
 Package pdftex.def Info: figures//heatmap_efficiency.pdf  used on input line 37
@@ -531,30 +531,132 @@ Package pdftex.def Info: figures//heatmap_efficiency.pdf  used on input line 37
 (pdftex.def)             Requested size: 455.24411pt x 262.98956pt.
  [8 <./figures//occ_hist_comparison_angle0.2.pdf> <./figures//heatmap_anomalous
 _occ.pdf>]
-<figures//heatmap_n_segments.pdf, id=1229, 1283.26044pt x 740.03117pt>
+<figures//heatmap_n_segments.pdf, id=1257, 1283.26044pt x 740.03117pt>
 File: figures//heatmap_n_segments.pdf Graphic file (type pdf)
 <use figures//heatmap_n_segments.pdf>
 Package pdftex.def Info: figures//heatmap_n_segments.pdf  used on input line 39
 3.
 (pdftex.def)             Requested size: 455.24411pt x 262.52658pt.
  [9 <./figures//heatmap_efficiency.pdf>]
-<figures//activation_spectrum.pdf, id=1338, 1002.14384pt x 351.37254pt>
+<figures//activation_spectrum.pdf, id=1366, 1002.13889pt x 351.37254pt>
 File: figures//activation_spectrum.pdf Graphic file (type pdf)
 <use figures//activation_spectrum.pdf>
 Package pdftex.def Info: figures//activation_spectrum.pdf  used on input line 4
-12.
+13.
 (pdftex.def)             Requested size: 455.24411pt x 159.6174pt.
 
 [10 <./figures//heatmap_n_segments.pdf> <./figures//activation_spectrum.pdf>]
-[11] (./segment_grass_report.aux)
+<figures//occ_sel_hist_clean.pdf, id=1538, 1182.84084pt x 592.63712pt>
+File: figures//occ_sel_hist_clean.pdf Graphic file (type pdf)
+<use figures//occ_sel_hist_clean.pdf>
+Package pdftex.def Info: figures//occ_sel_hist_clean.pdf  used on input line 45
+8.
+(pdftex.def)             Requested size: 455.24411pt x 228.08913pt.
+<figures//occ_sel_hist_comparison_angle0.1.pdf, id=1540, 1291.24583pt x 371.490
+92pt>
+File: figures//occ_sel_hist_comparison_angle0.1.pdf Graphic file (type pdf)
+<use figures//occ_sel_hist_comparison_angle0.1.pdf>
+Package pdftex.def Info: figures//occ_sel_hist_comparison_angle0.1.pdf  used on
+ input line 473.
+(pdftex.def)             Requested size: 223.07211pt x 64.17294pt.
+<figures//occ_sel_hist_comparison_angle0.2.pdf, id=1541, 1291.24583pt x 371.490
+92pt>
+File: figures//occ_sel_hist_comparison_angle0.2.pdf Graphic file (type pdf)
+<use figures//occ_sel_hist_comparison_angle0.2.pdf>
+Package pdftex.def Info: figures//occ_sel_hist_comparison_angle0.2.pdf  used on
+ input line 474.
+(pdftex.def)             Requested size: 223.07211pt x 64.17294pt.
+
+[11 <./figures//occ_sel_hist_clean.pdf> <./figures//occ_sel_hist_comparison_ang
+le0.1.pdf> <./figures//occ_sel_hist_comparison_angle0.2.pdf>]
+<figures//full_vs_selected_anomaly.pdf, id=1796, 857.62578pt x 659.40144pt>
+File: figures//full_vs_selected_anomaly.pdf Graphic file (type pdf)
+<use figures//full_vs_selected_anomaly.pdf>
+Package pdftex.def Info: figures//full_vs_selected_anomaly.pdf  used on input l
+ine 494.
+(pdftex.def)             Requested size: 455.24411pt x 350.03448pt.
+<figures//heatmap_anomalous_occ_sel.pdf, id=1797, 1280.80595pt x 740.03117pt>
+File: figures//heatmap_anomalous_occ_sel.pdf Graphic file (type pdf)
+<use figures//heatmap_anomalous_occ_sel.pdf>
+Package pdftex.def Info: figures//heatmap_anomalous_occ_sel.pdf  used on input 
+line 504.
+(pdftex.def)             Requested size: 455.24411pt x 263.03473pt.
+ [12 <./figures//full_vs_selected_anomaly.pdf>]
+<figures//heatmap_n_segments_sel.pdf, id=1909, 1281.52629pt x 740.03117pt>
+File: figures//heatmap_n_segments_sel.pdf Graphic file (type pdf)
+<use figures//heatmap_n_segments_sel.pdf>
+Package pdftex.def Info: figures//heatmap_n_segments_sel.pdf  used on input lin
+e 524.
+(pdftex.def)             Requested size: 455.24411pt x 262.88792pt.
+ [13 <./figures//heatmap_anomalous_occ_sel.pdf>]
+<figures//selected_true_false_breakdown.pdf, id=2023, 1000.96487pt x 371.04417p
+t>
+File: figures//selected_true_false_breakdown.pdf Graphic file (type pdf)
+<use figures//selected_true_false_breakdown.pdf>
+Package pdftex.def Info: figures//selected_true_false_breakdown.pdf  used on in
+put line 543.
+(pdftex.def)             Requested size: 455.24411pt x 168.75175pt.
+<figures//selected_activation_hist_angle0.1.pdf, id=2025, 1291.23592pt x 333.25
+98pt>
+File: figures//selected_activation_hist_angle0.1.pdf Graphic file (type pdf)
+<use figures//selected_activation_hist_angle0.1.pdf>
+Package pdftex.def Info: figures//selected_activation_hist_angle0.1.pdf  used o
+n input line 561.
+(pdftex.def)             Requested size: 223.07211pt x 57.57382pt.
+<figures//selected_activation_hist_angle0.2.pdf, id=2026, 1291.23592pt x 333.25
+98pt>
+File: figures//selected_activation_hist_angle0.2.pdf Graphic file (type pdf)
+<use figures//selected_activation_hist_angle0.2.pdf>
+Package pdftex.def Info: figures//selected_activation_hist_angle0.2.pdf  used o
+n input line 562.
+(pdftex.def)             Requested size: 223.07211pt x 57.57382pt.
+
+[14 <./figures//heatmap_n_segments_sel.pdf> <./figures//selected_true_false_bre
+akdown.pdf>]
+<figures//selected_activation_spectrum.pdf, id=2236, 1002.13889pt x 351.24376pt
+>
+File: figures//selected_activation_spectrum.pdf Graphic file (type pdf)
+<use figures//selected_activation_spectrum.pdf>
+Package pdftex.def Info: figures//selected_activation_spectrum.pdf  used on inp
+ut line 571.
+(pdftex.def)             Requested size: 455.24411pt x 159.5589pt.
+<figures//heatmap_hits_sel_module_cv.pdf, id=2238, 1281.81093pt x 740.03117pt>
+File: figures//heatmap_hits_sel_module_cv.pdf Graphic file (type pdf)
+<use figures//heatmap_hits_sel_module_cv.pdf>
+Package pdftex.def Info: figures//heatmap_hits_sel_module_cv.pdf  used on input
+ line 591.
+(pdftex.def)             Requested size: 455.24411pt x 262.83147pt.
+ [15 <./figures//selected_activation_hist_angle0.1.pdf> <./figures//selected_ac
+tivation_hist_angle0.2.pdf> <./figures//selected_activation_spectrum.pdf>]
+<figures//occ_sel_std_vs_ghost.pdf, id=2518, 1291.3914pt x 666.18001pt>
+File: figures//occ_sel_std_vs_ghost.pdf Graphic file (type pdf)
+<use figures//occ_sel_std_vs_ghost.pdf>
+Package pdftex.def Info: figures//occ_sel_std_vs_ghost.pdf  used on input line 
+610.
+(pdftex.def)             Requested size: 223.07211pt x 115.06865pt.
+<figures//occ_sel_std_vs_drop.pdf, id=2519, 1291.3914pt x 665.90579pt>
+File: figures//occ_sel_std_vs_drop.pdf Graphic file (type pdf)
+<use figures//occ_sel_std_vs_drop.pdf>
+Package pdftex.def Info: figures//occ_sel_std_vs_drop.pdf  used on input line 6
+11.
+(pdftex.def)             Requested size: 223.07211pt x 115.02129pt.
+
+Overfull \hbox (2.69135pt too wide) in paragraph at lines 618--625
+ []\OT1/cmr/bx/n/10.95 Summary of the selected-corpus anal-y-sis.[] \OT1/cmr/m/
+n/10.95 The clas-si-cal solver, ap-plied to the Hamiltonian-
+ []
+
+[16 <./figures//heatmap_hits_sel_module_cv.pdf> <./figures//occ_sel_std_vs_ghos
+t.pdf> <./figures//occ_sel_std_vs_drop.pdf>] [17] [18]
+(./segment_grass_report.aux)
 Package rerunfilecheck Info: File `segment_grass_report.out' has not changed.
-(rerunfilecheck)             Checksum: 715D769B12B328637D7BE735FBE37463;3283.
+(rerunfilecheck)             Checksum: DD6876D1DF55FABBBF810953DD683B7C;5039.
  ) 
 Here is how much of TeX's memory you used:
- 11349 strings out of 481008
- 169868 string characters out of 5909439
- 484971 words of memory out of 5000000
- 28335 multiletter control sequences out of 15000+600000
+ 11480 strings out of 481008
+ 174220 string characters out of 5909439
+ 487406 words of memory out of 5000000
+ 28438 multiletter control sequences out of 15000+600000
  417296 words of font info for 80 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  71i,13n,74p,476b,353s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -573,11 +675,12 @@ cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8
 /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/sh
 are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/
-texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb>
-Output written on segment_grass_report.pdf (11 pages, 739854 bytes).
+texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texlive/t
+exmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb>
+Output written on segment_grass_report.pdf (18 pages, 1220819 bytes).
 PDF statistics:
- 1589 PDF objects out of 1728 (max. 8388607)
- 456 compressed objects within 5 object streams
- 54 named destinations out of 1000 (max. 500000)
- 197 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2927 PDF objects out of 2984 (max. 8388607)
+ 785 compressed objects within 8 object streams
+ 79 named destinations out of 1000 (max. 500000)
+ 318 words of extra memory for PDF output out of 10000 (max. 10000000)
 
