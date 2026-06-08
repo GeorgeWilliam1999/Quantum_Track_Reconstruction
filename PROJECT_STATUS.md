@@ -1,6 +1,6 @@
 # Project Status & TODO — Quantum Track Reconstruction
 
-_Last updated: 2026-06-06_
+_Last updated: 2026-06-08_
 
 Root-level tracker for the whole workspace: outstanding work, a summary of
 what's done, and links to every written (compiled) report. Studies that are
@@ -8,6 +8,29 @@ what's done, and links to every written (compiled) report. Studies that are
 
 Detailed per-study audit for the active campaign lives in
 [Toy_Characterisation/AUDIT.md](Toy_Characterisation/AUDIT.md).
+
+> **📌 Notion is the canonical tracker** (since 2026-06-08 reconcile). The Notion
+> project [**Quantum LHCb Toy**](https://app.notion.com/p/3265d544b9d980b0befcef00eb67ab9c)
+> holds three databases that mirror this file:
+> - **Write Up for PhDs** — one row per study/report (status + date + repo path). 21 rows.
+> - **To do** — the live shared task list.
+> - **Literature and Resources** — external references + technical specs only.
+>
+> Every study/report below has a matching Write-Up row. Keep them in sync: when a
+> study changes state here, update its Notion row (and vice-versa).
+
+### 🔄 2026-06-08 reconcile (repo ↔ Notion)
+- Added **17 Write-Up rows** for every report/study that had none (the 5 Initial/
+  Grass/Recovery reports, segment-level, quantum_algorithm, comparison,
+  generalisability, reviewer-response, OneBQF audit, track-density legacy, ERF,
+  T3, T4, Verify_new_results, Quantum_Toy_Study); set Epsilon_study_2 → **Done**.
+- Closed stale todos (Eps2 GPU pipeline, ERF Condor submit = done); added open
+  todos for T3/T4 aggregation, the Verify notebook, scratch-notebook cleanup, and
+  the IBM-token security fix.
+- Relabelled the 5 report rows in **Literature** as `[ARCHIVED PDF]` pointers —
+  canonical tracking is now in Write-Up (the Notion MCP can't move file uploads).
+- ⚠️ **IBM Quantum API token is in plaintext on the Notion project page** — revoke,
+  regenerate, store outside Notion. Tracked as a todo dated 2026-06-09.
 
 ---
 
@@ -105,11 +128,11 @@ Detailed per-study audit for the active campaign lives in
 | **OneBQF parameter audit** | Parameter audit of the quantum solver | ✅ written |
 | **Generalisability** | Mini-report on generalisability | ✅ written |
 | **Track-density (OLD_TOY_CODE)** | Legacy density study | ✅ written |
-| **Epsilon_study_2 (T2)** | Calculated ε + sensitivity grid; 1102 pkls, aggregated, figures done | ✅ **report.pdf** (22 pp, +stability §, 2026-06-06) |
-| **Quantum_Toy_Study** | OneBQF benchmarking runs complete | 🚩 **no dedicated report** (largely folded into quantum_segment) |
-| **Larger_Scatter (T3)** | Scatter × hit-inefficiency grid | 🟢 **submitted 2026-06-06** (1225 jobs, running) |
-| **Larger_Scatter_Density (T4)** | Tight cone × scatter grid | 🟢 **submitted 2026-06-06** (490 jobs, running) |
-| **ERF (T5)** | Local T≤50 + comparison notebook; Condor grid submitted | 🟢 **submitted 2026-06-06** (882 jobs, running) |
+| **Epsilon_study_2 (T2)** | Calculated ε + sensitivity grid; 1121 pkls, aggregated, 82 figures | ✅ **report.pdf** (22 pp, +stability §); **Done 2026-06-07** |
+| **Quantum_Toy_Study** | OneBQF benchmarking runs complete (3367 pkls) | 🚩 **no dedicated report** (largely folded into quantum_segment) |
+| **Larger_Scatter (T3)** | Scatter × hit-inefficiency grid | 🟡 **1224 pkls in, drained 2026-06-07** — not yet aggregated → analyse + report |
+| **Larger_Scatter_Density (T4)** | Tight cone × scatter grid | 🟡 **472 pkls (draining 2026-06-08)** — not yet aggregated → analyse + report |
+| **ERF (T5)** | Local T≤50 + comparison notebook; Condor grid drained | 🟡 **712 pkls + 44 figs; report.pdf drafted** — Youden-J/EER + finalise (due 6/13) |
 | **EpsilonStudies (legacy)** | Superseded by Epsilon_study_2 | n/a (no report needed) |
 
 ---
@@ -141,10 +164,11 @@ Detailed per-study audit for the active campaign lives in
 ---
 
 ## 🚩 Complete but no report (write-ups owed)
-1. **Epsilon_study_2 (T2)** — the calculated-ε sensitivity data is essentially
-   complete (468 sensitivity + 40 validation + 541 seg14e pickles, aggregated
-   CSVs, figures under `Epsilon_study_2/figures/`) but **no report has been
-   written**. This is the highest-value owed write-up.
+1. **Larger_Scatter (T3)** & **Larger_Scatter_Density (T4)** — data is in
+   (1224 / 472 pickles) but **not yet aggregated**; no analysis or report. Highest-
+   value owed write-ups now that Eps2 is done. Tracked in Notion Write-Up (In progress).
 2. **Quantum_Toy_Study** — all benchmarking runs are complete with figures, but
    it has **no standalone report**. Confirm whether it should be written up or
    is fully covered by the `quantum_segment` reports, then close it out.
+3. ~~**Epsilon_study_2 (T2)**~~ — **DONE 2026-06-07**: `report.pdf` (22 pp,
+   +stability §), 1121 pkls aggregated, 82 figures. Notion Write-Up → Done.
