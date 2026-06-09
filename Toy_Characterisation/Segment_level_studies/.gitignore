@@ -1,0 +1,3 @@
+# Spectral ARPACK cache — large (stores per-segment solution arrays); regenerable.
+outputs/**/*.pkl
+__pycache__/
