@@ -1,0 +1,5 @@
+# Large event data — not committed (27 MB zip + ~80 MB extracted JSONs)
+events_bsphiphi_mag_down_run3/
+*.zip
+outputs/*.pkl
+__pycache__/
