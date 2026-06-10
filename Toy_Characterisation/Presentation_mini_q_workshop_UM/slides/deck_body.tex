@@ -9,7 +9,7 @@
     \begin{column}{0.54\textwidth}
       \begin{itemize}
         \item The LHCb \textbf{VELO} reconstructs charged particles (\textbf{tracks}) from \textbf{hits} on silicon planes.
-        \item HL-LHC pile-up $\Rightarrow$ reconstruction cost threatens to outpace classical resources.
+        \item HL-LHC pile-up (many more simultaneous collisions) $\Rightarrow$ reconstruction cost threatens to outpace classical resources.
         \item With $T$ hits per plane each plane-gap offers $T^2$ candidate links, only $T$ real:
         \[ n_{\rm seg}=4T^2 \quad\text{vs}\quad n_{\rm true}=4T \quad(\text{signal fraction } 1/T).\]
         \item At $T{=}400$: \textbf{640{,}000} candidates, \textbf{1{,}600} true (0.25\%).
@@ -18,34 +18,9 @@
     \end{column}
     \begin{column}{0.46\textwidth}
       \centering\fig{\textwidth}{\PF/event_display_3d.png}
-      \cn{A generated toy VELO event: tracks fan from the PV through 5 planes.}
+      \cn{A generated toy VELO event: tracks fan from the collision point (primary vertex) through 5 planes.}
     \end{column}
   \end{columns}
-\end{frame}
-
-\begin{frame}{A controlled toy VELO --- our testbed}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item \texttt{LHCb\_VeLo\_Toy\_Model}: \textbf{5 planes} at $z{=}33,66,99,132,165$\,mm, $\pm40$\,mm.
-        \item Deterministic and fully controlled: sweep multiplicity $T$, noise, density, kernel.
-        \item Decoupled pipeline: events stored once; the matrix $A$ regenerated on demand (sparse); metrics recomputed as a \emph{view}.
-        \item Purpose: isolate \emph{how each physical factor} moves the algorithm.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \centering\fig{\textwidth}{\PF/pipeline_architecture.png}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{The toy injects the two physical detector noises}
-  \centering
-  \figw{0.9\textwidth}{\PF/noise_types.png}
-  \begin{itemize}
-    \item \textbf{Multiple scattering} $\sigma_{\rm scatt}$: kicks the slopes $(t_x,t_y)$ at each plane $\Rightarrow$ a cone around the ideal track.
-    \item \textbf{Resolution} $\sigma_{\rm res}$: smears each measured hit in $x,y$. \quad Both \emph{widen the triplet kink angle} $\Rightarrow$ they set $\varepsilon$.
-  \end{itemize}
 \end{frame}
 
 % ==================================================================
@@ -124,27 +99,19 @@
       \textbf{Harrow--Hassidim--Lloyd} solves $A\mathbf{x}=\mathbf{b}$:
       \begin{enumerate}
         \item prepare $|\mathbf{b}\rangle$ over the segment basis;
-        \item \textbf{QPE}: $e^{iAt}$ writes each eigenvalue $\lambda_k$ onto an $n_{\rm time}$-qubit clock register;
+        \item \textbf{QPE} (quantum phase estimation): $e^{iAt}$ writes each eigenvalue $\lambda_k$ onto an $n_{\rm time}$-qubit clock register;
         \item controlled $R_y$: amplitude $\propto 1/\lambda_k$ onto an ancilla;
         \item uncompute, post-select ancilla $=1$ $\Rightarrow$ state $\propto A^{-1}\mathbf{b}$.
       \end{enumerate}
       \medskip
       Exponential speedup in the number of hits --- \emph{contingent on} efficient QPE \& readout.\\[4pt]
-      \textbf{Catch:} dense $e^{iAt}$ + high-precision QPE $\Rightarrow$ prohibitive depth on NISQ hardware.
+      \textbf{Catch:} dense $e^{iAt}$ + high-precision QPE $\Rightarrow$ prohibitive depth on near-term hardware.
     \end{column}
     \begin{column}{0.44\textwidth}
       \centering\fig{\textwidth}{\PF/hhl_vs_1bqf_circuit.png}
       \cn{Left: the HHL circuit. Right: where we are heading.}
     \end{column}
   \end{columns}
-\end{frame}
-
-\begin{frame}{HHL stage by stage: the statevector at every step}
-  \centering
-  \figw{0.99\textwidth}{\PF/hhl_states.png}
-  \vspace{2pt}
-  {\footnotesize On a true-track block ($P_4$): $|b\rangle \xrightarrow{\rm QPE} \sum_k\beta_k|u_k\rangle|\lambda_k\rangle
-   \xrightarrow{R_y(1/\lambda)} \text{ancilla}=1 \text{ branch} \xrightarrow{\rm post\text{-}select} \;\propto A^{-1}\mathbf{b}$.}
 \end{frame}
 
 \begin{frame}{TrackHHL: restrict the phase estimation to \emph{one bit}}
@@ -178,28 +145,11 @@
     \item \textbf{Depth} cut by up to $10^4$ vs full HHL.
     \item \textbf{Sparse} $e^{iAt}$ (two-level/Givens decomposition) $\Rightarrow$ gate complexity $O(\sqrt{N}\log N)$.
     \item \textbf{Read-out solved}: the answer is binary (on/off the notch), no amplitude tomography.
-    \item \textbf{NISQ-validated}: Quantinuum H2 and IBM Heron noise models.
+    \item \textbf{NISQ-validated} (today's noisy devices): Quantinuum H2 and IBM Heron noise models.
     \item \textbf{Enables PV reconstruction} as classical post-processing.
   \end{itemize}
   \vspace{4pt}
   \centering\figh{0.3\textheight}{\PF/hhl_why_one_bit.png}
-\end{frame}
-
-\begin{frame}{The conceptual reformulation: inversion $\to$ filtering}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{itemize}
-        \item We never needed the \emph{numbers} in $A^{-1}\mathbf{b}$ --- only a \textbf{binary decision} per segment: on or off.
-        \item The spectrum is \textbf{bimodal}: false bulk \emph{at} $\gamma+\delta$, true band \emph{away} from it.
-        \item So \textbf{one bit of spectral information classifies}: ``matrix inversion'' becomes ``\textbf{project out the known-bad eigenspace}''.
-        \item HHL's eigenvalue \emph{precision} was wasted effort for this problem --- the 1BQF spends one bit exactly where the physics puts the information.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \centering\fig{\textwidth}{\PF/eigenvalue_filter.png}
-      \cn{$1/\lambda$ reweighting (HHL) vs the single-notch filter (1BQF).}
-    \end{column}
-  \end{columns}
 \end{frame}
 
 \begin{frame}{Every cluster type in segment space --- and its block of $A$}
@@ -254,12 +204,6 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Class by class at matched efficiency ($T{=}400$)}
-  \centering\figw{0.94\textwidth}{\PF/per_class_matched_T400.png}
-  \vspace{-2pt}
-  {\footnotesize The quantum keeps \textbf{all} true segments --- and with them the coupled false clusters: the price of efficiency.}
-\end{frame}
-
 % ==================================================================
 \section{Attacking the survivors: the bifurcation term}
 \begin{frame}{Add a bifurcation (fork) penalty to the Hamiltonian}
@@ -268,22 +212,8 @@
   with $B$ the \textbf{fork adjacency}: segments sharing a start/end hit that are \emph{not} collinear continuations.
   Every segment touches exactly two hits $\Rightarrow$ the diagonal stays constant $\Rightarrow$ \textbf{still 1BQF-compatible}.
   \medskip
-  \centering\figw{0.88\textwidth}{\PF/fork_matrix.png}
-\end{frame}
-
-\begin{frame}{The fork term: dense breaks the quantum --- $\varepsilon$-windowed fixes it}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \centering\fig{\textwidth}{\BIF/eps_fork_quantum.png}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \centering\fig{\textwidth}{\BIF/eps_fork_sparsity.png}
-    \end{column}
-  \end{columns}
-  \begin{itemize}
-    \item \textbf{Dense} fork ($O(T^3)$ pairs): classically a benign uniform down-scaling (AUC $\approx1$) but \textbf{destroys the 1BQF} (AUC $\to0.55$) and the sparsity ($\sim$20$\times$ slower).
-    \item \textbf{$\varepsilon$-windowed} $B_\varepsilon$ (only near-collinear competitors): \textbf{sparse}, \textbf{targeted} (false rate $\to0$ at $\sim$2\% efficiency cost), and \textbf{1BQF-safe} (AUC $0.96$--$0.99$).
-  \end{itemize}
+  \centering\figw{0.88\textwidth}{\PF/fork_matrix.png}\\
+  {\footnotesize $\varepsilon$-windowed $B_\varepsilon$ (only near-collinear competitors): \textbf{false rate $\to0$ at $\sim$2\% efficiency cost}, sparse, 1BQF-safe (AUC $0.96$--$0.99$); the dense fork would break the filter [backup].}
 \end{frame}
 
 % ==================================================================
@@ -296,26 +226,11 @@
         \item \textbf{QSVT} (Gily\'en--Su--Low--Wiebe) realises \emph{any} bounded polynomial $p(A)$ from a block-encoding of $A$ + $d$ phase rotations.
         \item Target: a \textbf{band-limited inverse} --- $p(\lambda)\approx1/\lambda$ on true-track eigenvalues, $p(\lambda)\approx0$ on every false mode (\emph{many} notches).
         \item Works \emph{iff} false and true eigenvalues are separated --- on real $T{=}200$ events the false modes sit $\ge0.2$ from every true eigenvalue.
+        \item First results: a degree-$\sim$30 polynomial lifts true/false AUC from $0.49$ (classical) / $0.64$ (1-bit) to $\mathbf{0.88}$ [backup].
       \end{itemize}
     \end{column}
     \begin{column}{0.46\textwidth}
       \centering\fig{\textwidth}{\QS/polynomial_design.png}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{QSVT: a polynomial filter lifts true/false separation}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \centering\fig{\textwidth}{\QS/efficacy_frontier.png}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item A degree-$\sim$30 polynomial lifts true/false \textbf{AUC} from $0.49$ (classical) / $0.64$ (1-bit) to $\mathbf{0.88}$.
-        \item Nulls \emph{all} off-length bridges and $\sim$95\% of hubs.
-        \item \textbf{Cost:} $\sim$30 block-encoding calls $\times$ $\sim$2$\times$ amplitude-amplification $\approx$ tens$\times$ the 1-bit depth; sparsity preserved.
-        \item \textbf{Irreducible floor:} a false bridge of the \emph{same length} as a true track (0\% at $T\le200$; grows with density).
-      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
@@ -344,6 +259,95 @@
 % ==================================================================
 \appendix
 \section*{Backup}
+% ---- demoted from the main line for the 30-minute slot ----
+\begin{frame}{Backup: a controlled toy VELO --- our testbed}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item \texttt{LHCb\_VeLo\_Toy\_Model}: \textbf{5 planes} at $z{=}33,66,99,132,165$\,mm, $\pm40$\,mm.
+        \item Deterministic and fully controlled: sweep multiplicity $T$, noise, density, kernel.
+        \item Decoupled pipeline: events stored once; the matrix $A$ regenerated on demand (sparse); metrics recomputed as a \emph{view}.
+        \item Purpose: isolate \emph{how each physical factor} moves the algorithm.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering\fig{\textwidth}{\PF/pipeline_architecture.png}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Backup: the toy injects the two physical detector noises}
+  \centering
+  \figw{0.9\textwidth}{\PF/noise_types.png}
+  \begin{itemize}
+    \item \textbf{Multiple scattering} $\sigma_{\rm scatt}$: kicks the slopes $(t_x,t_y)$ at each plane $\Rightarrow$ a cone around the ideal track.
+    \item \textbf{Resolution} $\sigma_{\rm res}$: smears each measured hit in $x,y$. \quad Both \emph{widen the triplet kink angle} $\Rightarrow$ they set $\varepsilon$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Backup: HHL stage by stage --- the statevector at every step}
+  \centering
+  \figw{0.99\textwidth}{\PF/hhl_states.png}
+  \vspace{2pt}
+  {\footnotesize On a true-track block ($P_4$): $|b\rangle \xrightarrow{\rm QPE} \sum_k\beta_k|u_k\rangle|\lambda_k\rangle
+   \xrightarrow{R_y(1/\lambda)} \text{ancilla}=1 \text{ branch} \xrightarrow{\rm post\text{-}select} \;\propto A^{-1}\mathbf{b}$.}
+\end{frame}
+
+\begin{frame}{Backup: the conceptual reformulation --- inversion $\to$ filtering}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{itemize}
+        \item We never needed the \emph{numbers} in $A^{-1}\mathbf{b}$ --- only a \textbf{binary decision} per segment: on or off.
+        \item The spectrum is \textbf{bimodal}: false bulk \emph{at} $\gamma+\delta$, true band \emph{away} from it.
+        \item So \textbf{one bit of spectral information classifies}: ``matrix inversion'' becomes ``\textbf{project out the known-bad eigenspace}''.
+        \item HHL's eigenvalue \emph{precision} was wasted effort for this problem --- the 1BQF spends one bit exactly where the physics puts the information.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering\fig{\textwidth}{\PF/eigenvalue_filter.png}
+      \cn{$1/\lambda$ reweighting (HHL) vs the single-notch filter (1BQF).}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Backup: class by class at matched efficiency ($T{=}400$)}
+  \centering\figw{0.94\textwidth}{\PF/per_class_matched_T400.png}
+  \vspace{-2pt}
+  {\footnotesize The quantum keeps \textbf{all} true segments --- and with them the coupled false clusters: the price of efficiency.}
+\end{frame}
+
+\begin{frame}{Backup: the fork term --- dense breaks the quantum, $\varepsilon$-windowed fixes it}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \centering\fig{\textwidth}{\BIF/eps_fork_quantum.png}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering\fig{\textwidth}{\BIF/eps_fork_sparsity.png}
+    \end{column}
+  \end{columns}
+  \begin{itemize}
+    \item \textbf{Dense} fork ($O(T^3)$ pairs): classically a benign uniform down-scaling (AUC $\approx1$) but \textbf{destroys the 1BQF} (AUC $\to0.55$) and the sparsity ($\sim$20$\times$ slower).
+    \item \textbf{$\varepsilon$-windowed} $B_\varepsilon$ (only near-collinear competitors): \textbf{sparse}, \textbf{targeted} (false rate $\to0$ at $\sim$2\% efficiency cost), and \textbf{1BQF-safe} (AUC $0.96$--$0.99$).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Backup: QSVT --- a polynomial filter lifts true/false separation}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \centering\fig{\textwidth}{\QS/efficacy_frontier.png}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item A degree-$\sim$30 polynomial lifts true/false \textbf{AUC} from $0.49$ (classical) / $0.64$ (1-bit) to $\mathbf{0.88}$.
+        \item Nulls \emph{all} off-length bridges and $\sim$95\% of hubs.
+        \item \textbf{Cost:} $\sim$30 block-encoding calls $\times$ $\sim$2$\times$ amplitude-amplification $\approx$ tens$\times$ the 1-bit depth; sparsity preserved.
+        \item \textbf{Irreducible floor:} a false bridge of the \emph{same length} as a true track (0\% at $T\le200$; grows with density).
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---- original backup set ----
 \begin{frame}{Backup: track-level metrics --- segments propagate to tracks}
   \centering\fig{0.62\textwidth}{\PF/track_metrics_vs_T.png}\\
   \cn{Wide $\varepsilon$ $\Rightarrow$ bridges merge tracks $\Rightarrow$ reconstruction efficiency collapses ($1.0\to0.42$); tight $\varepsilon$ stays perfect.}
@@ -380,4 +384,3 @@
 \begin{frame}{Backup: classical vs quantum per cluster (analytic)}
   \centering\fig{0.9\textwidth}{\SL/walkthrough_400/classical_vs_quantum.png}
 \end{frame}
-
