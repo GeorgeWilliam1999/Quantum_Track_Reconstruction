@@ -109,13 +109,27 @@ C7. **Operator–response co-design: the ε-windowed bifurcation term lifts the
     (all co-hit pairs) breaks both the sparsity invariant (O(T³)) and the 1BQF
     (AUC → 0.55, ~20× slower) — the acceptance window is what makes the term
     admissible, mirroring how the line-comb (not the band) makes the filter
-    admissible. **Smoke-tested** (T=400, γ=3 clean, rep 0): β = 0.5–1.0
-    recovers 33–44 % of the floor-lost true segments (comb efficiency
-    97.8 % → 98.9 %, misses 36 → 20) with the comb false rate pinned at 0, and
-    simultaneously cleans the classical baseline (far 2.0 % → 0.9 %). Full
-    recovery is not expected from β alone (the parasite's continuation coupling
-    remains); the recoverable fraction and the β trade-off (the fork widens the
-    spectrum, λ_max 6.8 → 8.7 at β = 1, diluting comb resolution) are WP7.
+    admissible. **Measured** (deep dive, `01_codesign_deep_dive.ipynb`):
+    - *Surgical and provably safe:* the fork touches 1.8 % of segments at
+      T = 400; **0/1564** pure-P4 true segments carry a fork edge ⇒ the clean
+      true spectrum is exactly β-invariant (stays on the comb lines, any β).
+    - *Contamination recovery:* trajectory analysis shows the mechanism — the
+      true-weighted modes of contaminated clusters migrate **into** the comb
+      bands as β grows. ε = 2 mrad, T = 400: misses 36 → 20 (eff 97.8 → 98.9 %)
+      at comb far = 0; ε = 4 mrad, T = 400: comb eff 88.5 → 94.3 % and
+      classical far 19.4 → 11.1 % (β 0 → 1).
+    - *The honest limit:* an **isolated** floor bridge whose competitors lie
+      outside the fork window is β-invariant (harvested example: exact P4
+      spectrum, zero fork edges, flat trajectories) — the ε-window that makes
+      the term sparse also bounds its reach. **The fork window is a design
+      parameter separate from the acceptance window** (a wider B-window stays
+      sparse while reaching the bridges' competitors): quantifying that
+      decoupling is the core of WP7.
+    - *The β cost:* the spectral half-span grows only where the fork acts
+      (T ≤ 200: envelope pinned at the P4 extremes, no widening at all;
+      T = 400: 2.8 → 4.7 at β = 1 ⇒ comb degree 40 → ~67 for fixed line
+      resolution, ≤ 1 extra LCU qubit). Width, oracle sparsity
+      (nnz(B_ε) ≤ 5 % of nnz(A)) and success probability (∝ 1/T) are unchanged.
 
 ## 3. Theory section content
 
@@ -163,7 +177,8 @@ C7. **Operator–response co-design: the ε-windowed bifurcation term lifts the
 | Fig 8: qubit-width scaling + local exact-simulation ceiling | `QSVT/Initial/05` (`first_build_qubits`) | done |
 | Fig 9: efficiency-dip / floor quantification (contaminated clusters; irreducible fraction vs T, ε) | `QSVT/Segment_level_studies/01` §3 + `QSVT/Initial/00` (`irreducible_floor`) | done |
 | Fig 10: the ε-windowed fork term — sparsity, targeted suppression, dense-fork failure | `Bifurification/03` (`eps_fork_sparsity`, `eps_vs_dense_classical`, `eps_fork_quantum`) + `Bifurification/02` (`classical_vs_quantum_beta`) | done |
-| Fig 11: co-design — comb × ε-fork: floor recovery vs β + spectrum-widening trade-off | smoke-tested numbers exist (36→20 misses, far 0, λ_max 6.8→8.7) | **to make (WP7)** |
+| Fig 11: co-design — eigenvalue trajectories λ(β) (recovery vs the invariant bridge), ε=4 mrad floor test, spectrum/degree trade-off | `Paper_planning/01_codesign_deep_dive` (`codesign_spectral_trajectories`, `codesign_event_level`) | done (toy; ε_B scan = WP7) |
+| Fig 12: scaling — sparsity O(n_seg), width to 29 q at T=1000, success ∝ 1/T (measured) | `Paper_planning/01_codesign_deep_dive` (`codesign_scaling`) | done |
 | Tab 1: solver comparison at fixed τ and at working points | nb01 tables | done |
 | Tab 2: resource accounting (qubits, walk calls, success prob, AA rounds) vs 1BQF and HHL | `QSVT/Initial/03` | done (extend) |
 
@@ -195,16 +210,29 @@ C7. **Operator–response co-design: the ε-windowed bifurcation term lifts the
   makes the quantum claim honest: the *quantum* content is the resource scaling,
   not the response itself). This must be stated clearly to pre-empt the
   "dequantisation" referee.
-- **WP7 (co-design, C7):** the comb × ε-fork study at scale. β scan of the
-  floor-recovery fraction (contaminated-cluster efficiency) and of the
-  same-length-bridge floor (at ε = 4 mrad / T = 400 where the 0.6 % bridge floor
-  was measured); the β trade-off curve (spectrum widening → comb-degree cost,
-  optimal β); whether the fork also restores a *fixed* per-solver τ at T = 400
-  (the working-point τ drop to ~0.08 was driven by the contaminated clusters);
-  store-campaign variant with A′ = A₀ + βB_ε (new ham provenance keys) so the
-  2×2 and working points can be reported for the co-designed system. Smoke
-  test done (numbers in C7); script basis: `Bifurification/bif.py`
-  (`fork_graph_eps`) + `QSVT/qsvt_store_campaign.py`.
+- **WP7 (co-design, C7):** the comb × ε-fork study at scale. Core new question
+  from the deep dive: **decouple the fork window ε_B from the acceptance ε** —
+  scan ε_B > ε so the term reaches the isolated bridges' competitors while
+  staying sparse (measure nnz(B_{ε_B}) growth and the bridge-floor reduction vs
+  ε_B, alongside the β scan); the β trade-off curve (spectrum widening →
+  comb-degree cost, optimal (β, ε_B)); whether the fork restores a *fixed*
+  per-solver τ at T = 400 (the working-point τ drop to ~0.08 was driven by the
+  contaminated clusters); store-campaign variant with A′ = A₀ + βB_{ε_B} (new
+  ham provenance keys) so the 2×2 and working points can be reported for the
+  co-designed system. Deep dive done (`01_codesign_deep_dive.ipynb`: spectral
+  mechanics, ε=4 mrad floor test, scaling to T = 1000, Condor feasibility);
+  script basis: `Bifurification/bif.py` (`fork_graph_eps`) +
+  `QSVT/qsvt_store_campaign.py`.
+
+### Simulation reach (measured — scopes WP1/2/3/7; details in `01_codesign_deep_dive.ipynb` §C–D)
+
+| problem | method | reach | per-job cost |
+|---|---|---|---|
+| physics campaigns (2×2, working points, β/ε_B/γ/noise scans) | matrix-free exact semantics | **T = 1000+** (n = 4 M segments, 29 qubits-equivalent) | ~1.6 s solve + ~2 min build, ≲ 8 GB → a 1 000-solve campaign ≈ 50–80 CPU-h on Condor |
+| exact explicit-circuit validation | dense-walk statevector (streaming) | T ≈ 64 (21 q) comfortably; T ≈ 90 (22 q) hero job | n_s=14: ~1 h + ~60 GB (bigmem); n_s=15: days + ~200 GB |
+| shot-based + hardware-noise studies | Aer, cluster-level circuits | 5–60-segment components → 8–13 qubits | seconds–minutes per 10⁴ shots; full noise sweeps farmable |
+| hardware demo (WP3) | Quantinuum H2 / IBM Heron | one contaminated component, comb degree ~12–16 | **8–9 qubits** — realistic continuation of paper 2's hardware section |
+| full-event circuit at HL-LHC scale | — | 29–30 q *width* but 2ⁿ statevector | not classically simulable — the point of the paper |
 
 ## 5. Proposed outline
 
