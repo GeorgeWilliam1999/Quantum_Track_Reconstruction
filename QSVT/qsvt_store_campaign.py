@@ -74,11 +74,19 @@ def spectral_bounds_for(ham) -> tuple[float, float]:
 def main(dry_run: bool = False, overwrite: bool = False) -> int:
     md = qp.manifest_dir()
     sols = pd.read_csv(md / "solutions.csv")
-    fx = sols[(sols.eps_provenance == "set") &
-              (sols.epsilon.round(6) == EPS_FIXED) &
-              (sols.solver == "quantum")]
-    fx = fx[fx.sol_key.map(qp.solution_exists)].reset_index(drop=True)
-    print(f"[campaign] mirroring {len(fx)} fixed-eps quantum solves as solver='qsvt'")
+    base = sols[(sols.eps_provenance == "set") &
+                (sols.epsilon.round(6) == EPS_FIXED)]
+    # mirror the full 1BQF coverage (T<=400), plus the classical-only big events
+    # (T=700/1000, reps 0-2 -- WP2 of the paper plan: qsvt scales where the
+    # 1BQF statevector did not)
+    fq = base[base.solver == "quantum"]
+    fbig = base[(base.solver == "classical") &
+                (base.n_trk.isin([700, 1000])) & (base.rep <= 2)]
+    fx = pd.concat([fq, fbig], ignore_index=True)
+    fx = fx[fx.sol_key.map(qp.solution_exists)]
+    fx = fx.drop_duplicates(subset=["event_key", "ham_key"]).reset_index(drop=True)
+    print(f"[campaign] mirroring {len(fx)} fixed-eps solves as solver='qsvt' "
+          f"({len(fq)} from quantum coverage, {int((fx.n_trk>=700).sum())} big classical-only)")
 
     new_rows, done, t00 = [], 0, time.time()
     for i, r in fx.iterrows():
