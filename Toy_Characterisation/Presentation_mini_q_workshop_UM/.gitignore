@@ -1,2 +1,10 @@
 # intermediate data / logs (regenerable; not needed for Notion embeds)
 assets/
+# LaTeX build intermediates (keep talk.tex + talk.pdf)
+slides/*.aux
+slides/*.log
+slides/*.nav
+slides/*.snm
+slides/*.toc
+slides/*.out
+slides/build*.log
