@@ -60,7 +60,7 @@ eigenvalue/notch picture, the 1BQF).
 ## Running
 ```bash
 PY=/data/bfys/gscriven/conda/envs/Q_env/bin/python
-export MPLBACKEND=Agg
+# (do NOT set MPLBACKEND=Agg - it suppresses the inline figures in the executed notebooks)
 $PY -m jupyter nbconvert --to notebook --execute --inplace 01_construction_and_spectrum.ipynb
 $PY -m jupyter nbconvert --to notebook --execute --inplace 02_metrics_vs_beta.ipynb   # quantum ~5–8 min (cached)
 ```

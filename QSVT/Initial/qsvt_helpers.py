@@ -20,7 +20,7 @@ for _p in ("/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisatio
     if _p not in sys.path:
         sys.path.insert(0, _p)
 os.environ.setdefault("QTRK_STORE", "/data/bfys/gscriven/qtrk_store")
-os.environ.setdefault("MPLBACKEND", "Agg")
+# NOTE: do not force MPLBACKEND here - it suppresses inline figures in notebooks
 import qtrk_pipeline as qp  # noqa: E402
 
 GAMMA, DELTA, EPS = 3.0, 1.0, 0.002

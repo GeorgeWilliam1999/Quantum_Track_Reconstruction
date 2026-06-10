@@ -58,7 +58,7 @@ Figures land under `outputs/<notebook>/` as PDF (600 dpi) + PNG (300 dpi).
 
 ```bash
 PY=/data/bfys/gscriven/conda/envs/Q_env/bin/python
-export MPLBACKEND=Agg
+# (do NOT set MPLBACKEND=Agg - it suppresses the inline figures in the executed notebooks)
 $PY -m jupyter nbconvert --to notebook --execute --inplace 01_solver_segment_efficiency.ipynb
 # nb1 reads the metrics view (fast); nb2 reads vectors; nb3 runs ARPACK (slow at n=1000, cached).
 ```
