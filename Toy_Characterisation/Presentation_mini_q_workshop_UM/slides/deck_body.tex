@@ -23,6 +23,15 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{The toy injects the two physical detector noises}
+  \centering
+  \figw{0.9\textwidth}{\PF/noise_types.png}
+  \begin{itemize}
+    \item \textbf{Multiple scattering} $\sigma_{\rm scatt}$: kicks the slopes $(t_x,t_y)$ at each plane $\Rightarrow$ a cone around the ideal track.
+    \item \textbf{Resolution} $\sigma_{\rm res}$: smears each measured hit in $x,y$. \quad Both \emph{widen the triplet kink angle} $\Rightarrow$ they set $\varepsilon$.
+  \end{itemize}
+\end{frame}
+
 % ==================================================================
 \section{From hits to the Hamiltonian to a matrix inversion}
 \begin{frame}{Step 1: from hits to segments}
@@ -114,6 +123,14 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{HHL stage by stage: the statevector at every step}
+  \centering
+  \figw{0.99\textwidth}{\PF/hhl_states.png}
+  \vspace{2pt}
+  {\footnotesize On a true-track block ($P_4$): $|b\rangle \xrightarrow{\rm QPE} \sum_k\beta_k|u_k\rangle|\lambda_k\rangle
+   \xrightarrow{R_y(1/\lambda)} \text{ancilla}=1 \text{ branch} \xrightarrow{\rm post\text{-}select} \;\propto A^{-1}\mathbf{b}$.}
+\end{frame}
+
 \begin{frame}{TrackHHL: restrict the phase estimation to \emph{one bit}}
   \cn{[arXiv:2511.11458 --- Chiotopoulos, Lucio Martinez, Nicotra \emph{et al.}]}
   \begin{itemize}
@@ -150,6 +167,23 @@
   \end{itemize}
   \vspace{4pt}
   \centering\figh{0.3\textheight}{\PF/hhl_why_one_bit.png}
+\end{frame}
+
+\begin{frame}{The conceptual reformulation: inversion $\to$ filtering}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{itemize}
+        \item We never needed the \emph{numbers} in $A^{-1}\mathbf{b}$ --- only a \textbf{binary decision} per segment: on or off.
+        \item The spectrum is \textbf{bimodal}: false bulk \emph{at} $\gamma+\delta$, true band \emph{away} from it.
+        \item So \textbf{one bit of spectral information classifies}: ``matrix inversion'' becomes ``\textbf{project out the known-bad eigenspace}''.
+        \item HHL's eigenvalue \emph{precision} was wasted effort for this problem --- the 1BQF spends one bit exactly where the physics puts the information.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering\fig{\textwidth}{\PF/eigenvalue_filter.png}
+      \cn{$1/\lambda$ reweighting (HHL) vs the single-notch filter (1BQF).}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Every cluster type in segment space --- and its block of $A$}
@@ -272,40 +306,6 @@
     \end{column}
     \begin{column}{0.5\textwidth}
       \centering\fig{\textwidth}{\PF/pipeline_architecture.png}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Backup: the toy injects the two physical detector noises}
-  \centering
-  \figw{0.9\textwidth}{\PF/noise_types.png}
-  \begin{itemize}
-    \item \textbf{Multiple scattering} $\sigma_{\rm scatt}$: kicks the slopes $(t_x,t_y)$ at each plane $\Rightarrow$ a cone around the ideal track.
-    \item \textbf{Resolution} $\sigma_{\rm res}$: smears each measured hit in $x,y$. \quad Both \emph{widen the triplet kink angle} $\Rightarrow$ they set $\varepsilon$.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Backup: HHL stage by stage --- the statevector at every step}
-  \centering
-  \figw{0.99\textwidth}{\PF/hhl_states.png}
-  \vspace{2pt}
-  {\footnotesize On a true-track block ($P_4$): $|b\rangle \xrightarrow{\rm QPE} \sum_k\beta_k|u_k\rangle|\lambda_k\rangle
-   \xrightarrow{R_y(1/\lambda)} \text{ancilla}=1 \text{ branch} \xrightarrow{\rm post\text{-}select} \;\propto A^{-1}\mathbf{b}$.}
-\end{frame}
-
-\begin{frame}{Backup: the conceptual reformulation --- inversion $\to$ filtering}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{itemize}
-        \item We never needed the \emph{numbers} in $A^{-1}\mathbf{b}$ --- only a \textbf{binary decision} per segment: on or off.
-        \item The spectrum is \textbf{bimodal}: false bulk \emph{at} $\gamma+\delta$, true band \emph{away} from it.
-        \item So \textbf{one bit of spectral information classifies}: ``matrix inversion'' becomes ``\textbf{project out the known-bad eigenspace}''.
-        \item HHL's eigenvalue \emph{precision} was wasted effort for this problem --- the 1BQF spends one bit exactly where the physics puts the information.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \centering\fig{\textwidth}{\PF/eigenvalue_filter.png}
-      \cn{$1/\lambda$ reweighting (HHL) vs the single-notch filter (1BQF).}
     \end{column}
   \end{columns}
 \end{frame}
