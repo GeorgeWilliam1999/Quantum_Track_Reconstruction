@@ -13,16 +13,19 @@
 
 **This paper (working thesis).** Track finding on the segment Hamiltonian is not a
 linear-solve problem and not a one-notch problem — it is a **spectral
-discrimination** problem. The 1BQF is the degree-1 member of the
-Chebyshev/QSVT filter family; generalising the polynomial turns the filter into a
-**design space**. We (i) characterise the failure modes of inversion and of the
-1-bit filter as *spectral populations* of the Hamiltonian, (ii) prove what any
-spectral filter can and cannot remove (the same-length-degeneracy floor),
-(iii) engineer the optimal response — a **line-comb inverse** that passes only the
-geometry-pinned true-track eigenvalue lines — and (iv) show on the standard
-campaign that it **dominates both classical inversion and the 1BQF
-simultaneously** at efficiency-first working points, at a quantified, constant
-(degree × walk-call) cost with ~30-qubit width at HL-LHC multiplicity.
+discrimination** problem with **two design knobs**: the spectral response and the
+operator itself. The 1BQF is the degree-1 member of the Chebyshev/QSVT filter
+family; generalising the polynomial turns the filter into a design space. We
+(i) characterise the failure modes of inversion and of the 1-bit filter as
+*spectral populations* of the Hamiltonian, (ii) prove what any spectral filter can
+and cannot remove (the same-length-degeneracy floor), (iii) engineer the optimal
+response — a **line-comb inverse** that passes only the geometry-pinned true-track
+eigenvalue lines — and the optimal operator — the **ε-windowed bifurcation term**,
+a sparse, constant-diagonal modification that separates the hit-topology errors
+the spectrum cannot see, lifting the floor — and (iv) show on the standard
+campaign that the co-designed system **dominates both classical inversion and the
+1BQF simultaneously** at efficiency-first working points, at a quantified,
+constant (degree × walk-call) cost with ~30-qubit width at HL-LHC multiplicity.
 
 ---
 
@@ -35,7 +38,8 @@ simultaneously** at efficiency-first working points, at a quantified, constant
 | **this paper** | **engineer** | d walk calls + LCU/QSVT phases | designed polynomial p(λ) | the provable floor: spectrum-identical false (same-length bridges / contaminated clusters) |
 
 One-line pitch: *"From inverting the matrix, to filtering one bit, to engineering
-the whole spectral response — and the theorem that says where engineering ends."*
+the spectral response AND the Hamiltonian — with the theorem that says which knob
+each error type needs."*
 
 ## 2. Core contributions (the claims list)
 
@@ -90,6 +94,29 @@ C6. **Production-scale benchmark on the standard campaign.** Three solvers
     points. (Stretch: real Run-3 VeLo events via the existing Run3_Verification
     loader.)
 
+C7. **Operator–response co-design: the ε-windowed bifurcation term lifts the
+    floor.** The floor populations (C2) are spectrum-identical *under the base
+    Hamiltonian* — but they are not hit-topology-identical: every one of them
+    involves near-collinear competitors sharing a hit. The **ε-windowed
+    Denby–Peterson fork term** (from `Toy_Characterisation/Bifurification`)
+    adds a repulsive coupling +β on exactly those pairs,
+    A′ = (γ+δ)I − C + βB_ε, while **staying sparse** (nnz(B_ε) = O(n_seg) —
+    the block-encoding/walk cost is unchanged) and **constant-diagonal** (every
+    segment touches two hits ⇒ 1BQF/QSVT compatibility preserved). It moves the
+    error configurations the filter cannot see: cleanly separates the
+    competing-continuation errors in the operator, leaving the comb to do the
+    spectral discrimination. Includes its own negative result: the *dense* fork
+    (all co-hit pairs) breaks both the sparsity invariant (O(T³)) and the 1BQF
+    (AUC → 0.55, ~20× slower) — the acceptance window is what makes the term
+    admissible, mirroring how the line-comb (not the band) makes the filter
+    admissible. **Smoke-tested** (T=400, γ=3 clean, rep 0): β = 0.5–1.0
+    recovers 33–44 % of the floor-lost true segments (comb efficiency
+    97.8 % → 98.9 %, misses 36 → 20) with the comb false rate pinned at 0, and
+    simultaneously cleans the classical baseline (far 2.0 % → 0.9 %). Full
+    recovery is not expected from β alone (the parasite's continuation coupling
+    remains); the recoverable fraction and the β trade-off (the fork widens the
+    spectrum, λ_max 6.8 → 8.7 at β = 1, diluting comb resolution) are WP7.
+
 ## 3. Theory section content
 
 - The segment Hamiltonian and its cluster decomposition (block-diagonal over
@@ -113,6 +140,13 @@ C6. **Production-scale benchmark on the standard campaign.** Three solvers
 - Qubitization/LCU construction and resource theorem (C5); relation to the
   1BQF's O(√N log N) gate count — the comb costs a *constant factor d* more
   walk calls at the same width scaling, preserving the sparse-A invariant.
+- The modified Hamiltonian (C7): the Denby–Peterson occupancy penalty, its two
+  diagonal treatments (both constant-diagonal because every segment touches
+  exactly two hits), the ε-window restriction B_ε and its sparsity bound;
+  the analytic single-fork example (x_f = (δ − βx_s)/(γ+δ) → 0); why the dense
+  fork fails (uniform down-scaling classically; lifts the false bulk off the
+  notch quantumly); spectrum-widening vs β and the implied comb-degree cost.
+  (All derivations exist in `Bifurification/bifurcation_hamiltonian.md` §1–9.)
 
 ## 4. Evidence inventory — what exists vs what is missing
 
@@ -128,6 +162,8 @@ C6. **Production-scale benchmark on the standard campaign.** Three solvers
 | Fig 7: band-design failure vs comb (the negative result) | numbers exist (5.2/15.4/43.6 %); needs a dedicated comparison figure | **to make** |
 | Fig 8: qubit-width scaling + local exact-simulation ceiling | `QSVT/Initial/05` (`first_build_qubits`) | done |
 | Fig 9: efficiency-dip / floor quantification (contaminated clusters; irreducible fraction vs T, ε) | `QSVT/Segment_level_studies/01` §3 + `QSVT/Initial/00` (`irreducible_floor`) | done |
+| Fig 10: the ε-windowed fork term — sparsity, targeted suppression, dense-fork failure | `Bifurification/03` (`eps_fork_sparsity`, `eps_vs_dense_classical`, `eps_fork_quantum`) + `Bifurification/02` (`classical_vs_quantum_beta`) | done |
+| Fig 11: co-design — comb × ε-fork: floor recovery vs β + spectrum-widening trade-off | smoke-tested numbers exist (36→20 misses, far 0, λ_max 6.8→8.7) | **to make (WP7)** |
 | Tab 1: solver comparison at fixed τ and at working points | nb01 tables | done |
 | Tab 2: resource accounting (qubits, walk calls, success prob, AA rounds) vs 1BQF and HHL | `QSVT/Initial/03` | done (extend) |
 
@@ -159,6 +195,16 @@ C6. **Production-scale benchmark on the standard campaign.** Three solvers
   makes the quantum claim honest: the *quantum* content is the resource scaling,
   not the response itself). This must be stated clearly to pre-empt the
   "dequantisation" referee.
+- **WP7 (co-design, C7):** the comb × ε-fork study at scale. β scan of the
+  floor-recovery fraction (contaminated-cluster efficiency) and of the
+  same-length-bridge floor (at ε = 4 mrad / T = 400 where the 0.6 % bridge floor
+  was measured); the β trade-off curve (spectrum widening → comb-degree cost,
+  optimal β); whether the fork also restores a *fixed* per-solver τ at T = 400
+  (the working-point τ drop to ~0.08 was driven by the contaminated clusters);
+  store-campaign variant with A′ = A₀ + βB_ε (new ham provenance keys) so the
+  2×2 and working points can be reported for the co-designed system. Smoke
+  test done (numbers in C7); script basis: `Bifurification/bif.py`
+  (`fork_graph_eps`) + `QSVT/qsvt_store_campaign.py`.
 
 ## 5. Proposed outline
 
@@ -170,16 +216,23 @@ C6. **Production-scale benchmark on the standard campaign.** Three solvers
    works and stops; the two-notch no-go; the floor theorem (C2).
 4. **Engineering the response** — band design and its density failure (C3
    negative result); the line-comb inverse; degree/realizability; γ-awareness.
-5. **Quantum realisation** — qubitization/LCU construction; 1BQF as d = 1;
-   resources (C5); validation chain; (WP3 hardware/shots).
-6. **Results** — campaign setup; the 2×2; amplitudes/angles; working-point
-   methodology (C4) and the headline table; robustness (WP1); scale (WP2);
-   (WP5 Run-3).
-7. **Discussion** — what the floor means for spectral methods at HL-LHC
-   density; the comb + occupancy/hit-level division of labour; dequantisation
+5. **Engineering the operator** — the ε-windowed bifurcation term (C7): the
+   occupancy penalty, the acceptance-window restriction that keeps it sparse
+   and constant-diagonal, the dense-fork negative result, and the co-design
+   result (floor recovery at pinned-zero false rate; the β/spectrum-widening
+   trade-off).
+6. **Quantum realisation** — qubitization/LCU construction; 1BQF as d = 1;
+   resources (C5) — unchanged under A′ (sparsity + diagonal preserved);
+   validation chain; (WP3 hardware/shots).
+7. **Results** — campaign setup; the 2×2; amplitudes/angles; working-point
+   methodology (C4) and the headline table; co-design results (WP7);
+   robustness (WP1); scale (WP2); (WP5 Run-3).
+8. **Discussion** — what the floor means for spectral methods at HL-LHC
+   density; the three-knob division of labour (operator: hit-topology errors;
+   response: spectral errors; occupancy/track-level: the rest); dequantisation
    honesty (WP6); outlook (fault-tolerant costing, parity/phase-angle QSVT,
    amplitude amplification).
-8. **Conclusion.**
+9. **Conclusion.**
 
 ## 6. Title candidates
 
