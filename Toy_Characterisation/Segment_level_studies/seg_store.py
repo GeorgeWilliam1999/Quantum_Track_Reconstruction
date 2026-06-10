@@ -183,7 +183,7 @@ def load_vectors(row, classical_partner: pd.DataFrame | None = None) -> dict:
                hit_ineff=float(row["hit_ineff"]), n_seg=int(ham.n_segments),
                truth=truth, theta_mrad=theta, sol=sol,
                tau=threshold(float(row["gamma"]), float(row.get("delta", DELTA))))
-    if str(row["solver"]) == "quantum" and classical_partner is not None:
+    if str(row["solver"]) != "classical" and classical_partner is not None:
         c = classical_partner[(classical_partner["event_key"] == row["event_key"]) &
                               (classical_partner["ham_key"] == row["ham_key"])]
         if len(c):
