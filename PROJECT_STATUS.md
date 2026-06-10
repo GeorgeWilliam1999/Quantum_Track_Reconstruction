@@ -1,6 +1,23 @@
 # Project Status & TODO — Quantum Track Reconstruction
 
-_Last updated: 2026-06-08_
+_Last updated: 2026-06-10_
+
+### 🧮 QSVT (new sub-project, 2026-06-10) — `QSVT/`
+Polynomial spectral filters generalising the 1BQF's single cosine notch.
+**Done in one day:** feasibility Steps A–E (`QSVT/Initial/`), the circuit-level
+solver in the package (`lhcb_velo_toy.solvers.quantum.QSVT`, LCU-of-Chebyshev
+over the qubitization walk; circuit == streaming == matrix-free to 1e-9), a
+108-solve store campaign mirroring the 1BQF coverage (`solver='qsvt'`,
+`Verify_new_results`), the **line-comb inverse** production filter (band design
+fails at density: far 43.6 % @ T=400 → comb ≈ 0 at 97–100 % eff), the hit-drop
+fragment mechanism + **occupancy gate** (eff 93→96.1 % at far 0.47 %), and
+**per-solver efficiency-first thresholds** (closes the τ_Q decision; at T=400
+clean: classical 100 %/1.6 %, 1BQF 99.5 %/43.9 %, **QSVT 98.3 %/0.96 %**).
+**Notion:** project page *QSVT* (Project DB) + three Write-Ups — *QSVT I Theory*,
+*QSVT II Application* (every figure with full mathematical description), and the
+chronological log — all dual-linked to *Quantum LHCb Toy* and *QSVT*.
+**Open:** minimax/pyqsp circuit path, T=700/1000 points, gate → pipeline,
+Run-3 length-aware comb.
 
 Root-level tracker for the whole workspace: outstanding work, a summary of
 what's done, and links to every written (compiled) report. Studies that are
