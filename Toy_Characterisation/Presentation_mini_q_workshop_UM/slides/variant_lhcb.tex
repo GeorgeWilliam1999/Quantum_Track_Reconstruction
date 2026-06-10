@@ -1,0 +1,62 @@
+% VARIANT "LHCb bold" — white slides, LHCb navy title bars with a red rule,
+% full-bleed navy title page with red diagonal band and a white logo strip.
+% Build: pdflatex variant_lhcb.tex (x2)
+\documentclass[aspectratio=169,10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[scaled]{helvet}
+\input{deck_common}
+
+% ---- LHCb brand palette (overrides) ----
+\definecolor{lhcbnavy}{RGB}{15,45,92}
+\definecolor{lhcbred}{RGB}{228,0,43}
+\definecolor{velo}{RGB}{15,45,92}
+\definecolor{acc}{RGB}{228,0,43}
+\colorlet{thanksbg}{lhcbnavy}
+\colorlet{thanksfg}{white}
+
+\setbeamercolor{structure}{fg=lhcbnavy}
+\setbeamercolor{frametitle}{fg=white,bg=lhcbnavy}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{section in toc}{fg=lhcbnavy}
+\setbeamercolor{palette primary}{fg=white,bg=lhcbnavy}
+\setbeamercolor{palette secondary}{fg=white,bg=lhcbnavy!80}
+\setbeamercolor{palette tertiary}{fg=white,bg=lhcbnavy!60}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamertemplate{itemize item}{\color{lhcbred}\small$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{lhcbnavy}\textendash}
+% red rule under the frame-title bar
+\addtobeamertemplate{frametitle}{}{\vskip-1ex{\color{lhcbred}\hrule height 1.6pt}\vskip0.8ex}
+
+\begin{document}
+
+{\setbeamercolor{background canvas}{bg=lhcbnavy}\setbeamertemplate{footline}{}%
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    % red diagonal band
+    \fill[lhcbred]
+      ([yshift=0.255\paperheight]current page.south west) --
+      ([yshift=0.315\paperheight]current page.south west) --
+      ([yshift=0.545\paperheight]current page.south east) --
+      ([yshift=0.485\paperheight]current page.south east) -- cycle;
+    \fill[white,opacity=0.16]
+      ([yshift=0.235\paperheight]current page.south west) --
+      ([yshift=0.255\paperheight]current page.south west) --
+      ([yshift=0.485\paperheight]current page.south east) --
+      ([yshift=0.465\paperheight]current page.south east) -- cycle;
+    % white logo strip at the bottom
+    \fill[white] (current page.south west) rectangle ([yshift=0.135\paperheight]current page.south east);
+    \node[anchor=south] at ([yshift=0.022\paperheight]current page.south) {\logorow{0.048\textheight}};
+  \end{tikzpicture}
+  \centering
+  \vspace{0.10\textheight}
+  {\huge\bfseries\color{white} Quantum Track Reconstruction in the LHCb VELO}\\[10pt]
+  {\large\color{white!85!lhcbnavy} From the Hamiltonian to HHL to the 1-Bit Quantum Filter}\\[42pt]
+  {\color{white}\textbf{George Scriven}}\\[3pt]
+  {\footnotesize\color{white!80!lhcbnavy} Nikhef \;$\cdot$\; Maastricht University \;$\cdot$\; Hasselt University}\\[3pt]
+  {\footnotesize\color{white!80!lhcbnavy} Quantum Tracking Mini Workshop, Maastricht --- 11 June 2026
+   \;$\cdot$\; arXiv:2511.11458 / arXiv:2601.07766}
+\end{frame}}
+
+\input{deck_body}
+
+\end{document}

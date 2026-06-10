@@ -1,0 +1,62 @@
+% VARIANT "VELO Night" — dark navy deck, cyan/amber accents, TikZ track-fan title page.
+% Build: pdflatex variant_night.tex (x2)
+\documentclass[aspectratio=169,10pt]{beamer}
+\usetheme{Boadilla}
+\input{deck_common}
+
+% ---- dark palette (overrides) ----
+\definecolor{night}{RGB}{11,20,38}
+\definecolor{panel}{RGB}{20,34,60}
+\definecolor{skyblue}{RGB}{111,183,232}
+\definecolor{velo}{RGB}{111,183,232}
+\definecolor{acc}{RGB}{255,123,114}
+\definecolor{grn}{RGB}{124,227,139}
+\definecolor{orng}{RGB}{255,184,77}
+\definecolor{gray}{RGB}{159,176,195}
+\colorlet{thanksbg}{night}
+\colorlet{thanksfg}{white}
+
+\setbeamercolor{normal text}{fg=white!94!cyan,bg=night}
+\setbeamercolor{structure}{fg=skyblue}
+\setbeamercolor{frametitle}{fg=skyblue,bg=panel}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{section in toc}{fg=skyblue}
+\setbeamercolor{palette primary}{fg=white,bg=panel}
+\setbeamercolor{palette secondary}{fg=skyblue,bg=night!40!panel}
+\setbeamercolor{palette tertiary}{fg=white,bg=night!75!panel}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamertemplate{itemize item}{\color{skyblue}\textbullet}
+\setbeamertemplate{itemize subitem}{\color{orng}\textendash}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{}%
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    % detector planes
+    \foreach \x in {0.46,0.58,0.70,0.82,0.94}{
+      \draw[white,opacity=0.09,line width=1.4pt]
+        ([xshift=\x\paperwidth]current page.south west) --
+        ([xshift=\x\paperwidth]current page.north west);}
+    % tracks fanning from the PV
+    \coordinate (pv) at ([xshift=0.07\paperwidth,yshift=0.34\paperheight]current page.south west);
+    \foreach \ang in {26,17,9,2,-5,-13}{
+      \draw[skyblue,opacity=0.38,line width=1.1pt] (pv) -- ++(\ang:1.15\paperwidth);}
+    \foreach \ang in {21,-9}{
+      \draw[acc,opacity=0.42,line width=1.0pt,dashed] (pv) -- ++(\ang:1.1\paperwidth);}
+    \fill[orng] (pv) circle (2.8pt);
+  \end{tikzpicture}
+  \centering
+  \vspace{0.13\textheight}
+  {\huge\bfseries\color{white} Quantum Track Reconstruction in the LHCb VELO}\\[10pt]
+  {\large\color{skyblue} From the Hamiltonian to HHL to the 1-Bit Quantum Filter}\\[20pt]
+  {\color{white}\textbf{George Scriven}}\\[3pt]
+  {\footnotesize\color{gray} Nikhef \;$\cdot$\; Maastricht University \;$\cdot$\; Hasselt University}\\[3pt]
+  {\footnotesize\color{gray} Quantum Tracking Mini Workshop, Maastricht --- 11 June 2026}\\[3pt]
+  {\scriptsize\color{gray} arXiv:2511.11458 (HHL) \;$\cdot$\; arXiv:2601.07766 (1-Bit Quantum Filter)}\\[14pt]
+  \logocard{0.042\textheight}
+\end{frame}}
+
+\input{deck_body}
+
+\end{document}

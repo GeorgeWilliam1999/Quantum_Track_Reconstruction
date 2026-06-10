@@ -1,0 +1,42 @@
+% deck_common.tex — shared packages, metadata, paths, colors, logo helpers.
+% \input{deck_common} in the PREAMBLE of every theme variant, BEFORE theme overrides.
+\usepackage{graphicx,amsmath,amssymb,booktabs,xcolor,tikz}
+\setbeamertemplate{navigation symbols}{}
+
+% ---- default palette (variants may \definecolor again to override) ----
+\definecolor{velo}{RGB}{31,78,121}
+\definecolor{acc}{RGB}{214,39,40}
+\definecolor{grn}{RGB}{27,120,55}
+\definecolor{orng}{RGB}{224,130,20}
+\colorlet{thanksbg}{velo}
+\colorlet{thanksfg}{white}
+
+% ---- figure base paths ----
+\newcommand{\PF}{/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Presentation_mini_q_workshop_UM/figures}
+\newcommand{\SL}{/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Segment_level_studies/outputs}
+\newcommand{\BIF}{/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Bifurification/outputs}
+\newcommand{\FRSE}{/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/FR_SE_tradeoff/outputs}
+\newcommand{\QS}{/data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Initial/outputs}
+\newcommand{\LG}{/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Presentation_mini_q_workshop_UM/slides/logos}
+\newcommand{\fig}[2]{\includegraphics[width=#1,height=0.74\textheight,keepaspectratio]{#2}}
+\newcommand{\figh}[2]{\includegraphics[height=#1,keepaspectratio]{#2}}
+\newcommand{\figw}[2]{\includegraphics[width=#1,keepaspectratio]{#2}}
+\newcommand{\cn}[1]{{\footnotesize\color{gray}#1}}
+
+% ---- logos: Nikhef / UM / UHasselt / LHCb at a common visual height ----
+\newcommand{\logoone}[2]{\ensuremath{\vcenter{\hbox{\includegraphics[height=#1]{\LG/#2}}}}}
+\newcommand{\logorow}[1]{%
+  \logoone{#1}{nikhef.png}\hspace{2.2em}%
+  \logoone{#1}{um.png}\hspace{2.2em}%
+  \logoone{#1}{uhasselt.png}\hspace{2.2em}%
+  \logoone{\dimexpr#1*19/10\relax}{lhcb.png}}
+% logos on a white card (for coloured/dark backgrounds)
+\newcommand{\logocard}[1]{{\setlength{\fboxsep}{7pt}\colorbox{white}{\logorow{#1}}}}
+\newcommand{\ThanksLogos}{\logocard{0.045\textheight}}
+
+% ---- title metadata ----
+\title[1-Bit Quantum Filter for VELO tracking]{Quantum Track Reconstruction in the LHCb VELO}
+\subtitle{From the Hamiltonian to HHL to the 1-Bit Quantum Filter}
+\author[G.\ Scriven]{George Scriven}
+\institute[Nikhef/UM/UHasselt]{Nikhef \quad$\cdot$\quad Maastricht University \quad$\cdot$\quad Hasselt University}
+\date[Mini-Q UM 2026]{Quantum Tracking Mini Workshop, Maastricht --- 11 June 2026}

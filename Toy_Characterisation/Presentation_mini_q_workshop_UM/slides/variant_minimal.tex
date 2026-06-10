@@ -1,0 +1,49 @@
+% VARIANT "Minimal" — metropolis-style: white, dark-slate ink, orange accent rule,
+% no bars or boxes, page number only. Build: pdflatex variant_minimal.tex (x2)
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\input{deck_common}
+
+% ---- minimal palette ----
+\definecolor{ink}{RGB}{35,55,59}
+\definecolor{accmin}{RGB}{235,129,27}
+\colorlet{thanksbg}{ink}
+\colorlet{thanksfg}{white}
+
+\setbeamercolor{normal text}{fg=ink,bg=white}
+\setbeamercolor{structure}{fg=ink}
+\setbeamercolor{frametitle}{fg=ink,bg=white}
+\setbeamercolor{title}{fg=ink}
+\setbeamercolor{section in toc}{fg=ink}
+\setbeamerfont{frametitle}{series=\bfseries,size=\large}
+\setbeamertemplate{itemize item}{\color{accmin}\textbullet}
+\setbeamertemplate{itemize subitem}{\color{ink!60}\textendash}
+\setbeamertemplate{frametitle}{%
+  \vskip8pt\usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}\insertframetitle\\[2pt]
+  {\color{accmin}\rule{0.16\textwidth}{2.2pt}}\vskip2pt}
+\setbeamertemplate{footline}{%
+  \hfill{\scriptsize\color{ink!55}\insertframenumber\,/\,\inserttotalframenumber}\hspace*{3ex}\vskip5pt}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{}%
+\begin{frame}[plain]
+  \vspace{0.16\textheight}
+  \hspace*{0.04\textwidth}\begin{minipage}{0.9\textwidth}
+    {\Huge\bfseries\color{ink} Quantum Track Reconstruction\\[2pt] in the LHCb VELO}\\[12pt]
+    {\color{accmin}\rule{0.20\textwidth}{3pt}}\\[12pt]
+    {\large\color{ink!75} From the Hamiltonian to HHL to the 1-Bit Quantum Filter}\\[26pt]
+    {\color{ink}\textbf{George Scriven}}\hspace{1.5em}{\small\color{ink!60}
+      Nikhef \,$\cdot$\, Maastricht University \,$\cdot$\, Hasselt University}\\[4pt]
+    {\small\color{ink!60} Quantum Tracking Mini Workshop, Maastricht --- 11 June 2026}\\[2pt]
+    {\footnotesize\color{ink!50} arXiv:2511.11458 (HHL) \,$\cdot$\, arXiv:2601.07766 (1-Bit Quantum Filter)}
+  \end{minipage}
+  \vfill
+  \hspace*{0.04\textwidth}\logorow{0.044\textheight}
+  \vspace{0.03\textheight}
+\end{frame}}
+
+\input{deck_body}
+
+\end{document}

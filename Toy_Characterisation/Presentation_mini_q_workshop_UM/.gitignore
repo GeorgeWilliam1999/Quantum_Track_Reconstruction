@@ -8,3 +8,5 @@ slides/*.snm
 slides/*.toc
 slides/*.out
 slides/build*.log
+# variant decks are regenerable from variant_*.tex (pdflatex x2); only talk.pdf is canonical
+slides/variant_*.pdf
