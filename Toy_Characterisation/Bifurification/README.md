@@ -28,6 +28,16 @@ eigenvalue/notch picture, the 1BQF).
 - **`03_epsilon_windowed_bifurcation.ipynb`** — the **ε-windowed** (sparse) fork
   `B_ε` (`bif.fork_graph_eps`): restores sparsity, **targeted** false-positive
   suppression with no collateral, and a **preserved 1BQF**. The production version.
+- **`04_failure_types_and_phase.ipynb`** — deep dive on the **T = 200** false
+  positives with the **classical** solver: per-FP failure type (hub 77 % / bridge
+  23 %), classical amplitude, and the **dominant eigenvalue/QPE-phase** that carries
+  it. Tests whether the **1BQF phase** can be tuned (a second notch) to erase the
+  coupled false the way the single notch at λ=s erases the isolated false. Answer:
+  **no** — the coupled false are a *spread that straddles the true band* (hubs at
+  λ=(γ+δ)−√m just below 2.382, bridges just above), so no notch separates them from
+  true tracks; the base single-notch point is Pareto-best. Confirms the fix must be
+  Hamiltonian-level (the ε-fork term, nb03, for bridges) + track-level (for hubs),
+  not a phase update. Figs: `fp_atlas_T200`, `phase_filter_map`, `two_notch_scan`.
 
 ## Findings (γ = 3, δ = 1, ε = 2 mrad, clean events)
 1. True and false segments carry **equal fork degree**, so β acts as a near-uniform
