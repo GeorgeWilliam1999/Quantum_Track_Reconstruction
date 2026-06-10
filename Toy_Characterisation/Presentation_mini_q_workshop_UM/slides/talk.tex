@@ -24,8 +24,9 @@
 \newcommand{\SL}{/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Segment_level_studies/outputs}
 \newcommand{\BIF}{/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Bifurification/outputs}
 \newcommand{\FRSE}{/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/FR_SE_tradeoff/outputs}
-\newcommand{\QS}{/data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/outputs}
+\newcommand{\QS}{/data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Initial/outputs}
 \newcommand{\fig}[2]{\includegraphics[width=#1,height=0.74\textheight,keepaspectratio]{#2}}
+\newcommand{\figh}[2]{\includegraphics[height=#1,keepaspectratio]{#2}}
 \newcommand{\figw}[2]{\includegraphics[width=#1,keepaspectratio]{#2}}
 \newcommand{\cn}[1]{{\footnotesize\color{gray}#1}}
 
@@ -50,17 +51,17 @@
 \end{frame}
 
 % ==================================================================
-\section{Motivation}
+\section{Motivation \& the toy model}
 \begin{frame}{The problem: tracking is a combinatorial needle-in-a-haystack}
   \begin{columns}[T]
     \begin{column}{0.54\textwidth}
       \begin{itemize}
         \item The LHCb \textbf{VELO} reconstructs charged particles (\textbf{tracks}) from \textbf{hits} on silicon planes.
         \item HL-LHC pile-up $\Rightarrow$ reconstruction cost threatens to outpace classical resources.
-        \item Work with \textbf{segments} (hit$\to$hit links on adjacent planes). With $T$ hits/plane each gap offers $T^2$ candidates, only $T$ real:
+        \item With $T$ hits per plane each plane-gap offers $T^2$ candidate links, only $T$ real:
         \[ n_{\rm seg}=4T^2 \quad\text{vs}\quad n_{\rm true}=4T \quad(\text{signal fraction } 1/T).\]
-        \item At $T{=}400$: \textbf{640{,}000} segments, \textbf{1{,}600} true (0.25\%).
-        \item \textbf{Idea:} cast track finding as a \emph{linear system} $A\mathbf{x}=\mathbf{b}$ and solve it classically \emph{or} on a quantum computer.
+        \item At $T{=}400$: \textbf{640{,}000} candidates, \textbf{1{,}600} true (0.25\%).
+        \item \textbf{Idea:} cast track finding as a \emph{linear system} $A\mathbf{x}=\mathbf{b}$, solvable classically \emph{or} on a quantum computer.
       \end{itemize}
     \end{column}
     \begin{column}{0.46\textwidth}
@@ -70,16 +71,14 @@
   \end{columns}
 \end{frame}
 
-% ==================================================================
-\section{The toy model}
 \begin{frame}{A controlled toy VELO --- our testbed}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
       \begin{itemize}
         \item \texttt{LHCb\_VeLo\_Toy\_Model}: \textbf{5 planes} at $z{=}33,66,99,132,165$\,mm, $\pm40$\,mm.
-        \item Deterministic, fully controlled: sweep multiplicity $T$, noise, density.
-        \item Decoupled \texttt{qtrk\_pipeline}: events stored once; matrix $A$ regenerated on demand (sparse); metrics recomputed as a \emph{view}.
-        \item Lets us isolate \emph{how each factor} (noise, density, $T$, kernel) moves the algorithm.
+        \item Deterministic and fully controlled: sweep multiplicity $T$, noise, density, kernel.
+        \item Decoupled pipeline: events stored once; the matrix $A$ regenerated on demand (sparse); metrics recomputed as a \emph{view}.
+        \item Purpose: isolate \emph{how each physical factor} moves the algorithm.
       \end{itemize}
     \end{column}
     \begin{column}{0.5\textwidth}
@@ -90,158 +89,198 @@
 
 \begin{frame}{The toy injects the two physical detector noises}
   \centering
-  \figw{0.92\textwidth}{\PF/noise_types.png}
+  \figw{0.9\textwidth}{\PF/noise_types.png}
   \begin{itemize}
-    \item \textbf{Multiple scattering} $\sigma_{\rm scatt}$: kicks the slopes $(t_x,t_y)$ at each plane $\Rightarrow$ the track wanders into a cone.
-    \item \textbf{Resolution} $\sigma_{\rm res}$: smears each hit in $x,y$. Both \emph{widen the triplet kink angle}.
+    \item \textbf{Multiple scattering} $\sigma_{\rm scatt}$: kicks the slopes $(t_x,t_y)$ at each plane $\Rightarrow$ a cone around the ideal track.
+    \item \textbf{Resolution} $\sigma_{\rm res}$: smears each measured hit in $x,y$. \quad Both \emph{widen the triplet kink angle} $\Rightarrow$ they set $\varepsilon$.
   \end{itemize}
 \end{frame}
 
 % ==================================================================
-\section{Hamiltonian \& matrix inversion}
-\begin{frame}{The Hamiltonian: an Ising-like segment model}
+\section{From hits to the Hamiltonian to a matrix inversion}
+\begin{frame}{Step 1: from hits to segments}
+  \centering
+  \figw{0.93\textwidth}{\SL/walkthrough_400/event_and_segments.png}
+  \begin{itemize}
+    \item A \textbf{segment} is a candidate hit$\to$hit link between adjacent planes; assign each a variable $x_i$ (its \emph{activation}).
+    \item \textcolor{grn}{\textbf{Green}} $=$ true (both hits from the same particle); \textcolor{acc}{\textbf{red dashed}} $=$ false (cross-track accident).
+    \item The reconstruction task: switch ON the green, OFF the red --- $4T^2$ binary decisions.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Step 2: the kink-angle cost --- which segments support each other}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{itemize}
-        \item Two segments sharing a middle hit form a \textbf{triplet} with kink angle $\theta$; small $\theta\Rightarrow$ same particle.
-        \item Assign each segment an activation $x_i$ and minimise an Ising-like (Hopfield/Denby--Peterson) energy
-        \[ H(\mathbf{x}) = -\tfrac12\,\mathbf{x}^{\!\top}\!A\,\mathbf{x} + \mathbf{b}^{\!\top}\mathbf{x}. \]
-        \item Off-diagonal coupling \emph{rewards} compatible triplets; diagonal penalises activation.
+        \item Two segments sharing a middle hit form a \textbf{triplet} with kink angle
+        $\theta_{ij}=\arccos(\hat v_i\cdot\hat v_j)$.
+        \item A real particle goes nearly straight $\Rightarrow$ small $\theta$. The \textbf{cost/compatibility kernel} is explicit:
+        \[ C(\theta_{ij})=\begin{cases}1 & \text{share a hit and } \theta_{ij}<\varepsilon\\[2pt] 0 & \text{otherwise}\end{cases} \]
+        \item smooth variant: $C=1+\mathrm{erf}\!\big(\tfrac{\varepsilon-\theta}{\theta_d\sqrt2}\big)\in[0,2]$.
+        \item $\varepsilon$ is \emph{derived from the detector noise}:
+        \[ \varepsilon=\sqrt{2(s\sigma_{\rm scatt})^2+12\arctan^2\!\tfrac{s\sigma_{\rm res}}{\Delta z}+2\theta_{\min}^2}. \]
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \centering\fig{\textwidth}{\PF/hamiltonian_schematic.png}
+      \centering\fig{\textwidth}{\PF/kernel_C_theta.png}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{From the Hamiltonian to a matrix inversion}
+\begin{frame}{Step 3: the explicit Hamiltonian}
+  Reward mutually-compatible segments, penalise activation, bias every segment on:
+  \[ \boxed{\;H(\mathbf{x}) \;=\; \underbrace{\frac{\gamma+\delta}{2}\sum_i x_i^2}_{\text{activation penalty}}
+      \;-\; \underbrace{\frac12\sum_{i\neq j} C(\theta_{ij})\,x_i x_j}_{\text{triplet reward (attractive)}}
+      \;-\; \underbrace{\delta\sum_i x_i}_{\text{bias}}\;} \]
+  \begin{itemize}
+    \item An Ising/Hopfield-type energy over segment activations (Denby--Peterson lineage); defaults $\gamma{=}3$, $\delta{=}1$.
+    \item Physically: each active segment ``pulls up'' the segments that continue it through a shared hit at a small kink angle; lone segments are pulled down.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Step 4: minimising $H$ \emph{is} a matrix inversion}
+  Stationarity, $\partial H/\partial x_i = 0$ for every segment $i$:
+  \[ (\gamma+\delta)\,x_i \;-\; \sum_{j} C(\theta_{ij})\,x_j \;-\; \delta = 0
+     \qquad\Longleftrightarrow\qquad \boxed{\,A\,\mathbf{x}=\delta\mathbf{1},\quad A=(\gamma+\delta)I - C\,} \]
   \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-      Stationarity $\partial H/\partial \mathbf{x}=0$ gives a \textbf{linear system}:
-      \[ \boxed{\,A\,\mathbf{x}=\mathbf{b}=\delta\mathbf{1}\,}\qquad \mathbf{x}=A^{-1}\mathbf{b}. \]
-      \[ A_{ii}=\gamma+\delta,\qquad A_{ij}=-C(\theta_{ij}), \]
-      with $C$ the 0/1 compatibility adjacency ($\theta<\varepsilon$), so
-      \[ A=(\gamma+\delta)\,I-C,\qquad \gamma{=}3,\ \delta{=}1. \]
-      \textbf{Hopfield fixed points} $\Rightarrow$ an absolute operating point:
+    \begin{column}{0.5\textwidth}
       \begin{itemize}
-        \item false/isolated $\to \delta/(\delta+\gamma)=0.25$;
-        \item true (in a chain) $\to \approx 0.375$ plateau;
-        \item threshold $\tau=0.35$ separates them.
+        \item Reconstruction $=$ \textbf{solve a sparse linear system}; classically: $\mathbf{x}=A^{-1}\delta\mathbf{1}$ (LU/CG).
+        \item \textbf{Hopfield fixed points} give an absolute scale:
+        false/isolated $\to\delta/(\delta{+}\gamma)=0.25$;\quad
+        true chain $\to\big[\tfrac{4}{11},\tfrac{5}{11}\big]$;\quad
+        threshold $\tau{=}0.35$.
+        \item Classical solve $=$ state-of-the-art efficiency \cn{[arXiv:2511.11458]}.
       \end{itemize}
-      Classical solve $=$ state-of-the-art efficiency \cn{[arXiv:2511.11458]}.
     \end{column}
-    \begin{column}{0.45\textwidth}
-      \centering\fig{\textwidth}{\PF/activation_hopfield.png}
+    \begin{column}{0.5\textwidth}
+      \centering\figh{0.52\textheight}{\PF/activation_hopfield.png}
     \end{column}
   \end{columns}
+\end{frame}
+
+\begin{frame}{What the inversion produces on one clean 400-track event}
+  \centering
+  \figw{0.78\textwidth}{\PF/activation_spectrum_400.png}
 \end{frame}
 
 % ==================================================================
-\section{Quantum inversion: HHL $\to$ 1-bit $\to$ 1BQF}
-\begin{frame}{HHL: invert $A$ on a quantum computer}
+\section{Quantum inversion: HHL $\to$ one bit $\to$ 1BQF}
+\begin{frame}{HHL: the quantum linear-system algorithm}
   \begin{columns}[T]
     \begin{column}{0.56\textwidth}
       \textbf{Harrow--Hassidim--Lloyd} solves $A\mathbf{x}=\mathbf{b}$:
       \begin{enumerate}
-        \item prepare $|\mathbf{b}\rangle$;
-        \item \textbf{quantum phase estimation} writes each eigenvalue $\lambda$ onto $n_{\rm time}$ time qubits;
-        \item controlled rotation scales each eigencomponent by $1/\lambda$;
-        \item post-select an ancilla; uncompute.
+        \item prepare $|\mathbf{b}\rangle$ over the segment basis;
+        \item \textbf{QPE}: $e^{iAt}$ writes each eigenvalue $\lambda_k$ onto an $n_{\rm time}$-qubit clock register;
+        \item controlled $R_y$: amplitude $\propto 1/\lambda_k$ onto an ancilla;
+        \item uncompute, post-select ancilla $=1$ $\Rightarrow$ state $\propto A^{-1}\mathbf{b}$.
       \end{enumerate}
-      Promises an \textbf{exponential speedup in the number of hits} --- \emph{contingent} on efficient QPE and reading out the result.
       \medskip
-      \textbf{Catch:} dense $e^{iAt}$ and high-precision QPE $\Rightarrow$ prohibitive circuit depth on NISQ hardware.
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \centering\fig{\textwidth}{\PF/eigenvalue_filter.png}
-      \cn{HHL reweights \emph{every} eigenvalue by $1/\lambda$.}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{TrackHHL: restrict phase estimation to \emph{one bit}}
-  \begin{columns}[T]
-    \begin{column}{0.56\textwidth}
-      \cn{[arXiv:2511.11458 --- Chiotopoulos, Lucio Martinez, Nicotra \emph{et al.}]}
-      \begin{itemize}
-        \item For this Hamiltonian the spectrum is \textbf{bimodal} --- a single bit of eigenvalue precision is enough.
-        \item Restricting QPE to \textbf{one bit}:
-        \begin{itemize}
-          \item cuts circuit depth by up to $\mathbf{10^4}$;
-          \item resolves HHL's read-out problem;
-          \item enables a primary-vertex post-processing step.
-        \end{itemize}
-        \item Classical reconstruction efficiency is retained.
-      \end{itemize}
+      Exponential speedup in the number of hits --- \emph{contingent on} efficient QPE \& readout.\\[4pt]
+      \textbf{Catch:} dense $e^{iAt}$ + high-precision QPE $\Rightarrow$ prohibitive depth on NISQ hardware.
     \end{column}
     \begin{column}{0.44\textwidth}
       \centering\fig{\textwidth}{\PF/hhl_vs_1bqf_circuit.png}
+      \cn{Left: the HHL circuit. Right: where we are heading.}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{The 1-Bit Quantum Filter (1BQF)}
-  \cn{[arXiv:2601.07766 --- Chiotopoulos, Nicotra, Scriven \emph{et al.}]}
+\begin{frame}{HHL stage by stage: the statevector at every step}
+  \centering
+  \figw{0.99\textwidth}{\PF/hhl_states.png}
+  \vspace{2pt}
+  {\footnotesize On a true-track block ($P_4$): $|b\rangle \xrightarrow{\rm QPE} \sum_k\beta_k|u_k\rangle|\lambda_k\rangle
+   \xrightarrow{R_y(1/\lambda)} \text{ancilla}=1 \text{ branch} \xrightarrow{\rm post\text{-}select} \;\propto A^{-1}\mathbf{b}$.}
+\end{frame}
+
+\begin{frame}{TrackHHL: restrict the phase estimation to \emph{one bit}}
+  \cn{[arXiv:2511.11458 --- Chiotopoulos, Lucio Martinez, Nicotra \emph{et al.}]}
+  \begin{itemize}
+    \item For this Hamiltonian the spectrum is \textbf{bimodal}: a huge bulk at $\lambda=\gamma+\delta$ (lone/false segments) and a narrow band of track modes away from it.
+    \item One bit of eigenvalue information --- \emph{on the bulk or off it} --- is already the answer.
+    \item Restricting QPE to \textbf{one clock qubit}:
+      cuts circuit depth by up to $\mathbf{10^4}$; \quad
+      resolves the read-out problem (the output is binary); \quad
+      enables primary-vertex post-processing.
+  \end{itemize}
+  \centering\figh{0.4\textheight}{\SL/single_event_400/spectrum_notch.png}\\
+  \cn{The event spectrum: 637k eigenvalues exactly at $\gamma+\delta$ (the false bulk) + coupled satellites.}
+\end{frame}
+
+\begin{frame}{The 1-Bit Quantum Filter: the maths}
+  \cn{[arXiv:2601.07766 --- Chiotopoulos, Nicotra, Scriven \emph{et al.}]}\\[2pt]
+  Choose the evolution time $t=\pi/(\gamma+\delta)$. One-qubit QPE on $e^{iAt}$ leaves, per eigencomponent,
+  \[ |u_k\rangle\Big(\cos\tfrac{\lambda_k t}{2}\,|0\rangle_{\rm clock} - i\,\sin\tfrac{\lambda_k t}{2}\,|1\rangle_{\rm clock}\Big), \]
+  and the \texttt{X--CX--X} ancilla flip + post-selection keeps each mode with weight
+  \[ \boxed{\;w_Q(\lambda)=\cos\Big(\frac{\pi}{2}\,\frac{\lambda}{\gamma+\delta}\Big)\;}\qquad
+     w_Q(\gamma+\delta)=0\;\;\text{(the notch, placed \emph{exactly} on the false bulk)}. \]
+  \centering\figh{0.4\textheight}{\SL/single_event_400/notch_rotation.png}\\
+  \cn{The $0.25$ isolated-false bulk (637k segments) is rotated to $0$; the true band survives.}
+\end{frame}
+
+\begin{frame}{Why the 1BQF wins --- in brief}
+  \begin{itemize}
+    \item \textbf{One clock qubit} instead of an $n_{\rm time}$-qubit eigenvalue register.
+    \item \textbf{Depth} cut by up to $10^4$ vs full HHL.
+    \item \textbf{Sparse} $e^{iAt}$ (two-level/Givens decomposition) $\Rightarrow$ gate complexity $O(\sqrt{N}\log N)$.
+    \item \textbf{Read-out solved}: the answer is binary (on/off the notch), no amplitude tomography.
+    \item \textbf{NISQ-validated}: Quantinuum H2 and IBM Heron noise models.
+    \item \textbf{Enables PV reconstruction} as classical post-processing.
+  \end{itemize}
+  \vspace{4pt}
+  \centering\figh{0.3\textheight}{\PF/hhl_why_one_bit.png}
+\end{frame}
+
+\begin{frame}{The conceptual reformulation: inversion $\to$ filtering}
   \begin{columns}[T]
-    \begin{column}{0.54\textwidth}
-      \textbf{Reframe: matrix inversion $\to$ binary ground-state filtering.}
+    \begin{column}{0.52\textwidth}
       \begin{itemize}
-        \item One time qubit + a single ancilla flip realises the filter
-        \[ w_Q(\lambda)=\cos\!\Big(\tfrac{\pi}{2}\tfrac{\lambda}{\gamma+\delta}\Big), \]
-        whose \emph{only} zero is the \textbf{notch} at $\lambda=\gamma+\delta$.
-        \item Sparse $e^{iAt}$ (two-level/Givens) $\Rightarrow$ gate complexity $\mathbf{O(\sqrt{N}\log N)}$.
-        \item Runs on Quantinuum H2 and IBM Heron noise models.
+        \item We never needed the \emph{numbers} in $A^{-1}\mathbf{b}$ --- only a \textbf{binary decision} per segment: on or off.
+        \item The spectrum is \textbf{bimodal}: false bulk \emph{at} $\gamma+\delta$, true band \emph{away} from it.
+        \item So \textbf{one bit of spectral information classifies}: ``matrix inversion'' becomes ``\textbf{project out the known-bad eigenspace}''.
+        \item HHL's eigenvalue \emph{precision} was wasted effort for this problem --- the 1BQF spends one bit exactly where the physics puts the information.
       \end{itemize}
     \end{column}
-    \begin{column}{0.46\textwidth}
+    \begin{column}{0.48\textwidth}
       \centering\fig{\textwidth}{\PF/eigenvalue_filter.png}
-      \cn{1BQF keeps a band with a single notch.}
+      \cn{$1/\lambda$ reweighting (HHL) vs the single-notch filter (1BQF).}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Why one bit suffices: the spectrum is block-diagonal}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item $A=(\gamma+\delta)I-C$ is \textbf{block-diagonal over clusters}; eigenvalues $\lambda=(\gamma+\delta)-\mu(C)$.
-        \item \textbf{bad (notch) eigenvalue} $\iff \mu(C)=0 \iff \lambda=\gamma+\delta$.
-        \item 99.5\% of segments are \textbf{isolated false} ($1\times1$ block at the notch) $\Rightarrow$ the filter erases them for free.
-        \item True 4-chains sit \emph{off} the notch $\Rightarrow$ kept.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \centering\fig{\textwidth}{\PF/A_block_structure.png}
-    \end{column}
-  \end{columns}
+\begin{frame}{Every cluster type in segment space --- and its block of $A$}
+  \centering
+  \figw{0.97\textwidth}{\PF/A_blocks_segment_space.png}
 \end{frame}
 
 % ==================================================================
-\section{Results from the toy}
-\begin{frame}{Segment efficiency stays high --- the false rate is the story}
+\section{Results: efficiency, false rate, and the trade-off}
+\begin{frame}{Results: segment efficiency stays high; the false rate grows}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
       \centering \cn{Classical} \\ \fig{\textwidth}{\SL/solver_segment_efficiency/classical_2x2_g3_base.png}
     \end{column}
     \begin{column}{0.5\textwidth}
-      \centering \cn{1BQF (quantum)} \\ \fig{\textwidth}{\SL/solver_segment_efficiency/quantum_2x2_g3_base.png}
+      \centering \cn{1BQF at matched efficiency} \\ \fig{\textwidth}{\PF/quantum_2x2_matched_eff.png}
     \end{column}
   \end{columns}
   \vspace{-2pt}
-  {\footnotesize Efficiency $\approx100\%$ (classical) / $\approx75\%$ (1BQF) across multiplicity; the \textbf{false rate grows with $T$} --- the rare coupled cross-track clusters.}
+  {\footnotesize \textbf{Both solvers: efficiency $\approx100\%$ across multiplicity; the false rate grows with $T$} (classical $0\!\to\!21\%$ by $T{=}1000$; quantum $0\!\to\!44\%$ by $T{=}400$) --- the coupled cross-track clusters.}
 \end{frame}
 
-\begin{frame}{The efficiency--false-rate trade-off (the real result)}
+\begin{frame}{The efficiency--false-rate trade-off}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
       \centering\fig{\textwidth}{\SL/quantum_false_rate_investigation/operating_point_tradeoff.png}
     \end{column}
     \begin{column}{0.5\textwidth}
       \begin{itemize}
-        \item You \emph{can} push segment efficiency high --- but only by \textbf{lowering the threshold}, which admits false positives.
-        \item At $\tau{=}0.35$: 1BQF eff $=75\%$; to recover $\approx100\%$ the false rate climbs to $\approx 44\%$.
-        \item \textbf{High efficiency and high false rate come together} --- not low/low. The operating curve, not a single point, is the result.
+        \item Recovering \emph{every} true segment forces the threshold into the false band: \textbf{high efficiency and high false rate come together}.
+        \item Quantum at matched efficiency ($\approx100\%$): false rate $\to 44\%$ at $T{=}400$.
+        \item The alternative fixed-$\tau$ point (eff 75\%, far 1.7\%) only \emph{hides} the trade-off by discarding a quarter of the true segments.
+        \item The \textbf{operating curve}, not a single point, is the result.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -251,10 +290,10 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{itemize}
-        \item The single notch removes only the \textbf{isolated} false class.
-        \item Surviving false positives are \textbf{coupled cross-track bridges/hubs} --- they carry \emph{good}, off-notch eigenvalues.
-        \item In the QPE phase the hub/bridge modes fall in the \textbf{same band as true segments} (one zero can't separate them).
-        \item \textbf{Topological degeneracy}: a false chain of the same shape as a true track has an identical $A$-block $\Rightarrow$ no threshold (classical or quantum) can separate them.
+        \item The notch removes only the \textbf{isolated} false class (it \emph{is} the bulk eigenvalue).
+        \item Surviving false positives $=$ \textbf{coupled cross-track bridges/hubs}: \emph{good}, off-notch eigenvalues.
+        \item In QPE phase they fall in the \textbf{same band as true segments} --- one zero cannot separate them.
+        \item \textbf{Topological degeneracy}: a false chain shaped like a true track has an \emph{identical} $A$-block $\Rightarrow$ no threshold, classical or quantum, can split them.
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
@@ -263,10 +302,36 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Class-by-class: where each segment lands vs $\tau$}
-  \centering\figw{0.96\textwidth}{\SL/walkthrough_400/per_class_treatment.png}
+\begin{frame}{Class by class at matched efficiency ($T{=}400$)}
+  \centering\figw{0.94\textwidth}{\PF/per_class_matched_T400.png}
   \vspace{-2pt}
-  {\footnotesize Isolated/pair false $\to$ below $\tau$ (both solvers); coupled-$\ge 3$ false $\to$ above $\tau$ (false positives, both); true tracks $\to$ above $\tau$ (1BQF drops the outer segment $\to$ eff $\approx0.75$).}
+  {\footnotesize The quantum keeps \textbf{all} true segments --- and with them the coupled false clusters: the price of efficiency.}
+\end{frame}
+
+% ==================================================================
+\section{Attacking the survivors: the bifurcation term}
+\begin{frame}{Add a bifurcation (fork) penalty to the Hamiltonian}
+  The survivors are \textbf{competing continuations} --- segments fanning from a shared hit. Penalise them:
+  \[ \boxed{\,A' = (\gamma+\delta)\,I - C + \beta B\,},\qquad \mathbf{b}=\delta\mathbf{1}, \]
+  with $B$ the \textbf{fork adjacency}: segments sharing a start/end hit that are \emph{not} collinear continuations.
+  Every segment touches exactly two hits $\Rightarrow$ the diagonal stays constant $\Rightarrow$ \textbf{still 1BQF-compatible}.
+  \medskip
+  \centering\figw{0.88\textwidth}{\PF/fork_matrix.png}
+\end{frame}
+
+\begin{frame}{The fork term: dense breaks the quantum --- $\varepsilon$-windowed fixes it}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \centering\fig{\textwidth}{\BIF/eps_fork_quantum.png}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering\fig{\textwidth}{\BIF/eps_fork_sparsity.png}
+    \end{column}
+  \end{columns}
+  \begin{itemize}
+    \item \textbf{Dense} fork ($O(T^3)$ pairs): classically a benign uniform down-scaling (AUC $\approx1$) but \textbf{destroys the 1BQF} (AUC $\to0.55$) and the sparsity ($\sim$20$\times$ slower).
+    \item \textbf{$\varepsilon$-windowed} $B_\varepsilon$ (only near-collinear competitors): \textbf{sparse}, \textbf{targeted} (false rate $\to0$ at $\sim$2\% efficiency cost), and \textbf{1BQF-safe} (AUC $0.96$--$0.99$).
+  \end{itemize}
 \end{frame}
 
 % ==================================================================
@@ -276,9 +341,9 @@
     \begin{column}{0.54\textwidth}
       \begin{itemize}
         \item The 1BQF is QSVT restricted to $p=\cos$ --- \textbf{one} notch.
-        \item \textbf{QSVT} (Gilyén--Su--Low--Wiebe) realises \emph{any} bounded polynomial $p(A)$ from a block-encoding of $A$ + $d$ phase rotations.
+        \item \textbf{QSVT} (Gily\'en--Su--Low--Wiebe) realises \emph{any} bounded polynomial $p(A)$ from a block-encoding of $A$ + $d$ phase rotations.
         \item Target: a \textbf{band-limited inverse} --- $p(\lambda)\approx1/\lambda$ on true-track eigenvalues, $p(\lambda)\approx0$ on every false mode (\emph{many} notches).
-        \item Works \emph{iff} false and true eigenvalues are separated --- and on real $T{=}200$ events the false modes sit $\ge0.2$ from every true eigenvalue.
+        \item Works \emph{iff} false and true eigenvalues are separated --- on real $T{=}200$ events the false modes sit $\ge0.2$ from every true eigenvalue.
       \end{itemize}
     \end{column}
     \begin{column}{0.46\textwidth}
@@ -296,7 +361,7 @@
       \begin{itemize}
         \item A degree-$\sim$30 polynomial lifts true/false \textbf{AUC} from $0.49$ (classical) / $0.64$ (1-bit) to $\mathbf{0.88}$.
         \item Nulls \emph{all} off-length bridges and $\sim$95\% of hubs.
-        \item \textbf{Cost:} $\sim$30 block-encoding calls $\times$ a $\sim$2$\times$ amplitude-amplification overhead $\approx$ tens$\times$ the 1-bit depth; sparse-$A$ preserved.
+        \item \textbf{Cost:} $\sim$30 block-encoding calls $\times$ $\sim$2$\times$ amplitude-amplification $\approx$ tens$\times$ the 1-bit depth; sparsity preserved.
         \item \textbf{Irreducible floor:} a false bridge of the \emph{same length} as a true track (0\% at $T\le200$; grows with density).
       \end{itemize}
     \end{column}
@@ -307,10 +372,10 @@
 \section*{Summary}
 \begin{frame}{Summary}
   \begin{itemize}
-    \item Track finding $\to$ Ising-like Hamiltonian $\to$ \textbf{matrix inversion} $A\mathbf{x}=\delta\mathbf{1}$, $A=(\gamma+\delta)I-C$.
-    \item \textbf{HHL} solves it but needs deep circuits; \textbf{TrackHHL} restricts QPE to one bit ($10^4$ depth cut); the \textbf{1BQF} reframes it as a single-notch spectral filter, $O(\sqrt N\log N)$, NISQ-ready.
-    \item On the toy: \textbf{segment efficiency stays high}; the false rate is set by coupled cross-track clusters --- a \textbf{fundamental trade-off} (topological degeneracy), not a solver artefact.
-    \item \textbf{QSVT} generalises the one notch to a polynomial filter: AUC $\to 0.88$, down to a same-length-bridge floor.
+    \item Hits $\to$ segments $\to$ explicit kink-angle cost $C(\theta)$ $\to$ Ising-like $H(\mathbf{x})$ $\to$ stationarity $\Rightarrow$ \textbf{matrix inversion} $A\mathbf{x}=\delta\mathbf{1}$, $A=(\gamma+\delta)I-C$.
+    \item \textbf{HHL} inverts it but needs deep circuits; \textbf{TrackHHL} restricts QPE to one bit ($10^4$ depth cut); the \textbf{1BQF} reframes inversion as a \textbf{single-notch spectral filter} --- $O(\sqrt N\log N)$, NISQ-ready.
+    \item On the toy: \textbf{efficiency stays $\approx$100\%, the false rate grows with density} --- a fundamental trade-off set by topologically-degenerate cross-track clusters.
+    \item Hamiltonian-level fix: the \textbf{$\varepsilon$-windowed fork term} (targeted, sparse, 1BQF-safe). Algorithm-level next step: \textbf{QSVT} polynomial filters (AUC $\to0.88$).
   \end{itemize}
   \vspace{4pt}
   \centering\cn{arXiv:2511.11458 (HHL) $\cdot$ arXiv:2601.07766 (1BQF) $\cdot$ toy: \texttt{LHCb\_VeLo\_Toy\_Model}}
@@ -336,8 +401,9 @@
   \cn{On the classical signal support the 1BQF is faithful: $\cos\theta_{QC}\approx0.97$, flat to $T{=}1000$.}
 \end{frame}
 
-\begin{frame}{Backup: why one bit --- cost vs full HHL}
-  \centering\fig{0.72\textwidth}{\PF/hhl_why_one_bit.png}
+\begin{frame}{Backup: fixed-threshold operating point ($\tau=0.35$)}
+  \centering\fig{0.6\textwidth}{\SL/solver_segment_efficiency/quantum_2x2_g3_base.png}\\
+  \cn{The same data at fixed $\tau$: eff 75\%, far 1.7\% --- the conservative end of the same operating curve.}
 \end{frame}
 
 \begin{frame}{Backup: the bad-eigenvalue ladder}
@@ -356,6 +422,10 @@
 
 \begin{frame}{Backup: $\gamma$ self-similarity of the notch}
   \centering\fig{0.85\textwidth}{\SL/quantum_false_rate_investigation/notch_universal_gamma.png}
+\end{frame}
+
+\begin{frame}{Backup: classical vs quantum per cluster (analytic)}
+  \centering\fig{0.9\textwidth}{\SL/walkthrough_400/classical_vs_quantum.png}
 \end{frame}
 
 \end{document}
