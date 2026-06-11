@@ -91,6 +91,9 @@ def solve_qsvt(ham, degree: int = 40, spectral_bounds=None, domain=None,
       Rejects the tangle/chain modes between the lines, which keeps the false
       rate ~0 at high track density (the band design's false promotions grow
       to tens of percent by T=400).
+    * ``filter_design='minimax'`` — the same comb fit in the Chebyshev
+      (minimax) norm via an LP; floors the metric at roughly half the degree
+      of the least-squares comb (D4 resource reduction).
     * ``filter_design='band'`` — the band-limited inverse of the initial
       study (~1/lambda on the contiguous true band, notched at the failure
       modes).  Kept for comparison.
@@ -106,11 +109,14 @@ def solve_qsvt(ham, degree: int = 40, spectral_bounds=None, domain=None,
     the coupling spectral radius rho(C):  spec(A) = s - spec(C).
     """
     from lhcb_velo_toy.solvers.quantum import (
-        QSVT, design_band_limited_inverse, design_line_comb_inverse)
+        QSVT, design_band_limited_inverse, design_line_comb_inverse,
+        design_minimax_comb)
 
     t0 = time.time()
     s = float(getattr(ham, "gamma", 3.0)) + float(getattr(ham, "delta", 1.0))
-    if str(filter_design) == "comb":
+    if str(filter_design) == "minimax":
+        poly = design_minimax_comb(degree=int(degree), s=s, domain=domain)
+    elif str(filter_design) == "comb":
         poly = design_line_comb_inverse(degree=int(degree), s=s, domain=domain)
     else:
         poly = design_band_limited_inverse(degree=int(degree), s=s, domain=domain)
