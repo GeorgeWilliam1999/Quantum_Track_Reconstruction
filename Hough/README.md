@@ -54,3 +54,48 @@ T=400. Figures in `outputs/`:
   constant-width win D3 (cluster decomposition) chases, but Hough gets it natively.
 
 See `PLAN.md` for the quantum design and the honest competitive scoreboard.
+
+## The efficiency, from first principles (deep dive)
+
+Scripts `01..04_*.py` + `hough_study_lib.py`, figures in `outputs/deep_dive/`.
+Everything below is derived, then measured, then cross-checked on the 160 shared
+store events.
+
+**The vote model.** Hit k of a track with slopes **t** from a PV at (0,0,z_pv):
+`d_k = t (1 − z_pv/z_k) + s_k/z_k`. One track's 5 votes are smeared **radially**
+by the vertex term `δ_k = −(z_pv/z_k) t`:
+- rms = `|t||z_pv|·std(1/z)` = `|t||z_pv|·8.79e-3/mm` — verified point-by-point
+  (fig03; controlled experiments fig02 reproduce the sampled closed form);
+- scattering contributes only ~5e-5 (**18× below** the vertex term);
+- with z_pv = 0 and σ_s = 0 the votes coincide to machine precision.
+
+**The loss mechanism is merging, full stop (figs 04–10).**
+- NN distances in vote space are Poisson `2πλr·exp(−πλr²)`, λ=(T−1)/0.16 (fig04).
+- `P(lost | NN = r)` is one **universal, T-independent sigmoid**: amplitude
+  a = 0.63, midpoint r₀ = 2.5 bins, baseline b = 0.000 (fig05). The peak-finder,
+  not the event, owns the curve.
+- The parameter-free law `eff(T) = 1 − ∫ p_loss(r) f_NN(r;λ) dr` reproduces every
+  measured point to ≤1% (fig06). Census: ~100% of lost tracks are merges; the
+  321 isolated tracks have **zero** losses at the 256 grid (fig07/08).
+- Ghosts are merged-pair products (impure mixed candidates), not random froth
+  (fig09); fig10 shows a merged (1.6-bin) vs resolved (3.8-bin) pair in the
+  accumulator.
+
+**The resolution law (figs 11–13).** Across grids 64²–2048²: r₀ = 2.5·w at every
+grid (no smear floor — the radial smear never broadens the peak; the far-plane
+votes form the core and the near-plane votes *fragment away* instead). The
+fragmentation (M2) channel switches on when r₀ undercuts the radial spread:
+0% (256), ~1.7% (512), ~8.8% (1024), ~33% (2048) — predicted by a single-linkage
+cluster criterion at r₀ with no fitting. The two-mechanism model
+`eff = (1 − split_N)(1 − a(1 − e^{−πλr₀²}))` collapses all (grid, T) points.
+
+**Locus voting dismantles the smear (figs 14–15).** The point vote assumes
+z_pv = 0; the exact Hough votes along the hit's vertex locus
+`d(ζ) = (x,y)/(z−ζ)`, ζ ∈ ±3.5 mm — a short radial segment. All 5 segments of a
+track cross **exactly** at t (fig14), so the smear is gone *by construction* and
+fine grids stop fragmenting; residual losses are genuine near-collinear pairs
+(verified per-track). Implementation notes that matter: the ζ sampling must move
+< 1 bin per step (`n_zeta_for`), votes must be deduplicated per (hit, cell), and
+hits must be claimed by **peak height** (a hit's locus passes exactly through
+every accidental 2-fold crossing it participates in — nearest-peak assignment
+scatters hits; height-priority is the classic Hough readout).
