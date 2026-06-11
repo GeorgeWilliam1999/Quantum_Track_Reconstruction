@@ -315,7 +315,7 @@ def fig_per_class_matched_T400():
 
 # ---------------------------------------------------------------------------
 def fig_fork_matrix():
-    fig = plt.figure(figsize=(13.6, 4.9))
+    fig = plt.figure(figsize=(13.6, 5.8))
     gs = fig.add_gridspec(1, 4, width_ratios=[1.25, 1, 1, 1], wspace=0.35)
     # (a) segment-space fork schematic
     ax = fig.add_subplot(gs[0, 0])
@@ -356,8 +356,8 @@ def fig_fork_matrix():
             axm.set_xlabel("$\\lambda=\\{" + ", ".join(f"{v:.2f}" for v in w) + "\\}$", fontsize=9)
     fig.suptitle("The bifurcation term: penalise competing continuations — "
                  "$\\varepsilon$-windowed $B_\\varepsilon$ keeps it sparse and 1BQF-safe",
-                 fontsize=12.5, fontweight="bold")
-    fig.tight_layout(rect=(0, 0, 1, 0.9))
+                 fontsize=12.5, fontweight="bold", y=0.99)
+    fig.tight_layout(rect=(0, 0, 1, 0.83))
     cm.savefig(fig, "fork_matrix")
 
 
