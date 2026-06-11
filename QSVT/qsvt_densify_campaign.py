@@ -207,6 +207,12 @@ def phase_B(rows, dry):
                 if did and dt > 1:
                     print(f"  [B] 1BQF T={T} drop={drop} rep={rep}: {dt:.0f}s "
                           f"({time.time()-t0:.0f}s total)", flush=True)
+            # incremental flush per (T, drop) block: a mid-phase death (the
+            # long statevector solves have been OOM-killed twice) then loses
+            # at most the in-flight solve, never the registration.
+            if rows and not dry:
+                flush(rows, ["Verify_new_results"])
+                rows.clear()
     print(f"[phase B] done in {time.time()-t0:.0f}s", flush=True)
 
 
@@ -214,7 +220,30 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--phases", default="ACB", help="subset/order of phases, e.g. AC")
+    ap.add_argument("--register-only", action="store_true",
+                    help="build + flush manifest rows for existing .npz only; never solve")
     a = ap.parse_args()
+    if a.register_only:
+        # monkey-patch the solvers out: rows are appended regardless, solves skipped
+        import qtrk_pipeline as _qp
+        _orig_exists = _qp.solution_exists
+        # claim everything exists so no solver path is entered
+        _qp.solution_exists = lambda k: True
+        # ... but only FLUSH rows whose npz actually exists on disk
+        _orig_flush = flush
+
+        def _filtered_flush(rows, studies):
+            kept = [r for r in rows if _orig_exists(r["sol_key"])]
+            print(f"[register-only] {len(kept)}/{len(rows)} planned rows have npz on disk",
+                  flush=True)
+            if kept:
+                # build_metrics also consults solution_exists — give it the real one
+                _qp.solution_exists = _orig_exists
+                try:
+                    _orig_flush(kept, studies)
+                finally:
+                    _qp.solution_exists = lambda k: True
+        globals()["flush"] = _filtered_flush
     rows = []
     studies = set()
     for ph in a.phases:

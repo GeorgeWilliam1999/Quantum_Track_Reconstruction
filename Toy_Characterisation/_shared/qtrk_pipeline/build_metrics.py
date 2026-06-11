@@ -102,8 +102,9 @@ def build(study: str | None = None) -> pd.DataFrame:
     t0 = time.time()
     groups = list(solves.groupby("event_key"))
     for i, (ekey, g) in enumerate(groups):
-        # only build truth if at least one solution for this event exists
-        if not any(qp.solution_exists(k) for k in g.sol_key):
+        # skip rows whose solution npz is absent (planned-but-unsolved entries)
+        g = g[g.sol_key.map(qp.solution_exists)]
+        if g.empty:
             continue
         ev = qp.load_event(qp.event_path(ekey))
         truth = qp.truth_from_event(ev)
