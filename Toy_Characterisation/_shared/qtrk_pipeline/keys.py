@@ -65,6 +65,8 @@ def ham_key(
     gamma: float = 3.0,
     delta: float = 1.0,
     eps_provenance: str = "formula",
+    fork_beta: float = 0.0,
+    fork_eps: float | None = None,
 ) -> str:
     """Stable key for the matrix A built on an event.
 
@@ -72,6 +74,12 @@ def ham_key(
     always folded in so a key uniquely identifies the matrix.  ``eps_provenance``
     in {"formula", "set"} records how epsilon was chosen (it does not change A,
     but it changes how a point should be interpreted in analysis).
+
+    ``fork_beta`` / ``fork_eps`` identify the epsilon-windowed bifurcation
+    (Denby-Peterson fork) modification  A' = A0 + fork_beta * B_{fork_eps}
+    (B = co-hit pairs with mutual angle < fork_eps; the fork window may differ
+    from the acceptance epsilon).  ``fork_beta == 0`` is normalised out so all
+    pre-existing keys are unchanged.
     """
     kern = str(kernel).lower()
     if kern not in ("step", "erf"):
@@ -79,7 +87,7 @@ def ham_key(
     # For the step kernel erf_sigma is irrelevant to A: normalise it out so
     # step points never fragment across erf_sigma values.
     erfs = fnum(erf_sigma) if kern == "erf" else "na"
-    canonical = "|".join([
+    parts = [
         "hm",
         f"eps={fnum(epsilon)}",
         f"prov={eps_provenance}",
@@ -87,7 +95,11 @@ def ham_key(
         f"erfs={erfs}",
         f"g={fnum(gamma)}",
         f"d={fnum(delta)}",
-    ])
+    ]
+    if float(fork_beta) != 0.0:
+        fe = fork_eps if fork_eps is not None else epsilon
+        parts += [f"fb={fnum(fork_beta)}", f"fe={fnum(fe)}"]
+    canonical = "|".join(parts)
     return "hm_" + _digest(canonical)
 
 
