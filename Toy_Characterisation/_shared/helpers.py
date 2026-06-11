@@ -150,16 +150,34 @@ def solve_quantum_statevector(A, b, device: str = 'CPU'):
     """
     from lhcb_velo_toy.solvers.quantum.one_bit_hhl import OneBitHHL
 
-    if device.upper() == 'GPU':
+    dev = device.upper()
+    if dev in ('GPU', 'CPU'):
+        # AerSimulator for BOTH GPU and CPU. The CPU path is MULTI-THREADED C++
+        # (OpenMP) — ~3x slower than GPU at T=100, ~7x at T=200, widening at high
+        # T, but it runs on abundant CPU slots instead of waiting for scarce GPUs.
+        # (Single-threaded Statevector.from_instruction is the 'CPU_EXACT' fallback
+        # below and is much slower.)
+        import os
         from qiskit_aer import AerSimulator
         from qiskit import transpile
-        # readout='statevector' adds a save_statevector instruction so that
-        # AerSimulator returns the full state rather than measurement counts.
-        # Cannot use Statevector.from_instruction with this circuit variant.
         hhl = OneBitHHL(A, b, num_time_qubits=1, shots=1, debug=False,
                         readout='statevector')
         hhl.build_circuit()
-        sim = AerSimulator(method='statevector', device='GPU')
+        # CRITICAL: cap Aer's memory budget. AerSimulator queries the NODE's total
+        # RAM (not the Condor cgroup), so it over-allocates work buffers as if it
+        # owns the machine and OOMs the cgroup past ~22 qubits (T>=400). Passing
+        # max_memory_mb makes it stay within budget (cache-blocking if needed):
+        # T=400 dropped 64 GB -> ~5 GB. Set AER_MAX_MEM_MB to (request_mem - headroom)
+        # in the submit env. Disable fusion (no speed benefit here, sometimes slower).
+        aer_kw = dict(method='statevector', fusion_enable=False)
+        max_mem = int(os.environ.get('AER_MAX_MEM_MB', 0))
+        if max_mem > 0:
+            aer_kw['max_memory_mb'] = max_mem
+        if dev == 'GPU':
+            sim = AerSimulator(device='GPU', **aer_kw)
+        else:
+            threads = int(os.environ.get('OMP_NUM_THREADS', 0)) or (os.cpu_count() or 8)
+            sim = AerSimulator(device='CPU', max_parallel_threads=threads, **aer_kw)
         tqc = transpile(hhl.circuit, sim, optimization_level=1)
         job = sim.run(tqc, shots=1)
         sv = np.asarray(job.result().data(0)['statevector'])
