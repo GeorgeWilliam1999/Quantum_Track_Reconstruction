@@ -2,22 +2,36 @@
 
 _Last updated: 2026-06-10_
 
-### 🧮 QSVT (new sub-project, 2026-06-10) — `QSVT/`
-Polynomial spectral filters generalising the 1BQF's single cosine notch.
-**Done in one day:** feasibility Steps A–E (`QSVT/Initial/`), the circuit-level
-solver in the package (`lhcb_velo_toy.solvers.quantum.QSVT`, LCU-of-Chebyshev
-over the qubitization walk; circuit == streaming == matrix-free to 1e-9), a
-108-solve store campaign mirroring the 1BQF coverage (`solver='qsvt'`,
-`Verify_new_results`), the **line-comb inverse** production filter (band design
-fails at density: far 43.6 % @ T=400 → comb ≈ 0 at 97–100 % eff), the hit-drop
-fragment mechanism + **occupancy gate** (eff 93→96.1 % at far 0.47 %), and
-**per-solver efficiency-first thresholds** (closes the τ_Q decision; at T=400
-clean: classical 100 %/1.6 %, 1BQF 99.5 %/43.9 %, **QSVT 98.3 %/0.96 %**).
-**Notion:** project page *QSVT* (Project DB) + three Write-Ups — *QSVT I Theory*,
-*QSVT II Application* (every figure with full mathematical description), and the
-chronological log — all dual-linked to *Quantum LHCb Toy* and *QSVT*.
-**Open:** minimax/pyqsp circuit path, T=700/1000 points, gate → pipeline,
-Run-3 length-aware comb.
+### 🧮 QSVT (sub-project, 2026-06-10/11) — `QSVT/`
+Polynomial spectral filters generalising the 1BQF's single cosine notch — now a
+full paper programme (`QSVT/Paper_planning/PAPER_PLAN.md`, C1–C7 / WP1–WP7).
+**Done:** feasibility Steps A–E (`Initial/`); the circuit-level solver in the
+package (LCU-of-Chebyshev qubitization; circuit == streaming == matrix-free to
+1e-9); the store campaign (`solver='qsvt'`, now to **T=1000**: comb far 1.0 %
+vs classical 20.5 %); the **line-comb inverse** (band fails at density) and the
+**minimax comb** (`design_minimax_comb`, degree 6–10); hit-drop fragments +
+**occupancy gate**; **per-solver efficiency-first thresholds** (T=400 clean:
+classical 100 %/1.6 %, 1BQF 99.5 %/43.9 %, **QSVT 98.3 %/0.96 %**);
+**WP1** noise robustness (comb == classical to ≤0.7 % through the realistic
+range; acceptance wall + fragment degeneracy are encoding-level); **depth &
+qubit scaling** (29 q measured at T=1000; total walk calls flat ~50 at d≈16 to
+T=700); **resource directions D1–D6** with **D3 cluster decomposition**
+(3–6 qubits flat in T, exact, kills the √T amplification) and **D4 minimax**
+executed; **co-design** (ε-fork deep dive + **WP7** (β, ε_B) scan: sweet spot
+(0.5–1, ε_acc) kills half the filter-immune floor, strict Pareto); **WP5
+Run-3 real data** (variable length ⇒ band+grass-notch design; the fragment
+floor caps all solvers; m≥3 target: design concedes 5e-4 AUC to classical);
+**WP3/WP6 readout & dequantisation** (d·T^1.5·lnT walk calls vs d·T² float-ops,
+honest claim fixed); the **activation-spectrum unification** (closed-form
+ladder; toy AUC ~1 for all solvers — differences are tail/ladder phenomena).
+**Notion:** project page *QSVT* + Write-Ups *QSVT I Theory*, *QSVT II
+Application* (**§1–§18**, every figure with full mathematical description),
+the **first-principles mathematics** page (**§1–§12**, all derivations incl.
+floor-theorem proof, activation ladder, readout maths), and the chronological
+log — dual-linked to *Quantum LHCb Toy* and *QSVT*.
+**Open:** D1/D2 generalized-QSP over e^{-iAt} (the hardware path, 8–9 qubits);
+real-data fork campaign; length-aware response design; WP4 LaTeX; paper
+figures 3 & 7; paper assembly.
 
 Root-level tracker for the whole workspace: outstanding work, a summary of
 what's done, and links to every written (compiled) report. Studies that are
