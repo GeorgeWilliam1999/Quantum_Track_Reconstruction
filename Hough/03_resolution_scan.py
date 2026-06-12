@@ -3,8 +3,9 @@ Deep dive part 3 — the resolution wall as a DESIGN LAW: eff(T, N_bins).
 
 From parts 1+2 we know the two mechanisms and their scales:
   M1 merge:  r0 ~ 2.5 bins  -> shrinks with finer grids -> density win
-  M2 split:  activates when the claim radius (6 bins) drops below the physical
-             smear d3 -> predicted 0% (256/512), ~0.8% (1024), ~16% (2048)
+  M2 split:  activates when the resolution scale r0 = 2.5w drops below the
+             physical smear -> complete-linkage prediction (fig08):
+             0% (256), 0.06% (512), 7.9% (1024), 33.2% (2048)
 So eff(T, N_bins) should be:  eff = (1 - split(N)) * merge_term(T, r0(N)),
 with r0(N) ~ const x bin width.  The scan TESTS all of this:
   * eff/ghost vs T for N_bins in {64,...,2048}

@@ -51,8 +51,11 @@ Two genuine structural wins, both measured/derived:
 
 - **Resolution wall.** Bin size must exceed the scattering + vertex smear (~0.005)
   yet resolve adjacent tracks; at fixed resolution efficiency degrades with density
-  (94 %→91 %, T=200→400). The segment solvers have no binning wall. Quantum does
-  **not** remove this — finer bins = more qubits, not free.
+  (95 %→90 %, T=200→400 on the shared store events). The segment solvers have no
+  binning wall. Quantum does **not** remove this — finer bins = more qubits, not
+  free. (Deep-dive update: LOCUS voting removes the *smear* part of the wall by
+  construction — see README figs 14–16 — so bins can shrink to the scattering
+  floor; the density/merge part remains.)
 - **Displaced vertices kill the 2-D reduction.** The directional collapse only
   holds because the toy PV is pinned to `x=y=0`. Real LHCb / the Run-3 events have
   displaced vertices → the full **4-parameter** Hough `(tx,ty,x0,y0)` → `N_bins⁴`
