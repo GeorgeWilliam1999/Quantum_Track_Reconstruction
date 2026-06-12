@@ -1,6 +1,6 @@
 # Project Status & TODO — Quantum Track Reconstruction
 
-_Last updated: 2026-06-10_
+_Last updated: 2026-06-12_
 
 ### 🧮 QSVT (sub-project, 2026-06-10/11) — `QSVT/`
 Polynomial spectral filters generalising the 1BQF's single cosine notch — now a
@@ -23,7 +23,16 @@ Run-3 real data** (variable length ⇒ band+grass-notch design; the fragment
 floor caps all solvers; m≥3 target: design concedes 5e-4 AUC to classical);
 **WP3/WP6 readout & dequantisation** (d·T^1.5·lnT walk calls vs d·T² float-ops,
 honest claim fixed); the **activation-spectrum unification** (closed-form
-ladder; toy AUC ~1 for all solvers — differences are tail/ladder phenomena).
+ladder; toy AUC ~1 for all solvers — differences are tail/ladder phenomena);
+**the toy design closure** (2026-06-12, `Segment_level_studies/07`): the
+**shared-line theorem** (contaminated-P5 odd lines ≡ hub K(1,3) lines at s±√3;
+any recovering filter admits a hub population ≥ 3/2 × the recovered level;
+leg-null = count optimum, built & ladder-verified), the census (contamination
+*is* the efficiency story; hubs/bridges rare), the measured veto of line
+surgery (heterogeneity + mirror tax; wide tails = graded broadband recovery),
+and the (d, hw) scan closing the family at the production point d=40
+hw 0.12–0.18 — production comb stays, **sharp d120 = high-purity variant**
+(far 0.36 % vs 1.0 % fixed-τ at T=1000), Notion Write-Up *QSVT VIII*.
 **Notion:** project page *QSVT* + Write-Ups *QSVT I Theory*, *QSVT II
 Application* (**§1–§18**, every figure with full mathematical description),
 the **first-principles mathematics** page (**§1–§12**, all derivations incl.
