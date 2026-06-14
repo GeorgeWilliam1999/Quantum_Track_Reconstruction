@@ -16,6 +16,12 @@ Which directories use (or will want to use) the **NEW** decoupled pipeline data.
 
 _Last refreshed: 2026-06-09 (after the signal-support metrics rebuild)._
 
+> **Scaling / performance reference:** `SCALING_DEEP_DIVE.md` (2026-06-14) — profiled bottleneck
+> map for larger experiments. Key facts: `A` stays sparse but the **build is O(T³)** (validated
+> exact 8.5×@T1000 cKDTree fix); the **1BQF host OOM is the transpiled circuit fed to Aer**
+> (~7 KB/gate × millions), *not* the statevector — fixed by a **bit-identical matrix-free engine**
+> + per-solve subprocess isolation. 62 high-T 1BQF solves are the only blocked work.
+
 ---
 
 ## 1. The pipeline itself
@@ -24,18 +30,22 @@ _Last refreshed: 2026-06-09 (after the signal-support metrics rebuild)._
 |---|---|---|
 | `_shared/qtrk_pipeline` | **Defines & produces** the store | Generates events, builds sparse `A`, solves classical/quantum, writes `manifest/*.csv`. `build_metrics.py` → `metrics.csv`; `condor/` shards the campaign. This is the source of all NEW data. |
 
-## 2. Produce NEW data (params feed the manifest) — analysis **not yet ported**
+## 2. Produce NEW data (params feed the manifest) — analysis **ported (2026-06-14)**
 
-These directories' `gen_params*.py` define a manifest study, so the store holds their
-high-stat data. Their **analysis notebooks still read local `results/` (old)** and need
-porting to `qp.load_metrics(study=...)`.
+These directories' `gen_params*.py` define a manifest study. As of 2026-06-14 each has a
+**store-backed analysis script** that reads `qp.load_metrics(study=...)` directly (no local
+`results/` pkls, no re-solve). The original `analysis.ipynb` notebooks are retained but are
+no longer the canonical source. **Shared-event gotcha:** clean cells (e.g. p_drop=0,
+σ_res=0) are shared across studies, so per-study selection must use the comma-separated
+`studies` membership column, **not** the primary `study` column (else low-σ_scatt clean
+cells are attributed to Epsilon_study_2 and look missing).
 
-| Directory | Manifest study | Produces | Analysis notebooks (still old → want NEW) |
+| Directory | Manifest study | Store-backed analysis (NEW canonical) | Legacy notebooks (superseded) |
 |---|---|---|---|
-| `Epsilon_study_2` | `Epsilon_study_2` (2154) | `gen_params.py`, `gen_params_seg14e.py`, `gen_params_topup.py` | `analysis.ipynb`, `deep_analysis.ipynb`, `segment_metrics_calc_epsilon.ipynb` |
-| `ERF` | `ERF` (3240) | param sweep (paired noise) | `analysis.ipynb`, `hamiltonian_comparison.ipynb` |
-| `Larger_Scatter` | `Larger_Scatter` (3960) | `gen_params.py` | `analysis.ipynb` |
-| `Larger_Scatter_Density` | `Larger_Scatter_Density` (1440) | `gen_params.py` | `analysis.ipynb` |
+| `Epsilon_study_2` | `Epsilon_study_2` (2125) | headline re-derived from store, unchanged (store-verified) | `analysis.ipynb`, `deep_analysis.ipynb`, `segment_metrics_calc_epsilon.ipynb` |
+| `ERF` | `ERF` (3190, **paired noise**: clean/moderate/heavy) | `store_landscape.py` → `results/erf_store_landscape.csv` + `figures/erf_landscape_*.png` | `analysis.ipynb`, `hamiltonian_comparison.ipynb` |
+| `Larger_Scatter` | `Larger_Scatter` (3920) | `store_analysis.py` → `results/ls_store_summary.csv` + `figures/ls_*.png` | `analysis.ipynb` |
+| `Larger_Scatter_Density` | `Larger_Scatter_Density` (1418) | `store_analysis.py` → `results/lsd_store_summary.csv` + `figures/lsd_*.png` | `analysis.ipynb` |
 
 ## 3. Consume NEW data (already store-backed)
 
@@ -56,6 +66,11 @@ porting to `qp.load_metrics(study=...)`.
 ---
 
 ### TODO implied by this index
-Port the section-2 analysis notebooks (`Epsilon_study_2`, `ERF`, `Larger_Scatter`,
-`Larger_Scatter_Density`) from local `results/` to `qp.load_metrics(study=...)`, and
-finish migrating the remaining old `Verify_new_results` notebooks.
+- ✅ Section-2 analyses (`Epsilon_study_2`, `ERF`, `Larger_Scatter`, `Larger_Scatter_Density`)
+  ported to `qp.load_metrics(study=...)` via store-backed scripts (2026-06-14).
+- Finish migrating the remaining old `Verify_new_results` notebooks; retire
+  `Quantum_segment_level_analysis.ipynb` (reads local `results/`).
+- ERF: Youden-J / EER threshold optimisation still needs pooled per-segment scores
+  (`qp.load_solution` + truth) — existing store data, not yet done.
+
+_Section-2 update: 2026-06-14._
