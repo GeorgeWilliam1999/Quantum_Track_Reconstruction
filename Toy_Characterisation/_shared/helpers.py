@@ -134,20 +134,35 @@ def apply_hit_inefficiency(event, p_drop: float, rng: np.random.Generator):
 # Quantum solver (statevector readout, sparse-A path)
 # ---------------------------------------------------------------------------
 
-def solve_quantum_statevector(A, b, device: str = 'CPU'):
+def solve_quantum_statevector(A, b, device: str = 'CPU', engine: str | None = None):
     """
     Run the 1BQF / OneBitHHL solver in exact statevector mode.
 
-    ``device='CPU'``  — uses Qiskit's Python-level Statevector simulator.
-                        Feasible for T≤200 (n_sys≤18 qubits, ~1–12 ks).
-    ``device='GPU'``  — uses AerSimulator with CUDA (cuStateVec).
-                        Feasible for T≤1000 (n_sys≤22 qubits, ~1.5 h).
-                        Matches the Verify_new_results GPU Condor pipeline
-                        (run_event.py, submit_gpu.sub, wn-lot-008/009).
+    ``engine`` selects HOW the exact statevector is produced — the result is
+    bit-identical across engines (validated cos=1.0, ΔP~1e-14), so this never
+    changes a ``sol_key`` (the key carries solver/device/readout, not engine):
+
+    ``engine='matrixfree'`` (DEFAULT) — applies the OneBQF gates directly to a
+        numpy statevector (no qiskit circuit / transpile / Aer). Statevector-only
+        memory (≤256 MB at T=1000) and seconds per solve at any T/ε; this is what
+        removes the host-RAM OOM that the Aer circuit-assemble caused at T≥400.
+        ``device`` is ignored (CPU numpy; it already beats Aer-GPU).
+    ``engine='aer'`` — the legacy AerSimulator path (``device='CPU'`` multi-threaded
+        C++, ``device='GPU'`` cuStateVec). Kept for cross-checks; it transpiles the
+        circuit and Aer ingests ~millions of gates → 13–119 GB at high T/ε.
+
+    Override the default with env ``QTRK_OBQF_ENGINE=aer|matrixfree``.
 
     Returns ``(sol_vec, p_success, n_system_qubits)``.
     ``A`` must be a sparse matrix (OneBQF sparse path).
     """
+    import os
+    if engine is None:
+        engine = os.environ.get('QTRK_OBQF_ENGINE', 'matrixfree')
+    if str(engine).lower() == 'matrixfree':
+        from obqf_matrixfree import solve_matrixfree
+        return solve_matrixfree(A, b)
+
     from lhcb_velo_toy.solvers.quantum.one_bit_hhl import OneBitHHL
 
     dev = device.upper()

@@ -44,39 +44,24 @@ def _chunk(lane: str, T: int) -> int:
         # High-T A-build is ~2/7/19 s per event at T=400/700/1000, so cap each
         # shard near ~10-15 min of work and let the cluster parallelise the rest.
         return 300 if T <= 200 else 60 if T <= 400 else 25 if T <= 700 else 15
-    if lane == "quantum_cpu":          # AerSimulator multi-threaded CPU
-        # CPU solve ~7.5 min at T=200, ~3-4 h at T=700 -> one solve/job at high T.
-        if T <= 20:  return 60
-        if T <= 50:  return 25
-        if T <= 100: return 6
-        if T <= 200: return 4
-        if T <= 400: return 2
-        return 1                       # T=700
-    if lane == "quantum_gpu":          # T >= 200 statevector on GPU
-        # Each high-T solve is minutes-to-~1.5h, so go to ONE solve/job at high T:
-        # maximises parallelism, saves each result immediately, and short jobs fit
-        # transient free GPU slots better (no work lost on preemption).
-        return 20 if T <= 200 else 5 if T <= 400 else 1
+    if lane in ("quantum_cpu", "quantum_gpu"):
+        # The matrix-free OneBQF engine (default) solves in seconds even at T=1000
+        # (A-build ~5 s + solve ~12 s), not the Aer hours, so pack many per job.
+        # (If you force engine=aer at high T, drop these back to ~1-2/job.)
+        return 200 if T <= 200 else 100 if T <= 400 else 50
     return 100
 
 
 def _mem_gb(lane: str, T: int, eps: float = 0.0) -> int:
     if lane in ("events", "classical"):
         return 16                      # sparse A -> small even at T=1000
-    # Quantum memory is dominated by the 1BQF CIRCUIT, whose gate count = #
-    # interaction pairs, which scales with the acceptance epsilon^2 (and T). The
-    # AER_MAX_MEM_MB budget bounds Aer's statevector buffers but NOT the Qiskit
-    # circuit object, so high-noise (large-eps) cells need much more. Measured at
-    # T=400: eps=0.002 -> 1.9k gates (~5 GB), eps=0.0064 (sr=0.02) -> 8k, eps=0.0158
-    # (sr=0.05) -> 38k gates (~60 GB). Tier by epsilon so clean cells stay tiny
-    # (16 GB, schedule instantly) and only noisy ones get big slots.
-    if eps >= 0.012:    m = 96         # sr~0.05  (huge circuit)
-    elif eps >= 0.004:  m = 48         # sr~0.02
-    elif eps >= 0.0015: m = 24         # eps=0.002 / mild noise
-    else:               m = 16         # clean (formula eps ~4e-4)
-    if T >= 700:  m = max(m, 48)
-    if T >= 1000: m = max(m, 64)
-    return m
+    # Quantum now uses the matrix-free OneBQF engine (helpers default), whose host
+    # memory is just the 2^n statevector + the build: <=256 MB at T=1000, <1.5 GB
+    # incl. A. The old eps-aware 16/24/48/96 GB tiers existed only because the Aer
+    # path made the host assemble ~millions of transpiled gates (13-119 GB OOMs).
+    # A flat 16 GB has ~10x headroom and schedules fast. (If you force engine=aer
+    # at high T/eps you must restore the big eps-aware tiers — see SCALING_DEEP_DIVE.md.)
+    return 16
 
 
 def _lane_rows(lane: str, events: pd.DataFrame, solves: pd.DataFrame) -> pd.DataFrame:
