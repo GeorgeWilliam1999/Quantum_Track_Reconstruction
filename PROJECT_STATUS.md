@@ -168,11 +168,12 @@ Detailed per-study audit for the active campaign lives in
 | **OneBQF parameter audit** | Parameter audit of the quantum solver | ✅ written |
 | **Generalisability** | Mini-report on generalisability | ✅ written |
 | **Track-density (OLD_TOY_CODE)** | Legacy density study | ✅ written |
-| **Epsilon_study_2 (T2)** | Calculated ε + sensitivity grid; 1121 pkls, aggregated, 82 figures | ✅ **report.pdf** (22 pp, +stability §); **Done 2026-06-07** |
+| **Epsilon_study_2 (T2)** | Calculated ε + sensitivity grid; 1121 pkls, aggregated, 82 figures | ✅ **report.pdf** (22 pp, +stability §); **Done 2026-06-07**, headline **re-derived from qtrk_store 2026-06-14 — unchanged** |
 | **Quantum_Toy_Study** | OneBQF benchmarking runs complete (3367 pkls) | 🚩 **no dedicated report** (largely folded into quantum_segment) |
-| **Larger_Scatter (T3)** | Scatter × hit-inefficiency grid | 🟡 **1224 pkls in, drained 2026-06-07** — not yet aggregated → analyse + report |
-| **Larger_Scatter_Density (T4)** | Tight cone × scatter grid | 🟡 **472 pkls (draining 2026-06-08)** — not yet aggregated → analyse + report |
-| **ERF (T5)** | Local T≤50 + comparison notebook; Condor grid drained | 🟡 **712 pkls + 44 figs; report.pdf drafted** — Youden-J/EER + finalise (due 6/13) |
+| **Larger_Scatter (T3)** | Scatter × hit-inefficiency grid | ✅ **store-backed (qtrk_store, 3920 rows); `store_analysis.py` → report + 4 figs; Done 2026-06-14** |
+| **Larger_Scatter_Density (T4)** | Tight cone × scatter grid | ✅ **store-backed (1418 rows); `store_analysis.py` → report + 3 figs; Done 2026-06-14** |
+| **ERF (T5)** | Single-event comparison + full multiplicity sweep from store | 🟡 **single-event report + full store sweep (3190 rows, `store_landscape.py`) added**; Youden-J/EER on pooled scores pending |
+| **Run3_Verification** | Toy segment framework on real LHCb Run-3 Bs→φφ events | ✅ **classical 0.88/0.94 + 1BQF + false-type census; Write-Up created 2026-06-14** |
 | **EpsilonStudies (legacy)** | Superseded by Epsilon_study_2 | n/a (no report needed) |
 
 ---
