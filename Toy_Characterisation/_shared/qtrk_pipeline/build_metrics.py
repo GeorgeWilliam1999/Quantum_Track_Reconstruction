@@ -70,6 +70,7 @@ def _metrics_for_group(rows: pd.DataFrame, truth: np.ndarray) -> list[dict]:
         row["threshold"] = tau
         if str(r.solver) == "classical":
             m = qp.metrics_at(sol, truth, tau)
+            mwp = qp.metrics_at_wp(sol, truth, qp.WP_TARGET_EFF)
             row["cos_QC"] = None
             row["P_anc"] = None
         else:
@@ -77,7 +78,10 @@ def _metrics_for_group(rows: pd.DataFrame, truth: np.ndarray) -> list[dict]:
             if sol_C is None:
                 continue  # need the classical partner to set the norm
             m = qp.quantum_metrics(sol, sol_C, truth, tau)
+            mwp = qp.quantum_metrics_wp(sol, sol_C, truth, qp.WP_TARGET_EFF,
+                                        signal_threshold=tau)
             row["cos_QC"] = m.pop("cos_QC")
+            mwp.pop("cos_QC", None)
             row["P_anc"] = d.get("P_anc")
         row.update(
             n_seg=d.get("n_seg"), n_true=int(np.asarray(truth, bool).sum()),
@@ -87,6 +91,15 @@ def _metrics_for_group(rows: pd.DataFrame, truth: np.ndarray) -> list[dict]:
             segment_purity=m["segment_purity"],
             segment_false_rate=m["segment_false_rate"],
             A_nnz=d.get("A_nnz"), t_solve=d.get("t_solve"),
+        )
+        # wp99 high-efficiency working point (HEADLINE; see metrics.working_point_threshold)
+        row.update(
+            target_eff=qp.WP_TARGET_EFF, tau_wp=mwp["tau_wp"],
+            n_active_wp=mwp["n_active"], n_true_active_wp=mwp["n_true_active"],
+            n_false_active_wp=mwp["n_false_active"],
+            segment_efficiency_wp=mwp["segment_efficiency"],
+            segment_purity_wp=mwp["segment_purity"],
+            segment_false_rate_wp=mwp["segment_false_rate"],
         )
         out.append(row)
     return out

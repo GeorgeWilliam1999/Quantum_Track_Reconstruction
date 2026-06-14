@@ -46,6 +46,9 @@ def _sem(a):
 def load():
     df = pd.read_csv(METRICS)
     df = df[df["studies"].fillna("").apply(lambda s: in_study(s, STUDY))].copy()
+    # ERF is a CLASSICAL kernel study -> classical stays at the fixed gamma-aware
+    # absolute cut (0.35 at gamma=3), its established operating point (user
+    # 2026-06-14: wp99 is the 1BQF headline only; classical keeps tau=0.35).
     df["eff"] = df.segment_efficiency * 100
     df["far"] = df.segment_false_rate * 100
     df["pur"] = df.segment_purity * 100

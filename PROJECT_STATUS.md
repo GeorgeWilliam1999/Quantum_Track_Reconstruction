@@ -1,6 +1,6 @@
 # Project Status & TODO — Quantum Track Reconstruction
 
-_Last updated: 2026-06-12_
+_Last updated: 2026-06-14_
 
 ### 🧮 QSVT (sub-project, 2026-06-10/11) — `QSVT/`
 Polynomial spectral filters generalising the 1BQF's single cosine notch — now a
@@ -46,13 +46,15 @@ Root-level tracker for the whole workspace: outstanding work, a summary of
 what's done, and links to every written (compiled) report. Studies that are
 **finished but have no written report** are flagged with 🚩.
 
-Detailed per-study audit for the active campaign lives in
-[Toy_Characterisation/AUDIT.md](Toy_Characterisation/AUDIT.md).
+Operational data/pipeline guides live in
+[Toy_Characterisation/DATA_INDEX.md](Toy_Characterisation/DATA_INDEX.md) and
+[Toy_Characterisation/DATA_GENERATION_GUIDE.md](Toy_Characterisation/DATA_GENERATION_GUIDE.md)
+(the old per-study `AUDIT.md` tracker was removed 2026-06-14 — superseded by this file + Notion).
 
 > **📌 Notion is the canonical tracker** (since 2026-06-08 reconcile). The Notion
 > project [**Quantum LHCb Toy**](https://app.notion.com/p/3265d544b9d980b0befcef00eb67ab9c)
 > holds three databases that mirror this file:
-> - **Write Up for PhDs** — one row per study/report (status + date + repo path). 21 rows.
+> - **Write Up for PhDs** — one row per study/report (status + date + repo path).
 > - **To do** — the live shared task list.
 > - **Literature and Resources** — external references + technical specs only.
 >
@@ -76,80 +78,29 @@ Detailed per-study audit for the active campaign lives in
 
 ## ⏳ Outstanding TODO
 
-### ✅ Done 2026-06-06 (this session)
-1. **T3/T4/T5 submitted to Condor** — 2597 jobs. T3 `Larger_Scatter` (1225,
-   clusters 4799949–52), T4 `Larger_Scatter_Density` (490, 4799953–56), T5 `ERF`
-   (882, 4799957–60). Worker confirmed high-performance (`SimpleHamiltonianFast` +
-   Numba `fast_segment_metrics`). Per-T quantum cutoff baked into every `gen_params.py`:
-   **`run_quantum=1` for T≤200, `0` for T≥400** (OneBQF statevector is ~6 h at T=200,
-   intractable above; classical is ~10 s at any T). `mem_tier_gb` bug fixed in T3/T4
-   (T=1000 now 128 GB, was 64).
-2. **Held jobs resolved → queue 0 held.** 31 held eps2 jobs (T=200 walltime, T=700
-   "GPU unused") re-run **classical-only** (19 deduped rows, clusters 4799974/75). The
-   two dead Verify_new_results T2000 jobs removed (incl. the 256 GB OOM). Root cause of
-   the walltime/GPU holds: `submit_gpu.sub` still had `+MaxRuntime=86400`, and T≥500
-   quantum is simply intractable (T=200≈6 h, T=1000≈weeks; sampling has the same cost).
-3. **T2 Epsilon_study_2 report enhanced + recompiled** (22 pp). Added §4.10 *Algorithm
-   Stability: The Operating Envelope* (stable ≤0.01 mm; segment breakdown ≥0.02 mm &
-   T≳50; classical cliff-edge vs quantum graceful purity loss) + abstract envelope
-   sentence. `Epsilon_study_2/report.pdf`. (The "no report" 🚩 was stale — a full
-   report was written 2026-06-02.)
+_The 2026-06-06 Condor-submission TODO/Blockers (held jobs, "T3/T4 never submitted",
+the 24 h GPU walltime cap, the absolute-0.35 worker fix) are **history** — all five
+studies (T1–T5) are complete and store-backed (see the summary table below and Notion).
+The `qtrk_store` pipeline replaced the per-study Condor flow; the matrix-free 1BQF +
+exact cKDTree A-build (`SCALING_DEEP_DIVE.md`, 2026-06-14) removed the OOM/walltime
+problems entirely. Current open work only:_
 
-### 🔭 What's next (priority order)
-1. **Monitor T3/T4/T5 on Condor** (`condor-monitor`). High-T classical jobs run
-   `collect_segment_pair_angles` (O(T³)) so T=1000 takes hours and ~64–128 GB — a few
-   of the densest (clean, no-drop) T=1000 cells may OOM at 128 GB; bump to 192 or drop.
-2. **Aggregate + write T3/T4/T5 reports** as pickles complete (`aggregate-ready` →
-   `notebook-runner` → `report-drafter`). ERF analysis already has the local head start.
-3. **Verify_new_results** — finish `Quantum_segment_level_analysis.ipynb`.
+### Toy_Characterisation
+- [ ] **ERF (T5)** — Youden-J / EER threshold optimisation on pooled per-segment store
+  scores (`qp.load_solution` + truth), then finalise the report.
+- [ ] **Verify_new_results** — finish the store-backed `Quantum_segment_level_store.ipynb`;
+  retire the old local-pkl `Quantum_segment_level_analysis.ipynb`.
+- [ ] Run the segment analysis with a 0.5 % drop rate.
+- [ ] **Quantum_Toy_Study** — decide whether it needs its own write-up or is fully
+  superseded by the `quantum_segment` reports, then close out.
+- [ ] Housekeeping — delete scratch notebooks (`Quantum_Toy_Study/Untitled-2.ipynb`,
+  `Verify_new_results/Untitled-4.ipynb`, `Recovery_Seperation_analysis/Untitled-{2,3,5}.ipynb`);
+  triage backups.
 
-### Blockers
-- [x] ~~**Clear the 286 HELD Condor jobs**~~ — **RESOLVED 2026-05-30** (history). 166
-  walltime + 120 memory holds, fixed in-place via `condor_qedit` + `condor_release`.
-  See [Toy_Characterisation/AUDIT.md](Toy_Characterisation/AUDIT.md) §6.
-- [ ] **33 NEW held jobs (2026-06-06), all Epsilon_study_2 T=1000** — 24 walltime
-  (still hitting the 24 h `MaxWallTime=86400` site cap on GPU jobs), 8 *"GPU claimed
-  but no GPU usage"* (GPU statevector jobs not exercising the GPU), 1 OOM at **256 GB**
-  (used 261624 MB). Needs a decision, not a blind `condor_release`. See AUDIT.md §6b.
-- [x] ~~**Bake the memory/walltime fix into the T3–T5 submit config**~~ — `submit_base.sub`
-  now has `+JobCategory="long"`, `+MaxRuntime=259200`, and per-study `gen_params.py`
-  emit 16/32/64/128 GB tiers. **Note the 24 h GPU walltime cap above is a separate,
-  site-imposed limit** the `MaxRuntime` override does not clear.
-- [ ] `_shared/run_worker.py` and `ERF/hamiltonian_comparison.ipynb` are **untracked
-  in git** — the absolute-0.35 threshold fix (below) is live on disk but not committed.
-
-### Worker correctness fix (2026-06-06)
-- [x] **Segment threshold made absolute in `_shared/run_worker.py`.** Default-metric
-  reporting now uses `threshold = tau_default` (absolute 0.35) on both `sol_C` and the
-  rescaled `sol_Q`, matching `segment_level_analysis.ipynb` `SOLVER_THRESHOLD`. The old
-  relative `tau_default * max(sol)` collapsed below the 0.25 attractor / 0.375 plateau
-  and produced a spurious FAR≈0.98. **All four studies share this worker**, so newly
-  submitted jobs get correct stored defaults; already-completed pkls keep the full
-  `sol_C/sol_Q/truth`, so analysis must recompute from the vectors, not trust
-  `*_metrics_default`.
-
-### Supervisor 5-task series
-- [ ] **T2 Epsilon_study_2** — 1102 pkls; aggregated; figures done. 33 T=1000 GPU jobs
-  held + 51 idle (incremental reps). **Write the report** 🚩 (does not need to wait).
-- [ ] **T3 Larger_Scatter** — params generated (1222 rows) but **0 pkls, never
-  submitted**. Run `submit.sh`, aggregate, analyse, report.
-- [ ] **T4 Larger_Scatter_Density** — params generated (490 rows) but **0 pkls, never
-  submitted**. Same pipeline.
-- [ ] **T5 ERF** — **partially run locally** (162 CPU pkls, T∈{10,20,50}, all 18
-  (θ_d × noise) cells); deep step-vs-ERF comparison done in `hamiltonian_comparison.ipynb`
-  (eigenspectra, solution vectors, segment metrics). **Condor study not yet submitted**
-  (882 rows). After submission: Youden-J / EER histogram threshold analysis, report.
-
-### Quantum verification
-- [ ] **Verify_new_results** — finish `Quantum_segment_level_analysis.ipynb`; resubmit
-  any held seg14e high-T sampling jobs. Outputs live under `outputs/quantum_segment_analysis/`.
-
-### Housekeeping
-- [ ] Triage scratch notebooks: `Quantum_Toy_Study/Untitled-2.ipynb`,
-  `Verify_new_results/Untitled-4.ipynb`,
-  `Recovery_Seperation_analysis/Untitled-2/3/5.ipynb`.
-- [ ] Decide whether `Quantum_Toy_Study` needs its own write-up or is fully
-  superseded by the `quantum_segment` reports (see 🚩 below).
+### QSVT
+- [ ] D1/D2 generalized-QSP over the 1BQF's own e^{-iAt} (the hardware path, 8–9 qubits).
+- [ ] Real-data fork campaign; length-aware response design (the Run-3 frontier).
+- [ ] WP4 LaTeX transcription; paper figures 3 & 7; paper assembly.
 
 ---
 

@@ -23,8 +23,9 @@ if str(_SHARED) not in sys.path:
 from .hamiltonian import segments_only  # noqa: E402
 
 __all__ = [
-    "ABS_THRESHOLD", "truth_from_event", "rescale_to", "rescale_to_signal",
-    "cos_sim", "metrics_at", "quantum_metrics",
+    "ABS_THRESHOLD", "WP_TARGET_EFF", "truth_from_event", "rescale_to",
+    "rescale_to_signal", "cos_sim", "metrics_at", "quantum_metrics",
+    "working_point_threshold", "metrics_at_wp", "quantum_metrics_wp",
 ]
 
 # The validated absolute operating point FOR gamma=3, delta=1 (Hopfield false
@@ -36,6 +37,15 @@ ABS_THRESHOLD = 0.35
 # PENDING user confirmation — the principled alternative is a histogram-driven
 # (Youden-J / EER) threshold per cell.  See the Notion source-of-truth page.
 _THRESHOLD_MARGIN = 0.10
+
+# Default efficiency target for the HEADLINE operating point (user, 2026-06-14).
+# The fixed ABS_THRESHOLD above is the low-false-rate cut; for filtered solvers
+# (1BQF / QSVT) it chops genuine true segments (the "~75 % efficiency plateau"
+# is that artefact, not physics).  The canonical operating point is instead the
+# efficiency-first working point: hold ~WP_TARGET_EFF of the true segments and
+# pay the false rate (LHCb-style: keep all true, kill false).  See
+# working_point_threshold + the wp99 refresh log.
+WP_TARGET_EFF = 0.99
 
 
 def threshold_for(gamma: float = 3.0, delta: float = 1.0,
@@ -128,6 +138,83 @@ def quantum_metrics(sol_Q_raw: np.ndarray, sol_C: np.ndarray,
     mask = sol_C > float(threshold)
     if mask.any():
         out["cos_QC"] = cos_sim(sol_Q[mask], sol_C[mask])
+    else:
+        out["cos_QC"] = cos_sim(sol_Q, sol_C)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Efficiency-first working point (wp99) — the HEADLINE operating point.
+#
+# user, 2026-06-14: report every 1BQF/filtered-solver result at the working
+# point that holds ~100 % segment efficiency (get ALL true segments; killing
+# false segments is how LHCb works), accepting the false rate paid.  This
+# REPLACES the fixed ABS_THRESHOLD=0.35 cut as the headline.  Same convention
+# as QSVT/Segment_level_studies/01 §4 (fig qsvt_working_points).
+# ---------------------------------------------------------------------------
+
+def working_point_threshold(sol: np.ndarray, truth: np.ndarray,
+                            target_eff: float = WP_TARGET_EFF) -> float:
+    """Efficiency-first per-solve segment threshold (the wp99 working point).
+
+    Place ``tau`` just BELOW the ``(1 - target_eff)`` quantile of the TRUE-segment
+    amplitudes, so that >= ``target_eff`` of the true segments stay active.  The
+    magnitude of ``sol`` is used (active <=> ``|sol| > tau``).
+
+    NOTE this is SCALE-INVARIANT: scaling ``sol`` by a constant scales ``tau`` by
+    the same factor, so the active set — and hence eff / false-rate — does not
+    depend on the quantum rescale convention (only ``cos_QC`` does).  For a
+    quantum solve you still rescale to the classical SIGNAL first so ``cos_QC``
+    and the reported ``tau`` sit on the classical amplitude scale.
+    """
+    s = np.abs(np.asarray(sol, np.float64))
+    t = np.asarray(truth, bool)
+    st = np.sort(s[t])
+    if st.size == 0:
+        return 0.0
+    k = int(np.floor((1.0 - float(target_eff)) * st.size))
+    k = min(max(k, 0), st.size - 1)
+    return float(st[k] - 1e-9)
+
+
+def metrics_at_wp(sol: np.ndarray, truth: np.ndarray,
+                  target_eff: float = WP_TARGET_EFF) -> dict:
+    """Segment metrics at the efficiency-first working point.
+
+    Drop-in replacement for ``metrics_at`` for the HEADLINE numbers.  Returns the
+    usual metrics dict plus ``tau_wp`` (the threshold used) and ``target_eff``.
+    """
+    sol = np.abs(np.asarray(sol, np.float64))
+    tau = working_point_threshold(sol, truth, target_eff)
+    out = metrics_at(sol, truth, threshold=tau)
+    out["tau_wp"] = tau
+    out["target_eff"] = float(target_eff)
+    return out
+
+
+def quantum_metrics_wp(sol_Q_raw: np.ndarray, sol_C: np.ndarray,
+                       truth: np.ndarray,
+                       target_eff: float = WP_TARGET_EFF,
+                       signal_threshold: float = ABS_THRESHOLD) -> dict:
+    """Quantum-solve metrics at the efficiency-first working point.
+
+    Like ``quantum_metrics`` but the threshold is the per-solve wp99 working
+    point on the (signal-rescaled) quantum amplitudes, NOT the fixed cut.
+    Rescales the unit-norm quantum solution onto the classical SIGNAL support
+    (``sol_C > signal_threshold`` — pass the gamma-aware cut for gamma!=3 so the
+    reported ``tau_wp`` / ``cos_QC`` sit on the right classical scale; defaults to
+    the gamma=3 value 0.35), then sets ``tau`` just below the
+    ``(1 - target_eff)`` quantile of the quantum amplitudes on the TRUE segments.
+    eff / false-rate are rescale-INVARIANT (see ``working_point_threshold``), so
+    they are correct regardless of ``signal_threshold``; only ``tau_wp`` and
+    ``cos_QC`` depend on it.
+    """
+    sol_C = np.asarray(sol_C, np.float64)
+    sol_Q = rescale_to_signal(sol_Q_raw, sol_C, signal_threshold)
+    out = metrics_at_wp(sol_Q, truth, target_eff)
+    mask = sol_C > float(signal_threshold)
+    if mask.any():
+        out["cos_QC"] = cos_sim(np.asarray(sol_Q, np.float64)[mask], sol_C[mask])
     else:
         out["cos_QC"] = cos_sim(sol_Q, sol_C)
     return out

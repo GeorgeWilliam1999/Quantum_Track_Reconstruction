@@ -68,6 +68,12 @@ def fixed_eps_metrics(study: str = STUDY) -> pd.DataFrame:
         fx["eff_pct"] = fx["segment_efficiency"] * 100.0
         fx["far_pct"] = fx["segment_false_rate"] * 100.0
         fx["n_false_all"] = fx["n_seg"] - fx["n_true"]
+        # wp99 high-efficiency working point (HEADLINE) — present once metrics.csv
+        # is rebuilt with build_metrics.py >= 2026-06-14.  The fixed-τ eff/far
+        # above are kept as the diagnostic comparison.
+        if "segment_efficiency_wp" in fx.columns:
+            fx["eff_wp_pct"] = fx["segment_efficiency_wp"] * 100.0
+            fx["far_wp_pct"] = fx["segment_false_rate_wp"] * 100.0
     return fx
 
 
@@ -88,22 +94,36 @@ def agg_by_ntrk(df: pd.DataFrame, solver: str, gamma: float,
              (df["hit_ineff"] == hit_ineff)]
     if not len(sub):
         return {}
+    has_wp = "eff_wp_pct" in sub.columns and "n_true_active_wp" in sub.columns
     tc, se_m, se_e, fr_m, fr_e = [], [], [], [], []
+    se_wp_m, se_wp_e, fr_wp_m, fr_wp_e = [], [], [], []
+    tam_wp, tase_wp, fam_wp, fase_wp = [], [], [], []
     ntm, ntse, nfm, nfse, tam, tase, fam, fase = ([] for _ in range(8))
     for n in sorted(sub["n_trk"].unique()):
         g = sub[sub["n_trk"] == n]
         tc.append(float(n))
         se_m.append(g["eff_pct"].mean());   se_e.append(_sem(g["eff_pct"]))
         fr_m.append(g["far_pct"].mean());   fr_e.append(_sem(g["far_pct"]))
+        if has_wp:
+            se_wp_m.append(g["eff_wp_pct"].mean()); se_wp_e.append(_sem(g["eff_wp_pct"]))
+            fr_wp_m.append(g["far_wp_pct"].mean()); fr_wp_e.append(_sem(g["far_wp_pct"]))
+            tam_wp.append(g["n_true_active_wp"].mean());  tase_wp.append(_sem(g["n_true_active_wp"]))
+            fam_wp.append(g["n_false_active_wp"].mean()); fase_wp.append(_sem(g["n_false_active_wp"]))
         ntm.append(g["n_true"].mean());     ntse.append(_sem(g["n_true"]))
         nfm.append(g["n_false_all"].mean()); nfse.append(_sem(g["n_false_all"]))
         tam.append(g["n_true_active"].mean());  tase.append(_sem(g["n_true_active"]))
         fam.append(g["n_false_active"].mean()); fase.append(_sem(g["n_false_active"]))
     A = np.asarray
-    return dict(tc=A(tc), se_m=A(se_m), se_e=A(se_e), fr_m=A(fr_m), fr_e=A(fr_e),
-                ntm=A(ntm), ntse=A(ntse), nfm=A(nfm), nfse=A(nfse),
-                tam=A(tam), tase=A(tase), fam=A(fam), fase=A(fase),
-                n_reps=int(sub.groupby("n_trk").size().min()))
+    out = dict(tc=A(tc), se_m=A(se_m), se_e=A(se_e), fr_m=A(fr_m), fr_e=A(fr_e),
+               ntm=A(ntm), ntse=A(ntse), nfm=A(nfm), nfse=A(nfse),
+               tam=A(tam), tase=A(tase), fam=A(fam), fase=A(fase),
+               n_reps=int(sub.groupby("n_trk").size().min()))
+    if has_wp:  # wp99 HEADLINE arrays (se_*/fr_*/tam/fam stay as the fixed-τ diagnostic)
+        out.update(se_wp_m=A(se_wp_m), se_wp_e=A(se_wp_e),
+                   fr_wp_m=A(fr_wp_m), fr_wp_e=A(fr_wp_e),
+                   tam_wp=A(tam_wp), tase_wp=A(tase_wp),
+                   fam_wp=A(fam_wp), fase_wp=A(fase_wp))
+    return out
 
 
 # =========================================================================

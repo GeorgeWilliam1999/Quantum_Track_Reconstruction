@@ -35,8 +35,9 @@ from .events import generate_event, save_event, load_event, ensure_event
 from .hamiltonian import build_hamiltonian, segments_only
 from .solve import solve_classical, solve_quantum, solve_qsvt
 from .metrics import (
-    ABS_THRESHOLD, threshold_for, truth_from_event, rescale_to, rescale_to_signal,
-    cos_sim, metrics_at, quantum_metrics,
+    ABS_THRESHOLD, WP_TARGET_EFF, threshold_for, truth_from_event, rescale_to,
+    rescale_to_signal, cos_sim, metrics_at, quantum_metrics,
+    working_point_threshold, metrics_at_wp, quantum_metrics_wp,
 )
 from .manifest import (
     StudySpec, expand_spec, build_manifest, standard_specs, DEFAULT_TRACK_GRID,
@@ -50,8 +51,9 @@ __all__ = [
     "generate_event", "save_event", "load_event", "ensure_event",
     "build_hamiltonian", "segments_only",
     "solve_classical", "solve_quantum", "solve_qsvt",
-    "ABS_THRESHOLD", "threshold_for", "truth_from_event", "rescale_to",
-    "rescale_to_signal", "cos_sim", "metrics_at", "quantum_metrics",
+    "ABS_THRESHOLD", "WP_TARGET_EFF", "threshold_for", "truth_from_event",
+    "rescale_to", "rescale_to_signal", "cos_sim", "metrics_at", "quantum_metrics",
+    "working_point_threshold", "metrics_at_wp", "quantum_metrics_wp",
     "StudySpec", "expand_spec", "build_manifest", "standard_specs",
     "DEFAULT_TRACK_GRID",
 ]

@@ -67,8 +67,13 @@ def paired(view: pd.DataFrame) -> pd.DataFrame:
             "phi_max", "hit_ineff", "epsilon", "segment_efficiency",
             "segment_purity", "segment_false_rate", "n_active", "n_true_active",
             "n_false_active", "n_seg", "n_true", "t_solve", "sol_key"]
-    C = view[view.solver == "classical"][cols]
-    Q = view[view.solver == "quantum"][cols + ["cos_QC", "P_anc"]]
+    # wp99 high-efficiency working-point columns (present once metrics.csv is
+    # rebuilt with build_metrics.py >= 2026-06-14); carried through if available.
+    WP = ["segment_efficiency_wp", "segment_false_rate_wp", "segment_purity_wp",
+          "tau_wp", "n_active_wp", "n_true_active_wp", "n_false_active_wp"]
+    wp = [c for c in WP if c in view.columns]
+    C = view[view.solver == "classical"][cols + wp]
+    Q = view[view.solver == "quantum"][cols + wp + ["cos_QC", "P_anc"]]
     # pair on the SAME (event, matrix): classical & quantum solve of the same A
     m = Q.merge(C, on=["event_key", "ham_key"], suffixes=("_Q", "_C"))
     # convenience short names used by the plotting cells
@@ -77,6 +82,14 @@ def paired(view: pd.DataFrame) -> pd.DataFrame:
     m["pur_C"] = m["segment_purity_C"];     m["pur_Q"] = m["segment_purity_Q"]
     m["far_C"] = m["segment_false_rate_C"]; m["far_Q"] = m["segment_false_rate_Q"]
     m["cos"]   = m["cos_QC"]
+    if "segment_efficiency_wp" in wp:       # the HEADLINE working-point short names
+        m["eff_C_wp"] = m["segment_efficiency_wp_C"]
+        m["eff_Q_wp"] = m["segment_efficiency_wp_Q"]
+        m["far_C_wp"] = m["segment_false_rate_wp_C"]
+        m["far_Q_wp"] = m["segment_false_rate_wp_Q"]
+        m["pur_C_wp"] = m["segment_purity_wp_C"]
+        m["pur_Q_wp"] = m["segment_purity_wp_Q"]
+        m["tau_wp_C"] = m["tau_wp_C"]; m["tau_wp_Q"] = m["tau_wp_Q"]
     return m
 
 
@@ -91,7 +104,11 @@ def aggregate(m: pd.DataFrame) -> pd.DataFrame:
     g = m.groupby("n_trk")
     out = pd.DataFrame({"n_trk": sorted(m["n_trk"].unique())}).set_index("n_trk")
     out["n_reps"] = g.size()
-    for col in ["eff_C", "eff_Q", "pur_C", "pur_Q", "far_C", "far_Q", "cos"]:
+    base = ["eff_C", "eff_Q", "pur_C", "pur_Q", "far_C", "far_Q", "cos"]
+    # add the wp99 headline columns when present
+    wp = [c for c in ["eff_C_wp", "eff_Q_wp", "far_C_wp", "far_Q_wp",
+                      "pur_C_wp", "pur_Q_wp", "tau_wp_Q"] if c in m.columns]
+    for col in base + wp:
         out[f"{col}_mean"] = g[col].mean()
         out[f"{col}_sem"]  = g[col].apply(lambda x: float(_sem(x)) if len(x) > 1 else 0.0)
     return out.reset_index()
