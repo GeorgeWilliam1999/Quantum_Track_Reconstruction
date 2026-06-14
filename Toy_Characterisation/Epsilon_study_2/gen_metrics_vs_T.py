@@ -31,6 +31,14 @@ CMAP = plt.get_cmap("viridis")
 df = pd.read_csv("/data/bfys/gscriven/qtrk_store/manifest/metrics.csv")
 df = df[df["study"] == "Epsilon_study_2"]
 
+# HEADLINE = wp99 high-efficiency working point (per-solve tau holds ~99% of true
+# segments; segment_*_wp columns from build_metrics.py >= 2026-06-14).  The fixed
+# tau=0.35 cut pinned the 1BQF at the ~75% plateau; we report the working point.
+WP = "segment_efficiency_wp" in df.columns
+EFF = "segment_efficiency_wp" if WP else "segment_efficiency"
+FAR = "segment_false_rate_wp" if WP else "segment_false_rate"
+TAU_LAB = r"wp99 ($\varepsilon$-eff $\geq 99\%$)" if WP else r"$\tau=0.35$"
+
 for figname, famcol, famvals, sel, fixed_lab in (
     ("eff_fr_vs_T_sres_family", "sigma_res", [0.0, 0.01, 0.02, 0.05],
      df["sigma_scatt"] == SS_FIX,
@@ -45,8 +53,7 @@ for figname, famcol, famvals, sel, fixed_lab in (
     for v, col in zip(famvals, cols):
         lab = (rf"$\sigma_r={v:g}$ mm" if famcol == "sigma_res"
                else rf"$\sigma_s={v:g}$")
-        for ax, ycol in zip(axes, ("segment_efficiency",
-                                   "segment_false_rate")):
+        for ax, ycol in zip(axes, (EFF, FAR)):
             for solver, ls, mk in (("classical", "-", "o"),
                                    ("quantum", "--", "s")):
                 g = (sub[(sub[famcol] == v) & (sub["solver"] == solver)]
@@ -68,7 +75,7 @@ for figname, famcol, famvals, sel, fixed_lab in (
     axes[1].set_ylim(-0.03, 1.06)
     axes[0].legend(fontsize=7, ncol=2, loc="lower left")
     fig.suptitle(rf"Segment metrics vs $T$ — {fixed_lab}  (formula "
-                 rf"$\varepsilon$, $\tau=0.35$, 20 classical / 3 quantum "
+                 rf"$\varepsilon$, {TAU_LAB}, 20 classical / 3 quantum "
                  rf"reps, qtrk store)", fontsize=11.5)
     fig.tight_layout(rect=[0, 0, 1, 0.93])
     fig.savefig(FIGDIR / f"{figname}.png", dpi=160)
@@ -81,10 +88,13 @@ for famcol, famvals, sel in (
     ("sigma_scatt", [1e-4, 3e-4, 5e-4], df["sigma_res"] == SR_FIX),
 ):
     sub = df[sel]
+    summ_cols = ["segment_efficiency", "segment_false_rate"]
+    if WP:
+        summ_cols += ["segment_efficiency_wp", "segment_false_rate_wp", "tau_wp"]
     for solver in ("classical", "quantum"):
         g = (sub[sub["solver"] == solver]
-             .groupby([famcol, "n_trk"])[
-                 ["segment_efficiency", "segment_false_rate"]]
+             .groupby([famcol, "n_trk"])[summ_cols]
              .mean().round(3))
-        print(f"\n=== {famcol} family, {solver} ===")
+        print(f"\n=== {famcol} family, {solver} "
+              f"(fixed tau=0.35 vs wp99) ===")
         print(g.to_string())

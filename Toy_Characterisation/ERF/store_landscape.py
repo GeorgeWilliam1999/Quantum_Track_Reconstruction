@@ -46,9 +46,17 @@ def _sem(a):
 def load():
     df = pd.read_csv(METRICS)
     df = df[df["studies"].fillna("").apply(lambda s: in_study(s, STUDY))].copy()
-    df["eff"] = df.segment_efficiency * 100
-    df["far"] = df.segment_false_rate * 100
-    df["pur"] = df.segment_purity * 100
+    # HEADLINE = wp99 high-efficiency working point (segment_*_wp from build_metrics
+    # >= 2026-06-14); the fixed gamma-aware cut (0.35 at gamma=3) is kept as *_fix.
+    wp = "segment_efficiency_wp" in df.columns
+    E = "segment_efficiency_wp" if wp else "segment_efficiency"
+    F = "segment_false_rate_wp" if wp else "segment_false_rate"
+    P = "segment_purity_wp" if wp else "segment_purity"
+    df["eff"] = df[E] * 100
+    df["far"] = df[F] * 100
+    df["pur"] = df[P] * 100
+    df["eff_fix"] = df.segment_efficiency * 100
+    df["far_fix"] = df.segment_false_rate * 100
     return df
 
 
