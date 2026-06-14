@@ -16,11 +16,18 @@ Which directories use (or will want to use) the **NEW** decoupled pipeline data.
 
 _Last refreshed: 2026-06-09 (after the signal-support metrics rebuild)._
 
+> **Operational guide (start here):** `DATA_GENERATION_GUIDE.md` — schematics, where metrics are
+> defined, the store/keys, solvers, and how to run Condor well. Per-project guides:
+> `<study>/DATA_GUIDE.md` for Epsilon_study_2 / ERF / Larger_Scatter / Larger_Scatter_Density /
+> Verify_new_results. **Notion remains the single source of truth** (Data Coverage
+> `37d5d544-…`, Data & Metrics `3795d544-…`); the guides are the operational companion.
+>
 > **Scaling / performance reference:** `SCALING_DEEP_DIVE.md` (2026-06-14) — profiled bottleneck
-> map for larger experiments. Key facts: `A` stays sparse but the **build is O(T³)** (validated
-> exact 8.5×@T1000 cKDTree fix); the **1BQF host OOM is the transpiled circuit fed to Aer**
-> (~7 KB/gate × millions), *not* the statevector — fixed by a **bit-identical matrix-free engine**
-> + per-solve subprocess isolation. 62 high-T 1BQF solves are the only blocked work.
+> map. Key facts (now ACTIONED): `A` stays sparse but the **build was O(T³)** → exact cKDTree fix
+> (8.5×@T1000 measured vs the original full-block scan, `max|ΔA|=0`); the **1BQF host OOM was the transpiled circuit fed to Aer**
+> (~7 KB/gate × millions), *not* the statevector → **bit-identical matrix-free engine** is now the
+> default (statevector-only memory, seconds/solve). The 62 high-T 1BQF solves that were blocked are
+> now trivial (clean T=700: 6 s/0.9 GB; noisy T=400: 3 s/0.9 GB).
 
 ---
 
