@@ -3,6 +3,16 @@
 Can a QSVT polynomial $p(A)$ map the segment-solver failure modes to ~0 where the
 1BQF's single cosine notch cannot? Study layout:
 
+> **Infrastructure update (2026-06-14)** — see `../Toy_Characterisation/SCALING_DEEP_DIVE.md`
+> and `../Toy_Characterisation/DATA_GENERATION_GUIDE.md`. Two behaviour-preserving changes
+> landed in the package/pipeline that affect this programme's data:
+> - **1BQF is now matrix-free** (`helpers.solve_quantum_statevector`, default engine, statevector-only
+>   memory, seconds/solve, bit-identical to the old Aer path). The 1BQF column that "didn't scale past
+>   T=700" was an Aer host-RAM OOM, **not** the statevector — the three-solver comparison (QSVT II) can
+>   now carry 1BQF at **T=700/1000** too. Regenerate those rows with the standard campaign.
+> - **A-build is ~8.5× faster at T=1000** (exact cKDTree step path, `max|ΔA|=0`, measured vs the original full-block scan). The matrix-free QSVT
+>   `solve_statevector` and the comb designs are unchanged; only the underlying A regeneration is faster.
+
 ## `Initial/` — the feasibility study + first circuit build
 Steps A–E (spectral census, polynomial design, classical efficacy, quantum cost,
 noise robustness) and the first circuit-level build
