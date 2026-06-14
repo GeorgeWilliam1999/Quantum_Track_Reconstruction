@@ -134,6 +134,38 @@ solver_segment_efficiency/, Verify_new_results/outputs/quantum_segment_analysis/
 ERF/figures/, Larger_Scatter/figures/, Larger_Scatter_Density/figures/. After push, bump the
 `?v=<commit>` cache-busters on the embeds.
 
-## Optional cleanup
-- Final `build_metrics.py` rebuild to refresh `tau_wp`/`cos_QC` for γ≠3 quantum rows
-  (now γ-aware in code; eff/far already correct). ~20 min.
+## Optional cleanup — DONE
+- Final `build_metrics.py` rebuild (γ-aware `signal_threshold`) complete: 13848 rows, 0 nulls,
+  eff/far unchanged. `tau_wp` now sane for all healthy solves (median 0.18; γ=3 clean = 0.181).
+  A few genuinely DEGENERATE solves (1BQF ≈ orthogonal to the classical signal support — failed
+  high-noise / qsvt cells) still report a large `tau_wp`; harmless (eff/far are scale-invariant).
+- metrics.csv backups: `.pre_wp99.bak` (original) and `.wp99_v1.bak` (0.35-rescale tau_wp).
+
+## SCOPE CORRECTION (2026-06-14, user) — wp99 is the 1BQF HEADLINE ONLY
+
+The classical solver is NOT switched to wp99: it keeps its fixed γ-aware cut
+(τ=0.35 at γ=3), its established operating point (classical never had the 75 %
+dilemma — at 0.35 it already gets ~all true segments with low false). Applying
+wp99 to classical inverted the classical-focused narratives (ERF resolution
+recovery, LS drop-costs-efficiency, density) and contradicted the Epsilon abstract
+— so it was reverted. Final convention: **classical = fixed τ=0.35; 1BQF = wp99.**
+
+Files fixed (classical reverted, 1BQF kept wp99) + re-run:
+- `ERF/store_landscape.py`, `Larger_Scatter_Density/store_analysis.py` → classical fixed
+  (both classical-only studies).
+- `Larger_Scatter/store_analysis.py` → classical figs fixed; `fig_quantum` 1BQF uses
+  new `eff_wp` column (wp99).
+- `Epsilon_study_2/gen_metrics_vs_T.py` → per-solver: classical `segment_efficiency`,
+  1BQF `segment_efficiency_wp`.
+- `Segment_level_studies/01` → `plot_2x2(wp_headline=)`: classical fixed, 1BQF wp99+faded;
+  γ-sweep classical fixed / 1BQF wp99.
+- `Verify_new_results/Quantum_segment_level_store.ipynb` → classical `eff_C` (fixed),
+  1BQF `eff_Q_wp` headline + faded `eff_Q`.
+Classical headline numbers now match the existing page text again (LS clean 100/0.1,
+max-drop 84.6, etc.). Notion: LS-T3 1BQF text reframed to wp99.
+
+## Commit / push — DONE
+- `508fd455` on `highT-1bqf-refresh-2026-06-14` (pushed to origin). Code + 2 notebooks + all
+  regenerated figures/CSVs + this log. Parallel-session files (PROJECT_STATUS.md, theory.md,
+  dp*/detector_physics.*) deliberately excluded. **Notion `?v=` cache-busters should be bumped
+  to `508fd455`** so the corrected pages re-fetch the new figures.

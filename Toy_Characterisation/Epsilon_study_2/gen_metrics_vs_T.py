@@ -31,13 +31,15 @@ CMAP = plt.get_cmap("viridis")
 df = pd.read_csv("/data/bfys/gscriven/qtrk_store/manifest/metrics.csv")
 df = df[df["study"] == "Epsilon_study_2"]
 
-# HEADLINE = wp99 high-efficiency working point (per-solve tau holds ~99% of true
-# segments; segment_*_wp columns from build_metrics.py >= 2026-06-14).  The fixed
-# tau=0.35 cut pinned the 1BQF at the ~75% plateau; we report the working point.
+# The 1BQF HEADLINE is the wp99 high-efficiency working point (per-solve tau holds
+# ~99% of true segments; segment_*_wp from build_metrics.py >= 2026-06-14) — the
+# fixed tau=0.35 cut pinned it at the ~75% plateau.  The CLASSICAL solver stays at
+# its fixed tau=0.35 operating point (user 2026-06-14: wp99 is the 1BQF only).
 WP = "segment_efficiency_wp" in df.columns
-EFF = "segment_efficiency_wp" if WP else "segment_efficiency"
-FAR = "segment_false_rate_wp" if WP else "segment_false_rate"
-TAU_LAB = r"wp99 ($\varepsilon$-eff $\geq 99\%$)" if WP else r"$\tau=0.35$"
+EFF_C, FAR_C = "segment_efficiency", "segment_false_rate"
+EFF_Q = "segment_efficiency_wp" if WP else "segment_efficiency"
+FAR_Q = "segment_false_rate_wp" if WP else "segment_false_rate"
+TAU_LAB = r"classical $\tau=0.35$, 1BQF wp99" if WP else r"$\tau=0.35$"
 
 for figname, famcol, famvals, sel, fixed_lab in (
     ("eff_fr_vs_T_sres_family", "sigma_res", [0.0, 0.01, 0.02, 0.05],
@@ -53,9 +55,9 @@ for figname, famcol, famvals, sel, fixed_lab in (
     for v, col in zip(famvals, cols):
         lab = (rf"$\sigma_r={v:g}$ mm" if famcol == "sigma_res"
                else rf"$\sigma_s={v:g}$")
-        for ax, ycol in zip(axes, (EFF, FAR)):
-            for solver, ls, mk in (("classical", "-", "o"),
-                                   ("quantum", "--", "s")):
+        for ax, (col_c, col_q) in zip(axes, ((EFF_C, EFF_Q), (FAR_C, FAR_Q))):
+            for solver, ls, mk, ycol in (("classical", "-", "o", col_c),
+                                          ("quantum", "--", "s", col_q)):
                 g = (sub[(sub[famcol] == v) & (sub["solver"] == solver)]
                      .groupby("n_trk")[ycol].agg(["mean", "sem", "count"]))
                 g = g[g["count"] >= 2]

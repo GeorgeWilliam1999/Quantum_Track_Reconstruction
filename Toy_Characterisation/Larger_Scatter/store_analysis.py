@@ -44,17 +44,16 @@ def in_study(cell: str, name: str) -> bool:
 def load() -> pd.DataFrame:
     df = pd.read_csv(METRICS)
     df = df[df["studies"].fillna("").apply(lambda s: in_study(s, STUDY))].copy()
-    # HEADLINE = wp99 high-efficiency working point (segment_*_wp from build_metrics
-    # >= 2026-06-14); the fixed gamma-aware cut (0.35 at gamma=3) kept as *_fix.
+    # Classical stays at the fixed gamma-aware cut (0.35 at gamma=3), its
+    # established operating point (the classical eff/far figures). The wp99
+    # high-efficiency working point is the 1BQF HEADLINE only (user 2026-06-14):
+    # eff_wp/far_wp feed fig_quantum's 1BQF curve.
+    df["eff"] = df.segment_efficiency * 100
+    df["far"] = df.segment_false_rate * 100
+    df["pur"] = df.segment_purity * 100
     wp = "segment_efficiency_wp" in df.columns
-    E = "segment_efficiency_wp" if wp else "segment_efficiency"
-    F = "segment_false_rate_wp" if wp else "segment_false_rate"
-    P = "segment_purity_wp" if wp else "segment_purity"
-    df["eff"] = df[E] * 100
-    df["far"] = df[F] * 100
-    df["pur"] = df[P] * 100
-    df["eff_fix"] = df["segment_efficiency"] * 100
-    df["far_fix"] = df["segment_false_rate"] * 100
+    df["eff_wp"] = (df["segment_efficiency_wp"] if wp else df["segment_efficiency"]) * 100
+    df["far_wp"] = (df["segment_false_rate_wp"] if wp else df["segment_false_rate"]) * 100
     return df
 
 
@@ -72,6 +71,8 @@ def aggregate(df: pd.DataFrame) -> pd.DataFrame:
             eff=sub.eff.mean(), eff_sem=_sem(sub.eff),
             far=sub.far.mean(), far_sem=_sem(sub.far),
             pur=sub.pur.mean(), pur_sem=_sem(sub.pur),
+            eff_wp=sub.eff_wp.mean(), eff_wp_sem=_sem(sub.eff_wp),
+            far_wp=sub.far_wp.mean(), far_wp_sem=_sem(sub.far_wp),
             cos_QC=sub.cos_QC.mean() if sub.cos_QC.notna().any() else np.nan,
         ))
     out = pd.DataFrame(rows).sort_values(["solver", "sigma_scatt", "hit_ineff", "n_trk"])
@@ -145,12 +146,13 @@ def fig_quantum(ag):
     ax[0].set_title("1BQF–classical cosine vs T (p_drop=1%)"); ax[0].legend(title=r"$\sigma_{scatt}$", fontsize=8)
     ax[0].set_xscale("log"); ax[0].set_xlabel("T"); ax[0].set_ylabel(r"$\cos\theta_{QC}$"); ax[0].grid(alpha=0.3)
     # quantum vs classical efficiency to T=1000 (matrix-free 1BQF now reaches high T)
+    # classical at its fixed tau=0.35; 1BQF at the wp99 high-efficiency working point
     for c, ss in zip(cmap, SCATTS):
         Tc, ec, _ = pick(ag, "classical", ss, 0.01, "eff")
-        Tq, eq, _ = pick(ag, "quantum", ss, 0.01, "eff")
+        Tq, eq, _ = pick(ag, "quantum", ss, 0.01, "eff_wp")
         ax[1].plot(Tc, ec, "-", color=c, alpha=0.5)
         ax[1].plot(Tq, eq, "o--", color=c, label=f"{ss*1e4:.0f}e-4")
-    ax[1].set_title("efficiency: classical (—) vs 1BQF (o--), p_drop=1%")
+    ax[1].set_title("efficiency: classical τ=0.35 (—) vs 1BQF wp99 (o--), p_drop=1%")
     ax[1].set_xscale("log"); ax[1].set_xlabel("T"); ax[1].set_ylabel("efficiency [%]"); ax[1].grid(alpha=0.3)
     ax[1].legend(fontsize=8)
     fig.suptitle("Larger_Scatter (T3) — quantum 1BQF (to T=1000, matrix-free)", fontweight="bold")
