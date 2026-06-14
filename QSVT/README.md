@@ -10,7 +10,7 @@ Can a QSVT polynomial $p(A)$ map the segment-solver failure modes to ~0 where th
 >   memory, seconds/solve, bit-identical to the old Aer path). The 1BQF column that "didn't scale past
 >   T=700" was an Aer host-RAM OOM, **not** the statevector — the three-solver comparison (QSVT II) can
 >   now carry 1BQF at **T=700/1000** too. Regenerate those rows with the standard campaign.
-> - **A-build is ~8.5× faster at T=1000** (exact cKDTree step path, `max|ΔA|=0`, measured vs the original full-block scan). The matrix-free QSVT
+> - **A-build is ~25× faster at T=1000** (exact cKDTree step path, `max|ΔA|=0`, vs the §A.1-measured ~100 s original O(T³) build). The matrix-free QSVT
 >   `solve_statevector` and the comb designs are unchanged; only the underlying A regeneration is faster.
 
 ## `Initial/` — the feasibility study + first circuit build

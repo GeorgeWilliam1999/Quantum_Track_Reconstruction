@@ -114,7 +114,7 @@ the key, `engine` does not — a matrix-free CPU solve has the same `sol_key` as
 
 **A-build (NEW):** `fast.py::construct_hamiltonian` step path now uses a **cKDTree fixed-radius
 query** instead of the O(T³) full block dot — **bit-identical A** (validated `max|ΔA|=0` at
-T=50–1000, step *and* ERF) and ~8.5× faster at T=1000 (measured vs the original full-block scan). The ERF/`convolution=True` path is
+T=50–1000, step *and* ERF) and ~25× faster at T=1000 (vs the §A.1-measured ~100 s original O(T³) build; baseline-dependent, 8.5–25×). The ERF/`convolution=True` path is
 unchanged. The sparse invariant (`nnz ≈ n_seg`) is unchanged and still guarded.
 
 > These two changes mean **the 62 high-T 1BQF solves that were blocked by OOM are now trivial**

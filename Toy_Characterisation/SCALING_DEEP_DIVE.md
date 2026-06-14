@@ -431,8 +431,11 @@ applies the **identical** `cos > cos(ε)` test. Vs `SimpleHamiltonianFast.constr
 | 1000 | ✓ exact | **0.0** | 35.5 s | 4.17 s | **8.5×** |
 
 **`max|ΔA| = 0` and nnz identical at every T** — same matrix, bit-for-bit. Speedup grows with T
-(O(T³)→O(T²log T)), 8.5× at T=1000 and widening; a numba/vectorised inner loop would push it
-further. Behaviour-preserving for **all** solvers (they all build the same A).
+(O(T³)→O(T²log T)) and is **baseline-dependent**: this micro-benchmark's reference build
+(`_validate_fastbuild.py`, `t_current` = 35.5 s @T1000, a warm/already-grouped reference) gives
+**8.5×**, while the **§A.1 full-pipeline original build (99.5 s @T1000)** gives **~25×** vs the
+same ~4 s fast build. The **headline/Notion figure is ~25×** (vs the full O(T³) build); 8.5× is the
+conservative micro-benchmark floor. Behaviour-preserving for **all** solvers (they all build the same A).
 
 ### 5.3 P0 / opt0 — behaviour-preserving by construction
 
@@ -493,7 +496,7 @@ uncommitted and riding on a parallel session is now resolved. The QTR pipeline c
 
 | change | file(s) | status |
 |---|---|---|
-| **P3 cKDTree A-build** (exact, step path) | `LHCb_VeLo_Toy_Model/.../hamiltonians/fast.py::construct_hamiltonian` @ `17db26f` | **DONE & committed** — `max\|ΔA\|=0` at T=50–1000 (step+ERF, noisy; re-verified 2026-06-14), **8.5× @T1000** measured vs the original full-block scan (§5.2; exact multiplier is baseline-dependent — the original build no longer exists to re-time); `test_pipeline.py` + selftest pass |
+| **P3 cKDTree A-build** (exact, step path) | `LHCb_VeLo_Toy_Model/.../hamiltonians/fast.py::construct_hamiltonian` @ `17db26f` | **DONE & committed** — `max\|ΔA\|=0` at T=50–1000 (step+ERF, noisy; re-verified 2026-06-14), **~25× @T1000** vs the §A.1-measured ~100 s original O(T³) build (the §5.2 micro-benchmark's 8.5× used an already-grouped 35 s reference; multiplier is baseline-dependent, 8.5–25×); `test_pipeline.py` + selftest pass |
 | **P2 matrix-free 1BQF engine** | `_shared/obqf_matrixfree.py` (new) + `_shared/helpers.py::solve_quantum_statevector` (engine dispatch, default `matrixfree`, env `QTRK_OBQF_ENGINE`) | **DONE** — bit-identical to Aer (cos=1.0, ΔP~1e-14, clean+noisy); selftest metrics identical via both engines |
 | **Condor tiers/chunks** | `_shared/qtrk_pipeline/condor/build_submission.py::_mem_gb,_chunk` | **DONE** — flat 16 GB (was ε-aware 24/48/96), chunks 50–200 |
 | **P0 subprocess isolation** | `run_shard.py` | **SUPERSEDED** — matrix-free removes the OOM it worked around; not implemented (avoids fork overhead) |

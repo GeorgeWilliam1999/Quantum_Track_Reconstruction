@@ -24,7 +24,7 @@ _Last refreshed: 2026-06-09 (after the signal-support metrics rebuild)._
 >
 > **Scaling / performance reference:** `SCALING_DEEP_DIVE.md` (2026-06-14) — profiled bottleneck
 > map. Key facts (now ACTIONED): `A` stays sparse but the **build was O(T³)** → exact cKDTree fix
-> (8.5×@T1000 measured vs the original full-block scan, `max|ΔA|=0`); the **1BQF host OOM was the transpiled circuit fed to Aer**
+> (~25×@T1000 vs the §A.1-measured ~100 s original O(T³) build, `max|ΔA|=0`); the **1BQF host OOM was the transpiled circuit fed to Aer**
 > (~7 KB/gate × millions), *not* the statevector → **bit-identical matrix-free engine** is now the
 > default (statevector-only memory, seconds/solve). The 62 high-T 1BQF solves that were blocked are
 > now trivial (clean T=700: 6 s/0.9 GB; noisy T=400: 3 s/0.9 GB).
