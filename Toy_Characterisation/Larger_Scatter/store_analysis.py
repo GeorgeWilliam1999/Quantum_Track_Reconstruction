@@ -136,7 +136,7 @@ def fig_quantum(ag):
         if m.any(): ax[0].plot(np.array(T)[m], np.array(q)[m], "o-", color=c, label=f"{ss*1e4:.0f}e-4")
     ax[0].set_title("1BQF–classical cosine vs T (p_drop=1%)"); ax[0].legend(title=r"$\sigma_{scatt}$", fontsize=8)
     ax[0].set_xscale("log"); ax[0].set_xlabel("T"); ax[0].set_ylabel(r"$\cos\theta_{QC}$"); ax[0].grid(alpha=0.3)
-    # quantum vs classical efficiency at T<=200
+    # quantum vs classical efficiency to T=1000 (matrix-free 1BQF now reaches high T)
     for c, ss in zip(cmap, SCATTS):
         Tc, ec, _ = pick(ag, "classical", ss, 0.01, "eff")
         Tq, eq, _ = pick(ag, "quantum", ss, 0.01, "eff")
@@ -145,7 +145,7 @@ def fig_quantum(ag):
     ax[1].set_title("efficiency: classical (—) vs 1BQF (o--), p_drop=1%")
     ax[1].set_xscale("log"); ax[1].set_xlabel("T"); ax[1].set_ylabel("efficiency [%]"); ax[1].grid(alpha=0.3)
     ax[1].legend(fontsize=8)
-    fig.suptitle("Larger_Scatter (T3) — quantum 1BQF (T<=200)", fontweight="bold")
+    fig.suptitle("Larger_Scatter (T3) — quantum 1BQF (to T=1000, matrix-free)", fontweight="bold")
     fig.tight_layout(); fig.savefig(FIG / "ls_quantum.png", dpi=130); plt.close(fig)
 
 
