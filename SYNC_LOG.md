@@ -98,22 +98,39 @@ A parallel chat is **actively editing this repo right now** (verified by mtimes 
 - New `Epsilon_study_2/gen_detector_physics.py` + `outputs/detector_physics.{json,report.md}` + 5
   `figures/epsilon_sensitivity/dp{1..5}_*.png` — a **detector-physics analysis**, written 17:06–17:12,
   possibly still in progress. **Left for its owning chat to commit** (avoids capturing half-written work).
-- New `Maninm/` (a typo'd "Manim") — a Python **`.venv`** + quarto/manim tool install at the repo root,
-  written 17:16–17:17. This should almost certainly be **git-ignored, not committed** (a virtualenv +
-  binaries don't belong in git). **PENDING USER DECISION.**
+- New `Maninm/` (a typo'd "Manim") — a Python `.venv` + quarto/manim tool install at the repo root.
+  **RESOLVED (user-approved):** added `Maninm/` + generic `.venv/`/`venv/` rules to `.gitignore`
+  (commit `fc32f9b5`); its contents were **not** committed.
 
-**Final merge to `main`:** this branch is currently a clean linear fast-forward ahead of `main`
-(no divergence). Because the other chat is committing+pushing directly to `main`, the fast-forward
-(`git checkout main && git merge --ff-only sync-merge-2026-06-14`) and push were **held** so as not to
-race. **PENDING USER DECISION: fast-forward + push now, or after the parallel chat goes quiet** (and
-after re-checking for new commits on origin/main).
+By the end of the pass the concurrency had grown to **several** simultaneous chats editing this shared
+working dir (verified live): a **high-T 1BQF refresh** (it checked out branch
+`highT-1bqf-refresh-2026-06-14` over the shared checkout, + `HIGHT_1BQF_REFRESH_LOG.md`, re-running
+Verify/Larger_Scatter store figures — using the new matrix-free engine), a **detector-physics** chat in
+its own worktree `.git_dp_worktree/` (detached `639a8657`), and a **QSVT Segment_level_studies** chat
+regenerating figures. All of their uncommitted/worktree work was **left untouched**.
+
+**Final merge to `main`: DONE (user-approved).** My 7 reconciled commits were a clean linear
+fast-forward over `origin/main` (`d6fb474d..fc32f9b5`). `main` was advanced as a **ref-only**
+fast-forward (`git branch -f main fc32f9b5`, no checkout — so no active chat's working files moved) and
+**pushed**: `d6fb474d..fc32f9b5  main -> main`. The redundant `sync-merge-2026-06-14` branch was then
+retired (fully folded into main). The other chats' branch `highT-1bqf-refresh-2026-06-14` and the
+`.git_dp_worktree` were **left in place** (theirs to finish/merge).
+
+**Still left to the owning chats / pending:**
+- `PROJECT_STATUS.md` + `theory.md` + the `detector_physics` analysis — **left to their owning chats**
+  to commit; I did not edit PROJECT_STATUS to avoid racing. (User-confirmed.)
+- `build_metrics.py` view rebuild — still **deferred** until the store is quiet (it rewrites
+  `manifest/metrics.csv`, not concurrent-safe, and several chats are live in the store).
 
 ## 8. End state
 
 - **LVT:** clean, one branch (`main` @ `17db26f`), pushed. ✅
-- **QTR:** sync work on `sync-merge-2026-06-14` (5 commits, linear ahead of `main`); the parallel chat's
-  indefiniteness work is already in `main`/origin. Not yet folded to `main` (see §7). The repo is **not
-  fully clean** — the remaining diff is exclusively the parallel chat's live in-flight work (§7).
-- **Notion + memory + guides** tell one consistent story (matrix-free default; ~25× exact A-build;
-  metrics-as-view at τ=0.35; per-solver efficiency-first working points).
+- **QTR:** `main` @ `fc32f9b5` **pushed to origin** — contains all reconciled sync work (matrix-free
+  engine, guides, Verify topup, QSVT docs, speedup reconciliation, deletions, gitignore, this log) on
+  top of the parallel chat's already-pushed indefiniteness work. `sync-merge` retired. The working tree
+  is **not** clean, but the entire remaining diff is **exclusively other chats' live in-flight work**
+  (§7), deliberately untouched — not lost, theirs to commit. Branch `highT-1bqf-refresh-2026-06-14`
+  (== main) + `.git_dp_worktree` belong to active chats.
+- **Notion + memory + guides** tell one consistent story (matrix-free default; ~25× exact A-build with
+  the 8.5× micro-benchmark floor noted; metrics-as-view at τ=0.35; per-solver efficiency-first points).
 - **Nothing discarded.**
