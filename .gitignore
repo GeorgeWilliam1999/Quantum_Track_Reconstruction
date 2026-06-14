@@ -45,3 +45,9 @@ __pycache__/
 # Embedded OneBQF clones (tracked in their own forks)
 OneBQF_repo/
 Toy_Characterisation/Quantum_Toy_Study/OneBQF/
+
+# Local Python virtualenvs / tool installs (never commit binaries)
+.venv/
+**/.venv/
+venv/
+Maninm/
