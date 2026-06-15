@@ -178,40 +178,71 @@ A real track uses each hit **once**: one segment in, one segment out. A
 **bifurcation** violates this — one hit feeding (or fed by) several active segments.
 Group the segments by the hit they share on a side: for each hit $h$ there is an
 "out-group" (segments starting at $h$) and an "in-group" (segments ending at $h$).
-Let $\mathcal G$ be the set of all such groups. The Denby–Peterson **occupancy
-penalty** charges $\tfrac{\beta}{2}N(N-1)$ for a group carrying total activation
-$N=\sum_{i\in g}x_i$ (zero for one segment, growing for two or more):
-
-$$
-E_{\rm bif}(\mathbf{x})=\frac{\beta}{2}\sum_{g\in\mathcal G}
-\Big[\big(\textstyle\sum_{i\in g}x_i\big)^2-\sum_{i\in g}x_i\Big].
-$$
-
-The fork adjacency is exactly "two segments in a common group":
+Let $\mathcal G$ be the set of all such groups. The fork adjacency is exactly
+*two segments in a common group*:
 
 $$
 B_{ij}=\big[\,i\neq j\ \text{and}\ \big(\operatorname{start}(i)=\operatorname{start}(j)\ \text{or}\ \operatorname{end}(i)=\operatorname{end}(j)\big)\,\big].
 $$
 
-The base solve is the stationary point of $E_0=\tfrac12\mathbf x^\top A_0\mathbf x-\mathbf b_0^\top\mathbf x$.
-Add $E_{\rm bif}$ and set $\nabla(E_0+E_{\rm bif})=0$. **Each segment lies in exactly
-two groups** (its start-group and its end-group), so the gradient of the penalty is
+Two distinct segments share at most one hit, so each forked pair lies in exactly one
+group and $\sum_{g\in\mathcal G}\sum_{i\neq j\in g}x_ix_j=\mathbf x^\top B\mathbf x$ **exactly**.
+
+**The penalty (continuous form → off-diagonal).** Denby–Peterson charges every
+*pair* of co-active segments meeting at a hit. Written directly as a quadratic cost
+on the continuous activations $x_i\in\mathbb R$ that the solver actually produces,
+
+$$
+E_{\rm bif}(\mathbf x)=\frac{\beta}{2}\sum_{g\in\mathcal G}\ \sum_{i\neq j\in g}x_ix_j
+=\frac{\beta}{2}\,\mathbf x^\top B\,\mathbf x .
+$$
+
+The base solve is the stationary point of $E_0=\tfrac12\mathbf x^\top A_0\mathbf x-\mathbf b_0^\top\mathbf x$
+($\nabla E_0=A_0\mathbf x-\mathbf b_0$). Adding $E_{\rm bif}$ and setting
+$\nabla(E_0+E_{\rm bif})=0$ with $\nabla E_{\rm bif}=\beta B\mathbf x$ gives the
+
+> **off-diagonal form** $\;\boxed{A'=(\gamma+\delta)I-C+\beta B,\quad \mathbf b'=\delta\mathbf 1}$.
+
+There is **no** diagonal contribution because $B$ has none — a segment is never
+forked with itself — so $A'$ keeps the bare diagonal $\gamma+\delta$ and bare bias
+$\delta\mathbf 1$.
+
+**The full (binary) Denby–Peterson form.** In the original network the neurons are
+**binary**, $x_i\in\{0,1\}$, so $x_i^2=x_i$ and the *same* pairwise cost may be
+rewritten with a per-group occupancy $N_g=\sum_{i\in g}x_i$, using
+$\sum_{i\neq j\in g}x_ix_j=N_g^2-\sum_{i\in g}x_i^2=N_g^2-N_g$:
+
+$$
+E_{\rm bif}(\mathbf x)=\frac{\beta}{2}\sum_{g\in\mathcal G}
+\Big[\big(\textstyle\sum_{i\in g}x_i\big)^2-\sum_{i\in g}x_i\Big]
+=\frac{\beta}{2}\sum_{g\in\mathcal G}N_g(N_g-1)
+$$
+
+— it charges $\tfrac{\beta}{2}N(N-1)$ for a group of occupancy $N$ (zero for one
+segment, growing for two or more). The two expressions agree at every binary
+configuration but **differ off the corners of the cube**: the binary rewrite replaces
+the self-term $\sum_{i\in g}x_i^2$ by the linear $\sum_{i\in g}x_i$. Differentiating it —
+and using that **each segment lies in exactly two groups** (its start- and end-group,
+so $\sum_{g\ni k}\sum_{i\in g}x_i=2x_k+(B\mathbf x)_k$ and $\sum_{g\ni k}1=2$) —
 
 $$
 \frac{\partial E_{\rm bif}}{\partial x_k}
-=\beta\!\!\sum_{g\ni k}\sum_{i\in g}x_i-\beta
+=\frac{\beta}{2}\sum_{g\ni k}\Big[2\!\sum_{i\in g}x_i-1\Big]
 =\beta\big(2x_k+(B\mathbf x)_k\big)-\beta ,
+\qquad\text{i.e.}\quad \nabla E_{\rm bif}=\beta(2\mathbf x+B\mathbf x)-\beta\mathbf 1 .
 $$
 
-i.e. $\nabla E_{\rm bif}=\beta(2\mathbf x+B\mathbf x)-\beta\mathbf 1$. Two natural forms:
+Now $\nabla(E_0+E_{\rm bif})=0$ reads $(A_0+2\beta I+\beta B)\mathbf x=\mathbf b_0+\beta\mathbf 1$, the
 
-- **Full Denby–Peterson** (keep the whole gradient):
-  $\;(A_0+2\beta I+\beta B)\mathbf x=\mathbf b_0+\beta\mathbf 1$, i.e.
-  $\boxed{A''=(\gamma+\delta+2\beta)I-C+\beta B,\;\mathbf b''=(\delta+\beta)\mathbf 1}$.
-- **Off-diagonal only** (keep just the repulsive pairwise part
-  $\tfrac{\beta}{2}\mathbf x^\top B\mathbf x$; drop the diagonal/linear occupancy
-  pieces): $\nabla=\beta B\mathbf x$, so
-  $\boxed{A'=(\gamma+\delta)I-C+\beta B,\;\mathbf b'=\delta\mathbf 1}$.
+> **full Denby–Peterson form** $\;\boxed{A''=(\gamma+\delta+2\beta)I-C+\beta B,\quad \mathbf b''=(\delta+\beta)\mathbf 1}$.
+
+**The two forms are not two truncations of one gradient.** $A'$ is the *exact*
+gradient of the continuous pairwise penalty $\tfrac{\beta}{2}\mathbf x^\top B\mathbf x$;
+$A''$ is the *exact* gradient of the binary occupancy penalty
+$\tfrac{\beta}{2}\sum_gN_g(N_g-1)$. The extra $2\beta I$ (diagonal) and $\beta\mathbf 1$
+(bias) carried by $A''$ are precisely the *self-occupancy* pieces the binary rewrite
+keeps and the continuous form drops; they vanish as $\beta\to0$, where the two
+coincide.
 
 **Why the diagonal stays constant — and why that matters.** The occupancy term
 contributes the diagonal piece $2\beta x_k$ for *every* segment, because **every
@@ -369,6 +400,10 @@ the near-collinear false bridges (modes F3/F4 in
 `../Segment_level_studies/07_segment_amplitude_atlas.ipynb`) while leaving the rest
 of the spectrum — and the quantum solver — intact. See
 `03_epsilon_windowed_bifurcation.ipynb`.
+
+**The dense fork is never used in the algorithm.** It appears in this note only as
+the worst-case diagnostic of §3–§6; the production algorithm always uses
+$B_\varepsilon$.
 
 ---
 
