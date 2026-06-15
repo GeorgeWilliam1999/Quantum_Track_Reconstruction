@@ -51,7 +51,7 @@ from lhcb_velo_toy.analysis.segment_metrics import (  # noqa: E402
     segment_truth_mask, solver_segment_metrics,
 )
 from lhcb_velo_toy.solvers import SimpleHamiltonianFast  # noqa: E402
-from qtrk_pipeline.metrics import rescale_to_signal  # noqa: E402
+from qtrk_pipeline.metrics import rescale_to_signal, quantum_metrics_wp  # noqa: E402
 
 FIGDIR = HERE / "figures" / "epsilon_sensitivity"
 FIGDIR.mkdir(parents=True, exist_ok=True)
@@ -162,8 +162,11 @@ def solve_classical(ev, eps):
 
 def solve_quantum(ham, sol_C, truth):
     raw, p_anc, n_sys = solve_quantum_statevector(ham.A, ham.b, device="CPU")
-    sol_Q = rescale_to_signal(raw, sol_C, threshold=0.35)
-    mQ = solver_segment_metrics(truth, sol_Q, threshold=0.35)
+    # 1BQF HEADLINE = wp99 high-efficiency working point: per-solve tau just below
+    # the 1% quantile of the TRUE-segment amplitudes (eff/far are rescale-invariant).
+    # The fixed tau=0.35 cut pinned the 1BQF at the artefactual ~75% plateau
+    # (user 2026-06-14, wp99 refresh).  Classical stays at its fixed tau=0.35 op-point.
+    mQ = quantum_metrics_wp(raw, sol_C, truth)
     return mQ, int(n_sys)
 
 
@@ -401,6 +404,9 @@ axA.set_ylabel("segment efficiency")
 axA.set_ylim(0.6, 1.03)
 axA.set_title(r"(a) efficiency held flat by formula $\varepsilon$ (noise-independent)")
 axA.legend(fontsize=7.5, loc="lower left")
+axA.text(0.97, 0.04, r"classical $\tau=0.35$, 1BQF wp99",
+         transform=axA.transAxes, fontsize=7.5, ha="right", va="bottom",
+         bbox=dict(boxstyle="round", fc="white", ec="0.7", alpha=0.8))
 axB.set_ylabel("segment false rate")
 axB.set_yscale("log")
 axB.set_title(r"(b) false tax grows $\propto\sigma_p^2$ once $\sigma_{scatt}>\sigma^*_{scatt}$")

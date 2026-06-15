@@ -169,3 +169,35 @@ max-drop 84.6, etc.). Notion: LS-T3 1BQF text reframed to wp99.
   regenerated figures/CSVs + this log. Parallel-session files (PROJECT_STATUS.md, theory.md,
   dp*/detector_physics.*) deliberately excluded. **Notion `?v=` cache-busters should be bumped
   to `508fd455`** so the corrected pages re-fetch the new figures.
+
+## SESSION 2 (2026-06-15) — Epsilon §7 sensitivity-scan + §7.13 DP4 figures → wp99
+
+The §7 ε/σ sensitivity-scan figures and the §7.13 DP4 soft-track figure were the
+remaining Epsilon_study_2 plots still baking the fixed τ=0.35 1BQF (the artefactual
+~75 % plateau) — `gen_metrics_vs_T.py` had been converted in session 1 but these
+had not. User decision: **wp99 ONLY for the 1BQF (drop the fixed-τ 1BQF curve);
+classical stays fixed τ=0.35.** Discovery plots preserved.
+
+Files edited + re-run (Q_env):
+- `gen_epsilon_sensitivity_scan.py`: `solve_cell` now also computes
+  `quantum_metrics_wp` → `eff_Q_wp`/`far_Q_wp`/`tau_Q_wp` in the JSON. Figs 1+2
+  (`eps_scan_fixed_sres/sscatt`), Fig 4 (`sigma_scan_formula_eps`) plot 1BQF at
+  `*_Q_wp`; Fig 6 (`store_grid_highT`) reads `segment_efficiency_wp`/
+  `segment_false_rate_wp` for the quantum rows. Titles → "classical τ=0.35, 1BQF wp99".
+  eff ylim → (0.9, 1.005). The fixed-τ `eff_Q`/`far_Q` kept in JSON for the record.
+- `replot_sigma_scan_fig.py`: mirrors Fig 4 (reads `*_Q_wp` from the JSON).
+- `gen_detector_physics.py`: DP4 `solve_quantum` → `quantum_metrics_wp`; panel (a)
+  annotated "classical τ=0.35, 1BQF wp99".
+
+PRESERVED (discovery, unchanged in intent, regenerated with fresh stats):
+- `eff_universal_collapse.png` (motif ladder vs τ=0.35 + classical-only collapse).
+- `roc_tau_sweep.png` (swept-τ working-point ROC, markers at τ=0.35).
+
+Validation (formula-ε scans, T=30): 1BQF fixed-τ effQ ≈ 0.74–0.75 → wp99 effQ
+0.997–1.000; wp99 far 0 → 0.18 as σ_res 0→0.05 (LHCb-style trade). DP4 wp99 effQ
+≈ 1.0 across the soft-track sweep (pT 11→0.36 GeV). All 7 figures regenerated,
+non-zero, visually confirmed.
+
+TODO (handoff): **user must git push** the regenerated Epsilon figures, then bump
+the Notion `?v=` cache-busters on the §7 / §7.13 embeds so the write-up re-fetches
+the wp99 plots (the page text was already reframed to wp99 in session 1).
