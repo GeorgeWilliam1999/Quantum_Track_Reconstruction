@@ -48,13 +48,14 @@ accidental chain between two real tracks). The bifurcation term targets the fork
 Everything below is a single hand-built cluster of **five segments** (`make_schematic.py`),
 small enough to do entirely by hand and check against the solver.
 
-![Worked example: detector schematic, the continuation and fork graphs, and the assembled matrix A′](outputs/schematic_worked_example.png)
+![Worked example: detector schematic, the continuation graph C and the ε-windowed fork graph B_ε, and the assembled matrix A′](outputs/schematic_worked_example.png)
 
 ### 1.1 The picture (panel a)
 
 Five planes $M_0,\dots,M_4$. One real particle leaves five hits in a straight line,
 $h_0,h_1,h_2,h_3,h_4$ (one per plane). There is one extra hit $h_1'$ on plane
-$M_1$ (a different particle / noise). From these hits the model builds five
+$M_1$ (a different particle / noise), placed **close to $h_1$** so the false segment
+leaves $h_0$ nearly collinear with $s_1$. From these hits the model builds five
 segments:
 
 | segment | start-hit | end-hit | kind |
@@ -65,9 +66,11 @@ segments:
 | $s_4$ | $h_3$ | $h_4$ | true |
 | $f$   | $h_0$ | $h_1'$ | **false fork** |
 
-The false segment $f$ leaves the **same hit $h_0$** as $s_1$ but heads to the wrong
-plane-1 hit. That shared start-hit is the bifurcation: hit $h_0$ would feed *two*
-segments at once.
+The false segment $f$ leaves the **same hit $h_0$** as $s_1$ and is **near-collinear**
+with it (mutual angle $\theta<\varepsilon$, inside the acceptance window). That shared
+start-hit is the bifurcation — hit $h_0$ would feed *two* segments at once — and
+because $f$ genuinely competes with $s_1$ (small $\theta$) it is exactly the fork the
+**ε-windowed** term $B_\varepsilon$ acts on (§7).
 
 ### 1.2 The continuation graph $C$ (share a *middle* hit) — panel b, solid edges
 
@@ -86,20 +89,25 @@ C=\begin{pmatrix}0&1&0&0&0\\ 1&0&1&0&0\\ 0&1&0&1&0\\ 0&0&1&0&0\\ 0&0&0&0&0\end{p
 \quad(\text{rows/cols }s_1,s_2,s_3,s_4,f).
 $$
 
-### 1.3 The fork graph $B$ (share a *same-side* hit) — panel b, dashed edge
+### 1.3 The ε-windowed fork graph $B_\varepsilon$ (same-side hit, near-collinear) — panel b, dashed edge
 
 Now keep every pair that shares a hit **on the same side** — both start at one hit
-(*out-fork*) or both end at one hit (*in-fork*):
+(*out-fork*) or both end at one hit (*in-fork*) — **and is near-collinear** (mutual
+angle $<\varepsilon$): the genuinely competing continuations the production term acts on.
 
-- $s_1$ and $f$ both **start** at $h_0$ → out-fork, $B_{s_1 f}=1$.
+- $s_1$ and $f$ both **start** at $h_0$ *and* are near-collinear → out-fork, $(B_\varepsilon)_{s_1 f}=1$.
 - no other pair shares a start- or an end-hit.
 
 $$
-B=\begin{pmatrix}0&0&0&0&1\\ 0&0&0&0&0\\ 0&0&0&0&0\\ 0&0&0&0&0\\ 1&0&0&0&0\end{pmatrix}.
+B_\varepsilon=\begin{pmatrix}0&0&0&0&1\\ 0&0&0&0&0\\ 0&0&0&0&0\\ 0&0&0&0&0\\ 1&0&0&0&0\end{pmatrix}.
 $$
 
-**Key point: $C$ and $B$ act on disjoint pairs.** $C$ couples *opposite-side*
-sharing (end-of-one = start-of-other, a genuine continuation); $B$ couples
+For this single near-collinear pair the ε-windowed fork $B_\varepsilon$ and the full
+fork $B$ coincide; in a dense event every hit starts many mutually-forked segments and
+they differ sharply (full $B$ is $O(T^3)$, $B_\varepsilon$ stays sparse — §3 vs §7).
+
+**Key point: $C$ and $B_\varepsilon$ act on disjoint pairs.** $C$ couples *opposite-side*
+sharing (end-of-one = start-of-other, a genuine continuation); $B_\varepsilon$ couples
 *same-side* sharing (two ins or two outs at one hit, a competition). They never
 mark the same pair.
 
@@ -108,7 +116,7 @@ mark the same pair.
 The diagonal is $\gamma+\delta=4$; continuations contribute $-1$; forks contribute
 $+\beta$ (repulsive). The two forms differ only in the diagonal and the bias:
 
-**Off-diagonal form** $\;A'=(\gamma+\delta)\,I-C+\beta B,\qquad \mathbf b'=\delta\mathbf 1$:
+**Off-diagonal form** $\;A'=(\gamma+\delta)\,I-C+\beta B_\varepsilon,\qquad \mathbf b'=\delta\mathbf 1$:
 
 $$
 A'=\begin{pmatrix}
@@ -116,7 +124,7 @@ A'=\begin{pmatrix}
 \end{pmatrix},\qquad \mathbf b'=\begin{pmatrix}1\\1\\1\\1\\1\end{pmatrix}.
 $$
 
-**Full Denby–Peterson form** $\;A''=(\gamma+\delta+2\beta)\,I-C+\beta B,\qquad \mathbf b''=(\delta+\beta)\mathbf 1$:
+**Full Denby–Peterson form** $\;A''=(\gamma+\delta+2\beta)\,I-C+\beta B_\varepsilon,\qquad \mathbf b''=(\delta+\beta)\mathbf 1$:
 same off-diagonals, but the diagonal becomes $4+2\beta$ and the bias becomes
 $(1+\beta)\mathbf 1$. (Where these come from: §2.)
 
