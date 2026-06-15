@@ -48,7 +48,7 @@ from lhcb_velo_toy.analysis.segment_metrics import (  # noqa: E402
     DEFAULT_DZ, DEFAULT_THETA_MIN, segment_truth_mask, solver_segment_metrics,
 )
 from lhcb_velo_toy.solvers import SimpleHamiltonianFast  # noqa: E402
-from qtrk_pipeline.metrics import rescale_to_signal  # noqa: E402
+from qtrk_pipeline.metrics import rescale_to_signal, quantum_metrics_wp  # noqa: E402
 
 FIGDIR = HERE / "figures" / "epsilon_sensitivity"
 FIGDIR.mkdir(parents=True, exist_ok=True)
@@ -138,6 +138,11 @@ def solve_cell(ev, eps: float, tag: str = "", want_vectors: bool = False) -> dic
     # build_metrics convention, so these numbers are store-comparable.
     sol_Q = rescale_to_signal(sol_Q_raw, sol_C, threshold=TAU)
     mQ = solver_segment_metrics(truth, sol_Q, threshold=TAU)
+    # 1BQF HEADLINE = wp99 high-efficiency working point (per-solve tau just below
+    # the 1% quantile of the TRUE-segment amplitudes; eff/far rescale-invariant).
+    # The fixed tau=0.35 cut (mQ above) pins the 1BQF at the artefactual ~75%
+    # plateau and is kept only for the JSON record (user 2026-06-14 wp99 refresh).
+    mQ_wp = quantum_metrics_wp(sol_Q_raw, sol_C, truth)
     # secondary: legacy full-norm rescale, recorded for the convention note
     mQn = solver_segment_metrics(truth, rescale_quantum(sol_Q_raw, sol_C),
                                  threshold=TAU)
@@ -154,6 +159,8 @@ def solve_cell(ev, eps: float, tag: str = "", want_vectors: bool = False) -> dic
         n_false_couplings=false_coupling_count(ham, truth),
         eff_C=mC["segment_efficiency"], far_C=mC["segment_false_rate"],
         eff_Q=mQ["segment_efficiency"], far_Q=mQ["segment_false_rate"],
+        eff_Q_wp=mQ_wp["segment_efficiency"], far_Q_wp=mQ_wp["segment_false_rate"],
+        tau_Q_wp=mQ_wp["tau_wp"],
         eff_Qn=mQn["segment_efficiency"], far_Qn=mQn["segment_false_rate"],
         n_active_C=mC["n_active"], n_active_Q=mQ["n_active"],
         n_true_all=mC["n_true_all"],
@@ -271,12 +278,14 @@ for figname, family, fixed_lab, var_lab in (
                else rf"$\sigma_r={sr:g}$ mm")
         eps_f = float(compute_epsilon(sr, ss))
         for ax, met in zip(axes, ("eff", "far")):
-            for solver, ls, mk in (("C", "-", "o"), ("Q", "--", "s")):
-                x, m, e = agg(rows, "eps", f"{met}_{solver}")
+            # classical at its fixed tau=0.35 op-point; 1BQF at the wp99 headline
+            for solver, ls, mk, ycol, lab_s in (
+                    ("C", "-", "o", f"{met}_C", "classical"),
+                    ("Q", "--", "s", f"{met}_Q_wp", "1BQF wp99")):
+                x, m, e = agg(rows, "eps", ycol)
                 ax.errorbar(x, m, yerr=e, fmt=mk, ls=ls, ms=4.5, capsize=2.5,
                             color=col, mfc=(col if solver == "C" else "none"),
-                            label=f"{lab} "
-                                  f"({'classical' if solver=='C' else '1BQF'})")
+                            label=f"{lab} ({lab_s})")
             ax.axvline(eps_f, color=col, lw=1.2, alpha=0.55)
         # analytic overlays
         xx = np.logspace(np.log10(EPS_GRID[0]), np.log10(EPS_GRID[-1]), 300)
@@ -304,7 +313,7 @@ for figname, family, fixed_lab, var_lab in (
     axes[0].legend(fontsize=7, loc="lower right")
     fig.suptitle(rf"Segment metrics vs Hamiltonian $\varepsilon$ — "
                  rf"{fixed_lab}  (paired events, $T={T}$, {NREP} reps, "
-                 rf"$\tau={TAU}$)", fontsize=11.5)
+                 rf"classical $\tau=0.35$, 1BQF wp99)", fontsize=11.5)
     fig.tight_layout(rect=[0, 0, 1, 0.93])
     fig.savefig(FIGDIR / f"{figname}.png", dpi=160)
     plt.close(fig)
@@ -377,24 +386,26 @@ for j, (axis, xlab, fixed) in enumerate((
     xkey = "ss" if axis == "ss" else "sr"
     for i, met in enumerate(("eff", "far")):
         ax = axes[i, j]
-        for solver, ls, mk, col in (("C", "-", "o", "tab:blue"),
-                                    ("Q", "--", "s", "tab:red")):
-            x, m, e = agg(rows, xkey, f"{met}_{solver}")
+        # classical at its fixed tau=0.35 op-point; 1BQF at the wp99 headline
+        for solver, ls, mk, col, ycol, lab_s in (
+                ("C", "-", "o", "tab:blue", f"{met}_C", "classical"),
+                ("Q", "--", "s", "tab:red", f"{met}_Q_wp", "1BQF wp99")):
+            x, m, e = agg(rows, xkey, ycol)
             ax.errorbar(x, m, yerr=e, fmt=mk, ls=ls, ms=5, capsize=3,
-                        color=col,
-                        label="classical" if solver == "C" else "1BQF")
+                        color=col, label=lab_s)
         if met == "eff":
             ax.axhline(eff_analytic(P_DEFAULT), color="k", ls=":", lw=1.5,
                        label=r"analytic $(1-p)^2(1+p/2)$ at $p=e^{-9}$")
-            # keep the 1BQF ~0.75 ladder plateau in view
-            ax.set_ylim(0.55, 1.04)
+            # wp99: the 1BQF efficiency now sits at ~1.0 alongside classical
+            # (the old fixed-tau ~0.75 plateau was the cut, not lost physics)
+            ax.set_ylim(0.9, 1.005)
         else:
             xs = np.array(sorted(set(r[xkey] for r in rows)))
             eps_f = np.array([float(compute_epsilon(
                 (SR_FIX if axis == "ss" else v),
                 (v if axis == "ss" else SS_FIX))) for v in xs])
             _, mC, _ = agg(rows, xkey, "far_C")
-            _, mQ, _ = agg(rows, xkey, "far_Q")
+            _, mQ, _ = agg(rows, xkey, "far_Q_wp")
             c = fit_quadratic(eps_f, mC)
             fits[f"scan_{axis}"] = c
             ax.plot(xs, np.clip(c * eps_f**2, 0, 1.0), "k:", lw=1.5,
@@ -405,7 +416,7 @@ for j, (axis, xlab, fixed) in enumerate((
             xstar = np.sqrt(6.0) * np.arctan(SR_FIX / DZ)
             ax.axvline(xstar, color="gray", lw=1.2, alpha=0.7)
             if i == 0:
-                ax.text(xstar * 1.07, 0.86,
+                ax.text(xstar * 1.07, 0.915,
                         r"$\sigma^*_{\rm scatt}=\sqrt{6}\,"
                         r"\arctan(\sigma_r/\Delta z)$",
                         fontsize=8, color="gray", rotation=90, va="bottom")
@@ -419,7 +430,7 @@ axes[0, 0].legend(fontsize=8, loc="lower left")
 axes[1, 0].legend(fontsize=8, loc="upper left")
 fig.suptitle(rf"Noise scans at the formula $\varepsilon$ "
              rf"($p_{{\rm miss}}=e^{{-9}}$) — $T={T}$, {NREP} reps, "
-             rf"$\tau={TAU}$", fontsize=12)
+             rf"classical $\tau=0.35$, 1BQF wp99", fontsize=12)
 fig.tight_layout(rect=[0, 0, 1, 0.95])
 fig.savefig(FIGDIR / "sigma_scan_formula_eps.png", dpi=160)
 plt.close(fig)
@@ -483,11 +494,14 @@ for j, (xcol, sel, xlab, fixed) in enumerate((
 )):
     sub = df[sel]
     colsT = [CMAP(x) for x in np.linspace(0.0, 0.85, len(T_SHOW))]
-    for i, ycol in enumerate(("segment_efficiency", "segment_false_rate")):
+    # classical reads the fixed tau=0.35 columns; quantum (1BQF) the wp99 columns
+    for i, (ycol_c, ycol_q) in enumerate((
+            ("segment_efficiency", "segment_efficiency_wp"),
+            ("segment_false_rate", "segment_false_rate_wp"))):
         ax = axes[i, j]
         for t, col in zip(T_SHOW, colsT):
-            for solver, ls, mk in (("classical", "-", "o"),
-                                   ("quantum", "--", "s")):
+            for solver, ls, mk, ycol in (("classical", "-", "o", ycol_c),
+                                         ("quantum", "--", "s", ycol_q)):
                 g = (sub[(sub["n_trk"] == t) & (sub["solver"] == solver)]
                      .groupby(xcol)[ycol].agg(["mean", "sem", "count"]))
                 g = g[g["count"] >= 2]
@@ -505,8 +519,8 @@ axes[0, 0].set_ylabel("segment efficiency")
 axes[1, 0].set_ylabel("segment false rate")
 axes[0, 0].legend(fontsize=7, ncol=2)
 fig.suptitle(r"qtrk-store cross-check: same scans at high $T$ "
-             r"(formula $\varepsilon$, $\tau=0.35$, 20 reps classical / "
-             r"3 quantum)", fontsize=12)
+             r"(formula $\varepsilon$, classical $\tau=0.35$ / 1BQF wp99, "
+             r"20 reps classical / 3 quantum)", fontsize=12)
 fig.tight_layout(rect=[0, 0, 1, 0.95])
 fig.savefig(FIGDIR / "store_grid_highT.png", dpi=160)
 plt.close(fig)
@@ -517,9 +531,12 @@ plt.close(fig)
 
 out = dict(
     T=T, nrep=NREP, tau=TAU, eps_grid=EPS_GRID.tolist(),
-    quantum_convention=("eff_Q/far_Q: rescale_to_signal (qtrk_pipeline "
-                        "build_metrics convention, store-comparable); "
-                        "eff_Qn/far_Qn: legacy full-norm rescale_quantum"),
+    quantum_convention=("eff_Q_wp/far_Q_wp: 1BQF HEADLINE wp99 working point "
+                        "(tau just below the 1% quantile of true-segment "
+                        "amplitudes; the plotted 1BQF curves use these); "
+                        "eff_Q/far_Q: fixed tau=0.35 cut (the artefactual ~75% "
+                        "plateau, kept for the record); eff_Qn/far_Qn: legacy "
+                        "full-norm rescale_quantum. Classical = fixed tau=0.35."),
     family_A=FAMILY_A, family_B=FAMILY_B,
     scan_ss=SCAN_SS, scan_sr=SCAN_SR, roc_cell=ROC_CELL,
     roc_eps=[float(EPS_GRID[i]) for i in ROC_EPS_IDX],

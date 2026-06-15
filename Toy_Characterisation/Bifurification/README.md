@@ -6,8 +6,12 @@ Hamiltonian. Builds on `../Segment_level_studies/` (the base model, the
 eigenvalue/notch picture, the 1BQF).
 
 ## Contents
-- **`bifurcation_hamiltonian.md`** — the mathematics. Derives the two forms from
-  the Denby–Peterson occupancy penalty:
+- **`bifurcation_hamiltonian.md`** — the mathematics. **Opens with a labelled
+  worked example** (`make_schematic.py`): a 5-segment cluster taken from the
+  detector picture all the way to the assembled matrix and the solved activations,
+  so "how it is all defined" is concrete before any general algebra. Ends with a
+  **§8 code walkthrough** (picture → segments → C → B → assemble → solve →
+  metrics). Derives the two forms from the Denby–Peterson occupancy penalty:
   - off-diag: `A' = (γ+δ)I − C + βB`, `b = δ1`
   - full: `A'' = (γ+δ+2β)I − C + βB`, `b = (δ+β)1`
   with `C` = continuation adjacency, `B` = fork adjacency (segments sharing a
@@ -15,6 +19,10 @@ eigenvalue/notch picture, the 1BQF).
   exactly 2 hits) → both are 1BQF-compatible. Includes the analytic worked
   examples, the spectrum, the expected metric effect, and the classical-vs-quantum
   analysis.
+- **`make_schematic.py`** — builds the labelled worked-example figure
+  (`outputs/schematic_worked_example.png`): detector schematic + the continuation
+  and fork graphs + the assembled `A'` matrix. Standalone (hand-built cluster), so
+  the algebra in `bifurcation_hamiltonian.md` §1 is exactly reproducible.
 - **`bif.py`** — helper: `event`, `base_hamiltonian`, `fork_graph`, `bif_system`
   (build A,b,τ for either form), `solve_classical`, `solve_quantum` (1BQF),
   `metrics`, `auc`. Events are **reused** from the qtrk_store generator; metrics

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Regenerate sigma_scan_formula_eps.png from epsilon_sensitivity_scan.json
-(same plotting block as gen_epsilon_sensitivity_scan.py Fig 4, with the
-unclipped y-limits that keep the 1BQF ~0.75 plateau in view)."""
+(same plotting block as gen_epsilon_sensitivity_scan.py Fig 4: classical at the
+fixed tau=0.35 op-point, 1BQF at the wp99 high-efficiency working point)."""
 
 import json
 import sys
@@ -59,23 +59,24 @@ for j, (axis, xlab, fixed) in enumerate((
     xkey = "ss" if axis == "ss" else "sr"
     for i, met in enumerate(("eff", "far")):
         ax = axes[i, j]
-        for solver, ls, mk, col in (("C", "-", "o", "tab:blue"),
-                                    ("Q", "--", "s", "tab:red")):
-            x, m, e = agg(rows, xkey, f"{met}_{solver}")
+        # classical at its fixed tau=0.35 op-point; 1BQF at the wp99 headline
+        for solver, ls, mk, col, ycol, lab_s in (
+                ("C", "-", "o", "tab:blue", f"{met}_C", "classical"),
+                ("Q", "--", "s", "tab:red", f"{met}_Q_wp", "1BQF wp99")):
+            x, m, e = agg(rows, xkey, ycol)
             ax.errorbar(x, m, yerr=e, fmt=mk, ls=ls, ms=5, capsize=3,
-                        color=col,
-                        label="classical" if solver == "C" else "1BQF")
+                        color=col, label=lab_s)
         if met == "eff":
             ax.axhline(eff_analytic(P_DEFAULT), color="k", ls=":", lw=1.5,
                        label=r"analytic $(1-p)^2(1+p/2)$ at $p=e^{-9}$")
-            ax.set_ylim(0.55, 1.04)
+            ax.set_ylim(0.9, 1.005)
         else:
             xs = np.array(sorted(set(r[xkey] for r in rows)))
             eps_f = np.array([float(compute_epsilon(
                 (SR_FIX if axis == "ss" else v),
                 (v if axis == "ss" else SS_FIX))) for v in xs])
             _, mC, _ = agg(rows, xkey, "far_C")
-            _, mQ, _ = agg(rows, xkey, "far_Q")
+            _, mQ, _ = agg(rows, xkey, "far_Q_wp")
             c = fit_quadratic(eps_f, mC)
             print(f"refit c (scan_{axis}) = {c:.4g}")
             ax.plot(xs, np.clip(c * eps_f**2, 0, 1.0), "k:", lw=1.5,
@@ -86,7 +87,7 @@ for j, (axis, xlab, fixed) in enumerate((
             xstar = np.sqrt(6.0) * np.arctan(SR_FIX / DZ)
             ax.axvline(xstar, color="gray", lw=1.2, alpha=0.7)
             if i == 0:
-                ax.text(xstar * 1.07, 0.58,
+                ax.text(xstar * 1.07, 0.915,
                         r"$\sigma^*_{\rm scatt}=\sqrt{6}\,"
                         r"\arctan(\sigma_r/\Delta z)$",
                         fontsize=8, color="gray", rotation=90, va="bottom")
@@ -100,7 +101,7 @@ axes[0, 0].legend(fontsize=8, loc="lower left")
 axes[1, 0].legend(fontsize=8, loc="upper left")
 fig.suptitle(rf"Noise scans at the formula $\varepsilon$ "
              rf"($p_{{\rm miss}}=e^{{-9}}$) — $T={T}$, {NREP} reps, "
-             rf"$\tau={TAU}$", fontsize=12)
+             rf"classical $\tau=0.35$, 1BQF wp99", fontsize=12)
 fig.tight_layout(rect=[0, 0, 1, 0.95])
 fig.savefig(HERE / "figures" / "epsilon_sensitivity"
             / "sigma_scan_formula_eps.png", dpi=160)
