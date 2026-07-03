@@ -199,6 +199,12 @@ def build_manifest(specs: list[StudySpec], write: bool = True):
         # overwrite here silently dropped 1,255 solved rows from the view on
         # 2026-07-02 (repaired 2026-07-03) — never overwrite, always union.
         ev_p, so_p = md / "events.csv", md / "solutions.csv"
+        # rolling safety copy — the 2026-07-03 repair only worked because a
+        # stale .bak happened to exist; keep one automatically from now on
+        import shutil
+        for p in (ev_p, so_p):
+            if p.exists():
+                shutil.copy(p, p.with_suffix(".csv.prev"))
         if ev_p.exists():
             old = pd.read_csv(ev_p)
             keep = old[~old.event_key.isin(set(events.event_key))]

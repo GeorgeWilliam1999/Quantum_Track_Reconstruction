@@ -91,6 +91,11 @@ def _metrics_for_group(rows: pd.DataFrame, truth: np.ndarray) -> list[dict]:
             segment_purity=m["segment_purity"],
             segment_false_rate=m["segment_false_rate"],
             A_nnz=d.get("A_nnz"), t_solve=d.get("t_solve"),
+            # solve-scale diagnostic on the RAW stored vector: healthy classical
+            # solves top out ~<40, lambda_min->0 explosions reach 1e2-1e24
+            # (Eps2 7.12; ERF Youden gate = 50). Quantum vectors are unit-norm —
+            # gate quantum rows via their classical partner (same event+ham).
+            max_abs_x=float(np.max(np.abs(sol))),
         )
         # wp99 high-efficiency working point (HEADLINE; see metrics.working_point_threshold)
         row.update(
