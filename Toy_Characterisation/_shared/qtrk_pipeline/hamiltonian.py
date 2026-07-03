@@ -21,6 +21,7 @@ is the single place the regeneration + guard live:
 """
 from __future__ import annotations
 
+import os
 import sys
 import warnings
 from pathlib import Path
@@ -31,7 +32,11 @@ if str(_SHARED) not in sys.path:
 
 __all__ = ["build_hamiltonian", "segments_only"]
 
-STEP_MAX_RATIO = 5.0      # hard cap for the step kernel (sparse invariant)
+# Hard cap for the step kernel (sparse invariant).  Overridable via env
+# QTRK_STEP_MAX_RATIO for cells where the fill is genuinely dense physics
+# (e.g. Noisy_Density T=1000 phi_max=0.01 formula-eps reaches 5.0-5.2x with
+# real couplings, not the explicit-zero bug this guard was built to catch).
+STEP_MAX_RATIO = float(os.environ.get("QTRK_STEP_MAX_RATIO", 5.0))
 ERF_WARN_RATIO = 250.0    # soft warn for erf; above this a point may be heavy
 
 
