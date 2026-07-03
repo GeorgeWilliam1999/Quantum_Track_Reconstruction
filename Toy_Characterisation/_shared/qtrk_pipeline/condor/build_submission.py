@@ -49,11 +49,14 @@ def _chunk(lane: str, T: int) -> int:
         # (A-build ~5 s + solve ~12 s), not the Aer hours, so pack many per job.
         # (If you force engine=aer at high T, drop these back to ~1-2/job.)
         return 200 if T <= 200 else 100 if T <= 400 else 50
+    if lane == "qsvt":
+        # A-build + one Lanczos rho(C) + LCU emulation: classical-lane-like cost
+        return 300 if T <= 200 else 60 if T <= 400 else 25 if T <= 700 else 15
     return 100
 
 
 def _mem_gb(lane: str, T: int, eps: float = 0.0) -> int:
-    if lane in ("events", "classical"):
+    if lane in ("events", "classical", "qsvt"):
         return 16                      # sparse A -> small even at T=1000
     # Quantum now uses the matrix-free OneBQF engine (helpers default), whose host
     # memory is just the 2^n statevector + the build: <=256 MB at T=1000, <1.5 GB
@@ -74,6 +77,8 @@ def _lane_rows(lane: str, events: pd.DataFrame, solves: pd.DataFrame) -> pd.Data
         return q[(q.solver == "quantum") & (q.device == "CPU")]
     if lane == "quantum_gpu":
         return q[(q.solver == "quantum") & (q.device == "GPU")]
+    if lane == "qsvt":
+        return q[q.solver == "qsvt"]
     raise ValueError(f"unknown lane {lane}")
 
 

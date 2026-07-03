@@ -18,7 +18,33 @@ _SHARED = Path(__file__).resolve().parent.parent
 if str(_SHARED) not in sys.path:
     sys.path.insert(0, str(_SHARED))
 
-__all__ = ["solve_classical", "solve_quantum", "solve_qsvt"]
+__all__ = ["solve_classical", "solve_quantum", "solve_qsvt", "spectral_bounds_for"]
+
+
+def spectral_bounds_for(ham, pad: float = 0.10) -> tuple[float, float]:
+    """Cheap spectral bounds for A = sI - C: rho(C) via one Lanczos 'LA'.
+
+    C is symmetric non-negative, so (Perron-Frobenius) the spectral radius IS
+    lambda_max — a single 'LA' eigsh suffices; Gershgorin fallback.  Promoted
+    from QSVT/qsvt_store_campaign.py so Condor workers can run qsvt solves.
+    """
+    import scipy.sparse as sp
+    from scipy.sparse.linalg import eigsh
+
+    s = float(getattr(ham, "gamma", 3.0)) + float(getattr(ham, "delta", 1.0))
+    n = ham.A.shape[0]
+    C = (s * sp.identity(n, format="csr") - ham.A.tocsr())
+    if n <= 256:
+        w = np.linalg.eigvalsh(C.toarray())
+        rho = float(max(abs(w[0]), abs(w[-1])))
+    else:
+        try:
+            rho = float(eigsh(C, k=1, which="LA",
+                              return_eigenvectors=False, maxiter=3000)[0])
+        except Exception:
+            d = np.asarray(abs(C).sum(axis=1)).ravel()
+            rho = float(d.max())  # Gershgorin on C
+    return s - rho - pad, s + rho + pad
 
 
 def solve_classical(ham) -> tuple[np.ndarray, float]:

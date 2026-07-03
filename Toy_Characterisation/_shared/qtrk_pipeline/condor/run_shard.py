@@ -75,6 +75,18 @@ def _solve_one(r) -> None:
     if str(r.solver) == "classical":
         sol, t = qp.solve_classical(ham)
         scal["t_solve"] = t
+    elif str(r.solver) == "qsvt":
+        lo, hi = qp.spectral_bounds_for(ham)
+        s = float(r.gamma) + float(r.delta)
+        dom = None
+        if lo < s - 3.8 or hi > s + 3.8:  # rare: widen the comb design window
+            half = max(s - lo, hi - s)
+            dom = (s - half, s + half)
+        res = qp.solve_qsvt(ham, degree=40, spectral_bounds=(lo, hi), domain=dom)
+        sol = res["sol"]
+        scal.update(P_anc=res["P_anc"], n_sys=res["n_sys"], n_qubits=res["n_qubits"],
+                    degree=res["degree"], filter_design=res["filter_design"],
+                    t_solve=res["t_solve"])
     else:
         qd = qp.solve_quantum(ham, device=str(r.device), readout=str(r.readout),
                               shots=int(r.shots))
