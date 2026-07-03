@@ -201,3 +201,20 @@ non-zero, visually confirmed.
 TODO (handoff): **user must git push** the regenerated Epsilon figures, then bump
 the Notion `?v=` cache-busters on the §7 / §7.13 embeds so the write-up re-fetches
 the wp99 plots (the page text was already reframed to wp99 in session 1).
+
+## SESSION 3 (2026-07-03) — Notion cache-buster closure. DONE → todo closed.
+
+Verified sessions 1+2 are merged to origin/main (`508fd455`, `981ad948`, `55bbf923`
+via merges `69a167dd`, `04ce295f`); Eps2 figures identical branch↔main. Swept every
+figure embed on the six study write-ups (git last-change vs `?v=` buster commit date):
+
+- **Eps2 detector-noise page:** 7 embeds stale (the §7 scan set at `?v=f9163421`
+  06-13, dp4 at `?v=5fa4f020` 06-14 — both predating the 06-15 `55bbf923` regen)
+  → bumped all 7 to `?v=55bbf923` via surgical in-URL `update_content` (safety-tested
+  on a scratch page first: image blocks survive in-URL edits, no literalisation).
+  Verified post-edit: 7×`v=55bbf923`, 0 old busters, 0 escaped `\![`.
+- **LS / LSD / Segment_level / Verify / ERF pages:** all embeds already current
+  (session-1 bump to `69a167dd` 23:51 postdates the last figure change `981ad948`
+  23:40; no-buster embeds unchanged since before each page build). No action.
+
+wp99 refresh COMPLETE end-to-end: code + figures (main), page text, cache-busters.
