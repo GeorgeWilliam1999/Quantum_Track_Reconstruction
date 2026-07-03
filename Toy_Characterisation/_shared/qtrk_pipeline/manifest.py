@@ -258,4 +258,25 @@ def standard_specs() -> list[StudySpec]:
         gamma=[1.0, 2.0, 3.0], kernel="step",
         eps_provenance="set", eps_values=[0.002],
     )
-    return [eps2, larger_scatter, lsd, erf, verify, verify_fixed]
+    # Realistic-noise arm (user decision, 2026-07-03): the size ladder and the
+    # density cone grid re-run with ALL THREE noise knobs low-but-nonzero —
+    # sigma_scatt=1e-4, sigma_res=0.01 mm (10 um), hit drop 1%.  Two epsilon
+    # windows per event (shared events, distinct ham_key): the formula
+    # eps(0.01, 1e-4) = 3.178 mrad and the fixed 2 mrad used by the sigma_res=0
+    # ladder — at this noise the fixed window is NARROWER than the formula one,
+    # so window clipping is deliberately in scope.  1BQF statevector with 5 reps
+    # (not 1) at T>=700 to match the Verify_new_results high-T top-up.
+    _noisy = dict(sigma_scatt=[1e-4], sigma_res=[0.01], hit_ineff=[0.01],
+                  kernel="step", quantum_sv_hiT_reps=5)
+    noisy_ladder = StudySpec(name="Noisy_Ladder", **_noisy)
+    noisy_ladder_fixed = StudySpec(
+        name="Noisy_Ladder", eps_provenance="set", eps_values=[0.002], **_noisy)
+    noisy_density = StudySpec(
+        name="Noisy_Density",
+        phi_max=[0.2, 0.1, 0.05, 0.02, 0.01], **_noisy)
+    noisy_density_fixed = StudySpec(
+        name="Noisy_Density",
+        phi_max=[0.2, 0.1, 0.05, 0.02, 0.01],
+        eps_provenance="set", eps_values=[0.002], **_noisy)
+    return [eps2, larger_scatter, lsd, erf, verify, verify_fixed,
+            noisy_ladder, noisy_ladder_fixed, noisy_density, noisy_density_fixed]
