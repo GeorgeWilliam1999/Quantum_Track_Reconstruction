@@ -48,6 +48,8 @@ KERNELS = [(1e-6, "step ($\\theta_d$=1e-6)", "#52514e", "-"),
            (1e-4, "erf $\\theta_d$=1e-4", "#6baed6", "-"),
            (1e-3, "erf $\\theta_d$=1e-3", "#08306b", "-")]
 
+FAR_FLOOR = 5e-5   # log-axis display floor; a measured far=0 sits here as an OPEN marker
+
 FOOT = (r"ERF store (qtrk_store metrics view) · common formula $\varepsilon$ per pair: "
         "clean 0.425 · moderate 3.397 · heavy 6.646 mrad · "
         r"$\gamma$=3 $\delta$=1 · $\phi_{max}$=0.2 · drop=0 · T$\in$[10,1000]"
@@ -110,12 +112,18 @@ def plot_solver(erf, solver, headline_cols, faded_cols, fname, title):
             ec, fc = headline_cols
             ax_e.errorbar(T, ge[(ec, "mean")], yerr=ge[(ec, "sem")], color=color,
                           ls=ls, marker="o", ms=3.5, lw=1.6, capsize=2, label=lab)
-            ax_f.errorbar(T, np.clip(ge[(fc, "mean")], 5e-5, None), yerr=ge[(fc, "sem")],
+            fmean = ge[(fc, "mean")].values
+            ax_f.errorbar(T, np.clip(fmean, FAR_FLOOR, None), yerr=ge[(fc, "sem")],
                           color=color, ls=ls, marker="o", ms=3.5, lw=1.6, capsize=2)
+            # a measured 0 is data, not a gap: open marker pinned at the floor
+            zero = fmean <= 0
+            if zero.any():
+                ax_f.plot(T[zero], np.full(zero.sum(), FAR_FLOOR), marker="o",
+                          ms=5, mfc="white", mec=color, mew=1.2, ls="none", zorder=5)
             if faded_cols:
                 ec2, fc2 = faded_cols
                 ax_e.plot(T, ge[(ec2, "mean")], color=color, ls=":", lw=1.0, alpha=0.45)
-                ax_f.plot(T, np.clip(ge[(fc2, "mean")], 5e-5, None), color=color,
+                ax_f.plot(T, np.clip(ge[(fc2, "mean")], FAR_FLOOR, None), color=color,
                           ls=":", lw=1.0, alpha=0.45)
         if onset.get(pair):
             for ax in (ax_e, ax_f):
@@ -125,7 +133,10 @@ def plot_solver(erf, solver, headline_cols, faded_cols, fname, title):
         ax_f.set_ylabel("false rate")
         ax_e.set_ylim(0.4, 1.03)
         ax_f.set_yscale("log")
-        ax_f.set_ylim(5e-5, 1.5)
+        ax_f.set_ylim(2e-5, 1.5)
+        ax_f.axhline(FAR_FLOOR, color="#b9b7b1", lw=0.6, ls=":", zorder=0)
+        ax_f.text(1250, FAR_FLOOR, " open = 0", fontsize=6, color="#79776f",
+                  va="center", ha="left", clip_on=False)
         for ax in (ax_e, ax_f):
             ax.set_xscale("log")
             ax.set_xlim(9, 1300)

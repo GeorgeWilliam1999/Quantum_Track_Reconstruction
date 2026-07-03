@@ -75,17 +75,20 @@ class StudySpec:
     quantum_reps_by_readout: dict = field(
         default_factory=lambda: {"statevector": 3, "sampling": 20})
     quantum_shots: int = 100_000         # shots for the sampling readout
-    # Statevector is EXACT (no shot noise), so high-T reps only add event-to-event
-    # variance already sampled at lower T. Cut to 1 rep at T>=700 to tame the GPU
-    # tail (each T=1000 statevector solve is ~88 min). Sampling unaffected.
+    # Statevector is EXACT (no shot noise), so high-T reps only sample
+    # event-to-event variance — but 1 rep gives NO error bar and a single
+    # pathological event skews the mean. 3 reps at T>=700 (uniform with the
+    # low-T convention) since the matrix-free engine removed the Aer cost that
+    # motivated the 1-rep cut (user: full-range coverage, 2026-07-03).
     quantum_sv_hiT: int = 700            # T threshold for the high-T rep cut
-    quantum_sv_hiT_reps: int = 1
-    # Large-noise (large-ε) cells have a HUGE 1BQF circuit (gates ∝ ε²): e.g.
-    # σ_res=0.05 (ε≈0.016) at T=400 needs ~96 GB, and worse at higher T — heavy AND
-    # marginal (classical recon already collapses at that noise). Cap quantum at
-    # T<=400 for ε >= quantum_hieps. (user, 2026-06-09)
+    quantum_sv_hiT_reps: int = 3
+    # Large-noise (large-ε) cells once had a HUGE 1BQF circuit cost in Aer
+    # (gates ∝ ε²: σ_res=0.05 at T=400 needed ~96 GB), so quantum was capped at
+    # T<=400 for ε >= quantum_hieps (user, 2026-06-09). The matrix-free engine
+    # removed that wall (statevector-only memory), so the cap is lifted to the
+    # full ladder (user: full-range coverage, 2026-07-03).
     quantum_hieps: float = 0.012
-    quantum_hieps_Tmax: int = 400
+    quantum_hieps_Tmax: int = 1000
 
     def quantum_for(self, eps: float, T: int) -> bool:
         """Whether to run quantum for this (epsilon, T)."""
@@ -190,10 +193,28 @@ def build_manifest(specs: list[StudySpec], write: bool = True):
 
     if write:
         md = manifest_dir()
-        events.to_csv(md / "events.csv", index=False)
-        solves.to_csv(md / "solutions.csv", index=False)
-        print(f"[manifest] {len(events)} unique events -> {md/'events.csv'}")
-        print(f"[manifest] {len(solves)} unique solves -> {md/'solutions.csv'}")
+        # ADDITIVE merge with the CSVs already on disk: rows registered outside
+        # standard_specs (ad-hoc campaigns: QSVT third-solver, Verify densify,
+        # gamma top-ups, ...) must survive a spec-driven regeneration.  A plain
+        # overwrite here silently dropped 1,255 solved rows from the view on
+        # 2026-07-02 (repaired 2026-07-03) — never overwrite, always union.
+        ev_p, so_p = md / "events.csv", md / "solutions.csv"
+        if ev_p.exists():
+            old = pd.read_csv(ev_p)
+            keep = old[~old.event_key.isin(set(events.event_key))]
+            if len(keep):
+                events = pd.concat([events, keep], ignore_index=True)
+                print(f"[manifest] preserved {len(keep)} existing ad-hoc event rows")
+        if so_p.exists():
+            old = pd.read_csv(so_p)
+            keep = old[~old.sol_key.isin(set(solves.sol_key))]
+            if len(keep):
+                solves = pd.concat([solves, keep], ignore_index=True)
+                print(f"[manifest] preserved {len(keep)} existing ad-hoc solve rows")
+        events.to_csv(ev_p, index=False)
+        solves.to_csv(so_p, index=False)
+        print(f"[manifest] {len(events)} unique events -> {ev_p}")
+        print(f"[manifest] {len(solves)} unique solves -> {so_p}")
         _print_breakdown(solves)
     return events, solves
 
