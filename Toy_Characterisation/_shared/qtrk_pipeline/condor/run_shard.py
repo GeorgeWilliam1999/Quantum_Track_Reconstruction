@@ -78,10 +78,12 @@ def _solve_one(r) -> None:
     elif str(r.solver) == "qsvt":
         lo, hi = qp.spectral_bounds_for(ham)
         s = float(r.gamma) + float(r.delta)
-        dom = None
-        if lo < s - 3.8 or hi > s + 3.8:  # rare: widen the comb design window
-            half = max(s - lo, hi - s)
-            dom = (s - half, s + half)
+        # QSVT pads spectral_bounds by 2% of the span per side and requires the
+        # padded interval INSIDE poly.domain — a domain set exactly to (lo, hi)
+        # always fails, and bounds near the default window's edge fail too
+        # (437/2399 of cluster 5015574). Widen with margin instead.
+        half = max(s - lo, hi - s) * 1.06 + 0.02
+        dom = (s - half, s + half) if half > 3.8 else None
         res = qp.solve_qsvt(ham, degree=40, spectral_bounds=(lo, hi), domain=dom)
         sol = res["sol"]
         scal.update(P_anc=res["P_anc"], n_sys=res["n_sys"], n_qubits=res["n_qubits"],

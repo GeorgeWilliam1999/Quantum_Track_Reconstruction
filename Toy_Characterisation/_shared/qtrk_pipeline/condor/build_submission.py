@@ -153,6 +153,11 @@ def write_submit(lane: str, shards: list[tuple[Path, int]],
         env += f" OMP_NUM_THREADS={ncpu}"
     if quantum:
         env += " AER_MAX_MEM_MB=$(aer_mem)"
+    if lane == "qsvt":
+        # Noisy_Density T=1000 formula-eps cells genuinely reach 5.0-5.2x n_seg
+        # (real couplings, not the explicit-zero bug) — same override as the
+        # local classical/quantum rescue of those 25 cells.
+        env += " QTRK_STEP_MAX_RATIO=6.0"
     qvars = "shardfile, mem_gb, aer_mem" if quantum else "shardfile, mem_gb"
     lines += [
         "should_transfer_files = NO",
