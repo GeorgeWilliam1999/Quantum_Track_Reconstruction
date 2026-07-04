@@ -29,13 +29,15 @@ import sys
 import numpy as np
 import scipy.sparse as sp
 
+from pathlib import Path
+
 for _p in ("/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/_shared",
            "/data/bfys/gscriven/LHCb_VeLo_Toy_Model/src",
-           "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Bifurification_initial"):
+           str(Path(__file__).resolve().parent)):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-import bif  # v1 machinery: fork_graph (all co-hit), fork_graph_eps (windowed)
+import bif  # v1 machinery (now alongside): fork_graph (all co-hit), fork_graph_eps (windowed)
 
 
 def cohit_graph(ham) -> sp.csr_matrix:

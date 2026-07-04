@@ -1,12 +1,40 @@
-# Bifurcation term — v2 (work in progress)
+# Bifurification — the Denby–Peterson fork (bifurcation) term
 
-The new version of the bifurcation / Denby–Peterson fork write-up, built
-**Notion-first** (section by section) and synced here as each part settles.
+One coherent folder for the fork-penalty subproject (merged 2026-07-04 from
+`Bifurification` v2 + `Bifurification_initial` v1, per George).
 
-- **Previous version:** [`../Bifurification_initial/`](../Bifurification_initial/)
-  — `bifurcation_hamiltonian.md` + notebooks 01–04 (dense-fork characterisation,
-  the ε-windowed fix, and the T=200 failure-type / phase analysis). Kept for
-  reference; not edited further.
-- **Notion (v2):** _TBD — link added once the new page exists._
+The fork term penalises co-hit segment pairs within a mutual-angle window ε_B:
+`A_fork = A0 + β·B_fork` (off-diagonal mode, attractor unchanged). Only the
+ε-windowed form is viable — the dense all-pair fork uniformly rescales and
+breaks the 1BQF (v1 finding). **Step kernel only** for now (not ERF).
 
-Status: **scaffolding** — content to follow, bit by bit.
+## Layout
+- `bif.py` — v1 machinery, still live: `fork_graph` (all co-hit pairs, used by
+  the occupancy term), `fork_graph_eps` (ε-windowed fork), `auc`.
+- `dp_terms.py` — the shared DP system builder `dp_system(ham, beta, eps_B,
+  alpha, ...)` (fork + occupancy compose; the `Occupancy/` subproject imports
+  from here).
+- `dp_pilot.py` → `results/dp_pilot.csv` — fork/occupancy pilot (T∈{50,100,200}
+  ×3 rep, classical + 1BQF).
+- `dp_spectrum_classical.py` → `results/dp_classical_spectrum.csv` — the
+  classical-first spectral study (which eigenvalues to comb).
+- `dp_costs.py` → `results/dp_costs.csv` — 1BQF qubit / 2-qubit-gate cost and
+  sparsity of the modified systems (questions 2+3).
+- `dp_working_points.py` → `results/dp_working_points.csv` — matched-event
+  τ-sweep working points, classical + 1BQF (question 1) + pooled spectra /
+  peak structure (question 4).
+- `dp_analysis.ipynb` — joint pilot exploration; `fork_analysis.ipynb` — the
+  fork-specific answers to questions 1–4.
+- `initial_v1/` — the v1 study (notebooks 01–04, `bifurcation_hamiltonian.md`,
+  dense-fork characterisation + ε-windowed fix). Reference only; not edited.
+
+## The four questions (George, 2026-07-04)
+1. Do the added terms improve segment efficiency / false rate vs the original —
+   classical AND 1BQF?
+2. Extra cost in qubits and 2-qubit gates for the 1BQF?
+3. How is the sparsity of the matrix affected?
+4. Does the activation spectrum change — fewer distinct sets of peaks?
+
+Sister subproject: [`../Occupancy/`](../Occupancy/) (the per-hit occupancy
+term). Notion write-up: "Denby–Peterson penalties — pilot & classical-first
+spectral characterisation".
