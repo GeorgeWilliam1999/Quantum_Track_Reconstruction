@@ -30,7 +30,11 @@ os.environ.setdefault("QTRK_STORE", "/data/bfys/gscriven/qtrk_store")
 METRICS = Path(os.environ["QTRK_STORE"]) / "manifest" / "metrics.csv"
 
 STUDY = "ERF"
-TDS = [1e-6, 1e-5, 5e-5, 1e-4, 5e-4, 1e-3]
+# 2026-07-04: grid gained the kink-matched widths theta_d = eps/3 = sigma_kink
+# (one per pair, crossed with all pairs). Non-round floats -> match with
+# np.isclose (as _pair does), never ==.
+KINK = {"clean": 1.4159802e-4, "moderate": 1.1322446e-3, "heavy": 2.2153451e-3}
+TDS = sorted([1e-6, 1e-5, 5e-5, 1e-4, 5e-4, 1e-3] + list(KINK.values()))
 # ERF used PAIRED noise (not a Cartesian sigma_scatt x sigma_res grid):
 #   clean / moderate / heavy  =  (sigma_scatt, sigma_res)
 PAIRS = [(1e-4, 0.0, "clean"), (3e-4, 0.01, "moderate"), (5e-4, 0.02, "heavy")]
@@ -84,7 +88,7 @@ def fig_resolution_recovery(ag):
     fig, ax = plt.subplots(2, 3, figsize=(15, 8), sharex=True)
     for k, (ss, sr, name) in enumerate(PAIRS):
         for td, color, lab in [(1e-6, "k", "step (θ_d=1e-6)"),
-                               (1e-4, "tab:blue", "erf θ_d=1e-4"),
+                               (KINK[name], "tab:blue", "erf θ_d=ε/3 (kink-matched)"),
                                (1e-3, "tab:red", "erf θ_d=1e-3")]:
             s = _pair(ag, ss, sr, td).sort_values("n_trk")
             ax[0, k].errorbar(s.n_trk, s.eff, s.eff_sem, marker="o", color=color, label=lab)
@@ -152,6 +156,7 @@ def main():
         for T in (200,):
             print(f"{name:9s} (σ_sc={ss:g},σ_res={sr:g}) T={T}: "
                   f"step eff={at(ss,sr,1e-6,T,'eff'):5.1f}% far={at(ss,sr,1e-6,T,'far'):5.1f}%  "
+                  f"-> erf(ε/3) eff={at(ss,sr,KINK[name],T,'eff'):5.1f}% far={at(ss,sr,KINK[name],T,'far'):5.1f}%  "
                   f"-> erf(1e-3) eff={at(ss,sr,1e-3,T,'eff'):5.1f}% far={at(ss,sr,1e-3,T,'far'):5.1f}%")
 
 

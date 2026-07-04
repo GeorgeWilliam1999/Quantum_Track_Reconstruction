@@ -32,7 +32,7 @@ Run (Q_env):
 """
 from __future__ import annotations
 
-import os, sys, time
+import os, re, sys, time
 from pathlib import Path
 
 import numpy as np
@@ -68,22 +68,38 @@ CENTERS = 0.5 * (BINS[:-1] + BINS[1:])
 EXPLODE_MAX = 50.0
 PAIRS = [(1e-4, 0.0, "clean"), (3e-4, 0.01, "moderate"), (5e-4, 0.02, "heavy")]
 PAIR_LABEL = {(ss, sr): lab for ss, sr, lab in PAIRS}
-TDS = [1e-6, 1e-5, 5e-5, 1e-4, 5e-4, 1e-3]
+# 2026-07-04: + the kink-matched widths theta_d = eps/3 = sigma_kink (one per
+# pair, crossed with all pairs). Non-round floats: pool keys are SNAPPED onto
+# this grid (snap_td) so hard-coded lookups and df filters match exactly.
+KINK = {"clean": 1.4159802e-4, "moderate": 1.1322446e-3, "heavy": 2.2153451e-3}
+TDS = sorted([1e-6, 1e-5, 5e-5, 1e-4, 5e-4, 1e-3] + list(KINK.values()))
+
+
+def snap_td(x: float) -> float:
+    """Snap a stored erf_sigma onto the canonical TDS grid (isclose, not ==)."""
+    for t in TDS:
+        if np.isclose(x, t, rtol=1e-3):
+            return t
+    return float(x)
+
 
 # palette (validated reference set; one color-meaning per figure family)
 C_TRUE, C_FALSE = "#2a78d6", "#eb6834"            # truth state (distributions)
 C_CLASS, C_QUANT = "#2a78d6", "#e34948"           # solver identity (trends)
 # theta_d = ordered magnitude -> single-hue sequential ramp (light -> dark blue)
-TD_RAMP = ["#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08306b"]
+TD_RAMP = ["#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5",
+           "#08519c", "#08306b", "#041e42"]
 TD_COLOR = dict(zip(TDS, TD_RAMP))
 PAIR_RAMP = {"clean": "#9ecae1", "moderate": "#4292c6", "heavy": "#08306b"}
 
 FOOT = (r"ERF store (qtrk_store, abs $\tau$=0.35 ref) · $\gamma$=3 $\delta$=1 · erf kernel, "
-        r"$\theta_d\in\{10^{-6},10^{-5},5{\times}10^{-5},10^{-4},5{\times}10^{-4},10^{-3}\}$ "
-        r"($10^{-6}$ = step regression) · pairs ($\sigma_{scatt}$,$\sigma_{res}$): "
+        r"$\theta_d$: $\{10^{-6},10^{-5},5{\times}10^{-5},10^{-4},5{\times}10^{-4},10^{-3}\}$ "
+        r"+ kink-matched $\varepsilon/3$ per pair (0.142 · 1.132 · 2.215 mrad); $10^{-6}$ = step "
+        r"· pairs ($\sigma_{scatt}$,$\sigma_{res}$): "
         "clean(1e-4, 0) · moderate(3e-4, 0.01) · heavy(5e-4, 0.02) · "
-        r"$\phi_{max}$=0.2 · T$\in$[10,1000] · classical MINRES (20 rep) / "
-        "1BQF matrix-free statevector (3 rep, 1 at T≥700), rescaled to ‖sol_C‖")
+        r"$\phi_{max}$=0.2 · T$\in$[10,1000] · classical MINRES / 1BQF matrix-free "
+        "statevector, 20 events/point (2026-07-04 refresh), quantum rescaled on the "
+        "classical signal support")
 
 plt.rcParams.update({
     "figure.dpi": 150, "savefig.dpi": 150, "font.size": 9,
@@ -104,7 +120,12 @@ def pool_scores() -> dict:
         if hasattr(qp, "store_root") else pd.read_csv(
             os.path.join(os.environ.get("QTRK_STORE", "/data/bfys/gscriven/qtrk_store"),
                          "manifest", "metrics.csv"))
-    erf = m[m.study == "ERF"].copy()
+    # membership via `studies` (token match), NOT `study==`: shared cells are
+    # attributed to one owner study and a study== filter silently drops them.
+    is_erf = m.studies.fillna("").map(lambda s: "ERF" in re.split(r"[|,;\s]+", str(s)))
+    # qsvt solves live on their own comb scale — pooling them raw next to the
+    # 0.35-referenced classical/quantum scores would be meaningless; excluded.
+    erf = m[is_erf & m.solver.isin(["classical", "quantum"])].copy()
     erf["pair"] = [PAIR_LABEL.get((ss, sr)) for ss, sr in zip(erf.sigma_scatt, erf.sigma_res)]
     erf = erf.sort_values(["event_key", "solver"])   # classical before quantum
     from qtrk_pipeline.metrics import rescale_to_signal
@@ -127,7 +148,7 @@ def pool_scores() -> dict:
                 continue
             # canonical: rescale on the classical SIGNAL support (n-independent)
             sol = rescale_to_signal(sol, sol_C, TAU_ABS)
-        key = (r.pair, float(r.erf_sigma), int(r.n_trk), r.solver)
+        key = (r.pair, snap_td(r.erf_sigma), int(r.n_trk), r.solver)
         if key not in pools:
             pools[key] = [np.zeros(len(BINS) - 1, np.int64), np.zeros(len(BINS) - 1, np.int64),
                           np.zeros(2, np.int64)]  # [n_excluded_solves, n_total_solves]
@@ -200,7 +221,7 @@ def analyse_pool(ht, hf) -> dict:
 def fig_scores(pools, T=200):
     fig, axes = plt.subplots(3, 2, figsize=(9, 8.6), sharex=True)
     for i, (ss, sr, pair) in enumerate(PAIRS):
-        for k, td in enumerate([1e-6, 1e-3]):
+        for k, td in enumerate([1e-6, KINK[pair]]):
             ax = axes[i, k]
             ht, hf, _ = pools.get((pair, td, T, "classical"), (None, None, None))
             if ht is None:
@@ -214,7 +235,8 @@ def fig_scores(pools, T=200):
                 ax.axvline(tau, color="#52514e", ls=ls, lw=1.0)
             ax.set_yscale("log")
             ax.set_xlim(-0.1, 1.7)
-            ttl = "step ($\\theta_d$=1e-6)" if td == 1e-6 else "erf $\\theta_d$=1e-3"
+            ttl = ("step ($\\theta_d$=1e-6)" if td == 1e-6
+                   else f"erf $\\theta_d=\\varepsilon/3$ ({td*1e3:.3g} mrad)")
             ax.set_title(f"{pair} · {ttl}   AUC={st['auc']:.4f}  J*={st['youden_J']:.3f}",
                          fontsize=8.5)
             if k == 0:
@@ -265,13 +287,14 @@ def fig_roc(pools, T=200):
 
 
 def fig_tau_vs_T(df):
-    sel_td = [1e-6, 1e-4, 1e-3]
     fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.0), sharey=True)
     for ax, (ss, sr, pair) in zip(axes, PAIRS):
-        for td in sel_td:
+        for td in (1e-6, KINK[pair], 1e-3):
+            lab = ("step" if td == 1e-6
+                   else "$\\varepsilon/3$" if td == KINK[pair] else f"{td:g}")
             g = df[(df.pair == pair) & (df.theta_d == td) & (df.solver == "classical")].sort_values("n_trk")
             ax.plot(g.n_trk, g.tau_J, "-o", color=TD_COLOR[td], ms=3.5, lw=1.5,
-                    label=f"$\\tau_J$, $\\theta_d$={td:g}")
+                    label=f"$\\tau_J$, $\\theta_d$={lab}")
             ax.plot(g.n_trk, g.tau_wp99, ":s", color=TD_COLOR[td], ms=3, lw=1.2)
         ax.axhline(TAU_ABS, color="#52514e", lw=1.0, ls="--")
         ax.text(11, TAU_ABS + 0.012, "abs $\\tau$=0.35", fontsize=7, color="#52514e")
@@ -316,7 +339,8 @@ def fig_quantum(pools, df):
     fig, axes = plt.subplots(2, 2, figsize=(10, 7.6))
     # (a,b) heavy-pair pooled spectra at T=200: classical vs 1BQF (rescaled)
     for ax, td, ttl in ((axes[0, 0], 1e-6, "step ($\\theta_d$=1e-6)"),
-                        (axes[0, 1], 1e-3, "erf $\\theta_d$=1e-3")):
+                        (axes[0, 1], KINK["heavy"],
+                         "erf $\\theta_d=\\varepsilon/3$ (2.22 mrad)")):
         for solver, ls in (("classical", "-"), ("quantum", "--")):
             got = pools.get(("heavy", td, 200, solver))
             if got is None:
@@ -336,20 +360,20 @@ def fig_quantum(pools, df):
     # (c) AUC vs T, classical vs quantum, step + wide erf, heavy pair
     ax = axes[1, 0]
     for solver, color in (("classical", C_CLASS), ("quantum", C_QUANT)):
-        for td, ls in ((1e-6, "-"), (1e-3, "--")):
+        for td, ls in ((1e-6, "-"), (KINK["heavy"], "--")):
             g = df[(df.pair == "heavy") & (df.theta_d == td) & (df.solver == solver)].sort_values("n_trk")
             if not len(g):
                 continue
             ax.plot(g.n_trk, g.auc, ls, marker="o", ms=3.5, lw=1.5, color=color,
                     label=f"{'1BQF' if solver=='quantum' else solver}, "
-                          f"{'step' if td==1e-6 else 'erf 1e-3'}")
+                          f"{'step' if td==1e-6 else 'erf ε/3'}")
     ax.set_xscale("log"); ax.set_xlabel("T (tracks)"); ax.set_ylabel("AUC")
     ax.set_title("AUC vs T — heavy pair", fontsize=9)
     ax.legend(fontsize=7, loc="lower left")
     # (d) false rate paid at the wp99 point vs T
     ax = axes[1, 1]
     for solver, color in (("classical", C_CLASS), ("quantum", C_QUANT)):
-        for td, ls in ((1e-6, "-"), (1e-3, "--")):
+        for td, ls in ((1e-6, "-"), (KINK["heavy"], "--")):
             g = df[(df.pair == "heavy") & (df.theta_d == td) & (df.solver == solver)].sort_values("n_trk")
             if not len(g):
                 continue
@@ -385,7 +409,7 @@ def fig_operating_points(df, T=200):
     axes[0].set_ylabel("segment efficiency")
     handles = ([Line2D([], [], color=TD_COLOR[td], lw=1.6, label=f"$\\theta_d$={td:g}") for td in TDS]
                + [Line2D([], [], color="#52514e", ls="", marker=mk, label=lab) for _, mk, lab in marks])
-    axes[2].legend(handles=handles, fontsize=6.8, loc="lower right", ncol=2)
+    axes[0].legend(handles=handles, fontsize=6.4, loc="lower left", ncol=2)
     fig.suptitle(f"The threshold menu at T={T} (classical): what Youden / wp99 buy against the fixed 0.35 cut", y=0.98)
     fig.tight_layout(rect=(0, 0.05, 1, 0.93))
     footer(fig)
@@ -417,7 +441,7 @@ def main():
 
     # headline numbers for the write-up
     for pair in ("clean", "moderate", "heavy"):
-        for td in (1e-6, 1e-3):
+        for td in (1e-6, KINK[pair], 1e-3):
             r = df[(df.pair == pair) & (df.theta_d == td) & (df.n_trk == 200) & (df.solver == "classical")]
             if len(r):
                 r = r.iloc[0]
