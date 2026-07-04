@@ -56,7 +56,8 @@ CFG = {
         foot=(r"qtrk_store view · Larger_Scatter_Density: $\phi_{max}\in\{.01,.02,.05,.1\}$ ×"
               r" $\sigma_{scatt}\in\{1,3\}\times10^{-4}$ · $\sigma_{res}$=0 · drop=0 ·"
               r" formula $\varepsilon$ (0.42/1.27 mrad) · step · $\gamma$=3 $\delta$=1 ·"
-              r" T$\in$[10,1000] · classical MINRES 20 rep ($\tau$=0.35) · gate max$|x|\leq$50")),
+              "\n"
+              r"T$\in$[10,1000] · classical MINRES 20 rep ($\tau$=0.35) · gate max$|x|\leq$50")),
 }
 
 plt.rcParams.update({

@@ -100,34 +100,47 @@ def solve_point(ham, truth, beta, alpha, run_quantum=True):
     return out, (sol_C, None)
 
 
-def main():
+def main(plot_only: bool = False):
     scan = ([(b, 0.0) for b in BETAS] + [(0.0, a) for a in ALPHAS] + COMBOS)
+    spectra_keys = [(0.0, 0.0), (1.0, 0.0), (0.0, 0.3), (1.0, 0.3)]
     rows, spectra = [], {}
-    for T in T_GRID:
-        for rep in range(REPS):
-            ev, ekey = qp.ensure_event(n_trk=T, rep=rep, **NOISE)
-            from lhcb_velo_toy.analysis import compute_epsilon
-            eps = float(compute_epsilon(NOISE["sigma_res"], NOISE["sigma_scatt"]))
-            ham = qp.build_hamiltonian(ev, epsilon=eps, kernel="step",
-                                       gamma=GAMMA, delta=DELTA)
-            truth = np.asarray(qp.truth_from_event(ev), bool)
-            for beta, alpha in scan:
-                run_q = T <= 200
-                out, (sC, sQ) = solve_point(ham, truth, beta, alpha, run_q)
-                rows.append(dict(T=T, rep=rep, beta=beta, alpha=alpha,
-                                 epsilon=eps, n_seg=int(ham.n_segments), **out))
-                if T == 200 and rep == 0 and (beta, alpha) in [(0.0, 0.0), (1.0, 0.0),
-                                                               (0.0, 0.3), (1.0, 0.3)]:
-                    spectra[(beta, alpha)] = (sC, sQ, truth, out["tau"])
-                print(f"T={T} rep={rep} β={beta:g} α={alpha:g}: "
-                      f"effC={out['eff_C']:.3f} farC={out['far_C']:.3f} "
-                      f"aucC={out['auc_C']:.4f} "
-                      + (f"farQwp={out.get('far_Qwp', float('nan')):.3f} "
-                         f"cos={out.get('cos_QC', float('nan')):.3f}" if run_q else ""),
-                      flush=True)
-    df = pd.DataFrame(rows)
-    df.to_csv(HERE / "results" / "dp_pilot.csv", index=False)
-    print(f"[csv] {len(df)} rows -> results/dp_pilot.csv")
+    if plot_only:
+        df = pd.read_csv(HERE / "results" / "dp_pilot.csv")
+        # fig 2 needs the T=200 rep-0 vectors: classical re-solve only (cheap)
+        ev, _ = qp.ensure_event(n_trk=200, rep=0, **NOISE)
+        from lhcb_velo_toy.analysis import compute_epsilon
+        eps = float(compute_epsilon(NOISE["sigma_res"], NOISE["sigma_scatt"]))
+        ham = qp.build_hamiltonian(ev, epsilon=eps, kernel="step",
+                                   gamma=GAMMA, delta=DELTA)
+        truth = np.asarray(qp.truth_from_event(ev), bool)
+        for beta, alpha in spectra_keys:
+            out, (sC, _) = solve_point(ham, truth, beta, alpha, run_quantum=False)
+            spectra[(beta, alpha)] = (sC, None, truth, out["tau"])
+    else:
+        for T in T_GRID:
+            for rep in range(REPS):
+                ev, ekey = qp.ensure_event(n_trk=T, rep=rep, **NOISE)
+                from lhcb_velo_toy.analysis import compute_epsilon
+                eps = float(compute_epsilon(NOISE["sigma_res"], NOISE["sigma_scatt"]))
+                ham = qp.build_hamiltonian(ev, epsilon=eps, kernel="step",
+                                           gamma=GAMMA, delta=DELTA)
+                truth = np.asarray(qp.truth_from_event(ev), bool)
+                for beta, alpha in scan:
+                    run_q = T <= 200
+                    out, (sC, sQ) = solve_point(ham, truth, beta, alpha, run_q)
+                    rows.append(dict(T=T, rep=rep, beta=beta, alpha=alpha,
+                                     epsilon=eps, n_seg=int(ham.n_segments), **out))
+                    if T == 200 and rep == 0 and (beta, alpha) in spectra_keys:
+                        spectra[(beta, alpha)] = (sC, sQ, truth, out["tau"])
+                    print(f"T={T} rep={rep} β={beta:g} α={alpha:g}: "
+                          f"effC={out['eff_C']:.3f} farC={out['far_C']:.3f} "
+                          f"aucC={out['auc_C']:.4f} "
+                          + (f"farQwp={out.get('far_Qwp', float('nan')):.3f} "
+                             f"cos={out.get('cos_QC', float('nan')):.3f}" if run_q else ""),
+                          flush=True)
+        df = pd.DataFrame(rows)
+        df.to_csv(HERE / "results" / "dp_pilot.csv", index=False)
+        print(f"[csv] {len(df)} rows -> results/dp_pilot.csv")
 
     # ---- fig 1: metrics vs beta / alpha at each T --------------------------
     fig, axes = plt.subplots(2, 3, figsize=(12, 6.6), sharex="col")
@@ -138,7 +151,7 @@ def main():
                                         ("far_Qwp", "1BQF wp99 false rate")]):
             ax = axes[i, j]
             for T, mk in zip(T_GRID, ["o", "s", "^"]):
-                g = (df[sel & (df.T == T)].groupby(knob)[col].agg(["mean", "sem"]))
+                g = (df[sel & (df["T"] == T)].groupby(knob)[col].agg(["mean", "sem"]))
                 if not len(g):
                     continue
                 ax.errorbar(g.index, g["mean"], yerr=g["sem"], marker=mk, ms=4,
@@ -152,7 +165,7 @@ def main():
         for (knob, sel, ls) in [("beta", df.alpha == 0.0, "-"),
                                 ("alpha", df.beta == 0.0, "--")]:
             for T, mk in zip(T_GRID, ["o", "s", "^"]):
-                g = df[sel & (df.T == T)].groupby(knob)[col].mean()
+                g = df[sel & (df["T"] == T)].groupby(knob)[col].mean()
                 if len(g):
                     ax.plot(g.index, g.values, marker=mk, ms=3.5, ls=ls, lw=1.2,
                             label=f"T={T} {knob}" if i == 0 else None)
@@ -201,7 +214,7 @@ def main():
     for ax, (knob, sel) in zip(axes, [("beta", df.alpha == 0.0),
                                       ("alpha", df.beta == 0.0)]):
         for T, mk in zip(T_GRID, ["o", "s", "^"]):
-            g = df[sel & (df.T == T)].groupby(knob)[["lam_min", "lam_max"]].mean()
+            g = df[sel & (df["T"] == T)].groupby(knob)[["lam_min", "lam_max"]].mean()
             ax.plot(g.index, g.lam_min, marker=mk, ms=4, lw=1.5, label=f"λ_min T={T}")
             ax.plot(g.index, g.lam_max, marker=mk, ms=4, lw=1.0, ls=":", alpha=0.7)
         ax.axhline(0, color="#e34948", lw=0.8, ls="--")
@@ -217,4 +230,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(plot_only="--plot-only" in sys.argv[1:])
