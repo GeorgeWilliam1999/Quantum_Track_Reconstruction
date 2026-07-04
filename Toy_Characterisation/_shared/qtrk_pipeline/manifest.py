@@ -262,10 +262,25 @@ def standard_specs() -> list[StudySpec]:
         phi_max=[0.2, 0.1, 0.05, 0.02, 0.01], sigma_scatt=[1e-4, 3e-4],
         kernel="step",
     )
+    # ERF: the kink-matched width theta_d = eps/3 is the physically meaningful
+    # soft-edge width (eps = 3*sigma_kink, so eps/3 IS the true RMS 3D kink
+    # angle — the erf blur then matches the actual angular smearing).  One such
+    # width per noise pair, swept across ALL pairs so the theta_d/eps ratio
+    # axis is sampled on both sides of 1/3 (2026-07-04).
+    _erf_pairs = [(1e-4, 0.0), (3e-4, 0.01), (5e-4, 0.02)]
+    from lhcb_velo_toy.analysis import compute_epsilon as _ceps
+    _kink_widths = [_ceps(sr, ss) / 3.0 for ss, sr in _erf_pairs]
     erf = StudySpec(
         name="ERF",
-        noise_pairs=[(1e-4, 0.0), (3e-4, 0.01), (5e-4, 0.02)],   # paired, not product
-        kernel="erf", erf_sigma=[1e-6, 1e-5, 5e-5, 1e-4, 5e-4, 1e-3],
+        noise_pairs=_erf_pairs,                                  # paired, not product
+        kernel="erf",
+        erf_sigma=sorted([1e-6, 1e-5, 5e-5, 1e-4, 5e-4, 1e-3] + _kink_widths),
+        # 20-rep quantum, uniform in T (was 3): statevector is exact, but
+        # event-to-event variance dominates the eff/far-vs-T curves and 3
+        # events per point left them visibly noisy; the matrix-free engine is
+        # seconds/solve at any T so full-rep coverage is cheap (2026-07-04).
+        quantum_reps_by_readout={"statevector": 20, "sampling": 20},
+        quantum_sv_hiT_reps=20,
     )
     # Verify: baseline (formula) + a gamma sweep, drop in {0, 0.01}.
     verify = StudySpec(
