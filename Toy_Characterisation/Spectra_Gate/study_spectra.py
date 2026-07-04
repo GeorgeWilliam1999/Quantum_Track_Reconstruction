@@ -49,6 +49,15 @@ CFG = {
               r" × drop$\in\{0,.01,.02,.05,.10\}$ · $\sigma_{res}$=0 · $\phi_{max}$=0.2 ·"
               r" formula $\varepsilon$ (0.42–4.24 mrad) · step · $\gamma$=3 $\delta$=1 ·"
               r" T$\in$[10,1000] · classical MINRES 20 rep ($\tau$=0.35) · gate max$|x|\leq$50")),
+    "Epsilon_study_2": dict(
+        row="sigma_res", col="sigma_scatt",
+        spectra_rows=[0.0, 0.02, 0.05], spectra_cols=[1e-4, 5e-4],
+        row_lab="σ_res", col_lab="σ_scatt",
+        foot=(r"qtrk_store view · Epsilon_study_2: $\sigma_{res}\in\{0,.01,.02,.05\}$ ×"
+              r" $\sigma_{scatt}\in\{1,3,5\}\times10^{-4}$ · drop=0 · $\phi_{max}$=0.2 ·"
+              r" formula $\varepsilon$ · step · $\gamma$=3 $\delta$=1 ·"
+              "\n"
+              r"T$\in$[10,1000] · classical MINRES 20 rep ($\tau$=0.35) · gate max$|x|\leq$50")),
     "Larger_Scatter_Density": dict(
         row="phi_max", col="sigma_scatt",
         spectra_rows=[0.01, 0.05, 0.1], spectra_cols=[1e-4, 3e-4],
