@@ -47,6 +47,10 @@ def _sem(a):
     return a.std(ddof=1) / np.sqrt(len(a)) if len(a) > 1 else 0.0
 
 
+EXPLODE_MAX = 50.0  # classical validity gate (Eps2 §7.12 / 2026-07-05 audit)
+MIN_VALID = 5       # cells with fewer valid events are dropped (regime, not physics)
+
+
 def load():
     df = pd.read_csv(METRICS)
     df = df[df["studies"].fillna("").apply(lambda s: in_study(s, STUDY))].copy()
@@ -56,19 +60,28 @@ def load():
     df["eff"] = df.segment_efficiency * 100
     df["far"] = df.segment_false_rate * 100
     df["pur"] = df.segment_purity * 100
+    # validity gate: lambda_min->0 explosions saturate an event's metrics for
+    # regime reasons; quantum rows gated via the classical partner (unit-norm).
+    cls = (df[df.solver == "classical"][["event_key", "ham_key", "max_abs_x"]]
+           .rename(columns={"max_abs_x": "cls_max_abs"}))
+    df = df.merge(cls, on=["event_key", "ham_key"], how="left")
+    df["valid"] = df.cls_max_abs <= EXPLODE_MAX
     return df
 
 
 def aggregate(df):
     rows = []
     keys = ["solver", "erf_sigma", "sigma_scatt", "sigma_res", "n_trk"]
-    for k, sub in df.groupby(keys):
+    for k, sub_all in df.groupby(keys):
+        sub = sub_all[sub_all.valid]
         d = dict(zip(keys, k))
-        d.update(n_rep=len(sub),
-                 eff=sub.eff.mean(), eff_sem=_sem(sub.eff),
-                 far=sub.far.mean(), far_sem=_sem(sub.far),
-                 pur=sub.pur.mean(),
-                 cos_QC=sub.cos_QC.mean() if sub.cos_QC.notna().any() else np.nan)
+        d.update(n_rep=len(sub), n_total=len(sub_all),
+                 excluded_frac=1.0 - len(sub) / max(len(sub_all), 1))
+        if len(sub) >= MIN_VALID:
+            d.update(eff=sub.eff.mean(), eff_sem=_sem(sub.eff),
+                     far=sub.far.mean(), far_sem=_sem(sub.far),
+                     pur=sub.pur.mean(),
+                     cos_QC=sub.cos_QC.mean() if sub.cos_QC.notna().any() else np.nan)
         rows.append(d)
     out = pd.DataFrame(rows).sort_values(keys)
     out.to_csv(RES / "erf_store_landscape.csv", index=False)

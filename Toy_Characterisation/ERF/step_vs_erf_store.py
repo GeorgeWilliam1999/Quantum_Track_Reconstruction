@@ -53,15 +53,18 @@ STEP_TD = 1e-6                      # step reference (erf at negligible width)
 C_STEP, C_KINK = "#52514e", "#08519c"
 
 FAR_FLOOR = 5e-5   # log-axis display floor; a measured far=0 sits here as an OPEN marker
+EXPLODE_MAX = 50.0  # per-solve validity gate on the CLASSICAL vector (Eps2 §7.12)
+MIN_VALID = 5       # a (pair, kernel, T) point needs >=5/20 valid events to be shown
 
 FOOT = (r"ERF store (qtrk_store metrics view) · common formula $\varepsilon$ per pair: "
         "clean 0.425 · moderate 3.397 · heavy 6.646 mrad · kink-matched width "
         r"$\theta_d=\varepsilon/3=\sigma_{kink}$ · $\gamma$=3 $\delta$=1 · "
         r"$\phi_{max}$=0.2 · drop=0 · T$\in$[10,1000]"
         "\n"
-        "classical MINRES 20 events/point ($\\tau$=0.35) · 1BQF matrix-free statevector "
-        "20 events/point, wp99 headline · shaded: $\\lambda_{min}\\to0$ explosion regime "
-        "(step classical excluded_frac>50%, erf_youden_eer.csv)")
+        "classical MINRES ($\\tau$=0.35) · 1BQF matrix-free statevector, wp99 headline · "
+        "means over VALID events only (classical max$|x|\\leq$50 gate, quantum gated via "
+        "classical partner; point needs $\\geq$5/20 valid — see erf_stepvserf_validity.png) · "
+        "shaded: $\\lambda_{min}\\to0$ explosion regime")
 
 plt.rcParams.update({
     "figure.dpi": 150, "savefig.dpi": 150, "font.size": 9,
@@ -87,6 +90,19 @@ def load_view():
         next((lab for ss, sr, lab, _, _ in PAIRS
               if abs(row.sigma_scatt - ss) < 1e-12 and abs(row.sigma_res - sr) < 1e-9), None)
         for row in erf.itertuples()]
+    # Per-solve VALIDITY GATE (2026-07-05 consistency audit): a lambda_min->0
+    # explosion (max|x| up to 1e24, every segment active) saturates that
+    # event's metrics for regime reasons, not kernel physics — one exploded
+    # event dragged the clean T=200 step mean from 0.9% to 5.8% far while the
+    # pooled (gated) Youden section saw no difference, which is exactly the
+    # section-to-section inconsistency this gate closes.  Quantum vectors are
+    # unit-norm, so quantum rows are gated via their CLASSICAL partner
+    # (same event+ham), matching build_metrics / the Youden convention.
+    cls = (erf[erf.solver == "classical"]
+           [["event_key", "ham_key", "max_abs_x"]]
+           .rename(columns={"max_abs_x": "cls_max_abs"}))
+    erf = erf.merge(cls, on=["event_key", "ham_key"], how="left")
+    erf["valid"] = erf.cls_max_abs <= EXPLODE_MAX
     return erf
 
 
@@ -126,7 +142,12 @@ def plot_solver(erf, solver, headline_cols, faded_cols, fname, title):
             g = sel_width(sub, td)
             if not len(g):
                 continue
-            ge = agg(g, list(dict.fromkeys(headline_cols + (faded_cols or []))))
+            gv = g[g.valid]
+            cnt = gv.groupby("n_trk").size()
+            gv = gv[gv.n_trk.isin(cnt[cnt >= MIN_VALID].index)]
+            if not len(gv):
+                continue
+            ge = agg(gv, list(dict.fromkeys(headline_cols + (faded_cols or []))))
             T = ge.index.values
             ec, fc = headline_cols
             ax_e.errorbar(T, ge[(ec, "mean")], yerr=ge[(ec, "sem")], color=color,
@@ -167,6 +188,36 @@ def plot_solver(erf, solver, headline_cols, faded_cols, fname, title):
     fig.tight_layout(rect=(0, 0.035, 1, 0.985))
     footer(fig)
     fig.savefig(FIGS / fname)
+    plt.close(fig)
+
+
+def plot_validity(erf):
+    """Excluded fraction (classical max|x|>50) vs T per pair and kernel."""
+    fig, axes = plt.subplots(1, 3, figsize=(11.5, 3.9), sharey=True)
+    cls = erf[erf.solver == "classical"]
+    for ax, (ss, sr, pair, eps, kink_td) in zip(axes, PAIRS):
+        sub = cls[cls.pair == pair]
+        for td, lab, color in kernels_for(kink_td):
+            g = sel_width(sub, td)
+            if not len(g):
+                continue
+            ex = g.groupby("n_trk").apply(lambda d: 1.0 - d.valid.mean())
+            ax.plot(ex.index, ex.values, "-o", ms=3.5, lw=1.5, color=color, label=lab)
+        ax.axhline(1 - MIN_VALID / 20, color="#e34948", lw=0.8, ls="--")
+        ax.set_xscale("log")
+        ax.set_ylim(-0.03, 1.05)
+        ax.set_xlabel("T (tracks)")
+        ax.set_title(f"{pair} · $\\varepsilon$={eps:g} mrad", fontsize=9)
+    axes[0].set_ylabel("excluded fraction (max$|x|>$50)")
+    axes[0].legend(fontsize=7.5)
+    axes[1].text(11, 1 - MIN_VALID / 20 + 0.02, "points above the red line are DROPPED "
+                 "from the eff/far figures (<5/20 valid)", fontsize=7, color="#e34948")
+    fig.suptitle("Validity map: the $\\lambda_{min}\\to0$ explosion regime by kernel "
+                 "(fraction of the 20 events per point failing the max$|x|\\leq$50 gate)",
+                 y=0.98)
+    fig.tight_layout(rect=(0, 0.09, 1, 0.91))
+    footer(fig)
+    fig.savefig(FIGS / "erf_stepvserf_validity.png")
     plt.close(fig)
 
 
@@ -229,8 +280,9 @@ def main():
                 "erf_stepvserf_quantum.png",
                 "Step vs kink-matched erf ($\\theta_d=\\varepsilon/3$) at common ε — "
                 "1BQF (wp99 headline, dotted = fixed τ=0.35): efficiency | false rate vs T")
+    plot_validity(erf)
     plot_sparsity(erf)
-    # tidy summary CSV
+    # tidy summary CSV — means over VALID events; n_valid/n_total recorded
     rows = []
     for solver in ("classical", "quantum"):
         for ss, sr, pair, eps, kink_td in PAIRS:
@@ -239,15 +291,20 @@ def main():
                 g = sel_width(sub, td)
                 if not len(g):
                     continue
-                for T, gg in g.groupby("n_trk"):
-                    rows.append(dict(
-                        pair=pair, epsilon_mrad=eps, kernel=kname, theta_d=td,
-                        solver=solver, n_trk=T, n_events=len(gg),
-                        eff=gg.segment_efficiency.mean(), eff_sem=gg.segment_efficiency.sem(),
-                        far=gg.segment_false_rate.mean(), far_sem=gg.segment_false_rate.sem(),
-                        eff_wp=gg.segment_efficiency_wp.mean(), far_wp=gg.segment_false_rate_wp.mean(),
-                        nnz=gg.A_nnz.mean(), n_seg=gg.n_seg.mean(),
-                        fill=(gg.A_nnz / gg.n_seg).mean()))
+                for T, ga in g.groupby("n_trk"):
+                    gg = ga[ga.valid]
+                    row = dict(pair=pair, epsilon_mrad=eps, kernel=kname, theta_d=td,
+                               solver=solver, n_trk=T, n_valid=len(gg), n_total=len(ga),
+                               excluded_frac=1.0 - len(gg) / max(len(ga), 1),
+                               nnz=ga.A_nnz.mean(), n_seg=ga.n_seg.mean(),
+                               fill=(ga.A_nnz / ga.n_seg).mean())
+                    if len(gg) >= MIN_VALID:
+                        row.update(
+                            eff=gg.segment_efficiency.mean(), eff_sem=gg.segment_efficiency.sem(),
+                            far=gg.segment_false_rate.mean(), far_sem=gg.segment_false_rate.sem(),
+                            eff_wp=gg.segment_efficiency_wp.mean(),
+                            far_wp=gg.segment_false_rate_wp.mean())
+                    rows.append(row)
     out = pd.DataFrame(rows)
     out.to_csv(RES / "erf_stepvserf_summary.csv", index=False)
     print(f"[csv] {len(out)} rows -> {RES/'erf_stepvserf_summary.csv'}")

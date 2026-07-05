@@ -214,18 +214,52 @@ def analyse_pool(ht, hf) -> dict:
         act = ta + fa
         out[f"eff_{tag}"] = ta / max(n_t, 1)
         out[f"far_{tag}"] = fa / max(act, 1)
+    # MATCHED-EFFICIENCY working points (2026-07-05 consistency audit): the
+    # kernels put their activation levels at different absolute scales (the
+    # erf family has doubled couplings), so any fixed tau compares them at
+    # different points of their own distributions.  far at a fixed POOLED
+    # efficiency is the threshold-free cross-kernel comparison.
+    for tgt, tag in ((0.99, "m99"), (0.999, "m999")):
+        ok = np.where(tpr >= tgt)[0]
+        i = int(ok.max()) if len(ok) else 0
+        ta, fa = float(tpr[i] * n_t), float(fpr[i] * n_f)
+        out[f"tau_{tag}"] = float(BINS[i])
+        out[f"eff_{tag}"] = float(tpr[i])
+        out[f"far_{tag}"] = fa / max(ta + fa, 1e-300)
     return out
 
 
 # ---------------------------------------------------------------- figures
+def attractor_levels(w: float) -> dict:
+    """Exact activation levels of ideal structures at coupling weight w.
+
+    Isolated (unconnected) segment, coupled pair, and 4-chain end/interior for
+    A = (gamma+delta)I - w*Adj, b = delta.  w=1 is the true step kernel;
+    w=2 is the erf family's hard-edge limit (theta_d -> 0)."""
+    s = GAMMA + DELTA
+    lv = {"iso": DELTA / s}
+    lv["pair"] = float(np.linalg.solve(np.array([[s, -w], [-w, s]]),
+                                       np.full(2, DELTA))[0])
+    adj = np.eye(4, k=1) + np.eye(4, k=-1)
+    x4 = np.linalg.solve(s * np.eye(4) - w * adj, np.full(4, DELTA))
+    lv["chain end"], lv["chain mid"] = float(x4[0]), float(x4[1])
+    return lv
+
+
 def fig_scores(pools, T=200):
     fig, axes = plt.subplots(3, 2, figsize=(9, 8.6), sharex=True)
+    lv2 = attractor_levels(2.0)   # both columns are the erf (doubled) family
     for i, (ss, sr, pair) in enumerate(PAIRS):
         for k, td in enumerate([1e-6, KINK[pair]]):
             ax = axes[i, k]
             ht, hf, _ = pools.get((pair, td, T, "classical"), (None, None, None))
             if ht is None:
                 ax.set_axis_off(); continue
+            for name, v in lv2.items():
+                ax.axvline(v, color="#79b791", lw=0.8, ls="-.", alpha=0.8, zorder=0)
+                if i == 0:
+                    ax.text(v, 2e5, f" {name}", fontsize=5.5, color="#3f7f52",
+                            rotation=90, va="top")
             ax.stairs(np.maximum(ht, 0.5), BINS, color=C_TRUE, lw=1.4, label="true")
             ax.stairs(np.maximum(hf, 0.5), BINS, color=C_FALSE, lw=1.4, label="false")
             st = analyse_pool(ht, hf)
@@ -416,6 +450,37 @@ def fig_operating_points(df, T=200):
     fig.savefig(FIGS / f"erf_youden_operating_points_T{T}.png"); plt.close(fig)
 
 
+def fig_matched(df):
+    """THE fair cross-kernel comparison: pooled far at matched efficiency."""
+    fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.1), sharey=True)
+    for ax, (ss, sr, pair) in zip(axes, PAIRS):
+        for td, lab, color in ((1e-6, "step ($\\theta_d$=1e-6)", "#52514e"),
+                               (KINK[pair], "erf $\\theta_d=\\varepsilon/3$", "#08519c"),
+                               (1e-3, "erf $\\theta_d$=1e-3", "#6baed6")):
+            g = df[(df.pair == pair) & (df.solver == "classical")
+                   & np.isclose(df.theta_d, td, rtol=1e-3)].sort_values("n_trk")
+            if not len(g):
+                continue
+            ax.plot(g.n_trk, np.clip(g.far_m99, 5e-5, None), "-o", ms=4, lw=1.6,
+                    color=color, label=lab)
+            ax.plot(g.n_trk, np.clip(g.far_m999, 5e-5, None), ":o", ms=2.5, lw=1.0,
+                    color=color, alpha=0.6)
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlabel("T (tracks)")
+        ax.set_title(pair, fontsize=9.5)
+    axes[0].set_ylabel("pooled false rate at matched efficiency")
+    axes[0].legend(fontsize=7)
+    axes[1].text(11, 6e-5, "solid: eff=99% · dotted: eff=99.9% · pooled per-segment, "
+                 "gated (max$|x|\\leq$50)", fontsize=7.5, color="#52514e")
+    fig.suptitle("Threshold-free kernel comparison: pooled far at MATCHED efficiency "
+                 "(classical; each kernel at its own τ)", y=0.98)
+    fig.tight_layout(rect=(0, 0.06, 1, 0.93))
+    footer(fig)
+    fig.savefig(FIGS / "erf_youden_matched_eff.png")
+    plt.close(fig)
+
+
 # ---------------------------------------------------------------- main
 def main():
     pools = pool_scores()
@@ -437,7 +502,8 @@ def main():
     fig_separability(df)
     fig_quantum(pools, df)
     fig_operating_points(df, T=200)
-    print("[figs] 6 figures ->", FIGS)
+    fig_matched(df)
+    print("[figs] 7 figures ->", FIGS)
 
     # headline numbers for the write-up
     for pair in ("clean", "moderate", "heavy"):
@@ -448,7 +514,8 @@ def main():
                 print(f"  T=200 {pair:9} td={td:g}: AUC={r.auc:.4f} J*={r.youden_J:.3f} "
                       f"tau_J={r.tau_J:.3f} EER={r.eer:.4f} | eff/far @0.35="
                       f"{r.eff_abs:.3f}/{r.far_abs:.3f} @J={r.eff_J:.3f}/{r.far_J:.3f} "
-                      f"@wp99={r.eff_wp99:.3f}/{r.far_wp99:.3f}")
+                      f"@wp99={r.eff_wp99:.3f}/{r.far_wp99:.3f} | far@m99={r.far_m99:.3f} "
+                      f"@m999={r.far_m999:.3f}")
 
 
 if __name__ == "__main__":
