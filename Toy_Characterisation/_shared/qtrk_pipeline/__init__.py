@@ -30,6 +30,7 @@ from .store import (
     store_root, events_dir, solutions_dir, manifest_dir,
     event_path, solution_path,
     save_solution, load_solution, solution_exists, load_metrics,
+    add_validity, EXPLODE_MAX,
 )
 from .events import generate_event, save_event, load_event, ensure_event
 from .hamiltonian import build_hamiltonian, segments_only
@@ -48,6 +49,7 @@ __all__ = [
     "store_root", "events_dir", "solutions_dir", "manifest_dir",
     "event_path", "solution_path",
     "save_solution", "load_solution", "solution_exists", "load_metrics",
+    "add_validity", "EXPLODE_MAX",
     "generate_event", "save_event", "load_event", "ensure_event",
     "build_hamiltonian", "segments_only",
     "solve_classical", "solve_quantum", "solve_qsvt", "spectral_bounds_for",

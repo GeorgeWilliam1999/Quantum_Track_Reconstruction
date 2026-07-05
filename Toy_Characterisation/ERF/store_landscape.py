@@ -5,7 +5,8 @@ The existing report is the single fixed-event (T=50) step-vs-erf comparison.
 This extends it to the full Condor sweep that now lives in the store:
     kernel = erf, theta_d (erf_sigma) in {1e-6 .. 1e-3},
     sigma_scatt in {1e-4, 3e-4, 5e-4}, sigma_res in {0, 0.01, 0.02}, T in {10..1000}.
-theta_d = 1e-6 is the step regression point (erf width -> 0 reproduces the hard cut).
+theta_d = 1e-6 is the step2x reference: erf width -> 0 is the hard cut at DOUBLED
+coupling (A = 4I - 2C), NOT the true step kernel (A = 4I - C).
 
 Reads the recomputed metrics VIEW (segment metrics at the absolute 0.35
 threshold) — no local pkls, no re-solve.
@@ -96,11 +97,12 @@ def _pair(ag, ss, sr, td=None, T=None):
 
 
 def fig_resolution_recovery(ag):
-    """Headline: per noise PAIR, efficiency & false-rate vs T, step (theta_d=1e-6)
+    """Headline: per noise PAIR, efficiency & false-rate vs T, step2x (theta_d=1e-6,
+    the hard edge at DOUBLED coupling A=4I-2C — not the true step kernel)
     vs widest erf (theta_d=1e-3)."""
     fig, ax = plt.subplots(2, 3, figsize=(15, 8), sharex=True)
     for k, (ss, sr, name) in enumerate(PAIRS):
-        for td, color, lab in [(1e-6, "k", "step (θ_d=1e-6)"),
+        for td, color, lab in [(1e-6, "k", "step2x (θ_d=1e-6)"),
                                (KINK[name], "tab:blue", "erf θ_d=ε/3 (kink-matched)"),
                                (1e-3, "tab:red", "erf θ_d=1e-3")]:
             s = _pair(ag, ss, sr, td).sort_values("n_trk")
@@ -126,7 +128,7 @@ def fig_eff_vs_td(ag, T=200):
         ax[0].errorbar(s.erf_sigma, s.eff, s.eff_sem, marker="o", color=c, label=name)
         ax[1].errorbar(s.erf_sigma, s.far, s.far_sem, marker="o", color=c, label=name)
     for a, lab in zip(ax, ["segment efficiency [%]", "segment false rate [%]"]):
-        a.set_xscale("log"); a.set_xlabel(r"$\theta_d$ (erf width);  $\theta_d{=}10^{-6}\approx$ step")
+        a.set_xscale("log"); a.set_xlabel(r"$\theta_d$ (erf width);  $\theta_d{=}10^{-6}$= step2x")
         a.set_ylabel(lab); a.grid(alpha=0.3); a.legend(fontsize=8)
     fig.suptitle(f"ERF (T5) — kernel-width scan at T={T} (per noise pair)", fontweight="bold")
     fig.subplots_adjust(top=0.88); fig.savefig(FIG / "erf_landscape_td_scan.png", dpi=130, bbox_inches="tight"); plt.close(fig)
@@ -168,7 +170,7 @@ def main():
     for ss, sr, name in PAIRS:
         for T in (200,):
             print(f"{name:9s} (σ_sc={ss:g},σ_res={sr:g}) T={T}: "
-                  f"step eff={at(ss,sr,1e-6,T,'eff'):5.1f}% far={at(ss,sr,1e-6,T,'far'):5.1f}%  "
+                  f"step2x eff={at(ss,sr,1e-6,T,'eff'):5.1f}% far={at(ss,sr,1e-6,T,'far'):5.1f}%  "
                   f"-> erf(ε/3) eff={at(ss,sr,KINK[name],T,'eff'):5.1f}% far={at(ss,sr,KINK[name],T,'far'):5.1f}%  "
                   f"-> erf(1e-3) eff={at(ss,sr,1e-3,T,'eff'):5.1f}% far={at(ss,sr,1e-3,T,'far'):5.1f}%")
 

@@ -37,8 +37,14 @@ def main(dry_run: bool = False) -> int:
     md = qp.manifest_dir()
     sols = pd.read_csv(md / "solutions.csv")
     have = set(sols.sol_key)
+    # exact-token membership on the shared `studies` column: a scalar
+    # study.isin() filter drops shared cells owned by a study outside STUDIES
+    # (e.g. LS p_drop=0 cells owned by Epsilon_study_2) — 12-24% undercounts
+    import re
+    member = sols["studies"].fillna("").map(
+        lambda s: bool(set(re.split(r"[|,;\s]+", str(s))) & set(STUDIES)))
     q = sols[(sols.solver == "quantum") & (sols.readout == "statevector") &
-             (sols.study.isin(STUDIES))]
+             (member | sols.study.isin(STUDIES))]
     q = q.drop_duplicates(subset=["event_key", "ham_key"])
     new_rows = []
     for r in q.itertuples(index=False):

@@ -491,7 +491,10 @@ print("[fig] neg_eigs_vs_sigma_res_T.png", flush=True)
 # ===========================================================================
 print("\n=== FIG 4: indefiniteness boundary ===", flush=True)
 dfm = pd.read_csv(STORE_METRICS)
-dfm = dfm[dfm["study"].astype(str).str.contains("Epsilon_study_2")]
+# exact-token membership on `studies` (shared cells are owned by another study)
+_member = dfm["studies"].fillna("").astype(str).str.split(
+    r"[|,;\s]+", regex=True).map(lambda t: "Epsilon_study_2" in t)
+dfm = dfm[_member | (dfm["study"] == "Epsilon_study_2")]
 dfm = dfm[(dfm.solver == "classical") & (np.isclose(dfm.sigma_scatt, SS))]
 eff_piv = dfm.pivot_table(index="sigma_res", columns="n_trk",
                           values="segment_efficiency", aggfunc="mean")
@@ -554,7 +557,9 @@ print("[fig] indefiniteness_boundary.png", flush=True)
 print("\n=== FIG 5: localization + lost-true correlation (store T=400 sr=0.05)"
       " ===", flush=True)
 cl = pd.read_csv(STORE_METRICS)
-cl = cl[cl["study"].astype(str).str.contains("Epsilon_study_2")]
+_member5 = cl["studies"].fillna("").astype(str).str.split(
+    r"[|,;\s]+", regex=True).map(lambda t: "Epsilon_study_2" in t)
+cl = cl[_member5 | (cl["study"] == "Epsilon_study_2")]
 cl = cl[(cl.solver == "classical") & (cl.n_trk == 400)
         & np.isclose(cl.sigma_res, 0.05) & np.isclose(cl.sigma_scatt, SS)]
 

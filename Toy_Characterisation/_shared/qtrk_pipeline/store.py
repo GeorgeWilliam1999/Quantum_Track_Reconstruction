@@ -151,9 +151,35 @@ def load_metrics(study: str | None = None):
 
     This is what analysis notebooks read instead of their old result pickles.
     ``study`` filters to one study; the 'studies' column lists every requester.
+    Membership is exact-token (a substring test would let 'Larger_Scatter'
+    swallow every 'Larger_Scatter_Density' row).
     """
     import pandas as pd
     df = pd.read_csv(manifest_dir() / "metrics.csv")
     if study is not None:
-        df = df[df["studies"].fillna("").str.contains(study) | (df.get("study") == study)]
+        member = df["studies"].fillna("").str.split(r"[|,;\s]+").apply(
+            lambda toks: study in toks)
+        df = df[member | (df.get("study") == study)]
     return df.reset_index(drop=True)
+
+
+EXPLODE_MAX = 50.0  # classical max|x| above this = lambda_min->0 explosion, not physics
+
+
+def add_validity(df, explode_max: float = EXPLODE_MAX):
+    """Attach the standard validity gate to a metrics-view DataFrame.
+
+    Adds two columns: ``cls_max_abs`` (the classical partner's max_abs_x for
+    the same event_key+ham_key — a row's own max_abs_x for classical rows) and
+    ``valid`` (cls_max_abs <= explode_max).  Quantum/qsvt rows are judged by
+    their classical partner: a rescaled quantum vector hides the explosion its
+    linear system suffered.  Rows with no classical partner get valid=False.
+    Per-event/per-cell means from metrics.csv MUST be taken over valid rows.
+    """
+    import pandas as pd
+    cls = df[df["solver"] == "classical"]
+    partner = (cls.groupby(["event_key", "ham_key"])["max_abs_x"]
+                  .max().rename("cls_max_abs"))
+    out = df.merge(partner, on=["event_key", "ham_key"], how="left")
+    out["valid"] = out["cls_max_abs"].notna() & (out["cls_max_abs"] <= explode_max)
+    return out

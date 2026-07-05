@@ -12,7 +12,7 @@ comma-separated ``studies`` membership column (recovers the full 5 x 2 x 8 grid)
 Outputs:  results/lsd_store_summary.csv  +  figures/*.png
 """
 from __future__ import annotations
-import os, re
+import os, sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -20,27 +20,34 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+_SHARED = "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/_shared"
+for p in (_SHARED, "/data/bfys/gscriven/LHCb_VeLo_Toy_Model/src"):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+import qtrk_pipeline as qp
+
 HERE = Path(__file__).resolve().parent
 FIG = HERE / "figures"; FIG.mkdir(exist_ok=True)
 RES = HERE / "results"; RES.mkdir(exist_ok=True)
 os.environ.setdefault("QTRK_STORE", "/data/bfys/gscriven/qtrk_store")
-METRICS = Path(os.environ["QTRK_STORE"]) / "manifest" / "metrics.csv"
 
 STUDY = "Larger_Scatter_Density"
 PHIS = [0.2, 0.1, 0.05, 0.02, 0.01]
 SCATTS = [1e-4, 3e-4]
 TS = [10, 20, 50, 100, 200, 400, 700, 1000]
+MIN_VALID = 5   # a cell needs >=5 valid events for a mean to be quoted
 
 
-def in_study(cell, name): return name in re.split(r"[|,;\s]+", str(cell))
 def _sem(a):
     a = np.asarray(a, float)
     return a.std(ddof=1) / np.sqrt(len(a)) if len(a) > 1 else 0.0
 
 
 def load():
-    df = pd.read_csv(METRICS)
-    df = df[df["studies"].fillna("").apply(lambda s: in_study(s, STUDY))].copy()
+    # exact-token membership + the standard validity gate (max|x|<=50 on the
+    # classical partner): the tight-cone/high-T corner is lambda_min->0
+    # explosion territory and per-cell means over exploded solves are artefacts.
+    df = qp.add_validity(qp.load_metrics(study=STUDY))
     # Classical-only density study -> classical stays at the fixed gamma-aware cut
     # (0.35 at gamma=3), its established operating point (user 2026-06-14: wp99 is
     # the 1BQF headline only; classical keeps tau=0.35).
@@ -54,12 +61,22 @@ def load():
 def aggregate(df):
     rows = []
     for (sol, ph, ss, T), sub in df.groupby(["solver", "phi_max", "sigma_scatt", "n_trk"]):
-        rows.append(dict(solver=sol, phi_max=ph, sigma_scatt=ss, n_trk=T, n_rep=len(sub),
-                         density=T / ph**2,
-                         eff=sub.eff.mean(), eff_sem=_sem(sub.eff),
-                         far=sub.far.mean(), far_sem=_sem(sub.far),
-                         pur=sub.pur.mean(), pur_sem=_sem(sub.pur),
-                         cos_QC=sub.cos_QC.mean() if sub.cos_QC.notna().any() else np.nan))
+        v = sub[sub.valid]
+        row = dict(solver=sol, phi_max=ph, sigma_scatt=ss, n_trk=T,
+                   n_rep=len(sub), n_valid=len(v),
+                   excluded_frac=1.0 - len(v) / len(sub) if len(sub) else np.nan,
+                   density=T / ph**2)
+        # quantum cells run fewer reps than classical (3-4 vs 20): a cell needs
+        # min(MIN_VALID, n_rep) valid events for its mean to be quoted
+        if len(v) >= min(MIN_VALID, len(sub)) and len(v) > 0:
+            row.update(eff=v.eff.mean(), eff_sem=_sem(v.eff),
+                       far=v.far.mean(), far_sem=_sem(v.far),
+                       pur=v.pur.mean(), pur_sem=_sem(v.pur),
+                       cos_QC=v.cos_QC.mean() if v.cos_QC.notna().any() else np.nan)
+        else:
+            row.update(eff=np.nan, eff_sem=np.nan, far=np.nan, far_sem=np.nan,
+                       pur=np.nan, pur_sem=np.nan, cos_QC=np.nan)
+        rows.append(row)
     out = pd.DataFrame(rows).sort_values(["solver", "phi_max", "sigma_scatt", "n_trk"])
     out.to_csv(RES / "lsd_store_summary.csv", index=False)
     return out
@@ -137,11 +154,17 @@ def main():
         r = ag[(ag.solver == sol) & np.isclose(ag.phi_max, ph) &
                np.isclose(ag.sigma_scatt, ss) & (ag.n_trk == T)]
         return float(r[col].values[0]) if len(r) else float("nan")
-    print("\n=== HEADLINE (classical, sigma_scatt=1e-4) ===")
+    print("\n=== HEADLINE (classical, sigma_scatt=1e-4; valid solves only) ===")
     for T in (200, 1000):
-        print(f"T={T}:  wide phi=0.2 far={at('classical',0.2,1e-4,T,'far'):.1f}%  | "
-              f"tight phi=0.01 far={at('classical',0.01,1e-4,T,'far'):.1f}%  "
+        print(f"T={T}:  wide phi=0.2 far={at('classical',0.2,1e-4,T,'far'):.1f}% "
+              f"(excl {at('classical',0.2,1e-4,T,'excluded_frac'):.0%})  | "
+              f"tight phi=0.01 far={at('classical',0.01,1e-4,T,'far'):.1f}% "
+              f"(excl {at('classical',0.01,1e-4,T,'excluded_frac'):.0%})  "
               f"eff {at('classical',0.2,1e-4,T,'eff'):.1f}->{at('classical',0.01,1e-4,T,'eff'):.1f}%")
+    ex = ag[(ag.solver == "classical") & (ag.excluded_frac > 0)]
+    if len(ex):
+        print(f"\n[gate] {len(ex)} classical cells have exclusions; "
+              f"{(ag[ag.solver == 'classical'].n_valid < MIN_VALID).sum()} cells blanked (<{MIN_VALID} valid)")
 
 
 if __name__ == "__main__":

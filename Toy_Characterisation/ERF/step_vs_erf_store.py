@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Step vs kink-matched erf at common epsilon: eff | far vs T, and sparsity.
+"""Step2x vs kink-matched erf at common epsilon: eff | far vs T, and sparsity.
 
 Requested 2026-07-03 (first pass, ad-hoc widths) and refined 2026-07-04: the
 erf kernel is shown at its PHYSICALLY MEANINGFUL width, theta_d = eps/3.  The
@@ -112,7 +112,7 @@ def sel_width(df, td):
 
 
 def kernels_for(pair_kink_td):
-    return [(STEP_TD, "step ($\\theta_d$=1e-6)", C_STEP),
+    return [(STEP_TD, "step2x ($\\theta_d$=1e-6, 2$\\times$ coupling)", C_STEP),
             (pair_kink_td, "erf $\\theta_d=\\varepsilon/3$ (kink-matched)", C_KINK)]
 
 
@@ -254,7 +254,7 @@ def plot_sparsity(erf):
         ax.set_xlabel("T (tracks)")
         ax.set_title(ttl, fontsize=9.5)
         ax.set_ylabel(ylab)
-    handles = ([Line2D([], [], color=C_STEP, lw=1.6, label="step"),
+    handles = ([Line2D([], [], color=C_STEP, lw=1.6, label="step2x"),
                 Line2D([], [], color=C_KINK, lw=1.6, label="erf $\\theta_d=\\varepsilon/3$")]
                + [Line2D([], [], color="#52514e", ls=ls, lw=1.2, label=p)
                   for p, ls in (("clean", ":"), ("moderate", "--"), ("heavy", "-"))])
@@ -272,13 +272,13 @@ def main():
     print(f"[view] ERF rows: {len(erf)}")
     plot_solver(erf, "classical", ["segment_efficiency", "segment_false_rate"], None,
                 "erf_stepvserf_classical.png",
-                "Step vs kink-matched erf ($\\theta_d=\\varepsilon/3$) at common ε — "
+                "Step2x vs kink-matched erf ($\\theta_d=\\varepsilon/3$) at common ε — "
                 "classical (τ=0.35): efficiency | false rate vs T")
     plot_solver(erf, "quantum",
                 ["segment_efficiency_wp", "segment_false_rate_wp"],
                 ["segment_efficiency", "segment_false_rate"],
                 "erf_stepvserf_quantum.png",
-                "Step vs kink-matched erf ($\\theta_d=\\varepsilon/3$) at common ε — "
+                "Step2x vs kink-matched erf ($\\theta_d=\\varepsilon/3$) at common ε — "
                 "1BQF (wp99 headline, dotted = fixed τ=0.35): efficiency | false rate vs T")
     plot_validity(erf)
     plot_sparsity(erf)
@@ -287,7 +287,7 @@ def main():
     for solver in ("classical", "quantum"):
         for ss, sr, pair, eps, kink_td in PAIRS:
             sub = erf[(erf.pair == pair) & (erf.solver == solver)]
-            for (td, _, _), kname in zip(kernels_for(kink_td), ("step", "erf_kink")):
+            for (td, _, _), kname in zip(kernels_for(kink_td), ("step2x", "erf_kink")):
                 g = sel_width(sub, td)
                 if not len(g):
                     continue

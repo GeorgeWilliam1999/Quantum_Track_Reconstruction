@@ -21,7 +21,6 @@ Outputs
 """
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -75,9 +74,11 @@ def footer(fig):
 
 
 def load_view() -> pd.DataFrame:
-    store = os.environ.get("QTRK_STORE", "/data/bfys/gscriven/qtrk_store")
-    m = pd.read_csv(os.path.join(store, "manifest", "metrics.csv"))
-    n = m[m.study.isin(["Noisy_Ladder", "Noisy_Density"])].copy()
+    # exact-token membership per study (a `study.isin` scalar filter drops
+    # shared cells owned by the other study) + the standard validity gate
+    m = pd.concat([qp.load_metrics(study="Noisy_Ladder"),
+                   qp.load_metrics(study="Noisy_Density")]).drop_duplicates("sol_key")
+    n = qp.add_validity(m)
     n["arm"] = np.where(n.eps_provenance == "set", "fixed", "formula")
     return n
 
@@ -283,30 +284,33 @@ def fig_spectra(n: pd.DataFrame, gate: pd.DataFrame, T_sel: int = 200, phi_sel: 
 
 def main():
     n = load_view()
-    print(f"[view] Noisy rows: {len(n)}")
-    fig_ladder(n)
-    fig_density(n)
+    print(f"[view] Noisy rows: {len(n)} | valid frac: {n.valid.mean():.3f}")
+    # eff/far curves are drawn over VALID solves only (all-excluded cells become
+    # gaps); the excluded_frac landscape itself is fig_explosion's job
+    fig_ladder(n[n.valid])
+    fig_density(n[n.valid])
     gate = stream_gate(n)
     fig_explosion(gate)
     sp = fig_spectra(n, gate)
     print(sp.to_string(index=False))
 
-    # per-cell summary CSV (incl. gated/ungated classical far + excluded_frac)
+    # per-cell summary CSV: headline eff/far over valid solves + the ungated
+    # means (eff_all/far_all) kept for reference, excluded_frac per cell
     rows = []
-    gk = gate.set_index("sol_key")
-    for (study, arm, phi, T, solver), g in n.groupby(
-            ["study", "arm", "phi_max", "n_trk", "solver"]):
+    n["family"] = np.where(n.phi_max == 0.2, "Noisy_Ladder", "Noisy_Density")
+    for (fam, arm, phi, T, solver), g in n.groupby(
+            ["family", "arm", "phi_max", "n_trk", "solver"]):
         ec, fc = (("segment_efficiency", "segment_false_rate") if solver == "classical"
                   else ("segment_efficiency_wp", "segment_false_rate_wp"))
-        d = dict(study=study, arm=arm, phi_max=phi, n_trk=T, solver=solver,
-                 n_solves=len(g), eff=g[ec].mean(), eff_sem=g[ec].sem(),
-                 far=g[fc].mean(), far_sem=g[fc].sem())
-        if solver == "classical":
-            sub = gk.reindex(g.sol_key)
-            d["excluded_frac"] = float(sub.excluded.mean())
-            ok = g[~g.sol_key.isin(set(gate[gate.excluded].sol_key))]
-            d["far_valid"] = ok[fc].mean() if len(ok) else np.nan
-            d["eff_valid"] = ok[ec].mean() if len(ok) else np.nan
+        v = g[g.valid]
+        d = dict(study=fam, arm=arm, phi_max=phi, n_trk=T, solver=solver,
+                 n_solves=len(g), n_valid=len(v),
+                 excluded_frac=1.0 - len(v) / len(g) if len(g) else np.nan,
+                 eff=v[ec].mean() if len(v) else np.nan,
+                 eff_sem=v[ec].sem() if len(v) > 1 else np.nan,
+                 far=v[fc].mean() if len(v) else np.nan,
+                 far_sem=v[fc].sem() if len(v) > 1 else np.nan,
+                 eff_all=g[ec].mean(), far_all=g[fc].mean())
         rows.append(d)
     out = pd.DataFrame(rows)
     out.to_csv(RES / "noisy_first_look.csv", index=False)

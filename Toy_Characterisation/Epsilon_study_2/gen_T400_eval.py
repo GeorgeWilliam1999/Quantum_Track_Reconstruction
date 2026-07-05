@@ -159,7 +159,10 @@ for sr, ss in FAMILY_A + [(SR_FIX, SS_FIX)] + FAMILY_B:
 
 # store quantum at the formula eps (overlay points), T=400
 dfm = pd.read_csv(STORE_METRICS)
-dfm = dfm[(dfm["study"].str.contains("Epsilon_study_2")) & (dfm["n_trk"] == T)]
+# exact-token membership on `studies` (shared cells are owned by another study)
+_member = dfm["studies"].fillna("").astype(str).str.split(
+    r"[|,;\s]+", regex=True).map(lambda t: "Epsilon_study_2" in t)
+dfm = dfm[(_member | (dfm["study"] == "Epsilon_study_2")) & (dfm["n_trk"] == T)]
 qpt = {}
 for sr, ss in FAMILY_A + [(SR_FIX, SS_FIX)] + FAMILY_B:
     sub = dfm[(dfm.solver == "quantum") & (np.isclose(dfm.sigma_res, sr)) &

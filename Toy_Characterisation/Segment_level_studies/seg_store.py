@@ -60,8 +60,18 @@ def fixed_eps_metrics(study: str = STUDY) -> pd.DataFrame:
 
     Returns an empty frame (with the expected columns) if the metrics rebuild
     has not yet written the ε=0.002 rows, so callers can flag-and-move-on.
+
+    Rows failing the standard validity gate (classical partner max|x| > 50,
+    a lambda_min->0 explosion) are DROPPED: at γ=1 up to 100% of the high-T
+    cells explode, and ungated means mistake that solver-regime artefact for
+    an efficiency collapse (measured 7.4pp at n_trk=200).
     """
-    df = qp.load_metrics(study=study)
+    df = qp.add_validity(qp.load_metrics(study=study))
+    n0 = len(df)
+    df = df[df["valid"]]
+    if n0 and n0 > len(df):
+        print(f"[seg_store] validity gate: dropped {n0 - len(df)}/{n0} rows "
+              f"(classical partner max|x| > {qp.EXPLODE_MAX:g})")
     fx = df[(df["eps_provenance"] == "set") &
             (df["epsilon"].round(6) == EPS_FIXED)].copy()
     if len(fx):

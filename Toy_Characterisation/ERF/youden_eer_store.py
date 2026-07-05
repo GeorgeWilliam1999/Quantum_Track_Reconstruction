@@ -94,7 +94,8 @@ PAIR_RAMP = {"clean": "#9ecae1", "moderate": "#4292c6", "heavy": "#08306b"}
 
 FOOT = (r"ERF store (qtrk_store, abs $\tau$=0.35 ref) · $\gamma$=3 $\delta$=1 · erf kernel, "
         r"$\theta_d$: $\{10^{-6},10^{-5},5{\times}10^{-5},10^{-4},5{\times}10^{-4},10^{-3}\}$ "
-        r"+ kink-matched $\varepsilon/3$ per pair (0.142 · 1.132 · 2.215 mrad); $10^{-6}$ = step "
+        r"+ kink-matched $\varepsilon/3$ per pair (0.142 · 1.132 · 2.215 mrad); "
+        r"$10^{-6}$ = step2x (hard edge at 2$\times$ coupling, $A$=4$I$$-$2$C$ — NOT the step kernel) "
         r"· pairs ($\sigma_{scatt}$,$\sigma_{res}$): "
         "clean(1e-4, 0) · moderate(3e-4, 0.01) · heavy(5e-4, 0.02) · "
         r"$\phi_{max}$=0.2 · T$\in$[10,1000] · classical MINRES / 1BQF matrix-free "
@@ -140,12 +141,19 @@ def pool_scores() -> dict:
             truth_cache_key = r.event_key
             solC_event = {}                           # reset: partners are per-event
         sol = qp.load_solution(r.sol_key)["sol"].astype(np.float64)
+        exploded = False
         if r.solver == "classical":
             solC_event[r.ham_key] = sol
+            exploded = float(np.max(np.abs(sol))) > EXPLODE_MAX
         elif r.solver == "quantum":
             sol_C = solC_event.get(r.ham_key)
             if sol_C is None:   # no classical partner (should not happen)
                 continue
+            # the gate is the CLASSICAL partner's max|x|: the unit-norm quantum
+            # vector, rescaled onto the classical signal support, hides the
+            # explosion its linear system suffered (audit 2026-07-05: heavy
+            # T=1000 cells read 0/20 excluded while classical was 20/20)
+            exploded = float(np.max(np.abs(sol_C))) > EXPLODE_MAX
             # canonical: rescale on the classical SIGNAL support (n-independent)
             sol = rescale_to_signal(sol, sol_C, TAU_ABS)
         key = (r.pair, snap_td(r.erf_sigma), int(r.n_trk), r.solver)
@@ -155,12 +163,12 @@ def pool_scores() -> dict:
         pools[key][2][1] += 1
         # Per-solve VALIDITY GATE. Wide-eps high-T cells are in the INDEFINITENESS
         # regime (lambda_min -> 0, Eps2 §7.12): the classical solve explodes to
-        # |x| ~ 1e2-1e24 (vs the healthy/drifted <= ~40) and the signal-rescaled
-        # quantum follows. An exploded solve is a solver/regime failure, not a
-        # threshold question — pooling it floods the score axis and corrupts the
-        # absolute-tau pool. Exclude the whole solve; report the excluded fraction
-        # as the measured indefiniteness-onset map.
-        if float(np.max(np.abs(sol))) > EXPLODE_MAX:
+        # |x| ~ 1e2-1e24 (vs the healthy/drifted <= ~40). An exploded solve is a
+        # solver/regime failure, not a threshold question — pooling it floods the
+        # score axis and corrupts the absolute-tau pool. Exclude the whole solve
+        # (quantum via its classical partner); report the excluded fraction as
+        # the measured indefiniteness-onset map.
+        if exploded:
             pools[key][2][0] += 1
             continue
         pools[key][0] += np.histogram(sol[truth], bins=BINS)[0]
@@ -269,7 +277,7 @@ def fig_scores(pools, T=200):
                 ax.axvline(tau, color="#52514e", ls=ls, lw=1.0)
             ax.set_yscale("log")
             ax.set_xlim(-0.1, 1.7)
-            ttl = ("step ($\\theta_d$=1e-6)" if td == 1e-6
+            ttl = ("step2x ($\\theta_d$=1e-6)" if td == 1e-6
                    else f"erf $\\theta_d=\\varepsilon/3$ ({td*1e3:.3g} mrad)")
             ax.set_title(f"{pair} · {ttl}   AUC={st['auc']:.4f}  J*={st['youden_J']:.3f}",
                          fontsize=8.5)
@@ -324,7 +332,7 @@ def fig_tau_vs_T(df):
     fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.0), sharey=True)
     for ax, (ss, sr, pair) in zip(axes, PAIRS):
         for td in (1e-6, KINK[pair], 1e-3):
-            lab = ("step" if td == 1e-6
+            lab = ("step2x" if td == 1e-6
                    else "$\\varepsilon/3$" if td == KINK[pair] else f"{td:g}")
             g = df[(df.pair == pair) & (df.theta_d == td) & (df.solver == "classical")].sort_values("n_trk")
             ax.plot(g.n_trk, g.tau_J, "-o", color=TD_COLOR[td], ms=3.5, lw=1.5,
@@ -372,7 +380,7 @@ def fig_separability(df):
 def fig_quantum(pools, df):
     fig, axes = plt.subplots(2, 2, figsize=(10, 7.6))
     # (a,b) heavy-pair pooled spectra at T=200: classical vs 1BQF (rescaled)
-    for ax, td, ttl in ((axes[0, 0], 1e-6, "step ($\\theta_d$=1e-6)"),
+    for ax, td, ttl in ((axes[0, 0], 1e-6, "step2x ($\\theta_d$=1e-6)"),
                         (axes[0, 1], KINK["heavy"],
                          "erf $\\theta_d=\\varepsilon/3$ (2.22 mrad)")):
         for solver, ls in (("classical", "-"), ("quantum", "--")):
@@ -400,7 +408,7 @@ def fig_quantum(pools, df):
                 continue
             ax.plot(g.n_trk, g.auc, ls, marker="o", ms=3.5, lw=1.5, color=color,
                     label=f"{'1BQF' if solver=='quantum' else solver}, "
-                          f"{'step' if td==1e-6 else 'erf ε/3'}")
+                          f"{'step2x' if td==1e-6 else 'erf ε/3'}")
     ax.set_xscale("log"); ax.set_xlabel("T (tracks)"); ax.set_ylabel("AUC")
     ax.set_title("AUC vs T — heavy pair", fontsize=9)
     ax.legend(fontsize=7, loc="lower left")
@@ -454,7 +462,7 @@ def fig_matched(df):
     """THE fair cross-kernel comparison: pooled far at matched efficiency."""
     fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.1), sharey=True)
     for ax, (ss, sr, pair) in zip(axes, PAIRS):
-        for td, lab, color in ((1e-6, "step ($\\theta_d$=1e-6)", "#52514e"),
+        for td, lab, color in ((1e-6, "step2x ($\\theta_d$=1e-6)", "#52514e"),
                                (KINK[pair], "erf $\\theta_d=\\varepsilon/3$", "#08519c"),
                                (1e-3, "erf $\\theta_d$=1e-3", "#6baed6")):
             g = df[(df.pair == pair) & (df.solver == "classical")

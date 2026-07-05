@@ -14,7 +14,6 @@ Outputs figures/<study>_spectra_T200.png, figures/<study>_gate_map.png,
 """
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -78,11 +77,11 @@ plt.rcParams.update({
 
 def main(study: str):
     cfg = CFG[study]
-    store = os.environ.get("QTRK_STORE", "/data/bfys/gscriven/qtrk_store")
-    m = pd.read_csv(os.path.join(store, "manifest", "metrics.csv"))
     # membership, not first-requester: shared baseline cells (e.g. LS drop=0)
-    # are owned by another study in the `study` column but belong here too
-    n = m[m.studies.astype(str).str.contains(study)].copy()
+    # are owned by another study in the `study` column but belong here too.
+    # Exact-token membership (load_metrics) — a substring test would pull every
+    # Larger_Scatter_Density row into Larger_Scatter.
+    n = qp.load_metrics(study=study).copy()
     print(f"[{study}] view rows: {len(n)}")
 
     # ---- gate: stream every classical vector once -------------------------

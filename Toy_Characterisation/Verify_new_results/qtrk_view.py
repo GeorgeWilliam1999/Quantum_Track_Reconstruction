@@ -45,12 +45,13 @@ def threshold(gamma: float = GAMMA, delta: float = DELTA) -> float:
 def load_view(study: str | None = None, readout: str = "statevector") -> pd.DataFrame:
     """Tidy metrics view from the store (recomputed, fixed metrics).
 
-    ``study`` filters on the shared ``studies`` tag (an event may serve several
-    studies).  Quantum rows are restricted to ``readout`` (default statevector).
+    ``study`` filters on the shared ``studies`` tag with exact-token membership
+    (an event may serve several studies).  Quantum rows are restricted to
+    ``readout`` (default statevector).  The standard validity gate is attached:
+    ``valid`` = the classical partner's max|x| <= 50 — lambda_min->0 explosions
+    are solver-regime artefacts, and ``paired``/``aggregate`` drop them.
     """
-    df = qp.load_metrics()
-    if study is not None:
-        df = df[df["studies"].fillna("").str.contains(study, regex=False)].copy()
+    df = qp.add_validity(qp.load_metrics(study=study))
     # keep all classical + only the requested quantum readout
     df = df[(df["solver"] == "classical") |
             ((df["solver"] == "quantum") & (df["readout"] == readout))].copy()
@@ -62,11 +63,18 @@ def paired(view: pd.DataFrame) -> pd.DataFrame:
     """Pair the classical and quantum solve of each event (same ``event_key``).
 
     Returns one row per event with both solvers' metrics, ready to aggregate.
+    Rows failing the validity gate (see ``load_view``) are dropped first.
     """
-    cols = ["event_key", "ham_key", "n_trk", "rep", "sigma_scatt", "sigma_res",
-            "phi_max", "hit_ineff", "epsilon", "segment_efficiency",
-            "segment_purity", "segment_false_rate", "n_active", "n_true_active",
-            "n_false_active", "n_seg", "n_true", "t_solve", "sol_key"]
+    if "valid" in view.columns:
+        view = view[view.valid]
+    keys = ["event_key", "ham_key"]
+    for k in ("gamma", "delta"):        # per-ham_key, so safe (and useful) join keys
+        if k in view.columns:
+            keys.append(k)
+    cols = keys + ["n_trk", "rep", "sigma_scatt", "sigma_res",
+                   "phi_max", "hit_ineff", "epsilon", "segment_efficiency",
+                   "segment_purity", "segment_false_rate", "n_active", "n_true_active",
+                   "n_false_active", "n_seg", "n_true", "t_solve", "sol_key"]
     # wp99 high-efficiency working-point columns (present once metrics.csv is
     # rebuilt with build_metrics.py >= 2026-06-14); carried through if available.
     WP = ["segment_efficiency_wp", "segment_false_rate_wp", "segment_purity_wp",
@@ -75,7 +83,7 @@ def paired(view: pd.DataFrame) -> pd.DataFrame:
     C = view[view.solver == "classical"][cols + wp]
     Q = view[view.solver == "quantum"][cols + wp + ["cos_QC", "P_anc"]]
     # pair on the SAME (event, matrix): classical & quantum solve of the same A
-    m = Q.merge(C, on=["event_key", "ham_key"], suffixes=("_Q", "_C"))
+    m = Q.merge(C, on=keys, suffixes=("_Q", "_C"))
     # convenience short names used by the plotting cells
     m["n_trk"] = m["n_trk_Q"]
     m["eff_C"] = m["segment_efficiency_C"]; m["eff_Q"] = m["segment_efficiency_Q"]
@@ -93,14 +101,23 @@ def paired(view: pd.DataFrame) -> pd.DataFrame:
     return m
 
 
-def aggregate(m: pd.DataFrame) -> pd.DataFrame:
+def aggregate(m: pd.DataFrame, gamma: float | None = GAMMA) -> pd.DataFrame:
     """Per-n_trk mean/sem for every metric the plotting cells reference.
 
     Produces columns ``<metric>_mean`` / ``<metric>_sem`` for metric in
     {eff_C, eff_Q, pur_C, pur_Q, far_C, far_Q, cos}, plus ``n_reps``.
+
+    Restricted to ONE gamma (default 3.0, the headline): the view mixes
+    gamma in {1,2,3} at the same n_trk, and blending them inflates the per-T
+    means (measured up to 7.6x on far at n_trk=550).  Pass ``gamma=None``
+    only when the caller facets by gamma itself.
     """
     if m is None or len(m) == 0:
         return pd.DataFrame(columns=["n_trk", "n_reps"])
+    if gamma is not None and "gamma" in m.columns:
+        m = m[np.isclose(m["gamma"].astype(float), gamma)]
+        if len(m) == 0:
+            return pd.DataFrame(columns=["n_trk", "n_reps"])
     g = m.groupby("n_trk")
     out = pd.DataFrame({"n_trk": sorted(m["n_trk"].unique())}).set_index("n_trk")
     out["n_reps"] = g.size()
@@ -145,8 +162,14 @@ def get_vectors(view: pd.DataFrame, event_key: str, ham_key: str | None = None):
                sol_C=sol_C, truth=truth, seg_truth=truth,          # 'seg_truth' alias
                n_true=nt, n_true_clean=nt, n_true_all=nt,
                n_seg=int(sol_C.size), drop_rate=float(crow.hit_ineff))
-    # recomputed metric-count dicts, drop-in compatible with the OLD pkl schema
-    tau = threshold()
+    # recomputed metric-count dicts, drop-in compatible with the OLD pkl schema.
+    # tau is the ROW's gamma-aware threshold: 0.35 only at gamma=3 — a gamma=1
+    # matrix cut at 0.35 activates every segment (attractor 0.5 > 0.35).
+    _g = getattr(crow, "gamma", GAMMA); _d = getattr(crow, "delta", DELTA)
+    _g = float(_g) if pd.notna(_g) else GAMMA
+    _d = float(_d) if pd.notna(_d) else DELTA
+    tau = threshold(_g, _d)
+    out["gamma"], out["delta"], out["tau"] = _g, _d, tau
     mC = qp.metrics_at(sol_C, truth, threshold=tau)
     out["seg_C"] = {**mC, "n_true_clean": mC["n_true_all"]}
     q = sub[sub.solver == "quantum"]
@@ -221,9 +244,12 @@ def records_df(view: pd.DataFrame, with_vectors: bool = True) -> pd.DataFrame:
     m = paired(view)
     if len(m) == 0:
         return pd.DataFrame(columns=["n_trk", "rep"])
-    tau = threshold()
     rows = []
     for _, r in m.iterrows():
+        # the row's own gamma-aware threshold (0.35 only at gamma=3)
+        _g = float(r["gamma"]) if "gamma" in m.columns and pd.notna(r.get("gamma")) else GAMMA
+        _d = float(r["delta"]) if "delta" in m.columns and pd.notna(r.get("delta")) else DELTA
+        tau = threshold(_g, _d)
         d = dict(
             n_trk=int(r["n_trk"]), rep=int(r["rep_Q"]), shots=0,
             readout="statevector", n_hits=np.nan, n_seg=float(r["n_seg_Q"]),

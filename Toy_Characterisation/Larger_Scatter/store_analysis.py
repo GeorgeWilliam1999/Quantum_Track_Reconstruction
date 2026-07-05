@@ -17,7 +17,7 @@ the comma-separated ``studies`` membership column, which recovers the full
 Outputs:  results/ls_store_summary.csv  +  figures/*.png
 """
 from __future__ import annotations
-import os, re, sys
+import os, sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -25,25 +25,29 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+_SHARED = "/data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/_shared"
+for p in (_SHARED, "/data/bfys/gscriven/LHCb_VeLo_Toy_Model/src"):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+import qtrk_pipeline as qp
+
 HERE = Path(__file__).resolve().parent
 FIG = HERE / "figures"; FIG.mkdir(exist_ok=True)
 RES = HERE / "results"; RES.mkdir(exist_ok=True)
 os.environ.setdefault("QTRK_STORE", "/data/bfys/gscriven/qtrk_store")
-METRICS = Path(os.environ["QTRK_STORE"]) / "manifest" / "metrics.csv"
 
 STUDY = "Larger_Scatter"
 SCATTS = [1e-4, 3e-4, 5e-4, 7e-4, 1e-3]
 DROPS  = [0.0, 0.01, 0.02, 0.05, 0.10]
 TS     = [10, 20, 50, 100, 200, 400, 700, 1000]
-
-
-def in_study(cell: str, name: str) -> bool:
-    return name in re.split(r"[|,;\s]+", str(cell))
+MIN_VALID = 5
 
 
 def load() -> pd.DataFrame:
-    df = pd.read_csv(METRICS)
-    df = df[df["studies"].fillna("").apply(lambda s: in_study(s, STUDY))].copy()
+    # exact-token membership + the standard validity gate (LS itself has zero
+    # max|x|>50 explosions anywhere in its grid — the gate is a guarantee, not
+    # a correction — but quantum rows are still judged by the classical partner)
+    df = qp.add_validity(qp.load_metrics(study=STUDY))
     # Classical stays at the fixed gamma-aware cut (0.35 at gamma=3), its
     # established operating point (the classical eff/far figures). The wp99
     # high-efficiency working point is the 1BQF HEADLINE only (user 2026-06-14):
@@ -66,15 +70,25 @@ def aggregate(df: pd.DataFrame) -> pd.DataFrame:
     g = df.groupby(["solver", "sigma_scatt", "hit_ineff", "n_trk"])
     rows = []
     for (sol, ss, he, T), sub in g:
-        rows.append(dict(
-            solver=sol, sigma_scatt=ss, hit_ineff=he, n_trk=T, n_rep=len(sub),
-            eff=sub.eff.mean(), eff_sem=_sem(sub.eff),
-            far=sub.far.mean(), far_sem=_sem(sub.far),
-            pur=sub.pur.mean(), pur_sem=_sem(sub.pur),
-            eff_wp=sub.eff_wp.mean(), eff_wp_sem=_sem(sub.eff_wp),
-            far_wp=sub.far_wp.mean(), far_wp_sem=_sem(sub.far_wp),
-            cos_QC=sub.cos_QC.mean() if sub.cos_QC.notna().any() else np.nan,
-        ))
+        v = sub[sub.valid]
+        row = dict(solver=sol, sigma_scatt=ss, hit_ineff=he, n_trk=T,
+                   n_rep=len(sub), n_valid=len(v),
+                   excluded_frac=1.0 - len(v) / len(sub) if len(sub) else np.nan)
+        # quantum cells run fewer reps than classical (3-4 vs 20): a cell needs
+        # min(MIN_VALID, n_rep) valid events for its mean to be quoted
+        if len(v) >= min(MIN_VALID, len(sub)) and len(v) > 0:
+            row.update(
+                eff=v.eff.mean(), eff_sem=_sem(v.eff),
+                far=v.far.mean(), far_sem=_sem(v.far),
+                pur=v.pur.mean(), pur_sem=_sem(v.pur),
+                eff_wp=v.eff_wp.mean(), eff_wp_sem=_sem(v.eff_wp),
+                far_wp=v.far_wp.mean(), far_wp_sem=_sem(v.far_wp),
+                cos_QC=v.cos_QC.mean() if v.cos_QC.notna().any() else np.nan)
+        else:
+            row.update(eff=np.nan, eff_sem=np.nan, far=np.nan, far_sem=np.nan,
+                       pur=np.nan, pur_sem=np.nan, eff_wp=np.nan, eff_wp_sem=np.nan,
+                       far_wp=np.nan, far_wp_sem=np.nan, cos_QC=np.nan)
+        rows.append(row)
     out = pd.DataFrame(rows).sort_values(["solver", "sigma_scatt", "hit_ineff", "n_trk"])
     out.to_csv(RES / "ls_store_summary.csv", index=False)
     return out
