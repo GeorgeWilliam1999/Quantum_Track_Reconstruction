@@ -60,6 +60,12 @@ def make_figure(df):
     try:
         q = pd.read_csv("outputs/quantum_vs_classical.csv")
         q["n_hits"] = [len(json.load(open(EVDIR + "/" + e))["x"]) for e in q["event"]]
+        # 1BQF overlay at its wp99 HEADLINE working point (efficiency-first) —
+        # the fixed-tau farQ/effQ columns are the ~0.7-efficiency cut artefact
+        # (wp99 log 2026-06-14); fall back only if the CSV predates the wp columns.
+        q_far = q["farQ_wp"] if "farQ_wp" in q.columns else q["farQ"]
+        q_eff = q["effQ_wp"] if "effQ_wp" in q.columns else q["effQ"]
+        q_lab = "1BQF (wp99)" if "farQ_wp" in q.columns else "1BQF (fixed τ — stale CSV)"
     except Exception:
         q = None
     COL = {"iso": "#999999", "pair": "#7fb0d0", "chain": "#d6604d", "hub": "#7a0177"}
@@ -75,7 +81,7 @@ def make_figure(df):
         cx, cy = binmed(x, df[f"far_{c}"].values * 100); ax[0, 1].plot(cx, cy, "-o", color=COL[c], lw=2, ms=4, label=lab + " (median)")
     cx, cy = binmed(x, df["far"].values * 100); ax[0, 1].plot(cx, cy, "-s", color="k", lw=2, ms=4, label="total far (median)")
     if q is not None:
-        ax[0, 1].scatter(q.n_hits, q.farQ * 100, s=70, marker="D", color="#1b7837", ec="k", zorder=5, label="1BQF total far")
+        ax[0, 1].scatter(q.n_hits, q_far * 100, s=70, marker="D", color="#1b7837", ec="k", zorder=5, label=f"{q_lab} total far")
     ax[0, 1].set_xlabel("event size  (n_hits)"); ax[0, 1].set_ylabel("false rate contribution (%)")
     ax[0, 1].set_title("(b) Error RATE by source vs event size (classical; quantum overlay)", fontweight="bold"); ax[0, 1].legend(fontsize=8.5)
     for c, lab in [("chain", "chain$\\geq$3"), ("hub", "hub")]:
@@ -87,8 +93,8 @@ def make_figure(df):
     cx, cy = binmed(x, df["ineff"].values * 100); ax[1, 1].plot(cx, cy, "-o", color="#2166ac", lw=2, ms=5, label="inefficiency 1$-$eff (FN)")
     ax[1, 1].scatter(x, df["ineff"] * 100, s=8, alpha=0.2, color="#2166ac", ec="none")
     if q is not None:
-        ax[1, 1].scatter(q.n_hits, q.farQ * 100, s=60, marker="D", color="#d6604d", ec="k", zorder=5, label="1BQF false rate")
-        ax[1, 1].scatter(q.n_hits, (1 - q.effQ) * 100, s=60, marker="o", color="#2166ac", ec="k", zorder=5, label="1BQF inefficiency")
+        ax[1, 1].scatter(q.n_hits, q_far * 100, s=60, marker="D", color="#d6604d", ec="k", zorder=5, label=f"{q_lab} false rate")
+        ax[1, 1].scatter(q.n_hits, (1 - q_eff) * 100, s=60, marker="o", color="#2166ac", ec="k", zorder=5, label=f"{q_lab} inefficiency")
     ax[1, 1].set_xlabel("event size  (n_hits)"); ax[1, 1].set_ylabel("error rate (%)")
     ax[1, 1].set_title("(d) The two error rates vs size: false positives & missed true", fontweight="bold"); ax[1, 1].legend(fontsize=8.5)
     for a in ax.flat:

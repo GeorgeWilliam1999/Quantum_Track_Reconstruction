@@ -37,6 +37,7 @@ sys.path.insert(0, "/data/bfys/gscriven/LHCb_VeLo_Toy_Model/src")
 
 import helpers  # noqa: E402
 from helpers import solve_quantum_statevector, rescale_quantum  # noqa: E402
+from qtrk_pipeline.metrics import quantum_metrics_wp  # noqa: E402
 from lhcb_velo_toy.analysis import compute_epsilon  # noqa: E402
 from lhcb_velo_toy.analysis.segment_metrics import (  # noqa: E402
     DEFAULT_DZ, DEFAULT_THETA_MIN, segment_truth_mask, solver_segment_metrics,
@@ -197,6 +198,9 @@ for name, c in CELLS.items():
                 ham.A, ham.b, device='CPU')
             sol_Q = rescale_quantum(sol_Q_raw, sol_C)
             mQ = solver_segment_metrics(truth, sol_Q, threshold=TAU)
+            # 1BQF HEADLINE = wp99 (efficiency-first working point; the fixed-tau
+            # eff_Q/far_Q stay as the labelled cut-artefact record)
+            mQw = quantum_metrics_wp(sol_Q_raw, sol_C, truth, signal_threshold=TAU)
             t_q = time.time() - t0
 
             rows.append(dict(
@@ -204,6 +208,8 @@ for name, c in CELLS.items():
                 A_nnz=int(ham.A.nnz), n_sys=int(n_sys),
                 eff_C=mC["segment_efficiency"], far_C=mC["segment_false_rate"],
                 eff_Q=mQ["segment_efficiency"], far_Q=mQ["segment_false_rate"],
+                eff_Qw=mQw["segment_efficiency"], far_Qw=mQw["segment_false_rate"],
+                tau_Q_wp=mQw["tau_wp"],
                 n_true_all=mC["n_true_all"],
                 t_classical=t_c, t_quantum=t_q,
             ))
@@ -312,21 +318,24 @@ fig.savefig(FIGDIR / "pmiss_working_points.png", dpi=160)
 plt.close(fig)
 
 # Fig 9 — downstream solver effectiveness
+# convention (wp99 log 2026-06-14): classical at the fixed tau=0.35; the 1BQF
+# HEADLINE at its efficiency-first wp99 working point (the fixed-tau 1BQF curve
+# was the artefactual ~75% plateau)
 fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.8), sharex=True)
 for ax, key, ttl in zip(axes, ["eff", "far"],
-                        ["segment efficiency at $\\tau=0.35$",
-                         "segment false rate at $\\tau=0.35$"]):
-    for name in CELLS:
-        rows = partB[name]
-        pm = sorted(set(r["p_miss"] for r in rows))
-        for solver, ls, mk in (("C", "-", "o"), ("Q", "--", "s")):
-            ys = [np.mean([r[f"{key}_{solver}"] for r in rows
+                        ["segment efficiency (classical $\\tau$=0.35 · 1BQF wp99)",
+                         "segment false rate (classical $\\tau$=0.35 · 1BQF wp99)"]):
+    for col, ls, mk in (("C", "-", "o"), ("Qw", "--", "s")):
+        for name in CELLS:
+            rows = partB[name]
+            pm = sorted(set(r["p_miss"] for r in rows))
+            ys = [np.mean([r[f"{key}_{col}"] for r in rows
                            if r["p_miss"] == p]) for p in pm]
-            es = [np.std([r[f"{key}_{solver}"] for r in rows
+            es = [np.std([r[f"{key}_{col}"] for r in rows
                           if r["p_miss"] == p]) / np.sqrt(NREP_B) for p in pm]
             ax.errorbar(pm, ys, yerr=es, fmt=mk, ls=ls, ms=5, capsize=3,
                         color=CELL_COL[name],
-                        label=f"{'classical' if solver=='C' else '1BQF'}, "
+                        label=f"{'classical' if col=='C' else '1BQF (wp99)'}, "
                               f"{CELL_LAB[name]}")
     mark_options(ax)
     ax.set_xscale("log")

@@ -265,3 +265,52 @@ SESSION 4b (same day, user asked "are the write-ups correct?") — verification 
   was stale) and its scale-table 1BQF column → wp99 (99.5/43.9 · 99.5/69.5 · 100/82.6)
   with the fixed-cut values kept as a one-line artefact note.
 - §18 verdict table: checked, τ-clean (no 1BQF fixed-τ claims).
+
+## SESSION 5 (2026-07-06, second session in parallel) — full-repo sweep of the remainder
+
+Two exhaustive scans (every .py + every .ipynb under Toy_Characterisation/, QSVT/,
+Hough/) against the convention; SESSION 4 (above) covered the QSVT surfaces, this
+session everything else. Convention throughout: classical fixed γ-aware τ; **1BQF
+headline = wp99**; fixed-τ 1BQF kept only faded/labelled.
+
+**Library fix — `metrics.py` `working_point_threshold` degenerate corner (Run-3-found):**
+when >1 % of TRUE segments have ~zero amplitude (the 1BQF structurally zeroes ISOLATED
+clusters — λ = s exactly, notch → ~1e-17 — and real events have isolated-true from
+missing hits) the 1 %-quantile τ went NEGATIVE (st[k]−1e-9), re-admitting every
+structurally-killed segment (Run-3: ~1e6 isolated-false → far 0.92, purity 0.08 —
+meaningless). Now floored at `WP_TAU_FLOOR = 1e-6`: the working point reads "admit
+every segment the solver can PHYSICALLY recover"; the achieved efficiency honestly
+reports the structural miss. Healthy solves (quantile ~0.18) unaffected.
+
+**Fixed + re-executed/regenerated (1BQF → wp99 headline, fixed-τ kept as record):**
+- `Run3_Verification/Run3_segment_characterisation.ipynb` — quantum cell now computes
+  `quantum_metrics_wp`; per-class figure cut at the 1BQF's own wp99 τ. **HEADLINE
+  CHANGE: 1BQF wp99 eff 0.93 / pur 0.97 / far 0.030 — BEATS classical (0.86/0.98/0.023)
+  on Run-3.** The ~7 % residual inefficiency is STRUCTURAL (isolated-true zeroed by the
+  same notch that kills the ~1e6 isolated-false). Old "eff ≈ 0.7" = the cut artefact.
+  `quantum_vs_classical.csv` gains effQ_wp/purQ_wp/farQ_wp/tauQ_wp.
+- `Run3_Verification/make_error_rates_vs_size.py` — 1BQF overlay reads the wp columns.
+- `Noisy_Realistic/noisy_analysis.ipynb` — ladder figure: quantum+qsvt panels → wp99
+  headline + faded fixed-τ (wp99 1BQF eff 0.997–1.000 vs the 0.70–0.73 artefact); also
+  exact-token membership + validity gate ported in (matches noisy_first_look.py).
+- `Epsilon_study_2/build_fp_census.py` → census gains `act_Q_wp`/`tau_Q_wp` (scale-
+  invariant, valid on the legacy-rescale pickles); `make_fp_notebook.py` +
+  `false_positive_types.ipynb` quantum panels → wp99, fixed-τ kept in the summary CSV.
+- `Epsilon_study_2/gen_epsilon_pmiss_scan.py` — Part B + Fig 9 1BQF → wp99.
+- `Epsilon_study_2/gen_T400_eval.py` — store-1BQF overlay star → wp columns (captions
+  relabelled "store 1BQF (wp99)").
+
+**Bannered LEGACY (not re-executed; superseded, kept as record):** Eps2 `analysis.ipynb`
++ `segment_metrics_calc_epsilon.ipynb`, ERF `analysis.ipynb` + `hamiltonian_comparison
+.ipynb`, LS/LSD `analysis.ipynb`, Verify `Quantum_segment_level_analysis_new_data.ipynb`
++ `segment_level_analysis{,_new_data}.ipynb`; one-line LEGACY headers on the Verify
+`_restyle/_add_seg14e/_add_tau_sweep/_collect_and_plot.py` generators,
+`condor_obqf/run_segment_event.py`, `_shared/run_worker.py`.
+
+**Flagged, deliberately NOT touched:** UM-talk scripts (`Presentation_mini_q_workshop_UM/
+scripts/gen_quantum.py, gen_feedback.py, fig_quantum.py` — delivered-talk assets, 11 Jun;
+convert only if the deck is reused), `QSVT/Initial/qsvt_helpers.py` (fixed-τ-only helper
+library for the superseded Initial band-design notebooks), `QSVT/Initial/02` (self-
+caveated sandbox), `build_metrics.py` main() console summary (diagnostic, no figure).
+PRESERVE list honoured (FR_SE_tradeoff, Bifurification 02_metrics_vs_beta,
+Segment_level_studies/04, ERF youden diagnostics).

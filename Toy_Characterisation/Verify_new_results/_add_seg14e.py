@@ -1,4 +1,6 @@
 """Add §7d — direct §14e mirror (2x2 panels: Efficiency, False Rate,
+# LEGACY (pre-wp99, pre-store): 1BQF metrics here are FIXED-tau=0.35 (the ~70-75% efficiency artefact).
+# Headline convention is wp99 (Toy_Characterisation/WP99_REFRESH_LOG.md); canonical path = qtrk_store + *_store notebooks/scripts.
 Segment Pair Counts, Active Segment Pairs) with classical + E1 + E2 overlaid.
 Inserted before §11 output artefacts."""
 import json

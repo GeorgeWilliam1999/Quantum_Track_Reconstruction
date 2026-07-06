@@ -37,6 +37,7 @@ sys.path.insert(0, "/data/bfys/gscriven/LHCb_VeLo_Toy_Model/src")
 
 from helpers import make_geometry, safe_generate, segment_truth_mask  # noqa: E402
 from lhcb_velo_toy.solvers import SimpleHamiltonianFast                # noqa: E402
+from qtrk_pipeline.metrics import working_point_threshold              # noqa: E402
 
 TVALS = (50, 100, 200, 400)          # density range with full noise-grid coverage
 TYPES = ["isolated", "pair", "chain>=3", "hub", "TRUE"]
@@ -83,7 +84,18 @@ def process(pf: str):
     actC = solC > tau
     solQ = d.get("sol_Q")
     have_q = solQ is not None
-    actQ = (np.asarray(solQ).ravel() > tau) if have_q else None
+    # 1BQF HEADLINE activation = wp99 (efficiency-first, tau at the 1% quantile of
+    # the TRUE quantum amplitudes; wp99 log 2026-06-14). Scale-invariant, so it is
+    # valid even on these legacy-rescale pickles. The fixed-tau act_Q stays as the
+    # labelled cut-artefact record (it under-counts true actives by ~25%).
+    if have_q:
+        solQa = np.abs(np.asarray(solQ).ravel())
+        actQ = solQa > tau                                   # fixed-tau record
+        tauQw = float(working_point_threshold(solQa, truth)) # wp99 headline
+        actQw = solQa > tauQw
+    else:
+        actQ = actQw = None
+        tauQw = np.nan
     rows = []
     for t in TYPES:
         sel = cls == t
@@ -93,6 +105,8 @@ def process(pf: str):
             type=t, count=int(sel.sum()),
             act_C=int((sel & actC).sum()),
             act_Q=(int((sel & actQ).sum()) if have_q else np.nan),
+            act_Q_wp=(int((sel & actQw).sum()) if have_q else np.nan),
+            tau_Q_wp=tauQw,
             have_q=have_q,
         ))
     return rows

@@ -153,6 +153,11 @@ def quantum_metrics(sol_Q_raw: np.ndarray, sol_C: np.ndarray,
 # as QSVT/Segment_level_studies/01 §4 (fig qsvt_working_points).
 # ---------------------------------------------------------------------------
 
+WP_TAU_FLOOR = 1e-6   # never below this: a tau <= 0 would re-admit the segments
+                      # the 1BQF STRUCTURALLY zeroes (isolated clusters sit at
+                      # lambda = s exactly -> notch kills them to ~1e-17)
+
+
 def working_point_threshold(sol: np.ndarray, truth: np.ndarray,
                             target_eff: float = WP_TARGET_EFF) -> float:
     """Efficiency-first per-solve segment threshold (the wp99 working point).
@@ -166,15 +171,26 @@ def working_point_threshold(sol: np.ndarray, truth: np.ndarray,
     depend on the quantum rescale convention (only ``cos_QC`` does).  For a
     quantum solve you still rescale to the classical SIGNAL first so ``cos_QC``
     and the reported ``tau`` sit on the classical amplitude scale.
+
+    DEGENERATE CORNER (found on Run-3, 2026-07-06): if more than (1-target_eff)
+    of the TRUE segments have ~zero amplitude — the 1BQF structurally zeroes
+    ISOLATED clusters (lambda = s exactly, notch -> ~1e-17), and real events have
+    isolated-TRUE segments from missing hits — the quantile lands at ~0 and
+    ``st[k]-1e-9`` goes NEGATIVE, re-admitting every structurally-killed segment
+    (on Run-3: ~1e6 isolated-false -> far 0.92, purity 0.08, a meaningless point).
+    The threshold is therefore floored at WP_TAU_FLOOR (far below any physical
+    amplitude, far above numerical zeros): the working point then reads "admit
+    every segment the solver can PHYSICALLY recover", and the achieved efficiency
+    honestly reports the structural miss instead of fabricating 100 %.
     """
     s = np.abs(np.asarray(sol, np.float64))
     t = np.asarray(truth, bool)
     st = np.sort(s[t])
     if st.size == 0:
-        return 0.0
+        return WP_TAU_FLOOR
     k = int(np.floor((1.0 - float(target_eff)) * st.size))
     k = min(max(k, 0), st.size - 1)
-    return float(st[k] - 1e-9)
+    return float(max(st[k] - 1e-9, WP_TAU_FLOOR))
 
 
 def metrics_at_wp(sol: np.ndarray, truth: np.ndarray,

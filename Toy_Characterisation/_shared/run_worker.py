@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# LEGACY (pre-wp99, pre-store): 1BQF metrics here are FIXED-tau=0.35 (the ~70-75% efficiency artefact).
+# Headline convention is wp99 (Toy_Characterisation/WP99_REFRESH_LOG.md); canonical path = qtrk_store + *_store notebooks/scripts.
 """
 Universal single-event worker for the segment-level Toy_Characterisation
 experiments (Epsilon_study_2, Larger_Scatter, Larger_Scatter_Density, ERF).

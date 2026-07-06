@@ -53,8 +53,10 @@ print('cells:', df.groupby(['sigma_res','sigma_scatt']).ngroups,
       '| sigma_res:', SR, '| sigma_scatt:', SS)
 
 # mean over reps -> one row per (sigma_res, sigma_scatt, n_trk, type)
+# act_Q_wp = 1BQF activation at its per-solve wp99 HEADLINE working point
+# (efficiency-first; wp99 log 2026-06-14); act_Q = fixed-tau=0.35 record.
 agg = (df.groupby(['sigma_res','sigma_scatt','n_trk','type'], as_index=False)
-         [['count','act_C','act_Q']].mean())
+         [['count','act_C','act_Q','act_Q_wp']].mean())
 
 print('loaded', len(df), 'rows')
 """)
@@ -113,8 +115,11 @@ md(r"""
 ## 2 · Which types become false positives — per-type activation heatmaps (T = 200)
 
 For each topology class, the **activation rate** = fraction of that class with
-solver score $> \tau = 0.35$ (i.e. how often it becomes a *false positive*), over the
-$\sigma_{\rm res}\times\sigma_{\rm scatt}$ grid, classical vs 1BQF quantum.
+solver score above the solver's **operating-point** $\tau$ (i.e. how often it becomes
+a *false positive*), over the $\sigma_{\rm res}\times\sigma_{\rm scatt}$ grid:
+**classical at the fixed $\tau=0.35$; the 1BQF at its per-solve wp99
+efficiency-first $\tau$** (the headline convention — judging the 1BQF at 0.35 is
+the ~75 %-efficiency cut artefact).
 """)
 
 code(r"""
@@ -132,11 +137,11 @@ def grid_rate(solver):
                     g[a,b] = 100*act/c if c>0 else np.nan
         out[t] = g
     return out
-rates = {'classical':grid_rate('act_C'), 'quantum':grid_rate('act_Q')}
+rates = {'classical (τ=0.35)':grid_rate('act_C'), '1BQF (wp99)':grid_rate('act_Q_wp')}
 
 fig, axes = plt.subplots(2, 4, figsize=(17, 7.5))
 vmax = np.nanmax([np.nanmax(rates[s][t]) for s in rates for t in FALSE_TYPES])
-for r,solver in enumerate(['classical','quantum']):
+for r,solver in enumerate(rates):
     for c,t in enumerate(FALSE_TYPES):
         ax = axes[r,c]; G = rates[solver][t]
         im = ax.imshow(G, origin='lower', aspect='auto', cmap='magma', vmin=0, vmax=vmax)
@@ -185,7 +190,7 @@ def fp_comp(solver):
     return np.array(iso_frac), cells_lbl
 
 fig, ax = plt.subplots(1, 2, figsize=(15,5))
-for solver,axi,name in [('act_C',ax[0],'CLASSICAL'),('act_Q',ax[1],'QUANTUM 1BQF')]:
+for solver,axi,name in [('act_C',ax[0],'CLASSICAL (τ=0.35)'),('act_Q_wp',ax[1],'QUANTUM 1BQF (wp99)')]:
     iso,_ = fp_comp(solver)
     G = iso.reshape(len(SR),len(SS))
     im = axi.imshow(G, origin='lower', aspect='auto', cmap='cividis', vmin=0, vmax=np.nanmax(np.nan_to_num(iso)))
@@ -219,22 +224,22 @@ def fp_counts(solver):
             per_ss_iso.append(i); per_ss_coup.append(c)
         iso.append(np.nanmean(per_ss_iso)); coup.append(np.nanmean(per_ss_coup))
     return np.array(iso), np.array(coup)
-isoC, coupC = fp_counts('act_C'); isoQ, coupQ = fp_counts('act_Q')
+isoC, coupC = fp_counts('act_C'); isoQ, coupQ = fp_counts('act_Q_wp')   # 1BQF at wp99
 
 fig, ax = plt.subplots(1, 2, figsize=(15,5))
 x = np.arange(len(SR)); w=0.38
 ax[0].bar(x-w/2, coupC, w, color='#d6604d', label='classical · coupled')
 ax[0].bar(x-w/2, isoC, w, bottom=coupC, color='#f4a582', label='classical · isolated')
-ax[0].bar(x+w/2, coupQ, w, color='#4393c3', label='quantum · coupled')
-ax[0].bar(x+w/2, isoQ, w, bottom=coupQ, color='#92c5de', label='quantum · isolated')
+ax[0].bar(x+w/2, coupQ, w, color='#4393c3', label='1BQF (wp99) · coupled')
+ax[0].bar(x+w/2, isoQ, w, bottom=coupQ, color='#92c5de', label='1BQF (wp99) · isolated')
 ax[0].set_xticks(x); ax[0].set_xticklabels([f'{s:g}' for s in SR])
 ax[0].set_xlabel(r'$\sigma_{\rm res}$ (mm)'); ax[0].set_ylabel('false positives / event (mean over σ_scatt)')
 ax[0].set_title('(a) False-positive count & make-up: classical vs 1BQF', fontweight='bold')
 ax[0].legend(frameon=False, fontsize=9)
 ax[1].plot(SR, isoC+coupC, 'o-', color='#b2182b', label='classical total')
-ax[1].plot(SR, isoQ+coupQ, 's-', color='#2166ac', label='quantum total')
+ax[1].plot(SR, isoQ+coupQ, 's-', color='#2166ac', label='1BQF (wp99) total')
 ax[1].plot(SR, coupC, 'o--', color='#b2182b', alpha=.5, label='classical coupled-only')
-ax[1].plot(SR, coupQ, 's--', color='#2166ac', alpha=.5, label='quantum coupled-only')
+ax[1].plot(SR, coupQ, 's--', color='#2166ac', alpha=.5, label='1BQF (wp99) coupled-only')
 ax[1].set_yscale('log'); ax[1].set_xlabel(r'$\sigma_{\rm res}$ (mm)'); ax[1].set_ylabel('false positives / event')
 ax[1].set_title('(b) Totals vs resolution (log)', fontweight='bold'); ax[1].legend(frameon=False, fontsize=9)
 fig.suptitle(f'Absolute false-positive counts vs resolution noise, T={T}', fontweight='bold', y=1.0)
@@ -286,13 +291,15 @@ for sr in SR:
         s = sub[(sub['sigma_res']==sr)&(sub['sigma_scatt']==ss)]
         cnt = {t: float(s[s['type']==t]['count'].sum()) for t in FALSE_TYPES}
         aC  = {t: float(s[s['type']==t]['act_C'].sum()) for t in FALSE_TYPES}
-        aQ  = {t: float(s[s['type']==t]['act_Q'].sum()) for t in FALSE_TYPES}
-        tot=sum(cnt.values()) or 1; fpC=sum(aC.values()); fpQ=sum(aQ.values())
+        aQ  = {t: float(s[s['type']==t]['act_Q_wp'].sum()) for t in FALSE_TYPES}   # 1BQF wp99
+        aQf = {t: float(s[s['type']==t]['act_Q'].sum()) for t in FALSE_TYPES}      # fixed-tau record
+        tot=sum(cnt.values()) or 1; fpC=sum(aC.values()); fpQ=sum(aQ.values()); fpQf=sum(aQf.values())
         rows.append(dict(sigma_res=sr, sigma_scatt=ss,
             pct_coupled=100*(1-cnt['isolated']/tot),
             fp_C=fpC, fp_C_iso_pct=100*aC['isolated']/fpC if fpC else 0,
             fp_C_hub_pct=100*aC['hub']/fpC if fpC else 0,
-            fp_Q=fpQ, fp_Q_iso_pct=100*aQ['isolated']/fpQ if fpQ else 0))
+            fp_Q_wp=fpQ, fp_Q_wp_iso_pct=100*aQ['isolated']/fpQ if fpQ else 0,
+            fp_Q_fixedtau=fpQf))
 summ = pd.DataFrame(rows).round(2)
 summ.to_csv(HERE/'outputs'/'false_positive_types'/'fp_summary_T200.csv', index=False)
 import IPython.display as d; d.display(summ)
@@ -316,13 +323,17 @@ $\sigma_{\rm res}\gtrsim0.02$ mm, **94–99 %** of both solvers' false positives
 are pushed over $\tau$ by the corrupted high-occupancy solve. The genuinely-coupled
 false positives stay a small, almost noise-independent floor (dashed lines, §3b).
 
-**3. The 1BQF is not more pure than the classical solver here — it is less.**
-At low/moderate noise the quantum solver fires **more** false positives than classical
-(σ_res=0: 7→183; σ_res=0.01: ~25→~450), almost all isolated. The 1BQF eigen-filter
-spreads amplitude onto uncoupled segments after the $\|s_Q\|=\|s_C\|$ rescale, so its
-purity deficit (the Epsilon_study_2 headline) is concretely a flood of isolated
-leakage — the same failure mode as classical, only stronger. *(A few T=200 σ_res=0.05
-quantum points are missing — expensive CPU statevector jobs; the GPU re-run will fill them.)*
+**3. The 1BQF is not more pure than the classical solver here — it is less
+(quoted at its wp99 headline working point).**
+At low/moderate noise the 1BQF fires **more** false positives than classical
+(σ_res=0: ~7→~183/event; σ_res=0.01: ~26→~460), almost all isolated. Notably the
+count is **essentially identical at wp99 and at the fixed-τ=0.35 record** (183 vs
+183): the leaked isolated amplitudes sit far above *both* cuts, so this purity
+deficit is threshold-robust — a genuine flood of isolated leakage after the
+$\|s_Q\|=\|s_C\|$ rescale, not a cut artefact. (The 1BQF *efficiency* story is the
+opposite: the fixed-τ ~75 % plateau **was** the cut artefact; wp99 recovers
+~100 %.) *(A few T=200 σ_res=0.05 quantum points are missing — expensive CPU
+statevector jobs; the GPU re-run will fill them.)*
 
 These plug directly into the Epsilon_study_2 report: §4.8 purity collapse is
 resolution-driven, and the leakage is topological (isolated), which motivates an

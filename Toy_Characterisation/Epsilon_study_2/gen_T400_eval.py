@@ -168,9 +168,11 @@ for sr, ss in FAMILY_A + [(SR_FIX, SS_FIX)] + FAMILY_B:
     sub = dfm[(dfm.solver == "quantum") & (np.isclose(dfm.sigma_res, sr)) &
               (np.isclose(dfm.sigma_scatt, ss))]
     if len(sub):
+        # 1BQF overlay star at its wp99 HEADLINE (efficiency-first) working point
+        # — the fixed-tau columns are the ~75%-plateau cut artefact
         qpt[(sr, ss)] = (float(compute_epsilon(sr, ss)),
-                         sub.segment_efficiency.mean(),
-                         sub.segment_false_rate.mean())
+                         sub.segment_efficiency_wp.mean(),
+                         sub.segment_false_rate_wp.mean())
 
 for figname, family, var_lab, fixed_lab in (
     ("eps_scan_T400_fixed_sres", FAMILY_A, "ss",
@@ -217,10 +219,10 @@ for figname, family, var_lab, fixed_lab in (
         ax.set_xlabel(r"$\varepsilon$ [rad]")
         ax.grid(alpha=0.25)
     axes[0].set_title(r"circles+dotted: classical & analytic $(1-p)^2(1+p/2)$;"
-                      r"  $\star$ = store 1BQF at formula $\varepsilon$",
+                      r"  $\star$ = store 1BQF (wp99) at formula $\varepsilon$",
                       fontsize=9)
     axes[1].set_title(r"dotted: $c\,\varepsilon^2$;  vertical: formula "
-                      r"$\varepsilon$;  $\star$ = store 1BQF", fontsize=9)
+                      r"$\varepsilon$;  $\star$ = store 1BQF (wp99)", fontsize=9)
     axes[0].legend(fontsize=8, loc="lower right")
     fig.suptitle(rf"Segment metrics vs $\varepsilon$ at $T={T}$ — {fixed_lab} "
                  rf" (classical, {NREP_A} reps, $\tau={TAU}$)", fontsize=11.5)

@@ -1,4 +1,6 @@
 """Insert §7e threshold-sweep markdown + code cells before §11."""
+# LEGACY (pre-wp99, pre-store): 1BQF metrics here are FIXED-tau=0.35 (the ~70-75% efficiency artefact).
+# Headline convention is wp99 (Toy_Characterisation/WP99_REFRESH_LOG.md); canonical path = qtrk_store + *_store notebooks/scripts.
 import json, sys
 from pathlib import Path
 

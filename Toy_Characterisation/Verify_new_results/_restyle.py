@@ -1,4 +1,6 @@
 """Restyle Quantum_segment_level_analysis.ipynb to match the §14e paper style
+# LEGACY (pre-wp99, pre-store): 1BQF metrics here are FIXED-tau=0.35 (the ~70-75% efficiency artefact).
+# Headline convention is wp99 (Toy_Characterisation/WP99_REFRESH_LOG.md); canonical path = qtrk_store + *_store notebooks/scripts.
 from segment_level_analysis.ipynb cells 62 + 76."""
 import json
 from pathlib import Path
