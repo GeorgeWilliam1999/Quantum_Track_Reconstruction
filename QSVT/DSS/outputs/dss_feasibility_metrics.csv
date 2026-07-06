@@ -1,0 +1,17 @@
+T,variant,label,eff_fix,far_fix,eff_wp99,far_wp99
+100,prod_exact,"production comb (Chebyshev d=40, exact)",100.0,0.0,100.0,0.0
+100,trig_exact,trig comb K=40 (exact eigenphases),100.0,0.0,100.0,0.0
+100,trot_nat,"trig comb, DSS Trotter (natural order)",75.0,0.0,100.0,0.0
+100,trot_col,"trig comb, DSS Trotter (edge-coloured)",100.0,0.0,100.0,0.0
+100,trot_strang,"trig comb, DSS Trotter (Strang, 2nd order)",100.0,0.0,100.0,0.0
+100,trot_col_t2,"trig comb, t/2, K=80 (coloured)",100.0,0.0,100.0,0.0
+100,bqf_exact,1BQF (exact),50.0,0.0,100.0,5.66
+100,bqf_trot,"1BQF, DSS Trotter (natural)",50.0,0.0,100.0,5.66
+400,prod_exact,"production comb (Chebyshev d=40, exact)",97.75,0.0,99.06,1.12
+400,trig_exact,trig comb K=40 (exact eigenphases),97.75,0.0,99.06,1.55
+400,trot_nat,"trig comb, DSS Trotter (natural order)",97.75,0.0,99.06,1.18
+400,trot_col,"trig comb, DSS Trotter (edge-coloured)",97.75,0.0,99.06,1.18
+400,trot_strang,"trig comb, DSS Trotter (Strang, 2nd order)",97.75,0.0,99.06,1.55
+400,trot_col_t2,"trig comb, t/2, K=80 (coloured)",99.81,1.36,99.38,1.36
+400,bqf_exact,1BQF (exact),50.25,1.47,99.12,44.66
+400,bqf_trot,"1BQF, DSS Trotter (natural)",50.12,1.35,99.5,44.7
