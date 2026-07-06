@@ -23,6 +23,17 @@ breaks the 1BQF (v1 finding). **Step kernel only** for now (not ERF).
 - `dp_working_points.py` → `results/dp_working_points.csv` — matched-event
   τ-sweep working points, classical + 1BQF (question 1) + pooled spectra /
   peak structure (question 4).
+- `dp_matrix_characterisation.py` → `results/dp_matrix_{census,spectrum,classes}.csv`
+  + `figures/dp_matrix_*.png` — the MATRIX study (George, 2026-07-06): sparsity
+  census across T × noise (fork-window dial, co-hit degrees, C ⊥ B supports),
+  closed-form γ*(β,α) map from measured extremes (γ shifts the band rigidly,
+  never shrinks it), and per-false-class separability for the classical solve
+  AND the exact 1BQF filter (x_Q = |(e^{iAt}u + u)/2| via expm_multiply —
+  circuit-free, validated cos=1.000000000000 vs dense eigh).
+- `dp_gamma_validation.py` → `results/dp_gamma_validation.csv` — empirical test
+  that γ = γ* does NOT restore 1BQF separation under the DP terms
+  (distance-to-notch is γ-invariant; a penalty revives notched segments by
+  coupling them — the fork/occ admission fractions are frozen from γ=3 to 8/236).
 - `dp_analysis.ipynb` — joint pilot exploration; `fork_analysis.ipynb` — the
   fork-specific answers to questions 1–4.
 - `initial_v1/` — the v1 study (notebooks 01–04, `bifurcation_hamiltonian.md`,
