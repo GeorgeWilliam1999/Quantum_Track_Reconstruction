@@ -1,5 +1,13 @@
 # Epsilon\_study\_2: Detector Noise Sensitivity of the 1BQF Segment-Level Algorithm
 
+> ## ⚠️ Errata (2026-07-06) — programme consistency audit
+> This document is the **historical record**; the store-backed Notion write-up is the corrected canonical version. Do not cite:
+> 1. **"Classical efficiency collapses to 6%"** — an artefact of the *relative* threshold τ·max(x) in the original pipeline. At the absolute τ=0.35 (qtrk_store metrics view, commit `25df2eba`) classical segment **efficiency stays 98.4–100% (minimum cell 0.9839)** across the whole noise grid at T=200; it is the **purity** that collapses (≈0.999 → 0.18 as σ_res: 0 → 0.05 mm). The worst-corner breakdown is the λ_min→0 explosion regime (§7.12), handled by the per-event validity gate max|x| ≤ 50.
+> 2. **The 10.5 h/event quantum timing and "intractable beyond T≈90"** — obsolete: the matrix-free statevector engine (2026-06-14) solves T=200 events in ≈270 s mean (store t_solve, n=36) and reaches T=1000. The T^4.5 fit described the legacy Aer-transpile path, not the algorithm.
+>
+> Convention update: 1BQF headline = the efficiency-first **wp99** working point (fixed-τ 1BQF numbers are the ~75%-efficiency cut artefact); classical keeps τ=0.35.
+
+
 **Author:** G. Scriven  
 **Date:** June 2026  
 **Study directory:** `Toy_Characterisation/Epsilon_study_2/`  

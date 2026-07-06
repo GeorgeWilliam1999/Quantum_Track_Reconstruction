@@ -314,3 +314,15 @@ library for the superseded Initial band-design notebooks), `QSVT/Initial/02` (se
 caveated sandbox), `build_metrics.py` main() console summary (diagnostic, no figure).
 PRESERVE list honoured (FR_SE_tradeoff, Bifurification 02_metrics_vs_beta,
 Segment_level_studies/04, ERF youden diagnostics).
+
+## SESSION 4 CLOSURE (2026-07-06, evening) — pushed + busters bumped. DONE.
+
+Commit `0576268d` fast-forwarded to origin/main (`git push origin HEAD:main` from the
+branch — dirty-tree checkout was the blocker on the first attempt). Verified: raw
+GitHub content-length matches local bytes for all three changed figures. Cache-busters
+applied + fetch-verified: QSVT II 2×2 `?v=7ddc068a`→`?v=0576268d`; paper draft Fig 5 +
+5d and Application-compendium 2×2 clean/drop + γ-companion got `?v=0576268d` ADDED
+(were unbusted). `qsvt_working_points.png` embeds left unbusted (content unchanged).
+QSVT II Provenance property re-stamped to `0576268d`. wp99 todo `37f5d544…01dc`
+closed (Done). The QSVT lane of the wp99 refresh is complete end-to-end:
+figures → prose → tables → embeds → provenance.

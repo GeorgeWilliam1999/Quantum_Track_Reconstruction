@@ -69,6 +69,45 @@
 \maketitle
 \thispagestyle{fancy}
 
+% ── ERRATA (2026-07-06) ───────────────────────────────────────────────────────
+\begin{center}
+\setlength{\fboxsep}{8pt}%
+\colorbox{red!8}{\begin{minipage}{0.86\linewidth}
+\textbf{Errata (2026-07-06) — programme consistency audit.}\par\smallskip
+This document is retained as the historical record of the study; the store-backed
+Notion write-up is the corrected canonical version. Two findings below are
+\textbf{wrong or obsolete} and must not be cited:
+\begin{enumerate}[noitemsep,topsep=2pt]
+  \item \textbf{The ``classical efficiency collapses to 6\,\%'' claim (Abstract item 2,
+        \S\ref{sec:results:stability}, Discussion, Conclusions) is an artefact} of the
+        \emph{relative} threshold $\tau\cdot\max(x)$ used by the original pipeline —
+        exactly the mis-thresholding this report itself warns against. Recomputed from
+        the unified \codepath{qtrk\_store} at the absolute $\tau=0.35$ (metrics view,
+        commit \codepath{25df2eba}), classical segment \emph{efficiency} stays at
+        $98.4$--$100\,\%$ (minimum cell $0.9839$) over the entire noise grid at
+        $\ntrk=200$; it is the segment
+        \emph{purity} that collapses ($\approx\!0.999 \to 0.18$ as
+        $\sres\!: 0 \to 0.05\,$mm). Both solvers keep efficiency; the true breakdown
+        at the worst corner is the $\lambda_{\min}\!\to\!0$ explosion regime
+        (\S7.12), now handled by a per-event validity gate ($\max|x|\leq 50$).
+  \item \textbf{The quantum timing/scaling conclusions (Abstract item 4, the
+        $10.5\,$h/event figure, and ``intractable beyond $\ntrk\approx 90$'') are
+        obsolete}: the matrix-free statevector engine (2026-06-14) replays the 1BQF
+        gate stream directly on the statevector — mean $\approx\!270\,$s per event at
+        $\ntrk=200$ (store \codepath{t\_solve}, $n{=}36$), seconds at low $T$, and
+        solved events exist up to $\ntrk=1000$. The $\ntrk^{4.5}$ fit described the
+        legacy Aer-transpile path, not the algorithm.
+\end{enumerate}
+\smallskip
+In addition, per the 2026-06-14 convention the 1BQF headline operating point is the
+efficiency-first \emph{wp99} working point (fixed $\tau=0.35$ 1BQF numbers are the
+$\approx\!75\,\%$-efficiency cut artefact; classical keeps $\tau=0.35$).
+Provenance: \codepath{qtrk\_store} metrics view, study \codepath{Epsilon\_study\_2}
+(2\,125 rows re-derived 2026-06-14; audit 2026-07-05/06, commits
+\codepath{b6a8ace9}, \codepath{25df2eba}, \codepath{e065ee70}).
+\end{minipage}}
+\end{center}
+
 % ── Abstract ──────────────────────────────────────────────────────────────────
 \begin{abstractbox}
 This report characterises how hit-position measurement resolution~$\sres$ and
