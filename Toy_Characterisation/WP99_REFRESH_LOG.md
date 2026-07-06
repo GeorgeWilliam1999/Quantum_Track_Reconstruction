@@ -218,3 +218,50 @@ figure embed on the six study write-ups (git last-change vs `?v=` buster commit 
   23:40; no-buster embeds unchanged since before each page build). No action.
 
 wp99 refresh COMPLETE end-to-end: code + figures (main), page text, cache-busters.
+
+## SESSION 4 (2026-07-06) — the QSVT side (user re-raise: "plots showing ~70 % are not correct")
+
+Sessions 1–3 covered Toy_Characterisation; the standing note "QSVT pages already lead
+with wp99" was wrong for the HEADLINE surfaces: QSVT nb01's 2×2 plotted ALL solvers at
+fixed τ, and the paper draft §7.2 led with the fixed-τ Table 1 (1BQF 74–75 %).
+
+Fixed (convention: classical & comb at fixed τ=0.35; **1BQF headline = wp99**, fixed-τ
+kept faded as the labelled cut artefact):
+- `QSVT/Segment_level_studies/01_qsvt_segment_efficiency.ipynb` — 2×2 (clean + 1 % drop)
+  and γ companion re-plotted (1BQF wp99 solid + faded fixed-τ); headline cell prints both
+  conventions and saves `outputs/segment_efficiency/headline_both_conventions.csv`.
+  Re-executed in Q_env (no errors, figures verified visually). Same filenames.
+- **Paper draft** (Notion `37c5d544…d56f0`): §7.2 retitled "The headline comparison —
+  solver operating points" + rewritten (1BQF wp99 ladder 5.1→43.9→69.5→82.6 % over
+  T=100/400/700/1000); Table 1 1BQF column → wp99; Table 2 τ* rows → stable wp99 view
+  rows (clean: 100/1.5 · 99.5/43.9 · 99.1/1.4; drop: 99.4/41.7 · 99.5/44.3 · 99.4/44.0 —
+  fragment degeneracy now visibly solver-independent); Fig 6 swapped
+  headline_at_tau_star.png → segment_efficiency/qsvt_working_points.png; τ* demoted to an
+  explicit instability caveat; abstract "cheapest at every multiplicity / up to 44 %" →
+  "cheapest through T≈400, 1.4 % vs 43.9 % (82.6 % at T=1000)"; §7.3 crossover honesty
+  (comb behind classical at matched 99 % beyond T≈400: 9.1 vs 4.9 @700, 20.7 vs 10.0 @1000).
+- **QSVT II** (`37c5d544…aca1c`): headline table 1BQF column → wp99 + convention
+  paragraph; alt text + bottom-line callout rewritten (fixed-τ 74.x numbers preserved in
+  prose as the artefact record). **QSVT project hub**: status callout "vs 1BQF 75 %/1.7 %"
+  → wp99 framing; status-table T-label fix (0.9 % vs 20.5 % is T=1000).
+- Numbers source: store view (seg_store.fixed_eps_metrics, wp cols; validity gate drops
+  144/3189 rows). Table 2's fixed-τ discovery row deliberately kept.
+
+HANDOFF: **user must git push** nb01 + regenerated figures (qsvt_2x2_gamma3_drop0/1pct,
+qsvt_gamma_companion, qsvt_working_points, headline_both_conventions.csv), then bump
+`?v=` busters: QSVT II 2×2 embed (`?v=7ddc068a` → new commit) and ADD busters to the
+paper-draft Fig 5/5d embeds (currently unbusted, content changed).
+NOT swept (deliberate/discovery, unchanged): nb04 per-solver-threshold study, nb06 §5
+conventions comparison, nb07 comb-design fixed-τ analysis; compendium §7 (threshold
+mechanism/staircase) and §17 (carry the audit's τ* caveats).
+
+SESSION 4b (same day, user asked "are the write-ups correct?") — verification sweep:
+- QSVT III: checked, already clean (working-point based, no 1BQF headline).
+- **Application compendium** (`37b5d544…c7414`): WAS still stale → fixed + verified:
+  2×2/drop/γ-companion alt-texts + captions rewritten to the new figure content (1BQF
+  wp99 + faded artefact curve); §9 mid-programme scoreboard flagged "historical record,
+  kept verbatim" (fixed-τ + τ* rows predate the convention); §10 prose corrected (the
+  1BQF DOES now have T=700/1000 points — matrix-free engine; "no data points there"
+  was stale) and its scale-table 1BQF column → wp99 (99.5/43.9 · 99.5/69.5 · 100/82.6)
+  with the fixed-cut values kept as a one-line artefact note.
+- §18 verdict table: checked, τ-clean (no 1BQF fixed-τ claims).
