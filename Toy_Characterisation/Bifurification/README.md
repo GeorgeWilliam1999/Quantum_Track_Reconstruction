@@ -34,6 +34,11 @@ breaks the 1BQF (v1 finding). **Step kernel only** for now (not ERF).
   that γ = γ* does NOT restore 1BQF separation under the DP terms
   (distance-to-notch is γ-invariant; a penalty revives notched segments by
   coupling them — the fork/occ admission fractions are frozen from γ=3 to 8/236).
+- `dp_occupancy_proof.py` → `figures/dp_occupancy_proof.png` +
+  `results/dp_occupancy_proof.csv` — the four-panel PROOF that occupancy
+  cannot help a notch-equipped solver: (a) per-segment revival scatter,
+  (b) full τ sweep (no threshold escape; classical contrast), (c) γ scan
+  (no γ escape), (d) post-selected mass diverted to false segments.
 - `dp_analysis.ipynb` — joint pilot exploration; `fork_analysis.ipynb` — the
   fork-specific answers to questions 1–4.
 - `initial_v1/` — the v1 study (notebooks 01–04, `bifurcation_hamiltonian.md`,
