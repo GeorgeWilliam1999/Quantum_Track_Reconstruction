@@ -1,0 +1,55 @@
+solver,beta,family,med_amp
+classical,0.0,contaminated (true+false),0.4030906924096022
+classical,0.0,false chain P3+,0.35714285714285726
+classical,0.0,false pair P2,0.33333333333333326
+classical,0.0,isolated false,0.25
+classical,0.0,true P4,0.40909090909090934
+classical,0.0,true fragment (P1-P3),0.33333333333333326
+classical,0.5,contaminated (true+false),0.3842915080028481
+classical,0.5,false chain P3+,0.34598214285714285
+classical,0.5,false pair P2,0.33333333333333326
+classical,0.5,isolated false,0.25
+classical,0.5,true P4,0.40535832780358366
+classical,0.5,true fragment (P1-P3),0.33333333333333326
+classical,1.0,contaminated (true+false),0.3838350515463916
+classical,1.0,false chain P3+,0.33730158730158727
+classical,1.0,false pair P2,0.33333333333333326
+classical,1.0,isolated false,0.25
+classical,1.0,true P4,0.4029720279720282
+classical,1.0,true fragment (P1-P3),0.33333333333333326
+comb,0.0,contaminated (true+false),0.08580542916382357
+comb,0.0,false chain P3+,0.1450734701998564
+comb,0.0,false pair P2,0.0065152994066675725
+comb,0.0,isolated false,0.02958283932808678
+comb,0.0,true P4,0.4259313527141009
+comb,0.0,true fragment (P1-P3),0.021895251063421124
+comb,0.5,contaminated (true+false),0.21498269209730134
+comb,0.5,false chain P3+,0.14373258894704355
+comb,0.5,false pair P2,0.007403555310870673
+comb,0.5,isolated false,0.026507705107110303
+comb,0.5,true P4,0.3994025255190006
+comb,0.5,true fragment (P1-P3),0.020139528576966475
+comb,1.0,contaminated (true+false),0.22775570256542763
+comb,1.0,false chain P3+,0.12025574952235481
+comb,1.0,false pair P2,0.011390059763799644
+comb,1.0,isolated false,0.027429504915066977
+comb,1.0,true P4,0.3668335453796298
+comb,1.0,true fragment (P1-P3),0.022076654936455012
+onebqf,0.0,contaminated (true+false),0.2506086808815487
+onebqf,0.0,false chain P3+,0.2642897172247714
+onebqf,0.0,false pair P2,0.27137288533902315
+onebqf,0.0,isolated false,4.342178250987875e-17
+onebqf,0.0,true P4,0.3896572860668596
+onebqf,0.0,true fragment (P1-P3),0.2690402175123845
+onebqf,0.5,contaminated (true+false),0.2486604747784008
+onebqf,0.5,false chain P3+,0.231012562105391
+onebqf,0.5,false pair P2,0.2692825050505489
+onebqf,0.5,isolated false,4.3087305326811354e-17
+onebqf,0.5,true P4,0.3858034052923121
+onebqf,0.5,true fragment (P1-P3),0.2669682501489236
+onebqf,1.0,contaminated (true+false),0.24857266916722068
+onebqf,1.0,false chain P3+,0.20009933904212351
+onebqf,1.0,false pair P2,0.2691684618560631
+onebqf,1.0,isolated false,4.306905752441389e-17
+onebqf,1.0,true P4,0.38310401045444586
+onebqf,1.0,true fragment (P1-P3),0.2668560736009243
