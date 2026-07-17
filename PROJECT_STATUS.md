@@ -22,6 +22,17 @@ Provisional/verify-ready in Notion):
   1BQF worsens strictly with β (far 0.65→0.73→0.96); the atlas's emulated 99.1/0.9 three-knob
   target does not survive; the uniqueness gate, not the fork, controls the false rate quantum-side.
   Heterogeneous β=0.5 breaks the product formula (cos 0.944) — same split as the erf arbiter.
+  **⟶ CORRECTED by George's review (2026-07-17 later, commit `fa5dce9b`, QSVT XII):** the comb was
+  never FIT to the measured errors. `QSVT/Codesign/04_fit_comb_to_measured_spectrum.py` does the
+  demanded flow on exact per-component spectra (no giant component at heavy T=200): false pile-up
+  sits on the universal motif lines λ=s−1/s−√2 (overlap with true formation: cos 0.022); the
+  FITTED response beats classical at every eff below the fragment floor (0.096/0.061 vs
+  0.124/0.124 at eff 0.98/0.97), the **fork is redeemed** (b0.5@γ* fitted 0.085/0.046, beats
+  fitted-β0), fitted+gate reaches **far 1–2% at eff 0.97–0.985**. The eff≥0.99 wall is the
+  fragment floor: 1.9–2.8% of trues are spectral twins of the false motifs — all solvers flood
+  there, classical included. 1BQF root budget: its single root is owned by the isolated line
+  (tuned-notch control fails at 0.995); the pair line needs degree ≥2 ⇒ QSVT. Open engineering:
+  per-cluster D3 interpolation (global Chebyshev needs d≈700) + a universal cross-event response.
 Also: audit content-check closed (2 prose fixes; both Verify store notebooks re-executed against
 the current 2772-row store — wp99 curves now carry the WP_TAU_FLOOR fix).
 
