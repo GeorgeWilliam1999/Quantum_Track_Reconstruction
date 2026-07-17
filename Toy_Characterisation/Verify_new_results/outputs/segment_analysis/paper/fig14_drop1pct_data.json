@@ -1,0 +1,573 @@
+{
+  "description": "fig14_solver_segment_efficiency_drop1pct \u2014 classical solver segment metrics vs track multiplicity, 1% hit drop",
+  "fixed_parameters": {
+    "epsilon_rad": 0.002,
+    "gamma": 3.0,
+    "delta": 1.0,
+    "hit_drop_fraction": 0.01
+  },
+  "source_cache": "outputs/segment_analysis/cache/solver_segment_efficiency_ext_drop1pct.pkl",
+  "error_definition": "sem = sample_std(ddof=1) / sqrt(n_events), computed across independent toy events at each n_tracks",
+  "points": [
+    {
+      "n_tracks": 2,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 98.125,
+        "sem": 1.181939
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.0,
+        "sem": 0.0
+      },
+      "n_true_segments": {
+        "mean": 7.917,
+        "sem": 0.049
+      },
+      "n_false_segments": {
+        "mean": 7.917,
+        "sem": 0.049
+      },
+      "n_true_active_segments": {
+        "mean": 7.85,
+        "sem": 0.095
+      },
+      "n_false_active_segments": {
+        "mean": 0.0,
+        "sem": 0.0
+      }
+    },
+    {
+      "n_tracks": 4,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 96.5625,
+        "sem": 1.054912
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.0,
+        "sem": 0.0
+      },
+      "n_true_segments": {
+        "mean": 15.667,
+        "sem": 0.097
+      },
+      "n_false_segments": {
+        "mean": 47.0,
+        "sem": 0.291
+      },
+      "n_true_active_segments": {
+        "mean": 15.45,
+        "sem": 0.169
+      },
+      "n_false_active_segments": {
+        "mean": 0.0,
+        "sem": 0.0
+      }
+    },
+    {
+      "n_tracks": 6,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 96.388889,
+        "sem": 1.045622
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.0,
+        "sem": 0.0
+      },
+      "n_true_segments": {
+        "mean": 23.533,
+        "sem": 0.129
+      },
+      "n_false_segments": {
+        "mean": 117.683,
+        "sem": 0.638
+      },
+      "n_true_active_segments": {
+        "mean": 23.133,
+        "sem": 0.251
+      },
+      "n_false_active_segments": {
+        "mean": 0.0,
+        "sem": 0.0
+      }
+    },
+    {
+      "n_tracks": 8,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 96.979167,
+        "sem": 0.708442
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.0,
+        "sem": 0.0
+      },
+      "n_true_segments": {
+        "mean": 31.417,
+        "sem": 0.124
+      },
+      "n_false_segments": {
+        "mean": 219.917,
+        "sem": 0.869
+      },
+      "n_true_active_segments": {
+        "mean": 31.033,
+        "sem": 0.227
+      },
+      "n_false_active_segments": {
+        "mean": 0.0,
+        "sem": 0.0
+      }
+    },
+    {
+      "n_tracks": 10,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 95.875,
+        "sem": 0.702661
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.0,
+        "sem": 0.0
+      },
+      "n_true_segments": {
+        "mean": 39.05,
+        "sem": 0.147
+      },
+      "n_false_segments": {
+        "mean": 351.467,
+        "sem": 1.318
+      },
+      "n_true_active_segments": {
+        "mean": 38.35,
+        "sem": 0.281
+      },
+      "n_false_active_segments": {
+        "mean": 0.0,
+        "sem": 0.0
+      }
+    },
+    {
+      "n_tracks": 15,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 97.111111,
+        "sem": 0.526848
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.053763,
+        "sem": 0.053763
+      },
+      "n_true_segments": {
+        "mean": 58.95,
+        "sem": 0.179
+      },
+      "n_false_segments": {
+        "mean": 825.4,
+        "sem": 2.461
+      },
+      "n_true_active_segments": {
+        "mean": 58.267,
+        "sem": 0.316
+      },
+      "n_false_active_segments": {
+        "mean": 0.033,
+        "sem": 0.033
+      }
+    },
+    {
+      "n_tracks": 20,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 95.9375,
+        "sem": 0.503014
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.0,
+        "sem": 0.0
+      },
+      "n_true_segments": {
+        "mean": 78.083,
+        "sem": 0.22
+      },
+      "n_false_segments": {
+        "mean": 1483.8,
+        "sem": 4.132
+      },
+      "n_true_active_segments": {
+        "mean": 76.75,
+        "sem": 0.402
+      },
+      "n_false_active_segments": {
+        "mean": 0.0,
+        "sem": 0.0
+      }
+    },
+    {
+      "n_tracks": 30,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 95.930556,
+        "sem": 0.392716
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.055556,
+        "sem": 0.055556
+      },
+      "n_true_segments": {
+        "mean": 117.283,
+        "sem": 0.254
+      },
+      "n_false_segments": {
+        "mean": 3400.667,
+        "sem": 7.442
+      },
+      "n_true_active_segments": {
+        "mean": 115.117,
+        "sem": 0.471
+      },
+      "n_false_active_segments": {
+        "mean": 0.067,
+        "sem": 0.067
+      }
+    },
+    {
+      "n_tracks": 40,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 96.6875,
+        "sem": 0.312782
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.142815,
+        "sem": 0.091288
+      },
+      "n_true_segments": {
+        "mean": 156.833,
+        "sem": 0.265
+      },
+      "n_false_segments": {
+        "mean": 6117.117,
+        "sem": 10.226
+      },
+      "n_true_active_segments": {
+        "mean": 154.7,
+        "sem": 0.5
+      },
+      "n_false_active_segments": {
+        "mean": 0.233,
+        "sem": 0.151
+      }
+    },
+    {
+      "n_tracks": 50,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 96.716667,
+        "sem": 0.304014
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.110325,
+        "sem": 0.055527
+      },
+      "n_true_segments": {
+        "mean": 196.1,
+        "sem": 0.324
+      },
+      "n_false_segments": {
+        "mean": 9608.3,
+        "sem": 15.702
+      },
+      "n_true_active_segments": {
+        "mean": 193.433,
+        "sem": 0.608
+      },
+      "n_false_active_segments": {
+        "mean": 0.217,
+        "sem": 0.109
+      }
+    },
+    {
+      "n_tracks": 60,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 96.944444,
+        "sem": 0.253983
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.076189,
+        "sem": 0.044169
+      },
+      "n_true_segments": {
+        "mean": 235.633,
+        "sem": 0.334
+      },
+      "n_false_segments": {
+        "mean": 13903.567,
+        "sem": 19.555
+      },
+      "n_true_active_segments": {
+        "mean": 232.667,
+        "sem": 0.61
+      },
+      "n_false_active_segments": {
+        "mean": 0.183,
+        "sem": 0.108
+      }
+    },
+    {
+      "n_tracks": 75,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 96.094444,
+        "sem": 0.239807
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.142633,
+        "sem": 0.046896
+      },
+      "n_true_segments": {
+        "mean": 293.417,
+        "sem": 0.39
+      },
+      "n_false_segments": {
+        "mean": 21706.867,
+        "sem": 28.806
+      },
+      "n_true_active_segments": {
+        "mean": 288.283,
+        "sem": 0.719
+      },
+      "n_false_active_segments": {
+        "mean": 0.417,
+        "sem": 0.137
+      }
+    },
+    {
+      "n_tracks": 100,
+      "n_events": 60,
+      "segment_efficiency_pct": {
+        "mean": 96.1125,
+        "sem": 0.240455
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.306249,
+        "sem": 0.073171
+      },
+      "n_true_segments": {
+        "mean": 391.2,
+        "sem": 0.512
+      },
+      "n_false_segments": {
+        "mean": 38733.583,
+        "sem": 50.159
+      },
+      "n_true_active_segments": {
+        "mean": 384.45,
+        "sem": 0.962
+      },
+      "n_false_active_segments": {
+        "mean": 1.2,
+        "sem": 0.291
+      }
+    },
+    {
+      "n_tracks": 150,
+      "n_events": 30,
+      "segment_efficiency_pct": {
+        "mean": 96.45,
+        "sem": 0.263602
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.444219,
+        "sem": 0.119863
+      },
+      "n_true_segments": {
+        "mean": 587.633,
+        "sem": 0.87
+      },
+      "n_false_segments": {
+        "mean": 87567.0,
+        "sem": 128.321
+      },
+      "n_true_active_segments": {
+        "mean": 578.7,
+        "sem": 1.582
+      },
+      "n_false_active_segments": {
+        "mean": 2.6,
+        "sem": 0.706
+      }
+    },
+    {
+      "n_tracks": 200,
+      "n_events": 30,
+      "segment_efficiency_pct": {
+        "mean": 96.5875,
+        "sem": 0.19915
+      },
+      "segment_false_rate_pct": {
+        "mean": 0.724459,
+        "sem": 0.151764
+      },
+      "n_true_segments": {
+        "mean": 783.933,
+        "sem": 0.848
+      },
+      "n_false_segments": {
+        "mean": 155992.5,
+        "sem": 169.438
+      },
+      "n_true_active_segments": {
+        "mean": 772.7,
+        "sem": 1.593
+      },
+      "n_false_active_segments": {
+        "mean": 5.667,
+        "sem": 1.196
+      }
+    },
+    {
+      "n_tracks": 300,
+      "n_events": 30,
+      "segment_efficiency_pct": {
+        "mean": 96.397222,
+        "sem": 0.18482
+      },
+      "segment_false_rate_pct": {
+        "mean": 1.310175,
+        "sem": 0.136738
+      },
+      "n_true_segments": {
+        "mean": 1174.9,
+        "sem": 1.23
+      },
+      "n_false_segments": {
+        "mean": 351264.833,
+        "sem": 365.636
+      },
+      "n_true_active_segments": {
+        "mean": 1156.767,
+        "sem": 2.218
+      },
+      "n_false_active_segments": {
+        "mean": 15.4,
+        "sem": 1.62
+      }
+    },
+    {
+      "n_tracks": 500,
+      "n_events": 15,
+      "segment_efficiency_pct": {
+        "mean": 96.12,
+        "sem": 0.287882
+      },
+      "segment_false_rate_pct": {
+        "mean": 4.802726,
+        "sem": 0.381618
+      },
+      "n_true_segments": {
+        "mean": 1955.8,
+        "sem": 2.872
+      },
+      "n_false_segments": {
+        "mean": 976034.6,
+        "sem": 1430.79
+      },
+      "n_true_active_segments": {
+        "mean": 1922.4,
+        "sem": 5.758
+      },
+      "n_false_active_segments": {
+        "mean": 97.333,
+        "sem": 8.006
+      }
+    },
+    {
+      "n_tracks": 750,
+      "n_events": 15,
+      "segment_efficiency_pct": {
+        "mean": 96.742222,
+        "sem": 0.154354
+      },
+      "segment_false_rate_pct": {
+        "mean": 11.508411,
+        "sem": 0.514848
+      },
+      "n_true_segments": {
+        "mean": 2942.6,
+        "sem": 2.62
+      },
+      "n_false_segments": {
+        "mean": 2204015.667,
+        "sem": 1936.592
+      },
+      "n_true_active_segments": {
+        "mean": 2902.267,
+        "sem": 4.631
+      },
+      "n_false_active_segments": {
+        "mean": 379.0,
+        "sem": 19.22
+      }
+    },
+    {
+      "n_tracks": 1000,
+      "n_events": 15,
+      "segment_efficiency_pct": {
+        "mean": 96.551667,
+        "sem": 0.150761
+      },
+      "segment_false_rate_pct": {
+        "mean": 20.024111,
+        "sem": 0.716373
+      },
+      "n_true_segments": {
+        "mean": 3918.6,
+        "sem": 3.325
+      },
+      "n_false_segments": {
+        "mean": 3914379.067,
+        "sem": 3317.649
+      },
+      "n_true_active_segments": {
+        "mean": 3862.067,
+        "sem": 6.03
+      },
+      "n_false_active_segments": {
+        "mean": 972.8,
+        "sem": 44.712
+      }
+    },
+    {
+      "n_tracks": 1500,
+      "n_events": 15,
+      "segment_efficiency_pct": {
+        "mean": 96.49,
+        "sem": 0.076286
+      },
+      "segment_false_rate_pct": {
+        "mean": 44.180401,
+        "sem": 0.484125
+      },
+      "n_true_segments": {
+        "mean": 5877.733,
+        "sem": 2.533
+      },
+      "n_false_segments": {
+        "mean": 8810963.8,
+        "sem": 3920.214
+      },
+      "n_true_active_segments": {
+        "mean": 5789.4,
+        "sem": 4.577
+      },
+      "n_false_active_segments": {
+        "mean": 4593.533,
+        "sem": 92.341
+      }
+    }
+  ]
+}
