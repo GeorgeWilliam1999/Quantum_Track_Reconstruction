@@ -43,6 +43,7 @@ from .metrics import (
 from .manifest import (
     StudySpec, expand_spec, build_manifest, standard_specs, DEFAULT_TRACK_GRID,
 )
+from .postselect import hit_uniqueness_filter, uniqueness_frontier
 
 __all__ = [
     "event_key", "ham_key", "sol_key", "seed_for", "fnum",
@@ -58,4 +59,5 @@ __all__ = [
     "working_point_threshold", "metrics_at_wp", "quantum_metrics_wp",
     "StudySpec", "expand_spec", "build_manifest", "standard_specs",
     "DEFAULT_TRACK_GRID",
+    "hit_uniqueness_filter", "uniqueness_frontier",
 ]
