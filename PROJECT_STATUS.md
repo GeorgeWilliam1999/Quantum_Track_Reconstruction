@@ -10,6 +10,9 @@ Provisional/verify-ready in Notion):
   per-(hit, role) slot filter. Heavy T=200: far 0.65→**0.04** at eff 0.94 (far-optimal; the
   in-matrix term never reaches it); moderate T=200: **0.9975/0.0000** — beats in-matrix outright
   at the eff≥0.99 gate with zero solver change. Composes with the 1BQF notch (0.92/0.05).
+  _2026-07-17 (late): figures rebuilt_ — the original 2×2 PNG was corrupted by a pandas `.T`
+  footer bug; now split into `_frontiers/_census/_robustness/_wpmap` + fixed overview, and the
+  write-up was rebuilt (v2, with scope/theory/relevance) superseding the v1 page.
 - **ERF exact-evolution arbiter** (`ERF/erf_exact_evolution_check.py`): the kink-width wp99
   reversal is **Trotter-dominated** (far 0.834→0.218 moderate / 0.943→0.576 heavy without the
   product formula); step2x deficit is real doubled-coupling physics; a genuine residual remains

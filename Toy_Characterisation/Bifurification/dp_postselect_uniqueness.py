@@ -342,123 +342,231 @@ def main():
     census.to_csv(HERE / "results" / "dp_postselect_uniqueness_census.csv",
                   index=False)
 
-    # ---------------- figure --------------------------------------------------
+    # ---------------- figures -------------------------------------------------
     plt.rcParams.update({
         "figure.dpi": 150, "savefig.dpi": 150, "font.size": 9,
         "axes.spines.top": False, "axes.spines.right": False,
         "axes.grid": True, "grid.alpha": 0.25, "legend.frameon": False,
     })
-    fig, axes = plt.subplots(2, 2, figsize=(13.0, 9.4))
+    figdir = HERE / "figures"
+    d200c = df[(df.noise == "heavy") & (df["T"] == 200)
+               & (df.solver == "classical")]
+    d200q = df[(df.noise == "heavy") & (df["T"] == 200)
+               & (df.solver == "1bqf_emu")]
 
-    # (a) classical composed frontier, heavy T=200
-    ax = axes[0, 0]
-    e, f = frontier(main_ev["base"]["x"], truth200)
-    ax.plot(np.maximum(f, 5e-4), e, "-", color="#33322e", lw=1.8,
-            label="base: threshold only")
-    e, f = frontier(main_ev["occ"]["x"], truth200)
-    ax.plot(np.maximum(f, 5e-4), e, "-", color="#e34948", lw=1.6,
-            label="in-matrix occupancy (α=0.3)")
-    for mode, col in [("strict", "#8e6fad"), ("greedy", "#2a78d6")]:
-        taus, ee, ff = cases[f"cls-{mode}"]
-        ax.plot(np.maximum(ff, 5e-4), ee, "-", color=col, lw=2.0,
-                label=f"composed: threshold → uniqueness ({mode})")
-    taus, ee, ff = cases["cls-margin"]
-    ax.plot(np.maximum(ff, 5e-4), ee, "-", color="#1e9e6a", lw=2.2,
-            label="composed: threshold → margin uniqueness (best κ)")
-    d = df[(df.noise == "heavy") & (df["T"] == 200) & (df.solver == "classical")]
-    for sel, col, mk in [("base@wp99", "#33322e", "o"),
-                         ("inmatrix-occ@wp99", "#e34948", "o"),
-                         ("composed-greedy", "#2a78d6", "*"),
-                         ("composed-margin-best", "#1e9e6a", "*")]:
+    def style_roc(ax):
+        ax.set_xscale("log")
+        ax.set_xlim(5e-4, 1.0)
+        ax.set_ylim(0.55, 1.02)
+        ax.axhline(TARGET_EFF, color="#79776f", lw=0.7, ls=":")
+        ax.set_xlabel(r"false rate = N$_{false\,act}$ / N$_{act}$")
+        ax.set_ylabel("segment efficiency")
+
+    def mark_wp(ax, d, sel, col, mk, dx=1.15, dy=0.012, ha="left"):
         r = d[d.selector == sel].iloc[0]
-        ax.plot(max(r.far, 5e-4), r.eff, mk, color=col, ms=11 if mk == "*" else 6)
-    ax.set_xscale("log")
-    ax.set_xlim(5e-4, 1.0), ax.set_ylim(0.55, 1.02)
-    ax.axhline(TARGET_EFF, color="#79776f", lw=0.7, ls=":")
-    ax.set_xlabel("false rate = N_false_act / N_act")
-    ax.set_ylabel("segment efficiency")
-    ax.legend(fontsize=7.5, loc="lower right")
-    ax.set_title("(a) classical, heavy T=200: post-selection replaces the "
-                 "in-matrix term (★ = composed wp)", loc="left", fontsize=9)
+        x = max(r.far, 5e-4)
+        ax.plot(x, r.eff, mk, color=col, ms=12 if mk == "*" else 6, zorder=5)
+        ax.annotate(f"{r.eff:.3f} / {r.far:.3f}", (x, r.eff),
+                    xytext=(x * dx, r.eff + dy), fontsize=7, color=col, ha=ha)
 
-    # (b) 1BQF composed frontier — the three-knob composition
-    ax = axes[0, 1]
-    e, f = frontier(xq, truth200)
-    ax.plot(np.maximum(f, 5e-4), e, "-", color="#33322e", lw=1.8,
-            label="1BQF notch: threshold only")
-    taus, ee, ff = curve_q
-    ax.plot(np.maximum(ff, 5e-4), ee, "-", color="#2a78d6", lw=2.0,
-            label="1BQF notch → uniqueness (greedy)")
-    taus, ee, ff = cases["q-margin"]
-    ax.plot(np.maximum(ff, 5e-4), ee, "-", color="#1e9e6a", lw=2.2,
-            label="1BQF notch → margin uniqueness (best κ)")
-    e, f = frontier(main_ev["occ"]["xq"], truth200)
-    ax.plot(np.maximum(f, 5e-4), e, "-", color="#e34948", lw=1.2, alpha=0.7,
-            label="1BQF on in-matrix occ system (the disproven route)")
-    d = df[(df.noise == "heavy") & (df["T"] == 200) & (df.solver == "1bqf_emu")]
-    for sel, col, mk in [("base@wp99", "#33322e", "o"),
-                         ("composed-greedy", "#2a78d6", "*"),
-                         ("composed-margin-best", "#1e9e6a", "*")]:
-        r = d[d.selector == sel].iloc[0]
-        ax.plot(max(r.far, 5e-4), r.eff, mk, color=col, ms=11 if mk == "*" else 6)
-    ax.set_xscale("log")
-    ax.set_xlim(5e-4, 1.0), ax.set_ylim(0.55, 1.02)
-    ax.axhline(TARGET_EFF, color="#79776f", lw=0.7, ls=":")
-    ax.set_xlabel("false rate = N_false_act / N_act")
-    ax.set_ylabel("segment efficiency")
-    ax.legend(fontsize=7.5, loc="lower right")
-    ax.set_title("(b) 1BQF, heavy T=200: notch (isolated bulk) + uniqueness "
-                 "(co-hit survivors) compose", loc="left", fontsize=9)
+    def draw_frontier_classical(ax, tag="(a) "):
+        e, f = frontier(main_ev["base"]["x"], truth200)
+        ax.plot(np.maximum(f, 5e-4), e, "-", color="#33322e", lw=1.8,
+                label="base: threshold only")
+        e, f = frontier(main_ev["occ"]["x"], truth200)
+        ax.plot(np.maximum(f, 5e-4), e, "-", color="#e34948", lw=1.6,
+                label="in-matrix occupancy (α=0.3)")
+        _, ee, ff = cases["cls-strict"]
+        ax.plot(np.maximum(ff, 5e-4), ee, "--", color="#8e6fad", lw=1.2,
+                label="threshold → uniqueness (strict)")
+        _, ee, ff = cases["cls-greedy"]
+        ax.plot(np.maximum(ff, 5e-4), ee, "-", color="#2a78d6", lw=2.2,
+                label="threshold → uniqueness (greedy)")
+        _, ee, ff = cases["cls-margin"]
+        ax.plot(np.maximum(ff, 5e-4), ee, "-", color="#1e9e6a", lw=1.6,
+                label="threshold → margin uniqueness (best κ)")
+        mark_wp(ax, d200c, "base@wp99", "#33322e", "o",
+                dx=0.50, dy=0.012, ha="right")
+        mark_wp(ax, d200c, "inmatrix-occ@wp99", "#e34948", "o",
+                dx=0.85, dy=-0.050, ha="right")
+        mark_wp(ax, d200c, "composed-greedy", "#2a78d6", "*",
+                dx=1.25, dy=0.010)
+        mark_wp(ax, d200c, "composed-margin-best", "#1e9e6a", "*",
+                dx=1.10, dy=-0.055)
+        style_roc(ax)
+        ax.legend(fontsize=7.5, loc="lower right")
+        ax.set_title(tag + "classical, heavy T=200 — post-selection replaces "
+                     "the in-matrix term\n(marker labels: eff / far at the "
+                     "working point; ★ = composed wp)", loc="left", fontsize=9)
 
-    # (c) per-class census at the composed classical wp
-    ax = axes[1, 0]
-    cc = census.sort_values("act_thresh", ascending=False)
-    xs = np.arange(len(cc))
-    ax.bar(xs - 0.2, cc.act_thresh, 0.38, color="#9a9890",
-           label="active after threshold")
-    ax.bar(xs + 0.2, cc.act_composed, 0.38,
-           color=[dmc.CCOL.get(c, "#33322e") for c in cc.cls],
-           label="survive uniqueness")
-    ax.set_yscale("log")
-    ax.set_xticks(xs, cc.cls, rotation=20, ha="right", fontsize=7.5)
-    ax.set_ylabel("segments (log)")
-    ax.legend(fontsize=7.5)
-    ax.set_title("(c) who dies: per-class active counts at the composed wp "
-                 "(heavy T=200, classical)", loc="left", fontsize=9)
+    def draw_frontier_1bqf(ax, tag="(b) "):
+        e, f = frontier(xq, truth200)
+        ax.plot(np.maximum(f, 5e-4), e, "-", color="#33322e", lw=1.8,
+                label="1BQF notch: threshold only")
+        _, ee, ff = curve_q
+        ax.plot(np.maximum(ff, 5e-4), ee, "-", color="#2a78d6", lw=2.2,
+                label="1BQF notch → uniqueness (greedy)")
+        _, ee, ff = cases["q-margin"]
+        ax.plot(np.maximum(ff, 5e-4), ee, "-", color="#1e9e6a", lw=1.6,
+                label="1BQF notch → margin uniqueness (best κ)")
+        e, f = frontier(main_ev["occ"]["xq"], truth200)
+        ax.plot(np.maximum(f, 5e-4), e, "-", color="#e34948", lw=1.2,
+                alpha=0.7, label="1BQF on in-matrix occ system (disproven route)")
+        mark_wp(ax, d200q, "base@wp99", "#33322e", "o",
+                dx=0.50, dy=0.012, ha="right")
+        mark_wp(ax, d200q, "composed-greedy", "#2a78d6", "*",
+                dx=1.25, dy=0.010)
+        mark_wp(ax, d200q, "composed-margin-best", "#1e9e6a", "*",
+                dx=1.10, dy=-0.055)
+        style_roc(ax)
+        ax.legend(fontsize=7.5, loc="lower right")
+        ax.set_title(tag + "1BQF notch readout, heavy T=200 — notch kills the "
+                     "isolated bulk,\nthe uniqueness gate kills the co-hit "
+                     "survivors", loc="left", fontsize=9)
 
-    # (d) robustness & density: far at the working points across cases
-    ax = axes[1, 1]
-    grid = [("clean", 200), ("moderate", 200), ("heavy", 100),
-            ("heavy", 200), ("heavy", 400)]
-    xs = np.arange(len(grid))
-    for sel, col, lab in [("base@wp99", "#33322e", "base wp99"),
-                          ("inmatrix-occ@wp99", "#e34948", "in-matrix occ wp99"),
-                          ("composed-greedy", "#2a78d6",
-                           "composed uniqueness wp"),
-                          ("composed-margin-best", "#1e9e6a",
-                           "composed margin wp (best κ)")]:
-        vals, effs = [], []
-        for noise, T in grid:
-            d = df[(df.noise == noise) & (df["T"] == T)
-                   & (df.solver == "classical") & (df.selector == sel)]
-            vals.append(d.far.mean() if len(d) else np.nan)
-            effs.append(d.eff.mean() if len(d) else np.nan)
-        off = {"base wp99": -0.3, "in-matrix occ wp99": -0.1,
-               "composed uniqueness wp": 0.1,
-               "composed margin wp (best κ)": 0.3}[lab]
-        ax.bar(xs + off, vals, 0.19, color=col, label=lab)
-        for xi, (v, ef) in enumerate(zip(vals, effs)):
-            if np.isfinite(v):
-                ax.text(xi + off, v + 0.012, f"{ef:.3f}", ha="center",
-                        fontsize=6, color=col, rotation=90)
-    ax.set_xticks(xs, [f"{n}\nT={T}" for n, T in grid], fontsize=7.5)
-    ax.set_ylabel("false rate at the working point")
-    ax.legend(fontsize=7.5)
-    ax.set_title("(d) robustness & density: far at wp (labels = efficiency)",
-                 loc="left", fontsize=9)
+    def draw_census(ax, tag="(c) "):
+        order = ["cohit-true", "C-true", "cohit-false", "fork-true",
+                 "TRUE-coupled"]
+        cc = census.set_index("cls").loc[order].reset_index()
+        ys = np.arange(len(cc))[::-1]
+        ax.barh(ys + 0.19, cc.act_thresh, 0.36, color="#9a9890",
+                label="active after threshold alone")
+        ax.barh(ys - 0.19, cc.act_composed, 0.36,
+                color=[dmc.CCOL.get(c, "#33322e") for c in cc.cls],
+                label="survive the uniqueness gate")
+        for y, (_, r) in zip(ys, cc.iterrows()):
+            ax.text(max(r.act_thresh, 0.75) * 1.3, y + 0.19,
+                    f"{r.act_thresh:,}", va="center", fontsize=7.5,
+                    color="#52514e")
+            ax.text(max(r.act_composed, 0.75) * 1.3, y - 0.19,
+                    f"{r.act_composed:,}", va="center", fontsize=7.5,
+                    color="#33322e", fontweight="bold")
+        ax.set_xscale("log")
+        ax.set_xlim(0.7, 6000)
+        ax.set_yticks(ys, [f"{c}\n(n = {n:,})" for c, n in
+                           zip(cc.cls, cc["n"])], fontsize=7.5)
+        ax.set_xlabel("active segments at the composed wp (log; grey → colour "
+                      "= threshold → gate)")
+        ax.legend(fontsize=7.5, loc="center right")
+        ax.set_title(tag + "who dies — per-class census at the composed wp "
+                     "(heavy T=200, classical)", loc="left", fontsize=9)
 
+    def draw_wp_map(ax, tag="(d) "):
+        cells = [("clean", 200, "#79b465"), ("moderate", 200, "#e6b422"),
+                 ("heavy", 100, "#eb6834"), ("heavy", 200, "#e34948"),
+                 ("heavy", 400, "#8e6fad")]
+        for noise, T, col in cells:
+            dd = df[(df.noise == noise) & (df["T"] == T)
+                    & (df.solver == "classical")]
+            for rep in sorted(dd.rep.unique()):
+                b = dd[(dd.selector == "base@wp99") & (dd.rep == rep)].iloc[0]
+                g = dd[(dd.selector == "composed-greedy")
+                       & (dd.rep == rep)].iloc[0]
+                x0, x1 = max(b.far, 5e-4), max(g.far, 5e-4)
+                ax.plot(x0, b.eff, "o", color=col, ms=5, alpha=0.9)
+                ax.plot(x1, g.eff, "*", color=col, ms=12, zorder=5)
+                if abs(x1 - x0) > 1e-9 or abs(g.eff - b.eff) > 1e-9:
+                    ax.annotate("", xy=(x1, g.eff), xytext=(x0, b.eff),
+                                arrowprops=dict(arrowstyle="->", color=col,
+                                                lw=1.3, alpha=0.8,
+                                                shrinkA=4, shrinkB=7))
+            g = dd[dd.selector == "composed-greedy"]
+            xl = max(g.far.min(), 5e-4)
+            dy = {("clean", 200): 0.008, ("moderate", 200): -0.034}.get(
+                (noise, T), -0.022)
+            ax.text(xl, g.eff.min() + dy, f"{noise} T={T}", fontsize=7,
+                    color=col, ha="left" if xl < 2e-3 else "center")
+        style_roc(ax)
+        ax.set_ylim(0.80, 1.02)
+        ax.set_title(tag + "every cell: threshold-only wp (●) → composed "
+                     "uniqueness wp (★),\nclassical solve", loc="left",
+                     fontsize=9)
+
+    def draw_robustness(ax_e, ax_f):
+        grid = [("clean", 200), ("moderate", 200), ("heavy", 100),
+                ("heavy", 200), ("heavy", 400)]
+        sels = [("base@wp99", "#33322e", "base wp99 (threshold only)"),
+                ("inmatrix-occ@wp99", "#e34948", "in-matrix occupancy wp99"),
+                ("composed-greedy", "#2a78d6", "composed uniqueness wp"),
+                ("composed-margin-best", "#1e9e6a",
+                 "composed margin wp (best κ)")]
+        xs = np.arange(len(grid))
+        for k, (sel, col, lab) in enumerate(sels):
+            off = (k - 1.5) * 0.2
+            effs, fars = [], []
+            for noise, T in grid:
+                dd = df[(df.noise == noise) & (df["T"] == T)
+                        & (df.solver == "classical") & (df.selector == sel)]
+                effs.append(dd.eff.mean() if len(dd) else np.nan)
+                fars.append(dd.far.mean() if len(dd) else np.nan)
+            ax_e.bar(xs + off, effs, 0.19, color=col, label=lab)
+            ax_f.bar(xs + off, fars, 0.19, color=col)
+            for xi, (ev, fv) in enumerate(zip(effs, fars)):
+                if np.isfinite(ev):
+                    ax_e.text(xi + off, min(ev + 0.004, 1.035), f"{ev:.3f}",
+                              ha="center", va="bottom", fontsize=6,
+                              color=col, rotation=90)
+                if np.isfinite(fv):
+                    ax_f.text(xi + off, fv + 0.015, f"{fv:.3f}", ha="center",
+                              va="bottom", fontsize=6, color=col, rotation=90)
+        ax_e.axhline(TARGET_EFF, color="#79776f", lw=0.7, ls=":")
+        ax_e.set_ylim(0.80, 1.10)
+        ax_e.set_yticks([0.80, 0.85, 0.90, 0.95, 1.00])
+        ax_e.set_ylabel("efficiency at the wp")
+        ax_e.set_xticks([])
+        ax_e.legend(fontsize=7.5, ncols=2, loc="upper left",
+                    bbox_to_anchor=(0.0, 1.22))
+        ax_f.set_ylim(0, 1.12)
+        ax_f.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+        ax_f.set_ylabel("false rate at the wp")
+        ax_f.set_xticks(xs, [f"{n}\nT={T}"
+                             + ("\n(3 reps, mean)" if (n, T) == ("heavy", 100)
+                                else "") for n, T in grid], fontsize=7.5)
+
+    # Fig 1 — composed frontiers (heavy T=200, classical + 1BQF)
+    fig, axs = plt.subplots(1, 2, figsize=(12.8, 5.4))
+    draw_frontier_classical(axs[0], tag="")
+    draw_frontier_1bqf(axs[1], tag="")
+    fig.tight_layout()
+    fig.savefig(figdir / "dp_postselect_uniqueness_frontiers.png",
+                bbox_inches="tight")
+    plt.close(fig)
+
+    # Fig 2 — per-class census
+    fig, ax = plt.subplots(figsize=(8.8, 4.6))
+    draw_census(ax, tag="")
+    fig.tight_layout()
+    fig.savefig(figdir / "dp_postselect_uniqueness_census.png",
+                bbox_inches="tight")
+    plt.close(fig)
+
+    # Fig 3 — robustness & density (eff and far, same grid)
+    fig, (ax_e, ax_f) = plt.subplots(2, 1, figsize=(9.6, 6.8))
+    draw_robustness(ax_e, ax_f)
+    fig.suptitle("Robustness & density: working points across noise × T "
+                 "(classical solve)", y=0.99, fontsize=11)
+    fig.tight_layout(rect=(0, 0, 1, 0.90))
+    fig.savefig(figdir / "dp_postselect_uniqueness_robustness.png",
+                bbox_inches="tight")
+    plt.close(fig)
+
+    # Fig 4 — working-point map (all cells, base → composed)
+    fig, ax = plt.subplots(figsize=(7.6, 5.6))
+    draw_wp_map(ax, tag="")
+    fig.tight_layout()
+    fig.savefig(figdir / "dp_postselect_uniqueness_wpmap.png",
+                bbox_inches="tight")
+    plt.close(fig)
+
+    # Overview 2x2 (kept filename for PROJECT_STATUS / older links)
+    fig = plt.figure(figsize=(13.4, 10.0))
+    gs = fig.add_gridspec(2, 2)
+    draw_frontier_classical(fig.add_subplot(gs[0, 0]))
+    draw_frontier_1bqf(fig.add_subplot(gs[0, 1]))
+    draw_census(fig.add_subplot(gs[1, 0]))
+    draw_wp_map(fig.add_subplot(gs[1, 1]))
     anyrole = df[df.selector == "filter-anyrole@basewp"]
-    note = " · ".join(f"{r.noise} T={r.T}: eff {r.eff:.2f}"
+    note = " · ".join(f"{r.noise} T={r['T']}: eff {r.eff:.2f}"
                       for _, r in anyrole.iterrows())
     fig.suptitle("Hit-uniqueness as classical POST-SELECTION: the occupancy "
                  "physics without the Hamiltonian damage", y=0.995, fontsize=11)
@@ -472,15 +580,15 @@ def main():
             "(identical to the proof figure) · negative control (anyrole "
             f"pooled-slot argmax) kills track interiors: {note} · "
             "provenance: dp_postselect_uniqueness.py")
-    fig.tight_layout(rect=(0, 0.055, 1, 0.965))
-    fig.text(0.01, 0.004, foot, fontsize=5.8, color="#52514e", va="bottom")
-    fig.savefig(HERE / "figures" / "dp_postselect_uniqueness.png",
-                bbox_inches="tight")
+    fig.tight_layout(rect=(0, 0.045, 1, 0.965))
+    fig.text(0.01, 0.004, foot, fontsize=5.8, color="#52514e", va="bottom",
+             wrap=True)
+    fig.savefig(figdir / "dp_postselect_uniqueness.png", bbox_inches="tight")
     plt.close(fig)
 
     say(df[["noise", "T", "rep", "solver", "selector", "eff", "far"]]
         .round(4).to_string(index=False))
-    say(f"[done] {time.time()-t0:.0f}s -> figures/dp_postselect_uniqueness.png")
+    say(f"[done] {time.time()-t0:.0f}s -> figures/dp_postselect_uniqueness{{,_frontiers,_census,_robustness,_wpmap}}.png")
 
 
 if __name__ == "__main__":
