@@ -1,6 +1,26 @@
 # Project Status & TODO — Quantum Track Reconstruction
 
-_Last updated: 2026-06-14_
+_Last updated: 2026-07-17_
+
+### 🆕 2026-07-17 — occupancy as post-selection · erf Trotter arbiter · fork quantum NO-GO
+Three studies closed in one pass (all store-backed, committed `7e755992`/`747fed7a`, write-ups
+Provisional/verify-ready in Notion):
+- **Hit-uniqueness post-selection** (`qtrk_pipeline.postselect`, study script
+  `Bifurification/dp_postselect_uniqueness.py`): Denby occupancy applied AFTER the solve as a
+  per-(hit, role) slot filter. Heavy T=200: far 0.65→**0.04** at eff 0.94 (far-optimal; the
+  in-matrix term never reaches it); moderate T=200: **0.9975/0.0000** — beats in-matrix outright
+  at the eff≥0.99 gate with zero solver change. Composes with the 1BQF notch (0.92/0.05).
+- **ERF exact-evolution arbiter** (`ERF/erf_exact_evolution_check.py`): the kink-width wp99
+  reversal is **Trotter-dominated** (far 0.834→0.218 moderate / 0.943→0.576 heavy without the
+  product formula); step2x deficit is real doubled-coupling physics; a genuine residual remains
+  at heavy kink. Circuit fix path = QSVT X edge-colour-ordered DSS.
+- **Fork penalty on real solvers = NO-GO** (`QSVT/Codesign/03_fork_quantum_noisy.py`, store study
+  `QSVT_fork_noisy`): with γ*(β) validity, auto-tracked notch and a measured-spectrum comb, the
+  1BQF worsens strictly with β (far 0.65→0.73→0.96); the atlas's emulated 99.1/0.9 three-knob
+  target does not survive; the uniqueness gate, not the fork, controls the false rate quantum-side.
+  Heterogeneous β=0.5 breaks the product formula (cos 0.944) — same split as the erf arbiter.
+Also: audit content-check closed (2 prose fixes; both Verify store notebooks re-executed against
+the current 2772-row store — wp99 curves now carry the WP_TAU_FLOOR fix).
 
 ### 🧮 QSVT (sub-project, 2026-06-10/11) — `QSVT/`
 Polynomial spectral filters generalising the 1BQF's single cosine notch — now a
@@ -88,8 +108,8 @@ problems entirely. Current open work only:_
 ### Toy_Characterisation
 - [ ] **ERF (T5)** — Youden-J / EER threshold optimisation on pooled per-segment store
   scores (`qp.load_solution` + truth), then finalise the report.
-- [ ] **Verify_new_results** — finish the store-backed `Quantum_segment_level_store.ipynb`;
-  retire the old local-pkl `Quantum_segment_level_analysis.ipynb`.
+- [x] **Verify_new_results** — store-backed notebooks re-executed & frozen 2026-07-17 against
+  the 2772-row store (legacy local-pkl notebook deleted 2026-07-03).
 - [ ] Run the segment analysis with a 0.5 % drop rate.
 - [ ] **Quantum_Toy_Study** — decide whether it needs its own write-up or is fully
   superseded by the `quantum_segment` reports, then close out.
