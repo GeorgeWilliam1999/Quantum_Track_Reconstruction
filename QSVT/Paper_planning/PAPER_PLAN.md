@@ -1,5 +1,17 @@
 # Paper plan — QSVT spectral-filter engineering for particle track reconstruction
 
+> **STATUS 2026-07-18 — the paper is WRITTEN.** `qsvt_velo_paper/main.tex` ("From one
+> bit to a fitted polynomial", 20 pp, v2 @ `a4be48b6` + same-day author/citation/
+> benchmark edits) supersedes this plan's thesis: the headline is the **fitted
+> response** (QSVT XII — fit to the measured false pile-up on the motif lines,
+> beats classical below the fragment floor; fork redeemed at γ*), NOT the clean-toy
+> "comb dominates both baselines" claim below. The occupancy gate / three-knob
+> framing was retracted 2026-07-18 (occupancy = classical-side post-selection only).
+> This file remains the WP/evidence tracker; the LaTeX is the distributable and the
+> Notion "verbose technical companion" write-up mirrors it for internal use.
+> Remaining before submission: venue decision + Overleaf pass; §4 evaluator claims
+> now carry a persisted benchmark (`qsvt_velo_paper/benchmarks/`).
+
 **Follow-up to:**
 1. *A quantum algorithm for track reconstruction in the LHCb vertex detector*,
    Nicotra et al., JINST **18** P11028 (2023) — the Ising-like segment Hamiltonian;
@@ -256,8 +268,10 @@ C7. **Operator–response co-design: the ε-windowed bifurcation term lifts the
    methodology (C4) and the headline table; co-design results (WP7);
    robustness (WP1); scale (WP2); (WP5 Run-3).
 8. **Discussion** — what the floor means for spectral methods at HL-LHC
-   density; the three-knob division of labour (operator: hit-topology errors;
-   response: spectral errors; occupancy/track-level: the rest); dequantisation
+   density; the two engineered pillars (operator: hit-topology errors;
+   response: spectral errors) — fragment recovery is optional classical-side
+   post-selection, not a third pillar [three-knob framing retracted 2026-07-18];
+   dequantisation
    honesty (WP6); outlook (fault-tolerant costing, parity/phase-angle QSVT,
    amplitude amplification).
 9. **Conclusion.**

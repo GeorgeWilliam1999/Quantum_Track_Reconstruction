@@ -1,0 +1,68 @@
+{
+  "config": {
+    "T": 200,
+    "noise": "heavy",
+    "eps": 0.006312668537322595,
+    "beta": 0.0,
+    "gmode": "ref"
+  },
+  "reps": {
+    "0": {
+      "n_true": 788,
+      "n_seg": 157609,
+      "tol_1e-6": {
+        "n_floor_true": 692,
+        "n_isolated_stub": 4,
+        "n_multi_seg": 688
+      },
+      "tol_1e-8": {
+        "n_floor_true": 692,
+        "n_isolated_stub": 4,
+        "n_multi_seg": 688
+      },
+      "tol_1e-10": {
+        "n_floor_true": 692,
+        "n_isolated_stub": 4,
+        "n_multi_seg": 688
+      }
+    },
+    "1": {
+      "n_true": 783,
+      "n_seg": 156611,
+      "tol_1e-6": {
+        "n_floor_true": 707,
+        "n_isolated_stub": 2,
+        "n_multi_seg": 705
+      },
+      "tol_1e-8": {
+        "n_floor_true": 707,
+        "n_isolated_stub": 2,
+        "n_multi_seg": 705
+      },
+      "tol_1e-10": {
+        "n_floor_true": 707,
+        "n_isolated_stub": 2,
+        "n_multi_seg": 705
+      }
+    },
+    "2": {
+      "n_true": 786,
+      "n_seg": 157212,
+      "tol_1e-6": {
+        "n_floor_true": 684,
+        "n_isolated_stub": 5,
+        "n_multi_seg": 679
+      },
+      "tol_1e-8": {
+        "n_floor_true": 684,
+        "n_isolated_stub": 5,
+        "n_multi_seg": 679
+      },
+      "tol_1e-10": {
+        "n_floor_true": 684,
+        "n_isolated_stub": 5,
+        "n_multi_seg": 679
+      }
+    }
+  }
+}

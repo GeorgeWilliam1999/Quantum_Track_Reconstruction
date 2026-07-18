@@ -1,0 +1,38 @@
+{
+  "config": {
+    "gamma": 3.0,
+    "delta": 1.0,
+    "sigma_scatt": 0.0001,
+    "sigma_res": 0.0,
+    "phi_max": 0.2,
+    "hit_ineff": 0.0,
+    "epsilon": 0.002,
+    "degree": 40,
+    "design": "line comb (production)"
+  },
+  "host": {
+    "node": "stbc-i2.nikhef.nl",
+    "python": "3.12.11",
+    "numpy": "2.3.5"
+  },
+  "timing_T1000": {
+    "n_seg": 4000000,
+    "build_s": 4.9,
+    "solve_s": [
+      1.36,
+      1.23,
+      1.26
+    ],
+    "solve_s_median": 1.26
+  },
+  "agreement_T10": {
+    "n_seg": 400,
+    "max_absdiff_matrixfree_vs_circuit": 7.799316747991725e-15,
+    "max_absdiff_matrixfree_vs_streaming": 8.326672684688674e-17,
+    "claim_1e9_holds": true
+  },
+  "verdict": {
+    "timing_claim_1p6s": true,
+    "agreement_claim_1e9": true
+  }
+}

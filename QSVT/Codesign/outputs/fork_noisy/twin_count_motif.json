@@ -1,0 +1,26 @@
+{
+  "0": {
+    "n_true": 788,
+    "pair_trues": 4,
+    "triple_trues": 8,
+    "total": 12,
+    "isolated_true_stubs": 4,
+    "total_with_stubs": 16
+  },
+  "1": {
+    "n_true": 783,
+    "pair_trues": 10,
+    "triple_trues": 3,
+    "total": 13,
+    "isolated_true_stubs": 2,
+    "total_with_stubs": 15
+  },
+  "2": {
+    "n_true": 786,
+    "pair_trues": 4,
+    "triple_trues": 9,
+    "total": 13,
+    "isolated_true_stubs": 5,
+    "total_with_stubs": 18
+  }
+}

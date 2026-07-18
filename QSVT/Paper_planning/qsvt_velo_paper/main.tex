@@ -40,9 +40,10 @@
 engineered spectral filters for track reconstruction\\
 in a noisy LHCb VELO toy model}
 
-% TODO: author list + affiliations to be settled before submission.
-\author{George W.\ Scriven\thanks{george.w.scriven@gmail.com. Author list and
-affiliations to be settled; this draft is single-author for the moment.}}
+\author{George William Scriven\thanks{george.w.scriven@gmail.com}\\[2pt]
+\normalsize Maastricht University, Maastricht, The Netherlands\\
+\normalsize Hasselt University, Hasselt, Belgium\\
+\normalsize Nikhef, Amsterdam, The Netherlands}
 
 \date{\today}
 
@@ -100,7 +101,9 @@ The lineage of this work is short and worth stating precisely. Nicotra et
 al.~\cite{nicotra2023} showed that track reconstruction in a simplified
 model of the LHCb vertex detector (VELO) can be phrased as a linear system
 $A\mathbf{x}=\mathbf{b}$ over track segments and solved with the
-Harrow--Hassidim--Lloyd algorithm~\cite{hhl2009}. The follow-up
+Harrow--Hassidim--Lloyd algorithm~\cite{hhl2009}; a restricted-phase-estimation
+variant of that construction was subsequently reported in
+ref.~\cite{trackhhl_epj}. The follow-up
 paper~\cite{trackhhl} observed that the full inversion is overkill. The
 interesting information is which segments are active, not their precise
 weights, so a single-ancilla circuit, the one-bit quantum filter (1BQF),
@@ -552,11 +555,15 @@ its predecessors.
 Simulation-side, eq.~\eqref{eq:walkcheb} gives a matrix-free
 evaluator: $p(A)\mathbf{b}$ by the Chebyshev three-term recursion on
 sparse matrix-vector products, $\mathcal{O}(d\cdot{\rm nnz}(A))$
-flops, which runs in about $1.6$\,s at $T=1000$ ($n=4\times10^{6}$)
-and agrees with the full qiskit circuit and with a gate-streaming
-evaluation to $10^{-9}$ where all three are affordable. All large-$T$
-results below use this exact evaluator; nothing in this paper relies
-on an approximate simulation of the quantum readout.
+flops. In a persisted benchmark (repository
+\texttt{qsvt\_velo\_paper/benchmarks/}, 2026-07-18) the production
+$d=40$ comb solve runs in $1.2$--$1.7$\,s at $T=1000$
+($n=4\times10^{6}$), and the evaluator agrees with the full qiskit
+circuit and with a gate-streaming evaluation to better than
+$10^{-14}$ at circuit-affordable size (three-way maximum
+discrepancy $8\times10^{-15}$). All large-$T$ results below use this
+exact evaluator; nothing in this paper relies on an approximate
+simulation of the quantum readout.
 
 \subsection{Resource summary}
 \label{sec:qsvt:resources}
@@ -1129,14 +1136,19 @@ Third, the wall at $\eff\ge0.99$ is real, universal, and now has a
 name. At the strict efficiency-first point everything, classical
 included, floods back to $\far\approx0.65$. The per-component
 census locates the cause exactly: $\approx2\%$ of \emph{true}
-segments (directly counted: $15$ and $22$ of $783$/$788$ on two of
-the three events\footnote{On the third event the census heuristic
-reads $52$ through a scale-sensitive leak-tier definition (its fit
-selected a tenfold-larger regulariser), and it degenerates on the
-fork configurations, so I quote only the directly-counted events
-and flag the third as unresolved. The robust, heuristic-free
-statement is the measured wall itself: every solver holds
-$\eff=0.98$ and none holds $\eff=0.99$, on all three events.}) are
+segments (systematic motif-twin census: $16$, $15$ and $18$ of
+$788$/$783$/$786$ on the three events\footnote{The census
+(\texttt{QSVT/Codesign/05\_direct\_twin\_count.py}, 2026-07-18)
+counts true segments whose component formation is exactly the false
+pair or triple motif, plus isolated stubs; it is
+tolerance-independent and replaces an earlier leak-tier heuristic
+that read $52$ on the third event through a scale-sensitive
+definition (its fit selected a tenfold-larger regulariser). A
+by-hand count on the first event previously reached $22$ by also
+admitting a handful of contaminated mixed chains under a broader
+reading. The robust, definition-free statement is the measured wall
+itself: every solver holds $\eff=0.98$ and none holds $\eff=0.99$,
+on all three events.}) are
 spectral twins of the false motifs. They are the hit-drop fragments
 of section~\ref{sec:comb:drop}: a broken track's two-segment piece
 \emph{is} a pair, sitting on the pair line, in a pure-true
@@ -1347,6 +1359,13 @@ X.~Chiotopoulos, D.~Nicotra, G.~Scriven, K.~Driessens, M.~Merk,
 J.~Sch\"utz, J.~de~Vries and M.~H.~M.~Winands,
 \emph{TrackHHL: The 1-Bit Quantum Filter for particle trajectory
 reconstruction}, arXiv:2601.07766.
+
+\bibitem{trackhhl_epj}
+X.~Chiotopoulos, M.~L.~Martinez, D.~Nicotra, J.~A.~de~Vries,
+K.~Driessens, M.~Merk and M.~H.~Winands,
+\emph{TrackHHL: A Quantum Computing Algorithm for Track Reconstruction
+at the LHCb}, EPJ Web Conf.\ \textbf{337} (2025) 01181;
+arXiv:2511.11458.
 
 \bibitem{denby1988}
 B.~Denby,
