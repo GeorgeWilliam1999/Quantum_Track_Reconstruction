@@ -54,129 +54,132 @@ Track reconstruction in the LHCb vertex detector can be written as a linear
 system $A\mathbf{x}=\mathbf{b}$ over track \emph{segments}, whose solution
 scores each segment by how strongly its neighbours reinforce it. Two earlier
 papers solved this system with quantum linear algebra: first with the HHL
-algorithm, then --- much more cheaply --- with a one-bit variant, the one-bit
+algorithm, and then far more cheaply with a one-bit variant, the one-bit
 quantum filter (1BQF), which replaces the full inversion by a single cosine
-filter of the Hamiltonian with one spectral zero. In this paper I take that
-idea to its logical destination. The 1BQF is the degree-one member of the
-family of polynomial spectral transforms provided by the quantum singular
-value transformation (QSVT), and once the problem is viewed this way the
-design question changes character: it is no longer \emph{which algorithm
-inverts $A$}, but \emph{which function of $\lambda$ separates true from false
-segments}. On clean events the answer is a four-line comb pinned to the
-eigenvalues of a five-hit track, and it drives the segment false rate from
-$20.5\%$ (classical, $T{=}1000$ tracks) to $0.9\%$ at $92\%$
-efficiency. On noisy events the answer must be \emph{measured}: the false
-weight piles up on the eigenvalue lines of specific two- and three-segment
-motifs, and a polynomial fitted with roots at the measured pile-up beats the
-classical baseline at every attainable efficiency below a sharply defined
-\emph{fragment floor} --- the small population of true fragments that are
-spectral twins of the false motifs, which no function of $\lambda$ can
-separate. Along the way I show that the two natural Hamiltonian modifications
+filter of the Hamiltonian with one spectral zero. In this paper I develop
+that idea further. The 1BQF is the degree-one member of the family of
+polynomial spectral transforms provided by the quantum singular value
+transformation (QSVT), and once the problem is viewed this way the design
+question changes: it is no longer a question of which algorithm inverts
+$A$, but of which function of $\lambda$ separates true from false segments.
+On clean events the answer is a four-line comb pinned to the eigenvalues of
+a five-hit track, and it drives the segment false rate from $20.5\%$
+(classical, $T{=}1000$ tracks) to $0.9\%$ at $92\%$ efficiency. On noisy
+events the answer must be measured: the false weight piles up on the
+eigenvalue lines of specific two- and three-segment motifs, and a
+polynomial fitted with roots at the measured pile-up beats the classical
+baseline at every attainable efficiency below a sharply defined
+\emph{fragment floor}, the small population of true fragments that are
+spectral twins of the false motifs and that no function of $\lambda$ can
+separate. I also show that the two natural Hamiltonian modifications
 inherited from the classical literature behave very differently from what
-their classical performance suggests: the Denby--Peterson occupancy term is
-actively harmful to any notch-equipped solver and belongs outside the
-Hamiltonian as a classical post-selection gate (which alone cuts the
-heavy-noise false rate from $65\%$ to $4\%$, conceding five points of
-efficiency), while the bifurcation (fork) term --- a
-no-go when paired with an unfitted filter --- becomes a net win exactly when
-the polynomial is refitted to the spectrum it produces. The result is a
-three-knob design: the operator shapes the spectrum, the fitted response
-separates it, and hit-level post-selection collects what the spectrum cannot.
+their classical performance suggests. The Denby--Peterson occupancy term,
+although it helps the classical solver, is actively harmful to any solver
+that relies on a spectral zero and has no place in the Hamiltonian. The
+bifurcation (fork) term reads as a no-go when paired with an unfitted
+filter, and becomes a net win exactly when the polynomial is refitted to
+the spectrum it produces. The result is a two-part design rule: the
+operator shapes the spectrum, and the fitted response separates it; what
+the spectrum provably cannot separate is left, explicitly, to classical
+track-level information outside the scope of this paper.
 \end{abstract}
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{Introduction}
 \label{sec:intro}
 
-Charged-particle track reconstruction is, at heart, a combinatorial matching
-problem: a detector hands us a cloud of hits, and we must decide which hits
-belong together. At the High-Luminosity LHC this cloud becomes dense enough
-that the matching cost dominates real-time reconstruction budgets, which is
-why the tracking community has spent the past decade auditioning every
-alternative computational paradigm --- GPUs, FPGAs, neural networks, and,
-in the line of work this paper continues, quantum computers.
+Charged-particle track reconstruction is, at heart, a combinatorial
+matching problem: a detector hands us a cloud of hits, and we must decide
+which hits belong together. At the High-Luminosity LHC this cloud becomes
+dense enough that the matching cost dominates real-time reconstruction
+budgets, and the tracking community has responded by testing essentially
+every alternative computing platform: GPUs, FPGAs, neural networks, and, in
+the line of work this paper continues, quantum computers.
 
-The specific lineage matters here, so let me state it plainly. Nicotra
-et al.~\cite{nicotra2023} showed that track reconstruction in a simplified
+The lineage of this work is short and worth stating precisely. Nicotra et
+al.~\cite{nicotra2023} showed that track reconstruction in a simplified
 model of the LHCb vertex detector (VELO) can be phrased as a linear system
 $A\mathbf{x}=\mathbf{b}$ over track segments and solved with the
 Harrow--Hassidim--Lloyd algorithm~\cite{hhl2009}. The follow-up
-paper~\cite{trackhhl} observed that the full inversion is overkill: because
-the interesting information is \emph{which} segments are active rather than
-their precise weights, a single-ancilla circuit --- the one-bit quantum
-filter, 1BQF --- suffices. The 1BQF applies one cosine function of the
-Hamiltonian, placed so that its zero lands exactly on the eigenvalue shared
-by every isolated fake segment, and reads out the survivors. It is cheap,
-it is hardware-friendly, and it was demonstrated on trapped-ion and
-superconducting devices.
+paper~\cite{trackhhl} observed that the full inversion is overkill. The
+interesting information is which segments are active, not their precise
+weights, so a single-ancilla circuit, the one-bit quantum filter (1BQF),
+suffices. The 1BQF applies one cosine function of the Hamiltonian, placed
+so that its zero lands exactly on the eigenvalue shared by every isolated
+fake segment, and reads out the survivors. It is cheap, it suits near-term
+hardware, and it was demonstrated on trapped-ion and superconducting
+devices.
 
-This paper asks the question that the 1BQF makes unavoidable. A cosine with
-one zero is a \emph{polynomial filter of degree one}\footnote{Strictly, a
-trigonometric function realised at degree one in the Chebyshev basis of the
-walk operator; section~\ref{sec:qsvt} makes this exact.}. The quantum
-singular value transformation (QSVT)~\cite{gslw2019,martyn2021} tells us
-that a quantum computer can apply essentially \emph{any} bounded polynomial
-of the Hamiltonian at a cost linear in its degree. So, what could we do with
-more than one zero? Which polynomial should we choose? And --- the question
-that turns out to carry all the physics --- what happens to that choice when
-the Hamiltonian itself changes, because the detector is noisy or because we
-have added constraint terms to help it?
+This paper asks the question that follows naturally from the 1BQF. A
+cosine with one zero is a polynomial filter of degree
+one\footnote{Strictly, a trigonometric function realised at degree one in
+the Chebyshev basis of the walk operator; section~\ref{sec:qsvt} makes
+this exact.}. The quantum singular value transformation
+(QSVT)~\cite{gslw2019,martyn2021} tells us that a quantum computer can
+apply essentially any bounded polynomial of the Hamiltonian at a cost
+linear in its degree. So, what could we do with more than one zero? Which
+polynomial should we choose? And what happens to that choice when the
+Hamiltonian itself changes, because the detector is noisy or because we
+have added constraint terms to help it? In my opinion this last question
+carries most of the physics, and most of this paper is spent answering
+it.
 
 I answer these questions on the same toy model as the two predecessor
-papers, extended with realistic noise, and the answers organise themselves
-into a design philosophy I will refer to as \emph{fitting the response to
-the spectrum}. In outline:
+papers, extended with realistic noise. The answers can be summarised as a
+single working method, which I will refer to as fitting the response to
+the spectrum:
 
 \begin{enumerate}[leftmargin=2em]
 \item On clean events the true-track spectrum is \emph{discrete}: detector
 geometry pins every true track to the same five-hit chain, whose four
-eigenvalues are known in closed form. A comb of narrow passes at those four
-lines --- and nothing else --- separates true from false essentially
-perfectly up to the densities I can simulate ($T=1000$ tracks, four million
-segments), where the classical solver's false rate has climbed to
+eigenvalues are known in closed form. A comb of narrow passes at those
+four lines, and nothing else, separates true from false essentially
+perfectly up to the densities I can simulate ($T=1000$ tracks, four
+million segments), where the classical solver's false rate has climbed to
 $20.5\%$.
 \item On noisy events the false population moves: it concentrates on the
 eigenvalue lines of specific small \emph{motifs} (hit-sharing pairs and
 triples), which sit off the true lines but inside any naive pass window.
-The correct response cannot be written down a priori; it must be fitted to
-the \emph{measured} pile-up. Once it is, the quantum false rate drops below
+The correct response cannot be written down a priori; it must be fitted
+to the measured pile-up. Once it is, the quantum false rate drops below
 the classical one at every efficiency below a floor that I can identify,
 count, and explain segment by segment.
-\item Hamiltonian engineering and response engineering are coupled knobs.
-The occupancy penalty, helpful classically, is poison to any solver that
-relies on a spectral zero --- I prove this mechanistically and relocate the
-constraint to a classical post-selection gate, where it does more work than
-it ever did in the matrix. The fork penalty genuinely improves the spectrum,
-but only a \emph{refitted} response can collect the improvement: with the
-production comb it reads as a no-go, with the fitted response it is a net
-win. Changing the operator moves the activations; moving activations change
-the polynomial. That sentence is the paper.
+\item Hamiltonian engineering and response engineering are coupled. The
+occupancy penalty, helpful classically, damages any solver that relies on
+a spectral zero; I show the mechanism and conclude that the constraint
+belongs outside the Hamiltonian altogether. The fork penalty genuinely
+improves the spectrum, but only
+a refitted response can collect the improvement: with the production comb
+it reads as a no-go, with the fitted response it is a net win. Changing
+the operator moves the activations, and moving the activations changes
+the polynomial we have to fit.
 \end{enumerate}
 
 The paper is organised as follows. Section~\ref{sec:toy} builds the toy
-model and the segment Hamiltonian from zero, including the exact activation
-levels that make everything else quantitative. Section~\ref{sec:onebit}
-reviews the 1BQF as a spectral filter and establishes the working-point
-conventions used throughout. Section~\ref{sec:qsvt} develops the QSVT
-machinery --- block encoding, qubitization, and the
-linear-combination-of-Chebyshev construction --- at the level of detail
-needed to count qubits and gates. Section~\ref{sec:comb} designs and
-evaluates the line comb on clean events, including its resource scaling and
-its provable limits. Section~\ref{sec:noise} introduces the noise model and
-shows what it does to each solver. Section~\ref{sec:occupancy} dissects the
-occupancy term and introduces the hit-uniqueness gate.
-Section~\ref{sec:fork} does the same for the fork term and documents the
-no-go that motivates the final act. Section~\ref{sec:fit} fits the
-polynomial to the measured false pile-up and presents the headline
-comparison. Section~\ref{sec:limits} collects limitations ---
-realizability, generalization, Trotterization, and what a real detector
-geometry changes --- and section~\ref{sec:conclusion} concludes.
+model and the segment Hamiltonian from zero, including the exact
+activation levels that make everything else quantitative.
+Section~\ref{sec:onebit} reviews the 1BQF as a spectral filter and
+establishes the working-point conventions used throughout.
+Section~\ref{sec:qsvt} develops the QSVT machinery (block encoding,
+qubitization, and the linear-combination-of-Chebyshev construction) at
+the level of detail needed to count qubits and gates.
+Section~\ref{sec:comb} designs and evaluates the line comb on clean
+events, including its resource scaling and its provable limits.
+Section~\ref{sec:noise} introduces the noise model and shows what it does
+to each solver. Section~\ref{sec:occupancy} dissects the occupancy term.
+Section~\ref{sec:fork} does the
+same for the fork term and documents the no-go that motivates the
+refit. Section~\ref{sec:fit} fits the polynomial to the measured false
+pile-up and presents the main comparison. Section~\ref{sec:limits}
+collects the limitations: realizability, generalization, Trotterization,
+and what a real detector geometry changes. Section~\ref{sec:conclusion}
+concludes.
 
-A remark on style before we begin: this paper is deliberately verbose. The
-predecessor papers compressed the segment-Hamiltonian formalism to a few
-paragraphs; here I want every level, every eigenvalue, and every convention
-on the table, because the physics of \emph{why} filters succeed and fail
-lives in exactly those details.
+A remark on style before we begin. This paper is deliberately verbose.
+The predecessor papers compressed the segment-Hamiltonian formalism to a
+few paragraphs; here I want every level, every eigenvalue, and every
+convention on the table, because the physics of why filters succeed and
+fail lives in exactly those details.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{The toy model and the segment Hamiltonian}
@@ -186,17 +189,17 @@ lives in exactly those details.
 \label{sec:toy:events}
 
 The toy detector is the standard simplified VELO of
-refs.~\cite{nicotra2023,trackhhl}: parallel planes perpendicular to the beam
-axis ($z$), each recording a two-dimensional point where a charged particle
-crosses it. An event is generated by drawing $T$ tracks from a common
-primary vertex on the $z$-axis, with polar angles inside a generation cone,
-and propagating each as a straight line through the planes. Every track
-leaves one hit per plane. Detector effects enter as controlled
-perturbations, and I will always state the triple in force:
+refs.~\cite{nicotra2023,trackhhl}: parallel planes perpendicular to the
+beam axis ($z$), each recording a two-dimensional point where a charged
+particle crosses it. An event is generated by drawing $T$ tracks from a
+common primary vertex on the $z$-axis, with polar angles inside a
+generation cone, and propagating each as a straight line through the
+planes. Every track leaves one hit per plane. Detector effects enter as
+controlled perturbations, and I will always state the triple in force:
 multiple-scattering kinks of width $\sigma_{\rm scatt}$ applied at each
-plane crossing, Gaussian hit-position smearing of width $\sigma_{\rm res}$,
-and a hit-drop (inefficiency) probability applied hit by hit. The clean
-configuration used in section~\ref{sec:comb} is
+plane crossing, Gaussian hit-position smearing of width
+$\sigma_{\rm res}$, and a hit-drop (inefficiency) probability applied hit
+by hit. The clean configuration used in section~\ref{sec:comb} is
 $(\sigma_{\rm scatt},\sigma_{\rm res},{\rm drop})=(10^{-4},\,0,\,0)$; the
 heavy configuration used from section~\ref{sec:noise} onward is
 $(10^{-4},\,20\,\mu\mathrm{m},\,1\%)$.
@@ -209,20 +212,21 @@ n_{\rm seg}=4T^{2},\qquad n_{\rm true}=4T,\qquad
 n_{\rm false}=4T(T-1),
 \label{eq:combinatorics}
 \end{equation}
-where $n_{\rm true}$ counts the segments that connect two hits of the same
-generated track. The needle-in-haystack character of the problem is the
-ratio $n_{\rm true}/n_{\rm seg}=1/T$: at $T=1000$ only one segment in a
-thousand is real, and the false population grows quadratically while the
-true one grows linearly. Any segment classifier, classical or quantum,
-fights this composition before it fights anything else.
+where $n_{\rm true}$ counts the segments that connect two hits of the
+same generated track. The problem is a needle in a haystack, and the
+ratio $n_{\rm true}/n_{\rm seg}=1/T$ says how deep the hay is: at
+$T=1000$ only one segment in a thousand is real, and the false population
+grows quadratically while the true one grows linearly. Any segment
+classifier, classical or quantum, fights this composition before it
+fights anything else.
 
 \subsection{The Hamiltonian}
 \label{sec:toy:ham}
 
 Following Denby and Peterson's neural formulation of track
 finding~\cite{denby1988,peterson1989} as adapted by
-refs.~\cite{nicotra2023,trackhhl}, we encode an event in a quadratic energy
-over segment activations $x_i\in\mathbb{R}$,
+refs.~\cite{nicotra2023,trackhhl}, we encode an event in a quadratic
+energy over segment activations $x_i\in\mathbb{R}$,
 \begin{equation}
 E(\mathbf{x})=\tfrac12\,\mathbf{x}^{\!\top}\!A\,\mathbf{x}
 -\delta\,\mathbf{1}^{\!\top}\mathbf{x},
@@ -230,41 +234,42 @@ E(\mathbf{x})=\tfrac12\,\mathbf{x}^{\!\top}\!A\,\mathbf{x}
 A=(\gamma+\delta)\,I-C,
 \label{eq:energy}
 \end{equation}
-where $C$ is the 0/1 \emph{compatibility adjacency}: $C_{ij}=1$ exactly when
-segments $i$ and $j$ share a hit as head-to-tail continuations (the end hit
-of one is the start hit of the other) \emph{and} their mutual angle is below
-an acceptance $\varepsilon$. The constants are a self-penalty $\gamma$
-(discouraging indiscriminate activation), a bias $\delta$ (rewarding
-activation), and throughout the main text $\gamma=3$, $\delta=1$, so the
-constant diagonal is $s\equiv\gamma+\delta=4$. Minimising
+where $C$ is the 0/1 \emph{compatibility adjacency}: $C_{ij}=1$ exactly
+when segments $i$ and $j$ share a hit as head-to-tail continuations (the
+end hit of one is the start hit of the other) and their mutual angle is
+below an acceptance $\varepsilon$. The constants are a self-penalty
+$\gamma$ (discouraging indiscriminate activation) and a bias $\delta$
+(rewarding activation); throughout the main text $\gamma=3$, $\delta=1$,
+so the constant diagonal is $s\equiv\gamma+\delta=4$. Minimising
 eq.~\eqref{eq:energy} gives the linear system
 \begin{equation}
 A\,\mathbf{x}=\delta\,\mathbf{1},
 \label{eq:linsys}
 \end{equation}
 which I solve classically with MINRES ($A$ is symmetric, sparse, and at
-$\gamma=3$ comfortably positive definite). The intuition is a voting
-market: each segment starts with the same bias-funded credit $\delta$, and
-the off-diagonal couplings let aligned neighbours reinforce one another. A
-segment embedded in a long, straight chain of compatible neighbours
-accumulates support; a segment with no compatible continuation is left with
-only its own bias against its own penalty.
+$\gamma=3$ comfortably positive definite). A useful picture is a voting
+market: each segment starts with the same bias-funded credit $\delta$,
+and the off-diagonal couplings let aligned neighbours reinforce one
+another. A segment embedded in a long, straight chain of compatible
+neighbours accumulates support; a segment with no compatible continuation
+is left with only its own bias against its own penalty.
 
 The acceptance $\varepsilon$ deserves its own sentence, because it is the
 single most consequential experimental knob. It is set by a closed-form
 formula from the expected root-mean-square kink between consecutive true
 segments under the noise triple in force, so that true continuations pass
-the angular cut; on the heavy configuration this gives
-$\varepsilon=6.3\,$mrad, fifteen times wider than the clean-configuration
-value, and section~\ref{sec:noise} shows what that width admits.
+the angular cut. On the heavy configuration this gives
+$\varepsilon=6.3\,$mrad, fifteen times wider than the
+clean-configuration value, and section~\ref{sec:noise} shows what that
+width admits.
 
 \subsection{Exact activation levels: the atlas}
 \label{sec:toy:levels}
 
-Because $A$ has constant diagonal, its action decomposes over the connected
-components of the compatibility graph, and small components can be solved
-by hand. This is worth doing once in full, because these little closed
-forms are the vocabulary of every result in the paper.
+Because $A$ has constant diagonal, its action decomposes over the
+connected components of the compatibility graph, and small components can
+be solved by hand. This is worth doing once in full, because these little
+closed forms are the vocabulary of every result in the paper.
 
 An \emph{isolated} segment (no compatible neighbour) has the scalar
 equation $(\gamma+\delta)x=\delta$, so
@@ -272,31 +277,32 @@ equation $(\gamma+\delta)x=\delta$, so
 x_{\rm iso}=\frac{\delta}{\gamma+\delta}=\frac14=0.250 .
 \label{eq:iso}
 \end{equation}
-This is the false \emph{attractor}: at any multiplicity, the overwhelming
-majority of the $4T(T-1)$ false segments are isolated and sit at exactly
-$0.250$. A true track, by contrast, is a path $P_4$ of four segments
-(five hits), whose matrix is $sI-P_4$ with $P_4$ the path adjacency. Its
-solution can be written down exactly:
+This is the false \emph{attractor}: at any multiplicity, the
+overwhelming majority of the $4T(T-1)$ false segments are isolated and
+sit at exactly $0.250$. A true track, by contrast, is a path $P_4$ of
+four segments (five hits), whose matrix is $sI-P_4$ with $P_4$ the path
+adjacency. Its solution can be written down exactly:
 \begin{equation}
 x_{\rm outer}=\frac{4}{11}\approx0.364,\qquad
 x_{\rm inner}=\frac{5}{11}\approx0.455 ,
 \label{eq:p4levels}
 \end{equation}
-where ``outer'' are the two end segments (one continuation neighbour each)
-and ``inner'' the two middle segments (two neighbours each). More
-generally, a chain of $m$ segments has outer activation
+where the outer levels belong to the two end segments (one continuation
+neighbour each) and the inner levels to the two middle segments (two
+neighbours each). More generally, a chain of $m$ segments has outer
+activation
 \begin{equation}
 x_{\rm outer}(m)=\frac12-\frac{r+r^{m}}{2\,(1+r^{m+1})},
 \qquad r=2-\sqrt3,
 \label{eq:ladder}
 \end{equation}
 which climbs the ladder $\{0.250,\ \tfrac13,\ \tfrac{5}{14},\
-\tfrac{4}{11},\dots\}\nearrow0.366$ for $m=1,2,3,4,\dots$ --- a worked
-micro-example: a two-hit fragment ($m{=}1$) is \emph{exactly} at the
-isolated-false attractor $0.250$, and a three-hit fragment ($m{=}2$) sits at
-$1/3$, only $0.083$ above it. Fragments are barely distinguishable from
-noise by amplitude alone; this innocent-looking fact returns as the
-\emph{fragment floor} in section~\ref{sec:fit}.
+\tfrac{4}{11},\dots\}\nearrow0.366$ for $m=1,2,3,4,\dots$ It is worth
+working two rungs by hand. A two-hit fragment ($m{=}1$) sits at exactly
+the isolated-false attractor $0.250$, and a three-hit fragment ($m{=}2$)
+sits at $1/3$, only $0.083$ above it. Fragments are barely
+distinguishable from noise by amplitude alone; this innocent-looking
+fact returns as the fragment floor in section~\ref{sec:fit}.
 
 \begin{figure}[t]
 \centering
@@ -315,9 +321,10 @@ iff $x_i>\tau$ with
 \tau(\gamma,\delta)=\frac{\delta}{\gamma+\delta}+0.10 ,
 \label{eq:tau}
 \end{equation}
-i.e.\ $\tau=0.35$ at $\gamma=3$: a fixed margin above the false attractor,
-below the lowest clean-track level $4/11$. The margin $0.10$ is
-convention, inherited from ref.~\cite{trackhhl} and kept for comparability.
+i.e.\ $\tau=0.35$ at $\gamma=3$: a fixed margin above the false
+attractor, below the lowest clean-track level $4/11$. The margin $0.10$
+is convention, inherited from ref.~\cite{trackhhl} and kept for
+comparability.
 
 \subsection{Metric definitions}
 \label{sec:toy:metrics}
@@ -329,9 +336,9 @@ these words in any other sense:
 the fraction of true segments that survive selection;
 \item \textbf{segment false rate}
 $\far=n_{\rm false\,active}/n_{\rm active}$: the fraction of the
-\emph{selected} sample that is fake (note the denominator --- this is an
+\emph{selected} sample that is fake (note the denominator: this is an
 impurity, not a false-positive rate over all fakes);
-\item \textbf{working points}: either the \emph{fixed threshold}
+\item \textbf{working points}: either the \emph{fixed threshold} of
 eq.~\eqref{eq:tau}; or the \emph{efficiency-first} point ``wp99''
 (the threshold placed just below the 1\% quantile of the true-segment
 amplitudes, so $\eff\ge0.99$ by construction); or, in
@@ -341,41 +348,43 @@ $k=\lceil\mathrm{eff}\cdot n_{\rm true}\rceil$, which lets solvers be
 compared at identical efficiency without quantile-grid artefacts.
 \end{itemize}
 Quantum solutions are unit-norm vectors; before thresholding they are
-rescaled to the classical amplitude scale on the classically-active support
-(rescaling by the full norm would be multiplicity-dependent --- the false
-bulk owns most of the norm --- and was the source of a metric artefact
-documented in the programme's earlier write-ups). All thresholds act on
-$|x_i|$.
+rescaled to the classical amplitude scale on the classically-active
+support. Rescaling by the full norm would be multiplicity-dependent,
+since the false bulk owns most of the norm, and was the source of a
+metric artefact documented in the programme's earlier write-ups. All
+thresholds act on $|x_i|$.
 
 \subsection{The spectrum}
 \label{sec:toy:spectrum}
 
-Because $A=sI-C$, its spectrum is a rigid reflection of the compatibility
-graph's: $\lambda(A)=s-\mu(C)$. Three families matter:
+Because $A=sI-C$, its spectrum is a rigid reflection of the
+compatibility graph's: $\lambda(A)=s-\mu(C)$. Three families matter:
 \begin{enumerate}[leftmargin=2em]
 \item \textbf{Isolated segments}: $\lambda=s$ exactly. This single line
-carries $\mathcal{O}(n_{\rm seg})$ modes --- at $T=200$ under heavy noise,
+carries $\mathcal{O}(n_{\rm seg})$ modes: at $T=200$ under heavy noise,
 $155{,}371$ of $157{,}609$ segments (rep~0).
 \item \textbf{Chains} $P_m$: $\lambda_k=s-2\cos\!\big(k\pi/(m{+}1)\big)$,
-$k=1,\dots,m$. A true track ($m=4$) therefore lives on exactly four lines,
+$k=1,\dots,m$. A true track ($m=4$) therefore lives on exactly four
+lines,
 \begin{equation}
 \lambda\in\{s-2\cos(k\pi/5)\}_{k=1}^{4}
 =\{2.382,\ 3.382,\ 4.618,\ 5.618\}\quad(s=4),
 \label{eq:p4lines}
 \end{equation}
-symmetric about $s$ and split by the golden-ratio cosines\footnote{The
-values $2\cos(\pi/5)=\varphi=1.618\dots$ and $2\cos(2\pi/5)=1/\varphi$: the
-five-hit track is secretly a pentagon problem.}.
-\item \textbf{Stars} $K_{1,m}$ (one hit shared by $m$ segments of the same
-role): $\lambda=s\pm\sqrt m$ plus $m{-}1$ copies of $s$.
+symmetric about $s$ and split by the golden-ratio
+cosines\footnote{The values $2\cos(\pi/5)=\varphi=1.618\dots$ and
+$2\cos(2\pi/5)=1/\varphi$: the five-hit track is secretly a pentagon
+problem.}.
+\item \textbf{Stars} $K_{1,m}$ (one hit shared by $m$ segments of the
+same role): $\lambda=s\pm\sqrt m$ plus $m{-}1$ copies of $s$.
 \end{enumerate}
 The pair motif ($m{=}1$) at $\lambda=s\pm1$ and the triple ($m{=}2$) at
-$\{s,\,s\pm\sqrt2\}$ are false-population workhorses under noise, and
-their lines interleave the true lines of eq.~\eqref{eq:p4lines} without
-touching them. That gap --- false lines close to, but not on, the true
-lines --- is the entire opportunity this paper exploits, and its exceptions
-(motifs whose spectrum coincides with a true motif's) are the entire
-obstruction.
+$\{s,\,s\pm\sqrt2\}$ do most of the false-population work under noise,
+and their lines interleave the true lines of eq.~\eqref{eq:p4lines}
+without touching them. That gap, false lines close to but not on the
+true lines, is what this paper exploits. Motifs whose spectrum coincides
+with a true motif's are the exception, and they return in
+sections~\ref{sec:comb:limits} and~\ref{sec:fit} as the limiting factor.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{The one-bit quantum filter, read as a spectral filter}
@@ -383,244 +392,256 @@ obstruction.
 
 \subsection{The circuit and its response function}
 
-The 1BQF of ref.~\cite{trackhhl} is a one-ancilla interference experiment.
-Prepare the uniform superposition $|u\rangle$ over the (zero-padded) segment
-register, put the ancilla in $(|0\rangle+|1\rangle)/\sqrt2$, apply
-$e^{iAt}$ to the register controlled on the ancilla, close the
-interferometer with a second Hadamard, and keep the runs in which the
-ancilla reports the interference branch. The kept state is
+The 1BQF of ref.~\cite{trackhhl} is a one-ancilla interference
+experiment. Prepare the uniform superposition $|u\rangle$ over the
+(zero-padded) segment register, put the ancilla in
+$(|0\rangle+|1\rangle)/\sqrt2$, apply $e^{iAt}$ to the register
+controlled on the ancilla, close the interferometer with a second
+Hadamard, and keep the runs in which the ancilla reports the
+interference branch. The kept state is
 \begin{equation}
 |\psi\rangle \;\propto\; \tfrac12\big(I+e^{iAt}\big)|u\rangle
 \;=\;\sum_i e^{i\lambda_i t/2}\cos\!\Big(\frac{\lambda_i t}{2}\Big)\,
 \langle v_i|u\rangle\,|v_i\rangle ,
 \label{eq:onebitresponse}
 \end{equation}
-where $\{\lambda_i,|v_i\rangle\}$ are the eigenpairs of $A$. Reading out
-$|\langle j|\psi\rangle|$ segment by segment gives amplitudes
-$x^{Q}_j$, and the whole device is summarised by a single real response
-function applied to the spectrum:
+where $\{\lambda_i,|v_i\rangle\}$ are the eigenpairs of $A$. Reading
+out $|\langle j|\psi\rangle|$ segment by segment gives amplitudes
+$x^{Q}_j$, and the whole device is summarised by a single real
+response function applied to the spectrum:
 \begin{equation}
 f(\lambda)=\cos\!\Big(\frac{\lambda t}{2}\Big),
 \qquad t=\frac{\pi}{s} .
 \label{eq:notch}
 \end{equation}
-The choice $t=\pi/s$ places the zero of the cosine exactly at $\lambda=s$
---- the isolated-segment line. Every isolated false segment, all
-$\mathcal{O}(n_{\rm seg})$ of them, is annihilated \emph{exactly}: not
-suppressed, killed. This is the entire magic of the 1BQF, and it is worth
-stating as a slogan we will need later: \textbf{one query buys one zero},
-and the 1BQF spends its one zero on the largest false population in the
-problem. The padding modes introduced to reach a power-of-two dimension are
-diagonal-only, sit at $\lambda=s$ too, and are removed by the same zero ---
-a small but pleasing piece of engineering hygiene.
+The choice $t=\pi/s$ places the zero of the cosine exactly at
+$\lambda=s$, the isolated-segment line. Every isolated false segment,
+all $\mathcal{O}(n_{\rm seg})$ of them, is annihilated exactly: not
+suppressed, killed. This is the entire content of the 1BQF, and the
+form in which we will need it later is a simple accounting rule: each
+application of the filter buys exactly one zero of the response, and
+the 1BQF spends its one zero on the largest false population in the
+problem. The padding modes introduced to reach a power-of-two
+dimension are diagonal-only, sit at $\lambda=s$ too, and are removed
+by the same zero, a small but pleasing piece of engineering hygiene.
 
 \subsection{What the notch cannot do}
 
-Away from its zero the cosine is not flat, and this has two consequences
-that define the 1BQF's operating envelope.
+Away from its zero the cosine is not flat, and this has two
+consequences that define the 1BQF's operating envelope.
 
-First, \emph{true amplitudes are reshaped}. A true track's four modes
-(eq.~\eqref{eq:p4lines}) sit symmetrically about $s$, where
+The first is that true amplitudes are reshaped. A true track's four
+modes (eq.~\eqref{eq:p4lines}) sit symmetrically about $s$, where
 $|f(\lambda)|$ is small; the filtered chain no longer reproduces the
-classical $\{4/11,5/11\}$ profile. The effect has a closed form: the outer
-(endpoint) segments of a clean track drop from $0.364$ to $0.258$ ---
-\emph{below} the fixed threshold $\tau=0.35$ --- while the inner pair
+classical $\{4/11,5/11\}$ profile. The effect has a closed form: the
+outer (endpoint) segments of a clean track drop from $0.364$ to
+$0.258$, below the fixed threshold $\tau=0.35$, while the inner pair
 survives above it. At the fixed threshold the 1BQF therefore reports a
-segment efficiency plateau of $\approx0.73$--$0.75$: it finds the middles
-of tracks and loses the ends. This ``endpoint halving'' is a property of
-the cut, not of the physics --- the endpoint amplitudes are perfectly
-well-ordered above the false ones --- and the honest convention, used for
-all 1BQF headlines in this paper, is the efficiency-first working point
-wp99: place the threshold just below the 1\% quantile of true amplitudes
-and pay whatever false rate results. On clean fixed-acceptance events at
-$\gamma=3$ that price is steep at high multiplicity: the wp99 false rate
-climbs to several tens of percent by $T=400$ and beyond
-(section~\ref{sec:comb} quantifies this against the comb), because ---
+segment efficiency plateau of $\approx0.73$--$0.75$: it finds the
+middles of tracks and loses the ends. This endpoint halving is a
+property of the cut, not of the physics; the endpoint amplitudes
+remain perfectly well ordered above the false ones. The honest
+convention, used for all 1BQF headlines in this paper, is the
+efficiency-first working point wp99: place the threshold just below
+the 1\% quantile of true amplitudes and pay whatever false rate
+results. On clean fixed-acceptance events at $\gamma=3$ that price is
+steep at high multiplicity: the wp99 false rate climbs to several
+tens of percent by $T=400$ and beyond, and section~\ref{sec:comb}
+quantifies this against the comb.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.75\textwidth]{chain_amplitude_ladder.pdf}
 \caption{The chain ladder and the endpoint halving. Classical outer
 activation climbs eq.~\eqref{eq:ladder} toward $0.366$ (above $\tau$);
-the 1BQF response drops the $P_4$ outer level to $0.258$, below the fixed
-threshold --- the origin of the fixed-$\tau$ efficiency plateau, and the
-reason 1BQF headlines use the efficiency-first working point.}
+the 1BQF response drops the $P_4$ outer level to $0.258$, below the
+fixed threshold. This is the origin of the fixed-$\tau$ efficiency
+plateau, and the reason 1BQF headlines use the efficiency-first
+working point.}
 \label{fig:ladder}
 \end{figure}
 
-Second, \emph{coupled false segments pass}. A false segment that
-accidentally couples to the graph moves off the $\lambda=s$ line, out of
-the zero, and into the passband. The notch has no second zero to spend on
-it. As density or acceptance width grows, the coupled-false population
-grows, and the 1BQF's false rate grows with it. The 1BQF is, precisely,
-the statement ``unconnected fakes are exactly removable''; everything in
-this paper beyond section~\ref{sec:qsvt} is about the connected ones.
+The second consequence is that coupled false segments pass. A false
+segment that accidentally couples to the graph moves off the
+$\lambda=s$ line, out of the zero, and into the passband. The notch
+has no second zero to spend on it. As density or acceptance width
+grows, the coupled-false population grows, and the 1BQF's false rate
+grows with it. The 1BQF is, precisely, the statement that unconnected
+fakes are exactly removable; everything in this paper beyond
+section~\ref{sec:qsvt} is about the connected ones.
 
 On success probability: the kept-branch probability scales as
-$P_{\rm anc}\approx 0.25/T$ on this problem --- the uniform input spreads
-over $4T^2$ segments of which order $T$ carry surviving amplitude ---
-so shot budgets grow linearly in $T$ and amplitude amplification buys the
-usual quadratic discount.\footnote{The $0.25$ constant is the analytic
-estimate for the uniform input; the comb's analogous constant,
-$\approx0.44$, is directly measured (section~\ref{sec:comb:resources}).} These costs carry over essentially unchanged to
-the polynomial filters below, which is why I defer resource accounting to
-section~\ref{sec:comb:resources}.
+$P_{\rm anc}\approx 0.25/T$ on this problem, since the uniform input
+spreads over $4T^2$ segments of which order $T$ carry surviving
+amplitude, so shot budgets grow linearly in $T$ and amplitude
+amplification buys the usual quadratic discount.\footnote{The $0.25$
+constant is the analytic estimate for the uniform input; the comb's
+analogous constant, $\approx0.44$, is directly measured
+(section~\ref{sec:comb:resources}).} These costs carry over
+essentially unchanged to the polynomial filters below, which is why I
+defer resource accounting to section~\ref{sec:comb:resources}.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{From one bit to any polynomial: the QSVT construction}
 \label{sec:qsvt}
 
-The promotion from eq.~\eqref{eq:notch} to an arbitrary polynomial response
-rests on three standard ingredients --- block encoding, qubitization, and a
-linear combination of unitaries (LCU) --- which I assemble here in the
-concrete, real-arithmetic form used by the simulations. Readers who trust
-the QSVT literature~\cite{gslw2019,lowchuang2019,childs2012,martyn2021} can
-skim to the resource summary in
-section~\ref{sec:qsvt:resources}; the details are included because the
-paper's cost claims (qubit counts, walk calls, success probabilities) are
-read directly off this construction.
+The promotion from eq.~\eqref{eq:notch} to an arbitrary polynomial
+response rests on three standard ingredients: block encoding,
+qubitization, and a linear combination of unitaries (LCU). I assemble
+them here in the concrete, real-arithmetic form used by the
+simulations. Readers who trust the QSVT
+literature~\cite{gslw2019,lowchuang2019,childs2012,martyn2021} can
+skim to the resource summary in section~\ref{sec:qsvt:resources}; the
+details are included because the paper's cost claims (qubit counts,
+walk calls, success probabilities) are read directly off this
+construction.
 
 \subsection{Block encoding and the qubitization walk}
 
 Rescale the Hamiltonian affinely so its spectrum fits in $[-1,1]$:
-$X=(A-c_0 I)/c_1$ with $c_0$ the spectrum centre and $c_1$ slightly more
-than its half-width\footnote{The implementation pads the user-supplied
-spectral bounds by a few percent; an early campaign bug taught us that the
-polynomial's fit domain must exceed the padded bounds or the constructor
-rightly refuses.}. A block encoding is a unitary that hides $X$ in its
-top-left corner:
+$X=(A-c_0 I)/c_1$ with $c_0$ the spectrum centre and $c_1$ slightly
+more than its half-width\footnote{The implementation pads the
+user-supplied spectral bounds by a few percent; an early campaign bug
+taught us that the polynomial's fit domain must exceed the padded
+bounds or the constructor rightly refuses.}. A block encoding is a
+unitary that hides $X$ in its top-left corner:
 \begin{equation}
 U=\begin{pmatrix} X & \sqrt{I-X^{2}}\\[2pt] \sqrt{I-X^{2}} & -X
 \end{pmatrix},
 \label{eq:dilation}
 \end{equation}
-acting on the segment register plus one \emph{dilation} qubit. The analogy
-I find most useful: $U$ is a rotation in each eigenplane --- for every
+acting on the segment register plus one \emph{dilation} qubit. The
+picture I find most useful is a rotation in each eigenplane: for every
 eigenvalue $x$ of $X$ there is a two-dimensional invariant subspace in
-which $U$ rotates by the angle $\arccos x$. The \emph{qubitization walk}
-$W=(Z\otimes I)\,U$ turns these into clean rotations with the defining
-property
+which $U$ rotates by the angle $\arccos x$. The \emph{qubitization
+walk} $W=(Z\otimes I)\,U$ turns these into clean rotations with the
+defining property
 \begin{equation}
 \big\langle 0\big|\,W^{k}\,\big|0\big\rangle_{\rm dil}=T_{k}(X),
 \label{eq:walkcheb}
 \end{equation}
-where $T_k$ is the $k$-th Chebyshev polynomial and the bra-ket projects the
-dilation qubit onto $|0\rangle$. Equation~\eqref{eq:walkcheb} is exact ---
-no Trotterization, no error terms --- and every operator in it is real, so
-the entire simulation can run in real arithmetic on orthogonal matrices.
-Walking $k$ steps and looking at the undeflected component applies the
-$k$-th Chebyshev polynomial of the Hamiltonian: that is the whole theorem.
+where $T_k$ is the $k$-th Chebyshev polynomial and the bra-ket
+projects the dilation qubit onto $|0\rangle$.
+Equation~\eqref{eq:walkcheb} is exact, with no Trotterization and no
+error terms, and every operator in it is real, so the entire
+simulation can run in real arithmetic on orthogonal matrices. Walking
+$k$ steps and looking at the undeflected component applies the $k$-th
+Chebyshev polynomial of the Hamiltonian; that is the whole theorem.
 
 \subsection{Summing the series: LCU}
 
-A degree-$d$ response $p(X)=\sum_{k=0}^{d}c_k T_k(X)$ is then a weighted
-sum of walk powers. Introduce an index register of
+A degree-$d$ response $p(X)=\sum_{k=0}^{d}c_k T_k(X)$ is then a
+weighted sum of walk powers. Introduce an index register of
 $m=\lceil\log_2(d{+}1)\rceil$ qubits, prepare
 $|{\rm prep}\rangle\propto\sum_k\sqrt{|c_k|}\,|k\rangle$, apply
 $W^{k}$ controlled on the index (in practice: controlled powers
-$W^{2^j}$), undo the preparation, and post-select the index and dilation
-registers on zero. The surviving register state is $\propto p(X)|u\rangle$
-with success probability
+$W^{2^j}$), undo the preparation, and post-select the index and
+dilation registers on zero. The surviving register state is
+$\propto p(X)|u\rangle$ with success probability
 \begin{equation}
 P_{\rm anc}=\frac{\big\lVert p(X)\,|u\rangle\big\rVert^{2}}
 {\big(\sum_k |c_k|\big)^{2}} ,
 \label{eq:psucc}
 \end{equation}
-the usual LCU price: the one-norm of the coefficient vector. The 1BQF is
-recovered, exactly, as the $d=1$ row of this table --- $\cos$ is $T_1$ of
-the appropriately rescaled operator --- which is the formal content of the
-claim that this paper continues rather than replaces its predecessors.
+the usual LCU price: the one-norm of the coefficient vector. The 1BQF
+is recovered, exactly, as the $d=1$ row of this table ($\cos$ is
+$T_1$ of the appropriately rescaled operator), which is the formal
+content of the claim that this paper continues rather than replaces
+its predecessors.
 
-Simulation-side, eq.~\eqref{eq:walkcheb} gives a matrix-free evaluator:
-$p(A)\mathbf{b}$ by the Chebyshev three-term recursion on sparse
-matrix-vector products, $\mathcal{O}(d\cdot{\rm nnz}(A))$ flops, which runs
-in about $1.6$\,s at $T=1000$ ($n=4\times10^{6}$) and agrees with the full
-qiskit circuit and with a gate-streaming evaluation to $10^{-9}$ where all
-three are affordable. All large-$T$ results below use this exact
-evaluator; nothing in this paper relies on an approximate simulation of
-the quantum readout.
+Simulation-side, eq.~\eqref{eq:walkcheb} gives a matrix-free
+evaluator: $p(A)\mathbf{b}$ by the Chebyshev three-term recursion on
+sparse matrix-vector products, $\mathcal{O}(d\cdot{\rm nnz}(A))$
+flops, which runs in about $1.6$\,s at $T=1000$ ($n=4\times10^{6}$)
+and agrees with the full qiskit circuit and with a gate-streaming
+evaluation to $10^{-9}$ where all three are affordable. All large-$T$
+results below use this exact evaluator; nothing in this paper relies
+on an approximate simulation of the quantum readout.
 
 \subsection{Resource summary}
 \label{sec:qsvt:resources}
 
 For a degree-$d$ filter on an event of $T$ tracks:
 \begin{itemize}[leftmargin=2em]
-\item \textbf{Width}: $n_{\rm sys}=\lceil\log_2 4T^2\rceil$ system qubits
-$+\,1$ dilation $+\,m=\lceil\log_2(d{+}1)\rceil$ index qubits. With the
-production degree $d=40$ this is 21 qubits at $T=50$ rising to 29 at
-$T=1000$ --- width is cheap, and grows only logarithmically.
-\item \textbf{Depth}: $d$ controlled walk calls per coherent repetition,
-times $\mathcal{O}(1/\sqrt{P_{\rm anc}})$ amplitude-amplification rounds.
+\item \textbf{Width}: $n_{\rm sys}=\lceil\log_2 4T^2\rceil$ system
+qubits $+\,1$ dilation $+\,m=\lceil\log_2(d{+}1)\rceil$ index qubits.
+With the production degree $d=40$ this is 21 qubits at $T=50$ rising
+to 29 at $T=1000$. Width is cheap, and grows only logarithmically.
+\item \textbf{Depth}: $d$ controlled walk calls per coherent
+repetition, times $\mathcal{O}(1/\sqrt{P_{\rm anc}})$
+amplitude-amplification rounds.
 \item \textbf{Success}: $P_{\rm anc}\propto 1/T$ (measured constant
-$\approx0.44$ for the comb of section~\ref{sec:comb}), so total walk calls
-scale as $d\sqrt{T}$.
+$\approx0.44$ for the comb of section~\ref{sec:comb}), so total walk
+calls scale as $d\sqrt{T}$.
 \end{itemize}
 The quantum content of this paper is this resource profile; the
-\emph{response functions} themselves are classically simulable by the same
+response functions themselves are classically simulable by the same
 recursion, and I return to what that does and does not concede in
 section~\ref{sec:limits:dequant}.
 
 % ══════════════════════════════════════════════════════════════════════════════
-\section{Fitting the polynomial to the problem, I: the clean toy and the
-line comb}
+\section{Fitting the polynomial to the clean events: the line comb}
 \label{sec:comb}
 
 \subsection{The design insight: the true spectrum is discrete}
 
-Here is the observation that turns QSVT from a mathematical possibility
-into a design tool. On this detector geometry every true track has exactly
-five hits, hence exactly four segments, hence --- by
-eq.~\eqref{eq:p4lines} --- exactly the same four eigenvalues. The true
-spectrum of the entire event, however many thousand tracks it contains, is
-four discrete lines. We are not trying to pass a \emph{region} of the
-spectrum; we are trying to pass four known radio stations, and everything
-between them is static.
+Here is the observation that turns QSVT from a mathematical
+possibility into a design tool. On this detector geometry every true
+track has exactly five hits, hence exactly four segments, hence, by
+eq.~\eqref{eq:p4lines}, exactly the same four eigenvalues. The true
+spectrum of the entire event, however many thousand tracks it
+contains, is four discrete lines. We are not trying to pass a region
+of the spectrum; we are trying to pass four known radio stations, and
+everything between them is static.
 
 My first design did not understand this. A band-limited approximate
-inverse --- $\approx1/\lambda$ across a contiguous band containing the
-true lines, zero outside --- works beautifully at low multiplicity and
-then fails exactly where it matters: as $T$ grows, accidental tangles of
-false segments produce eigenvalues \emph{throughout} the band, and a band
-design passes them all. At fixed threshold its false rate reached tens of
-percent by $T=400$, worse than classical.\footnote{A useful failure: it
-taught us that the exploitable structure is the \emph{discreteness} of the
-geometry-pinned true spectrum, not its location.} The production design is
-therefore a \emph{line comb}: narrow Gaussian passes of half-width
-$h_w$, weighted $\propto1/\lambda$, centred at the four lines
-$s-2\cos(k\pi/5)$ only, fitted as a bounded Chebyshev series of degree
-$d$. The defaults, fixed once by a two-dimensional $(d,h_w)$ scan and
-never tuned per event, are $d=40$, $h_w=0.18$.
+inverse ($\approx1/\lambda$ across a contiguous band containing the
+true lines, zero outside) works beautifully at low multiplicity and
+then fails exactly where it matters: as $T$ grows, accidental tangles
+of false segments produce eigenvalues throughout the band, and a band
+design passes them all. At fixed threshold its false rate reached tens
+of percent by $T=400$, worse than classical.\footnote{A useful
+failure: it taught us that the exploitable structure is the
+discreteness of the geometry-pinned true spectrum, not its location.}
+The production design is therefore a \emph{line comb}: narrow Gaussian
+passes of half-width $h_w$, weighted $\propto1/\lambda$, centred at
+the four lines $s-2\cos(k\pi/5)$ only, fitted as a bounded Chebyshev
+series of degree $d$. The defaults, fixed once by a two-dimensional
+$(d,h_w)$ scan and never tuned per event, are $d=40$, $h_w=0.18$.
 
 Why does a width of $0.18$ work? The nearest systematically-populated
-false lines --- the $P_3$ bridge modes at $\{s-\sqrt2,\,s,\,s+\sqrt2\}$
---- sit $\gtrsim0.2$ away from the true lines, so the comb threads the
-gap; and the resolution law of a degree-$d$ Chebyshev series, features no
-narrower than $\approx 2W/d$ on a domain of half-width $W$, makes $d=40$
-sufficient for $h_w=0.18$ on the clean-event domain. Degree, width, and
-line spacing are one budget, and this is the budget the noisy events of
-section~\ref{sec:fit} will re-open.
+false lines, the $P_3$ bridge modes at $\{s-\sqrt2,\,s,\,s+\sqrt2\}$,
+sit $\gtrsim0.2$ away from the true lines, so the comb threads the
+gap; and the resolution law of a degree-$d$ Chebyshev series, features
+no narrower than $\approx 2W/d$ on a domain of half-width $W$, makes
+$d=40$ sufficient for $h_w=0.18$ on the clean-event domain. Degree,
+width, and line spacing are one budget, and this is the budget the
+noisy events of section~\ref{sec:fit} will re-open.
 
 \subsection{Clean-event results}
 \label{sec:comb:results}
 
-On the fixed-acceptance ($\varepsilon=2$\,mrad), $\gamma=3$ study --- the
+On the fixed-acceptance ($\varepsilon=2$\,mrad), $\gamma=3$ study, the
 canonical benchmark of the programme, with events and solutions shared
 segment-for-segment across all three solvers through a common data
-pipeline --- the picture at the fixed threshold $\tau=0.35$ is:
+pipeline, the picture at the fixed threshold $\tau=0.35$ is:
 \begin{itemize}[leftmargin=2em]
-\item \textbf{Classical}: efficiency $100\%$ throughout (the minimum true amplitude $4/11$ clears $\tau$ at every $T$); false rate
-grows from $\approx0$ at low $T$ to $2.25\%$ at $T=400$ and $20.5\%$ at
-$T=1000$ as the $\mathcal{O}(T^2)$ false pairing feeds the active set.
+\item \textbf{Classical}: efficiency $100\%$ throughout (the minimum
+true amplitude $4/11$ clears $\tau$ at every $T$); false rate grows
+from $\approx0$ at low $T$ to $2.25\%$ at $T=400$ and $20.5\%$ at
+$T=1000$ as the $\mathcal{O}(T^2)$ false pairing feeds the active
+set.
 \item \textbf{1BQF}: the fixed-$\tau$ efficiency plateau of
-section~\ref{sec:onebit} ($74.7\%$ at $T=400$, the endpoint cut); false
-rate at or just below classical ($1.73\%$ at $T=400$, $18.8\%$ at
-$T=1000$).
+section~\ref{sec:onebit} ($74.7\%$ at $T=400$, the endpoint cut);
+false rate at or just below classical ($1.73\%$ at $T=400$, $18.8\%$
+at $T=1000$).
 \item \textbf{Comb}: efficiency $97$--$100\%$ with false rate
-$\le0.02\%$ through $T=400$ --- zero to a few false actives per event
-where the classical solver admits tens --- rising to $0.17\%$ at $T=700$
-and $0.9\%$ at $T=1000$ against the classical $20.5\%$, at efficiency
-$92.1\%$.
+$\le0.02\%$ through $T=400$ (zero to a few false actives per event
+where the classical solver admits tens), rising to $0.17\%$ at
+$T=700$ and $0.9\%$ at $T=1000$ against the classical $20.5\%$, at
+efficiency $92.1\%$.
 \end{itemize}
+
 \begin{figure}[t]
 \centering
 \begin{subfigure}[t]{0.49\textwidth}
@@ -632,75 +653,74 @@ $92.1\%$.
 \caption{Line-comb QSVT.}
 \end{subfigure}
 \caption{The clean-toy $2{\times}2$ ($\gamma=3$, fixed
-$\varepsilon=2$\,mrad, no hit drop): segment efficiency, false rate, and
-pair counts against multiplicity, classical (left) versus the production
-line comb (right). The corresponding 1BQF panels appear in the study
-records; its fixed-$\tau$/wp99 duality is described in
+$\varepsilon=2$\,mrad, no hit drop): segment efficiency, false rate,
+and pair counts against multiplicity, classical (left) versus the
+production line comb (right). The corresponding 1BQF panels appear in
+the study records; its fixed-$\tau$/wp99 duality is described in
 section~\ref{sec:onebit}.}
 \label{fig:clean2x2}
 \end{figure}
 
 At the efficiency-first wp99 point the comb wins clearly through
-$T=400$ ($1.3\%$ vs classical $3.1\%$ on matched fresh solves), but at
-extreme density the composition effect dominates everyone: the
+$T=400$ ($1.3\%$ vs classical $3.1\%$ on matched fresh solves), but
+at extreme density the composition effect dominates everyone: the
 false-to-true ratio $n_F/n_T\approx T-1$ converts even excellent
 per-segment separation into a growing impurity, and by $T=1000$ the
 wp99 false rates cross ($\approx21\%$ comb vs $17.5\%$ classical,
-crossover near $T=700$).\footnote{The crossover is robust; its size is
-aggregation-dependent --- a whole-store aggregate reads the classical
+crossover near $T=700$).\footnote{The crossover is robust; its size
+is aggregation-dependent. A whole-store aggregate reads the classical
 wp99 false rate at $T=1000$ as low as $10\%$. Both sources agree the
 comb no longer wins at wp99 beyond $T\approx700$, which is the
-operative statement.}
-The two regimes --- fixed-$\tau$, where the comb wins by an order of
-magnitude and more, and wp99 at extreme density, where composition
-flattens everyone --- bracket the operational truth.
+operative statement.} The two regimes, fixed-$\tau$ where the comb
+wins by an order of magnitude and more, and wp99 at extreme density
+where composition flattens everyone, bracket the operational truth.
 
-The comb's amplitude picture explains the numbers. Under the comb response
-the false population collapses to $\lesssim10^{-2}$ of the true median
-(the passes reject everything off the lines), while the true band stays
-tight around its classical profile --- the $1/\lambda$ weighting inside
-the passes preserves the chain shape rather than reshaping it as the
-single cosine does. Where the 1BQF splits the true population and the
-classical solver drags a false tail across the threshold, the comb simply
-leaves a gap.
+The comb's amplitude picture explains the numbers. Under the comb
+response the false population collapses to $\lesssim10^{-2}$ of the
+true median (the passes reject everything off the lines), while the
+true band stays tight around its classical profile: the $1/\lambda$
+weighting inside the passes preserves the chain shape rather than
+reshaping it as the single cosine does. Where the 1BQF splits the
+true population and the classical solver drags a false tail across
+the threshold, the comb simply leaves a gap.
 
 \subsection{Hit inefficiency: the first appearance of fragments}
 \label{sec:comb:drop}
 
-Dropping $1\%$ of hits breaks $\approx5\%$ of tracks into fragments ---
+Dropping $1\%$ of hits breaks $\approx5\%$ of tracks into fragments:
 chains of one, two, or three segments whose spectra
-(section~\ref{sec:toy:spectrum}) are \emph{not} on the four $P_4$ lines.
-The comb, by design, does not pass them: per-class efficiency under the
-production comb is $100\%$ on intact tracks and $0\%$ on every fragment
-class, which is why its overall efficiency reads $94.0\%$ rather than
-$97$--$98\%$ at $T=400$ under drop. Extending the comb with passes at
-the fragment lines does not help: it re-admits their false spectral
-twins wholesale (a $P_2$ fragment and a false pair are the same
-matrix), so fragments are a \emph{spectral floor} --- the first
-appearance of the twin obstruction that section~\ref{sec:fit} meets at
-full strength. Recovery, if wanted, must come from information a
-spectral filter cannot see --- hit-level constraint information ---
-and it belongs to the solver-agnostic post-selection machinery of
-section~\ref{sec:occupancy:gate}, applied evenly to every solver, not
-to a comb-specific bolt-on.\footnote{An earlier version of this study
-paired a recovery gate with the comb alone; it was retired as
-methodologically unfair (no other solver received the same help) and
-does not appear in this paper's comparisons. Wherever a gate appears
-below, its composition with the \emph{classical} solver is reported on
-identical terms.}
+(section~\ref{sec:toy:spectrum}) are \emph{not} on the four $P_4$
+lines. The comb, by design, does not pass them. Per-class efficiency
+under the production comb is $100\%$ on intact tracks and $0\%$ on
+every fragment class, which is why its overall efficiency reads
+$94.0\%$ rather than $97$--$98\%$ at $T=400$ under drop. Extending
+the comb with passes at the fragment lines does not help: it
+re-admits their false spectral twins wholesale (a $P_2$ fragment and
+a false pair are the same matrix), so fragments are a spectral
+floor, the first appearance of the twin obstruction that
+section~\ref{sec:fit} meets at full strength. Recovery, if wanted, must come from information a spectral filter
+cannot see, namely hit-level constraint information, and that is
+classical post-processing, outside the scope of this
+paper.\footnote{An earlier version of this study paired a
+hit-occupancy recovery gate with the comb alone; it was retired as
+mission creep (no other solver received the same help, and the tool
+is orthogonal to the spectral question). Classical post-selection is
+developed and reported separately in the programme's occupancy
+study.}
 
 \subsection{Resource scaling and the depth ladder}
 \label{sec:comb:resources}
 
-Measured on the shared events: total width 21 qubits at $T=50$ to 29 at
-$T=1000$; success probability $P_{\rm anc}\approx0.44/T$; walk calls per
-amplified repetition $d\cdot\pi/(4\sqrt{P_{\rm anc}})\propto d\sqrt T$.
-Two findings sharpen the budget. A \emph{half-resolved} comb at $d=16$
-matches the $d=40$ metrics up to $T=700$ at an approximately
-$T$-independent $P_{\rm anc}\approx6\%$ --- about fifty total walk calls,
-flat in $T$ --- because partially-merged passes still cover the four
-lines while rejecting the bulk. And the degree axis is \emph{not
-monotonic}: intermediate degrees ($d\approx20$--$32$) can cliff at the
+Measured on the shared events: total width 21 qubits at $T=50$ to 29
+at $T=1000$; success probability $P_{\rm anc}\approx0.44/T$; walk
+calls per amplified repetition
+$d\cdot\pi/(4\sqrt{P_{\rm anc}})\propto d\sqrt T$. Two findings
+sharpen the budget. A half-resolved comb at $d=16$ matches the
+$d=40$ metrics up to $T=700$ at an approximately $T$-independent
+$P_{\rm anc}\approx6\%$, about fifty total walk calls, flat in $T$,
+because partially-merged passes still cover the four lines while
+rejecting the bulk. And the degree axis is not monotonic:
+intermediate degrees ($d\approx20$--$32$) can cliff at the
 efficiency-first working point through Chebyshev fit pathologies, so
 every production degree must be validated, not interpolated.
 
@@ -716,8 +736,8 @@ every production degree must be validated, not interpolated.
 \end{subfigure}
 \caption{Measured resource scaling of the comb on the shared events:
 width grows logarithmically (21 qubits at $T=50$ to 29 at $T=1000$);
-success probability falls as $\approx0.44/T$; amplified walk calls grow
-as $d\sqrt T$, with the half-resolved $d=16$ comb holding a
+success probability falls as $\approx0.44/T$; amplified walk calls
+grow as $d\sqrt T$, with the half-resolved $d=16$ comb holding a
 $T$-independent $\approx50$-call budget to $T=700$.}
 \label{fig:resources}
 \end{figure}
@@ -725,321 +745,304 @@ $T$-independent $\approx50$-call budget to $T=700$.}
 \subsection{Provable limits on the clean toy}
 \label{sec:comb:limits}
 
-Three structural results bound what any response function can do here.
-First, the \emph{floor theorem}: if a false cluster's matrix is
-graph-isomorphic to a true cluster's (a false ``bridge'' of exactly four
-segments, say), then for \emph{every} function $f$, $f(A)\mathbf{b}$
-assigns both clusters identical amplitudes --- permutation similarity
-commutes with matrix functions and $\mathbf{b}$ is uniform. Such
-topological twins are invisible to the entire filter family, classical
-scoring included. They are rare on clean events (none found in the $T\le200$ census;
-$0.6\%$ of true segments by $T=400$ with the acceptance widened to
-$4$\,mrad) but they are the true ceiling.
-Second, the \emph{shared-line theorem}: the odd modes of a contaminated
-five-segment chain coincide exactly with the $s\pm\sqrt3$ lines of the
-three-pronged hub $K_{1,3}$, so no comb can null both populations
-independently --- pass menus trade one against the other with a fixed
-exchange rate. Third, the \emph{mirror tax}: a chain-reflection symmetry
-forces the false extension of a recovered cluster to the recovered-true
-amplitude level, so ``recovery'' passes always buy their efficiency at a
-false-rate premium. Together these three results closed the clean-toy
-design question: the production comb is optimal up to provable
-exceptions, and further progress must come from changing the
-\emph{operator} or leaving the spectral domain --- which is exactly where
+Three structural results bound what any response function can do
+here. The first is the \emph{floor theorem}: if a false cluster's
+matrix is graph-isomorphic to a true cluster's (a false ``bridge'' of
+exactly four segments, say), then for every function $f$,
+$f(A)\mathbf{b}$ assigns both clusters identical amplitudes, because
+permutation similarity commutes with matrix functions and
+$\mathbf{b}$ is uniform. Such topological twins are invisible to the
+entire filter family, classical scoring included. They are rare on
+clean events (none found in the $T\le200$ census; $0.6\%$ of true
+segments by $T=400$ with the acceptance widened to $4$\,mrad) but
+they are the true ceiling. The second is the \emph{shared-line
+theorem}: the odd modes of a contaminated five-segment chain coincide
+exactly with the $s\pm\sqrt3$ lines of the three-pronged hub
+$K_{1,3}$, so no comb can null both populations independently; pass
+menus trade one against the other with a fixed exchange rate. The
+third is the \emph{mirror tax}: a chain-reflection symmetry forces
+the false extension of a recovered cluster to the recovered-true
+amplitude level, so recovery passes always buy their efficiency at a
+false-rate premium. Together these three results closed the
+clean-toy design question. The production comb is optimal up to
+provable exceptions, and further progress must come from changing
+the operator or leaving the spectral domain, which is exactly where
 the rest of this paper goes.
 
 % ══════════════════════════════════════════════════════════════════════════════
-\section{What heavy noise does to the picture}
+\section{The heavy-noise operating point}
 \label{sec:noise}
 
-From here on the operating point is the \emph{heavy} configuration:
+From here on the operating point is the heavy configuration:
 $\sigma_{\rm scatt}=10^{-4}$, $\sigma_{\rm res}=20\,\mu$m, hit drop
 $1\%$, at $T=200$, with the acceptance set by the kink formula to
-$\varepsilon=6.3$\,mrad. Three reps of every event are used throughout;
-where a single event is dissected, it is rep~0.
+$\varepsilon=6.3$\,mrad. Three reps of every event are used
+throughout; where a single event is dissected, it is rep~0.
 
 The acceptance width is the story. At $\varepsilon=2$\,mrad a false
-segment rarely finds an angular partner; at $6.3$\,mrad the compatibility
-graph fills with small false structures. Two facts about that graph, both
-established by direct decomposition of the solved events, control
-everything downstream:
+segment rarely finds an angular partner; at $6.3$\,mrad the
+compatibility graph fills with small false structures. Two facts
+about that graph, both established by direct decomposition of the
+solved events, control everything downstream:
 \begin{enumerate}[leftmargin=2em]
-\item \textbf{There is no giant tangle.} The compatibility graph at heavy
-$T=200$ splits into $\approx870$ nontrivial connected components of at
-most $\approx17$ segments, floating in a sea of $155{,}371$
-isolated segments (rep~0). Noise, at this operating point, buys \emph{many small
-motifs}, not one big mess --- and small components mean the entire
-spectrum is computable exactly, component by component, with dense
-eigensolvers. Every spectral statement in
-sections~\ref{sec:occupancy}--\ref{sec:fit} is exact, not approximate.
-\item \textbf{The false actives are motif-borne.} At the classical wp99
-point the event has $2238$ active segments of which $1454$ are false; those
-false actives live in $707$ components that contain, between them, only
-$142$ true segments. Ninety percent of the false-active population sits in
-essentially \emph{pure-false} motifs --- pairs, triples, short bridges ---
-not entangled with true tracks at all.
+\item \textbf{There is no giant tangle.} The compatibility graph at
+heavy $T=200$ splits into $\approx870$ nontrivial connected
+components of at most $\approx17$ segments, floating in a sea of
+$155{,}371$ isolated segments (rep~0). Noise, at this operating
+point, buys many small motifs rather than one big mess, and small
+components mean the entire spectrum is computable exactly, component
+by component, with dense eigensolvers. Every spectral statement in
+sections~\ref{sec:occupancy}--\ref{sec:fit} is exact, not
+approximate.
+\item \textbf{The false actives are motif-borne.} At the classical
+wp99 point the event has $2238$ active segments of which $1454$ are
+false; those false actives live in $707$ components that contain,
+between them, only $142$ true segments. Ninety percent of the
+false-active population sits in essentially pure-false motifs
+(pairs, triples, short bridges), not entangled with true tracks at
+all.
 \end{enumerate}
 
-The solver scoreboard at this point is sobering. At wp99 the classical
-false rate is $0.65$; the 1BQF's is $0.65$ as well --- the notch's one
-zero still annihilates the isolated bulk, but every false \emph{active} is
-by definition coupled, off the line, and untouched. The production comb,
-designed for a $2$\,mrad world where false structures barely exist, fares
-worst of all: the wide acceptance populates false motif lines throughout
-its pass windows. The measured false-active pile-up
-(section~\ref{sec:fit}) will show exactly where; the important statement
-here is the diagnosis --- \textbf{at heavy noise all three solvers fail
-for the same reason, a false population that has moved into spectral
-regions the designs were never told about} --- and the two candidate
-cures the classical literature offers are Hamiltonian terms: occupancy
-and bifurcation. The next two sections take them in turn, and both turn
-out to behave in ways their classical reputations do not predict.
+The solver scoreboard at this point makes uncomfortable reading. At
+wp99 the classical false rate is $0.65$; the 1BQF's is $0.65$ as
+well, since the notch's one zero still annihilates the isolated bulk
+while every false \emph{active} is by definition coupled, off the
+line, and untouched. The production comb, designed for a $2$\,mrad
+world where false structures barely exist, fares worst of all: the
+wide acceptance populates false motif lines throughout its pass
+windows. The measured false-active pile-up (section~\ref{sec:fit})
+will show exactly where. The important statement here is the
+diagnosis: at heavy noise all three solvers fail for the same
+reason, a false population that has moved into spectral regions the
+designs were never told about. The classical literature offers two
+Hamiltonian terms as candidate cures, occupancy and bifurcation. The
+next two sections take them in turn, and both turn out to behave in
+ways their classical reputations do not predict.
 
 % ══════════════════════════════════════════════════════════════════════════════
-\section{The occupancy term: helpful classically, poison to a notch}
+\section{The occupancy term}
 \label{sec:occupancy}
 
 \subsection{The term}
 
-Denby's original network~\cite{denby1988} constrains each hit to be used
-by at most one selected segment per role. The quadratic form of that
-constraint --- per-hit occupancy --- adds
-$E_{\rm occ}=\alpha\sum_h(o_h-1)^2$ with $o_h=\sum_{s\ni h}x_s$, which at
-the matrix level reads
+Denby's original network~\cite{denby1988} constrains each hit to be
+used by at most one selected segment per role. The quadratic form of
+that constraint, per-hit occupancy, adds
+$E_{\rm occ}=\alpha\sum_h(o_h-1)^2$ with $o_h=\sum_{s\ni h}x_s$,
+which at the matrix level reads
 \begin{equation}
 A_{\rm occ}=A+4\alpha I+2\alpha B_{\rm all},\qquad
 \mathbf{b}\to\mathbf{b}+4\alpha\mathbf{1},
 \label{eq:occ}
 \end{equation}
-where $B_{\rm all}$ couples every pair of segments sharing a hit in the
-same role (two segments departing the same hit, or two arriving at it ---
-consecutive segments of one track share their interior hit in
-\emph{opposite} roles and are not coupled). The isolated attractor moves
-to $(\delta+4\alpha)/(\gamma+\delta+4\alpha)$ and the threshold tracks it.
+where $B_{\rm all}$ couples every pair of segments sharing a hit in
+the same role: two segments departing the same hit, or two arriving
+at it. Consecutive segments of one track share their interior hit in
+opposite roles and are not coupled. The isolated attractor moves to
+$(\delta+4\alpha)/(\gamma+\delta+4\alpha)$ and the threshold tracks
+it.
 
 \subsection{Classically it works; spectrally it is a trap}
 
 On the heavy $T=200$ benchmark event the in-matrix occupancy term at
-$\alpha=0.3$ does exactly what Denby promised: the classical wp99 false
-rate falls from $0.650$ to $0.210$ at efficiency $0.991$. If this paper
-were classical, the section would end here with a recommendation.
+$\alpha=0.3$ does exactly what Denby promised: the classical wp99
+false rate falls from $0.650$ to $0.210$ at efficiency $0.991$. If
+this paper were classical, the section would end here with a
+recommendation.
 
-For the 1BQF it is a disaster, and the mechanism is worth spelling out
-because it generalises. The notch's power is that isolated false segments
-sit \emph{exactly} on its zero. The occupancy coupling $2\alpha B_{\rm
-all}$ connects precisely those segments to their co-hit neighbours ---
-that is its job --- and thereby moves them \emph{off} the zero. On the
-benchmark event the co-hit false bulk, notched to amplitudes
-$\sim10^{-19}$ under the base Hamiltonian ($99\%$ of it below $10^{-17}$),
-re-emerges under $A_{\rm occ}$ at amplitudes on the \emph{true band}
-(its 99th percentile rises to $1.5\times10^{-3}$ against a true median of
-$1.2\times10^{-3}$). The rank separation collapses --- 1BQF AUC
-$0.996\to0.634$ --- and no threshold rescues it: the full sweep shows
-every occupancy-1BQF operating point dominated by the base-1BQF curve.
-Nor does the self-coupling $\gamma$ offer an escape: the notch tracks the
-diagonal, distance-to-notch is $\gamma$-invariant, and at the
-window-restoring $\gamma=236$ the occupancy system is strictly worse.
-Post-selection tells the same story: the occupancy term diverts the
-ancilla-conditioned probability mass almost entirely onto false segments.
+For the 1BQF it is a disaster, and the mechanism is worth spelling
+out because it generalises. The notch's power is that isolated false
+segments sit exactly on its zero. The occupancy coupling
+$2\alpha B_{\rm all}$ connects precisely those segments to their
+co-hit neighbours, which is its job, and thereby moves them off the
+zero. On the benchmark event the co-hit false bulk, notched to
+amplitudes $\sim10^{-19}$ under the base Hamiltonian ($99\%$ of it
+below $10^{-17}$), re-emerges under $A_{\rm occ}$ at amplitudes on
+the true band: its 99th percentile rises to $1.5\times10^{-3}$
+against a true median of $1.2\times10^{-3}$. The rank separation
+collapses (1BQF AUC $0.996\to0.634$) and no threshold rescues it;
+the full sweep shows every occupancy-1BQF operating point dominated
+by the base-1BQF curve. Nor does the self-coupling $\gamma$ offer an
+escape: the notch tracks the diagonal, distance-to-notch is
+$\gamma$-invariant, and at the window-restoring $\gamma=236$ the
+occupancy system is strictly worse. Post-selection tells the same
+story: the occupancy term diverts the ancilla-conditioned
+probability mass almost entirely onto false segments.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{dp_occupancy_proof.png}
-\caption{The occupancy proof (heavy $T=200$): (a) the same co-hit false
-segments, exactly notched under the base Hamiltonian, re-emerge on the
-true amplitude band under $A_{\rm occ}$; (b) no threshold escape --- every
-occupancy-1BQF operating point is dominated, while the same term helps
-the classical solver; (c) no $\gamma$ escape; (d) the post-selected
-probability mass diverts to false segments.}
+\caption{The occupancy proof (heavy $T=200$): (a) the same co-hit
+false segments, exactly notched under the base Hamiltonian, re-emerge
+on the true amplitude band under $A_{\rm occ}$; (b) no threshold
+escape: every occupancy-1BQF operating point is dominated, while the
+same term helps the classical solver; (c) no $\gamma$ escape; (d) the
+post-selected probability mass diverts to false segments.}
 \label{fig:occproof}
 \end{figure}
 
-The general lesson, stated once and used twice: \textbf{a spectral filter
-earns its living from populations pinned to known eigenvalues; any
-Hamiltonian term that couples a pinned population unpins it.} Constraint
-terms that help an amplitude-reading solver can therefore destroy a
-spectrum-reading one. The occupancy constraint is real physics --- hits
-really are used once --- but it must act where it cannot smear the
-spectrum: after the solve.
-
-\subsection{Occupancy as post-selection: the hit-uniqueness gate}
-\label{sec:occupancy:gate}
-
-So, what can we do? Move the constraint out of the matrix. The
-\emph{hit-uniqueness gate} applies Denby's rule to the solver's
-\emph{output}: walk the active segments in descending amplitude, let each
-claim its two (hit, role) slots, and drop any active segment arriving at
-an already-claimed slot --- an auction with one ticket per seat, in which
-the strongest candidate for each slot wins.\footnote{Role-awareness is
-essential. A hit interior to a track legitimately serves two segments ---
-one arriving, one departing --- so competition is only ever
-\emph{same-role}. A role-blind version of this gate exists in our study
-as a deliberate negative control: it deletes track interiors and caps
-efficiency at $25$--$50\%$.}
-
-On the heavy $T=200$ benchmark, applied to the \emph{base} classical
-solution with no solver change at all, the gate's threshold-swept optimum
-reaches false rate $0.040$ at efficiency $0.942$ --- a false-rate level
-the in-matrix term cannot reach at any threshold --- and its per-class
-census shows the kill is surgical: of $1403$ thresholded co-hit false
-actives, $14$ survive; true losses are the $\approx40$ segments that
-genuinely lose their slot auction (crossing tracks and hub-centre
-usurpers). At moderate noise the gate beats the in-matrix term on
-\emph{both} axes ($\eff=0.9975$, $\far=0.0000$ against $0.9911/0.0275$),
-and on clean events it is exact. Composed with the 1BQF instead of the
-classical solver it performs identically in kind ($0.921/0.053$ at heavy
-$T=200$): the notch removes the isolated bulk, the gate removes the
-coupled survivors. Its one genuine limitation appears at high density
-($T=400$ heavy), where slot auctions among near-degenerate candidates
-cost real efficiency; there the gate is a component, not a solution ---
-and section~\ref{sec:fit} shows what completes it.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.95\textwidth]{dp_postselect_uniqueness_frontiers.png}
-\caption{The hit-uniqueness gate: composed threshold$\to$gate frontiers
-against the base and in-matrix-occupancy sweeps, classical (left) and
-1BQF (right), heavy $T=200$. The gate reaches false-rate levels the
-in-matrix term cannot, at either solver.}
-\label{fig:gate}
-\end{figure}
-
-The occupancy verdict, then, is a precise inversion of the naive reading:
-the \emph{constraint} is valuable, the \emph{Hamiltonian term} is not.
-Keep the physics; change the interface.
+The general lesson, stated once here and used again for the fork, is
+this: a spectral filter earns its living from populations pinned to
+known eigenvalues, and any Hamiltonian term that couples a pinned
+population unpins it. Constraint terms that help an
+amplitude-reading solver can therefore destroy a spectrum-reading
+one. The occupancy constraint is real physics, since hits really are
+used once, but if it is to be used at all it must act where it
+cannot smear the spectrum: after the solve, as classical
+post-processing.\footnote{The programme develops that
+post-processing tool, a hit-uniqueness selection applied evenly to
+every solver's output, in a separate occupancy study; it is
+deliberately kept out of this paper, whose subject is the spectral
+side.} For this paper the occupancy verdict is the negative result,
+and it is worth stating plainly: as a Hamiltonian term, occupancy is
+poison to a notch, and the classical intuition for the term does not
+transfer.
 
 % ══════════════════════════════════════════════════════════════════════════════
-\section{The fork term: a real spectral improvement, and a no-go that
-was really a fitting failure}
+\section{The fork term and the moving spectrum}
 \label{sec:fork}
 
 \subsection{The term and its validity envelope}
 
 The second Denby--Peterson penalty targets \emph{bifurcations}: two
-segments claiming the same hit in the same role at small mutual angle ---
-the fork topology that produces the closely-competing candidates a wide
-acceptance admits. The $\varepsilon$-windowed form adds
+segments claiming the same hit in the same role at small mutual
+angle, the fork topology that produces the closely-competing
+candidates a wide acceptance admits. The $\varepsilon$-windowed form
+adds
 \begin{equation}
 A'=A+\beta\,B_{\rm fork}(\varepsilon_B),
 \label{eq:fork}
 \end{equation}
-where $B_{\rm fork}$ couples co-hit same-role pairs within angular window
-$\varepsilon_B$ (default: the acceptance itself). Unlike the occupancy
-term, the fork is \emph{surgical} where it matters: on clean events it
-touches $\approx2\%$ of segments and provably no pure-true chain carries a
-fork edge, so the true comb lines are $\beta$-invariant. Earlier
-classical-side work in this programme established that the fork migrates
-contaminated-true spectral weight back toward the comb bands, and an
-emulated composition projected efficiency near $99\%$ at sub-percent
-false rate --- the target the present section set out to validate with
-real solvers.
+where $B_{\rm fork}$ couples co-hit same-role pairs within angular
+window $\varepsilon_B$ (default: the acceptance itself). Unlike the
+occupancy term, the fork is surgical where it matters. On clean
+events it touches $\approx2\%$ of segments, and provably no
+pure-true chain carries a fork edge, so the true comb lines are
+$\beta$-invariant. Earlier classical-side work in this programme
+established that the fork migrates contaminated-true spectral weight
+back toward the comb bands, and an emulated composition projected an
+operating point near $99\%$ efficiency at sub-percent false rate,
+the target this section set out to validate with real solvers.
 
-Adding a positive semi-definite coupling widens the spectrum, and the
-solver imposes two validity conditions with closed forms. Positive
-definiteness requires $\gamma>\gamma_{\rm pd}=\gamma_{\rm
+Adding a positive semi-definite coupling widens the spectrum, and
+the solver imposes two validity conditions with closed forms.
+Positive definiteness requires $\gamma>\gamma_{\rm pd}=\gamma_{\rm
 ref}-\lambda_{\min}$; the one-period condition of any cosine-family
-filter --- the top of the spectrum must not alias through the response
-period --- requires $\gamma>\gamma_{\rm win}=\lambda_{\max}-\gamma_{\rm
-ref}-2\delta$ (both extremes measured at a reference $\gamma_{\rm ref}$
-and shifted rigidly, since $\gamma$ enters only the diagonal). At heavy
-$T=200$ the measured requirement is $\gamma^*\approx3.4$ at $\beta=0.5$
-and $\approx4.4$ at $\beta=1$; the notch tracks the diagonal
-automatically ($t=\pi/s'$, $s'=\gamma+\delta$), and the comb is rebuilt
-on the measured shifted spectrum. Every fork result below carries these
-retunes; a window-violating control ($\beta=0.5$ at $\gamma=3$) is kept
-in the study to show they matter.
+filter (the top of the spectrum must not alias through the response
+period) requires $\gamma>\gamma_{\rm win}=\lambda_{\max}-\gamma_{\rm
+ref}-2\delta$, both extremes measured at a reference
+$\gamma_{\rm ref}$ and shifted rigidly, since $\gamma$ enters only
+the diagonal. At heavy $T=200$ the measured requirement is
+$\gamma^*\approx3.4$ at $\beta=0.5$ and $\approx4.4$ at $\beta=1$.
+The notch tracks the diagonal automatically ($t=\pi/s'$,
+$s'=\gamma+\delta$), and the comb is rebuilt on the measured shifted
+spectrum. Every fork result below carries these retunes; a
+window-violating control ($\beta=0.5$ at $\gamma=3$) is kept in the
+study to show they matter.
 
 \subsection{The measured no-go with the unfitted comb}
 \label{sec:fork:nogo}
 
-Ran exactly so, with the \emph{production} comb: the fork strictly hurts.
-The exact-readout 1BQF's wp99 false rate at heavy $T=200$ climbs
-$0.65\to0.73\to0.96$ for $\beta=0\to0.5\to1$; the comb's wp99 reading is
-pinned near $0.995$ for every $\beta$ (a convention degeneracy --- see
-below); the emulated $99.1/0.9$ target is nowhere in sight; and the best
-composition on offer ($\approx0.95$ efficiency at $0.04$--$0.05$ false
-rate) comes from the uniqueness gate, $\beta$-independent. Taken at face
-value: a no-go for the operator knob on the quantum side.
+Run exactly so, with the \emph{production} comb, the fork strictly
+hurts. The exact-readout 1BQF's wp99 false rate at heavy $T=200$
+climbs $0.65\to0.73\to0.96$ for $\beta=0\to0.5\to1$; the comb's
+wp99 reading is pinned near $0.995$ for every $\beta$ (a convention
+degeneracy, discussed below); and the emulated target is nowhere in
+sight. Taken at face value this is a no-go for the operator knob on
+the quantum side.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.95\textwidth]{fork_quantum_noisy.png}
-\caption{The fork with the \emph{unfitted} comb (heavy $T=200$): wp99
-false rates per solver and $\beta$ (a); the three-knob composition
-against the emulated target (b); per-segment comb readout migration (c);
+\caption{The fork with the \emph{unfitted} comb (heavy $T=200$):
+wp99 false rates per solver and $\beta$ (a); compositions against
+the emulated target (b); per-segment comb readout migration (c);
 spectral span, degree, success and circuit fidelity costs (d).}
 \label{fig:forknogo}
 \end{figure}
 
-Two observations kept the verdict from being final. First, the wp99
-convention degenerates for the comb at heavy noise --- contaminated true
-segments carry near-zero comb amplitude, the $1\%$-quantile threshold
-collapses to its floor, and the ``false rate'' reading of $0.995$
-describes the convention, not the filter. This is why
-section~\ref{sec:fit} switches to matched-efficiency comparisons.
-Second, and decisively: \emph{the comb was never refitted to the fork
-system's false population}. The retunes above move the comb's centre and
-domain --- they do not ask where the false weight now lives. The
-no-go, in other words, was a verdict on an unfitted filter, and the
-correct response was not to abandon the operator knob but to complete
-the design loop it opens: change the Hamiltonian $\Rightarrow$ the
-activations and their spectral support move $\Rightarrow$ the polynomial
-must be refitted to the moved spectrum. Carrying out that loop is the
-final act of this paper.
+Two observations kept the verdict from being final. The first is
+that the wp99 convention degenerates for the comb at heavy noise:
+contaminated true segments carry near-zero comb amplitude, the
+$1\%$-quantile threshold collapses to its floor, and the resulting
+false-rate reading of $0.995$ describes the convention, not the
+filter. This is why section~\ref{sec:fit} switches to
+matched-efficiency comparisons. The second observation is the
+decisive one: the comb was never refitted to the fork system's false
+population. The retunes above move the comb's centre and domain;
+they do not ask where the false weight now lives. The no-go, in
+other words, was a verdict on an unfitted filter, and the correct
+response was not to abandon the operator knob but to complete the
+design loop it opens. Change the Hamiltonian, and the activations
+and their spectral support move; when they move, the polynomial must
+be refitted to the moved spectrum. Carrying out that refit is the
+subject of section~\ref{sec:fit}.
 
 \subsection{A Trotter aside that will matter on hardware}
 
-The same study ran the real product-formula OneBQF circuit against the
-exact evolution on identical fork systems, and found a clean split:
-with \emph{uniform} couplings ($\beta=0$, and $\beta=1$ where fork edges
-match compatibility edges in weight) circuit and exact evolution agree to
-$\cos\approx0.985$; at \emph{heterogeneous} $\beta=0.5$ the per-pair
-product formula scatters the readout ($\cos=0.944$, circuit false rate
-$0.96$ against the exact $0.73$). An independent arbiter run on the erf
-angular-cost Hamiltonian --- same events, exact $e^{iAt}$ against the
-stored circuits --- shows the identical pattern at larger amplitude:
-mixed-weight kernels are Trotter-dominated (false rate $0.83\to0.22$ at
-moderate noise once the product formula is removed), uniform-weight
-kernels are not. The rule of thumb for hardware: \textbf{heterogeneous
-coupling weights break the naive product formula}, and circuit
-realisations of weighted Hamiltonians need the structured synthesis
-route (edge-coloured ordering) developed in the programme's
+The same study ran the real product-formula OneBQF circuit against
+the exact evolution on identical fork systems, and found a clean
+split. With uniform couplings ($\beta=0$, and $\beta=1$ where fork
+edges match compatibility edges in weight) circuit and exact
+evolution agree to $\cos\approx0.985$; at heterogeneous $\beta=0.5$
+the per-pair product formula scatters the readout
+($\cos=0.944$, circuit false rate $0.96$ against the exact $0.73$).
+An independent arbiter run on the erf angular-cost Hamiltonian, same
+events, exact $e^{iAt}$ against the stored circuits, shows the
+identical pattern at larger amplitude: mixed-weight kernels are
+Trotter-dominated (false rate $0.83\to0.22$ at moderate noise once
+the product formula is removed), uniform-weight kernels are not. The
+rule of thumb for hardware is that heterogeneous coupling weights
+break the naive product formula, and circuit realisations of
+weighted Hamiltonians need the structured synthesis route
+(edge-coloured ordering) developed in the programme's
 direct-structural-synthesis study. All fork and fit results in this
-paper use exact evolution precisely so that filter physics and circuit
-error are never conflated.
+paper use exact evolution precisely so that filter physics and
+circuit error are never conflated.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{erf_exact_evolution_check.png}
+\caption{The exact-evolution arbiter on the erf angular-cost
+Hamiltonian: uniform-coupling kernels (step2x) show circuit $=$
+exact (the deficit is physics); finite-width kernels (kink) are
+Trotter-dominated. Removing the product formula collapses the false
+rate from $0.83$ to $0.22$ (moderate) and $0.94$ to $0.58$ (heavy).}
+\label{fig:erf}
+\end{figure}
 
 % ══════════════════════════════════════════════════════════════════════════════
-\section{Fitting the polynomial to the problem, II: roots at the
+\section{Fitting the polynomial to noisy events: roots at the
 measured pile-up}
 \label{sec:fit}
 
-\subsection{Measure first}
+\subsection{Measuring the false pile-up}
 
-The fit begins with the measurement the no-go was missing. Because the
-heavy-noise compatibility graph has no giant component
-(section~\ref{sec:noise}), the per-component eigendecomposition gives,
-for every eigenvalue in the event, its exact content: how much of the
-mode's weight lies on true segments, how much on false, and how much of
-each segment's amplitude it builds. Under any response $p$,
+The fit begins with the measurement the no-go was missing. Because
+the heavy-noise compatibility graph has no giant component
+(section~\ref{sec:noise}), the per-component eigendecomposition
+gives, for every eigenvalue in the event, its exact content: how
+much of the mode's weight lies on true segments, how much on false,
+and how much of each segment's amplitude it builds. Under any
+response $p$,
 \begin{equation}
 x_s(p)=\sum_i p(\lambda_i)\,\big(\mathbf{v}_i^{\!\top}\mathbf{b}\big)\,
 v_i(s),
 \label{eq:linresponse}
 \end{equation}
-linear in $p$ --- so ``where does the false amplitude come from'' is a
-well-posed, exactly answerable question. The answer, on the heavy
-$T=200$ events, is strikingly concentrated: the false-active formation
-weight piles up on the \emph{pair line} $\lambda=s-1$ --- on the three
-events measured, that single bin carries $1122$--$1378$ weight units
-against $4$--$10$ units of true weight --- with the triple lines
-$s\pm\sqrt2$ next; the overall bin-level overlap between false-active
-and true formation is $0.014$--$0.023$ in cosine. The false
-population is not smeared; it is parked on the eigenvalue lines of
-identifiable two- and three-segment motifs, almost none of which are
-shared with true formation. One could hardly ask for a friendlier
-target.
+linear in $p$, so the question of where the false amplitude comes
+from is well posed and exactly answerable. The answer, on the heavy
+$T=200$ events, is concentrated to a degree I did not expect. The
+false-active formation weight piles up on the \emph{pair line}
+$\lambda=s-1$: on the three events measured, that single bin carries
+$1122$--$1378$ weight units against $4$--$10$ units of true weight,
+with the triple lines $s\pm\sqrt2$ next; the overall bin-level
+overlap between false-active and true formation is $0.014$--$0.023$
+in cosine. The false population is not smeared. It is parked on the
+eigenvalue lines of identifiable two- and three-segment motifs,
+almost none of which are shared with true formation.
 
-\subsection{Then fit}
+\subsection{Fitting the response}
 
 With eq.~\eqref{eq:linresponse} linear in the response, the fit is a
 regularised least-squares problem over binned response values
@@ -1050,280 +1053,265 @@ regularised least-squares problem over binned response values
 \qquad |p|\le1,
 \label{eq:fit}
 \end{equation}
-with the isolated-false line pressured to zero and $\mu$ swept to trace
-the efficiency--purity trade. No root position is chosen by hand: zeros
-appear where false weight concentrates because that is what the
-objective rewards. The fitted response reproduces the comb's passes at
-the (contamination-shifted) true lines and drives deep roots through
-$s-1$ and $s\pm\sqrt2$ --- the polynomial the no-go was missing.
+with the isolated-false line pressured to zero and $\mu$ swept to
+trace the efficiency--purity trade. No root position is chosen by
+hand: zeros appear where false weight concentrates because that is
+what the objective rewards. The fitted response reproduces the
+comb's passes at the (contamination-shifted) true lines and drives
+deep roots through $s-1$ and $s\pm\sqrt2$, which is precisely the
+polynomial the no-go was missing.
 
-\subsection{The results}
+\subsection{Results}
 \label{sec:fit:results}
 
 Comparisons are at matched efficiency (the $k$-th-true-amplitude
-convention of section~\ref{sec:toy:metrics}), rep-averaged over three
-events per configuration. The headline table, heavy noise, $T=200$:
+convention of section~\ref{sec:toy:metrics}), rep-averaged over
+three events per configuration. The main table, heavy noise,
+$T=200$:
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.98\textwidth]{fit_comb.png}
-\caption{Fitting the response to the measured pile-up (heavy $T=200$):
-(a) exact per-mode false (red) and true (green) formation weight against
-$\lambda$, with the fixed comb and the fitted response overlaid --- the
-fitted roots land on the pair and triple lines; (b) the resulting
-frontier, with the fragment floor biting only above
-$\eff\approx0.99$; (c) matched-efficiency verdict across configurations;
-(d) realizability and generalization of the fitted response.}
+\caption{Fitting the response to the measured pile-up (heavy
+$T=200$): (a) exact per-mode false (red) and true (green) formation
+weight against $\lambda$, with the fixed comb and the fitted
+response overlaid; the fitted roots land on the pair and triple
+lines. (b) The resulting frontier, with the fragment floor biting
+only above $\eff\approx0.99$. (c) Matched-efficiency verdict across
+configurations. (d) Realizability and generalization of the fitted
+response.}
 \label{fig:fit}
 \end{figure}
 
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{llcccccc}
+\begin{tabular}{llcccc}
 \toprule
-config & eff & classical & 1BQF & comb (fixed) & \textbf{fitted} &
-\textbf{fitted+gate}\\
+config & eff & classical & 1BQF & comb (fixed) & \textbf{fitted}\\
 \midrule
-$\beta=0$        & 0.98 & 0.124 & 0.199 & 0.733 & \textbf{0.096} & \textbf{0.010}\\
-$\beta=0$        & 0.97 & 0.124 & 0.199 & 0.466 & \textbf{0.061} & \textbf{0.018}\\
-$\beta=0.5,\gamma^*$ & 0.98 & 0.463 & 0.145 & 0.960 & \textbf{0.085} & \textbf{0.013}\\
-$\beta=0.5,\gamma^*$ & 0.97 & 0.292 & 0.124 & 0.960 & \textbf{0.046} & \textbf{0.015}\\
+$\beta=0$        & 0.98 & 0.124 & 0.199 & 0.733 & \textbf{0.096}\\
+$\beta=0$        & 0.97 & 0.124 & 0.199 & 0.466 & \textbf{0.061}\\
+$\beta=0.5,\gamma^*$ & 0.98 & 0.463 & 0.145 & 0.960 & \textbf{0.085}\\
+$\beta=0.5,\gamma^*$ & 0.97 & 0.292 & 0.124 & 0.960 & \textbf{0.046}\\
 any              & 0.99 & 0.63--0.76 & 0.65--0.96 & $\approx$1 &
-0.63--0.77 & ---\\
+0.63--0.77\\
 \bottomrule
 \end{tabular}
-\caption{Segment false rate at matched efficiency, heavy noise, $T=200$
-(rep-means). ``Fitted'' is the optimal binned response of
-eq.~\eqref{eq:fit}; ``fitted+gate'' composes it with the hit-uniqueness
-gate of section~\ref{sec:occupancy:gate}.}
+\caption{Segment false rate at matched efficiency, heavy noise,
+$T=200$ (rep-means). ``Fitted'' is the optimal binned response of
+eq.~\eqref{eq:fit}.}
 \label{tab:fit}
 \end{table}
 
-Three conclusions, in decreasing order of comfort.
+Three conclusions follow.
 
-\textbf{The expected ordering is restored.} Below efficiency
+First, the expected ordering is restored. Below efficiency
 $\approx0.985$ the fitted quantum filter sits under the classical
-baseline everywhere --- modestly alone ($0.061$ vs $0.124$ at
-$\eff=0.97$), decisively with the gate ($0.010$--$0.018$: a false rate
-forty times below the raw wp99 reading).\footnote{Gate bookkeeping, for
-fairness: the gate frontier does not reach every efficiency target on
-every event. The $\eff=0.97$ gate entries average all three events; the
-$\eff=0.98$ entries rest on the subset (one of three events at
-$\beta=0$) where the gated frontier attains that efficiency. The same
-gate composed with the \emph{classical} solver --- reported on identical
-terms --- holds no target above $\eff\approx0.95$, where it reads
-$\approx0.03$ against the fitted filter's $0.011$.} The claim the
-reviewer asked for --- \emph{the false rate should still be lower for
-the quantum filters, once fitted} --- holds.
+baseline everywhere: $0.096$ against $0.124$ at $\eff=0.98$, $0.061$
+against $0.124$ at $\eff=0.97$. The claim this section set out to
+test, that the false rate should still be lower for the quantum
+filters once they are fitted, holds.
 
-\textbf{The fork is redeemed.} On the fork system the fitted response
+Second, the fork is redeemed. On the fork system the fitted response
 reaches $0.046$ at $\eff=0.97$, beating the fitted no-fork system's
-$0.061$ --- while the classical solver on the same fork system reads
+$0.061$, while the classical solver on the same fork system reads
 $0.292$. The operator knob does exactly what the spectral-migration
-analysis promised, \emph{provided} the response is refitted; paired
-with a fixed response it reads as a no-go. Changing the Hamiltonian
-without refitting the polynomial is not a half-measure --- it is worse
-than doing neither. The standard-notch 1BQF, incidentally, also
-benefits from the fork below the floor ($0.145$ vs $0.199$ at
-$\eff=0.98$): the fork pushes coupled-false modes \emph{away} from the
-passband even when the only zero sits at $s'$.
+analysis promised, provided the response is refitted; paired with a
+fixed response it reads as a no-go. Changing the Hamiltonian without
+refitting the polynomial is not a half-measure, it is worse than
+doing neither. The standard-notch 1BQF also benefits from the fork
+below the floor ($0.145$ against $0.199$ at $\eff=0.98$): the fork
+pushes coupled-false modes away from the passband even when the
+only zero sits at $s'$.
 
-\textbf{The wall at $\eff\ge0.99$ is real, universal, and now has a
-name.} At the strict efficiency-first point everything --- classical
-included --- floods back to $\far\approx0.65$. The per-component
+Third, the wall at $\eff\ge0.99$ is real, universal, and now has a
+name. At the strict efficiency-first point everything, classical
+included, floods back to $\far\approx0.65$. The per-component
 census locates the cause exactly: $\approx2\%$ of \emph{true}
-segments (directly counted: $15$ and $22$ of $783$/$788$ on two of the
-three events\footnote{On the third event the census heuristic reads
-$52$ through a scale-sensitive leak-tier definition (its fit selected a
-tenfold-larger regulariser), and it degenerates on the fork
-configurations, so I quote only the directly-counted events and flag the
-third as unresolved. The robust, heuristic-free statement is the
-measured wall itself: every solver holds $\eff=0.98$ and none holds
-$\eff=0.99$, on all three events.}) are \textbf{spectral twins of
-the false motifs}. They are the hit-drop fragments of
-section~\ref{sec:comb:drop} --- a broken track's two-segment piece
-\emph{is} a pair, sitting on the pair line, in a pure-true component
-of shape $(2,2,0)$ --- plus a handful of contaminated mixed chains.
-Any response with a root at $s-1$ kills them alongside the false
-pairs; their population exceeds the $1\%$ efficiency budget; and once
-the working point must dip below their (suppressed) amplitudes, the
-entire suppressed false band comes back above threshold. This is the
-\emph{fragment floor}: the noisy-event generalisation of the clean
-floor theorem, no longer a curiosity ($0\%$ at $T\le200$ clean) but
-the binding constraint, and no function of $\lambda$ --- fitted,
-oracle, or otherwise --- can cross it. Recovering those segments
-requires hit-level information, which is exactly what the gate
-provides at the efficiencies it can reach.
+segments (directly counted: $15$ and $22$ of $783$/$788$ on two of
+the three events\footnote{On the third event the census heuristic
+reads $52$ through a scale-sensitive leak-tier definition (its fit
+selected a tenfold-larger regulariser), and it degenerates on the
+fork configurations, so I quote only the directly-counted events
+and flag the third as unresolved. The robust, heuristic-free
+statement is the measured wall itself: every solver holds
+$\eff=0.98$ and none holds $\eff=0.99$, on all three events.}) are
+spectral twins of the false motifs. They are the hit-drop fragments
+of section~\ref{sec:comb:drop}: a broken track's two-segment piece
+\emph{is} a pair, sitting on the pair line, in a pure-true
+component, plus a handful of contaminated mixed chains. Any
+response with a root at $s-1$ kills them alongside the false pairs;
+their population exceeds the $1\%$ efficiency budget; and once the
+working point must dip below their (suppressed) amplitudes, the
+entire suppressed false band comes back above threshold. This is
+the \emph{fragment floor}: the noisy-event generalisation of the
+clean floor theorem, no longer a curiosity but the binding
+constraint, and no function of $\lambda$, fitted or otherwise, can
+cross it. Recovering those segments requires hit-level information,
+which is classical track-level work outside the spectral domain and
+outside this paper.
 
 \subsection{Why the 1BQF specifically cannot follow}
 \label{sec:fit:rootbudget}
 
-A degree-one filter owns one zero, and the measurement says the heavy
-false spectrum has \emph{two} mandatory root locations: the isolated
-line at $s$ ($\mathcal{O}(10^5)$ segments) and the pair line at $s-1$
-(the active pile-up). The study's control makes the conflict vivid:
-retuning the notch onto the pair line ($t=\pi/(s{-}1)$) does root the
-pile-up --- and releases the isolated bulk, which re-enters at
-amplitude $|\cos(st/2)|\,\delta=0.5$, on top of the true band, for a
-false rate of $0.995$. The 1BQF's zero is spoken for. Covering both
-lines is degree two; covering the triple lines as well is degree
-four-and-up; and that, stated as a root budget, is the cleanest
-justification for the whole QSVT programme that the toy has produced.
+A degree-one filter owns one zero, and the measurement says the
+heavy false spectrum has two mandatory root locations: the isolated
+line at $s$ ($\mathcal{O}(10^5)$ segments) and the pair line at
+$s-1$ (the active pile-up). The study's control makes the conflict
+vivid. Retuning the notch onto the pair line ($t=\pi/(s{-}1)$) does
+root the pile-up, and releases the isolated bulk, which re-enters
+at amplitude $|\cos(st/2)|\,\delta=0.5$, on top of the true band,
+for a false rate of $0.995$. The 1BQF's zero is spoken for.
+Covering both lines is degree two; covering the triple lines as
+well is degree four and up; and that, stated as a root budget, is
+in my opinion the cleanest justification for the whole QSVT
+programme that the toy has produced.
 
 % ══════════════════════════════════════════════════════════════════════════════
-\section{Limitations, and what they teach}
+\section{Limitations}
 \label{sec:limits}
 
-I collect here, deliberately unvarnished, everything that stands between
-the results above and a deployable algorithm. Each limitation comes with
-its measured size and, where we have one, its escape route.
+I collect here, deliberately and in one place, everything that
+stands between the results above and a deployable algorithm. Each
+limitation comes with its measured size and, where we have one, its
+escape route.
 
 \subsection{Realizability of the fitted response}
 \label{sec:limits:realizability}
 
 The fitted optimum of eq.~\eqref{eq:fit} has features of width
 $\approx0.02$ on a spectral span of $\approx7$. A single global
-Chebyshev series resolving that needs degree $d\approx2W/h\approx700$;
-our realizability ladder confirms the arithmetic (at $d=240$ the
-realised filter still reads $0.88$ false rate at $\eff=0.985$, far from
-the optimum's $0.35$ on the same convention). Global realization at the
-fitted resolution is therefore expensive --- hundreds of walk calls per
-repetition. The escape is structural: the same no-giant-component fact
-that made the spectrum measurable makes the \emph{problem
-block-diagonal}. Solving per connected component (a classical
-$\mathcal{O}(n)$ preprocessing step) replaces one $4T^2$-dimensional
-filter problem by hundreds of $\le17$-dimensional ones, on which a
-degree-$\le17$ interpolating polynomial reproduces \emph{any} response
-exactly --- and as a bonus the register shrinks to
-$\lceil\log_2 17\rceil+2$ qubits and the success probability per
-cluster becomes $\mathcal{O}(1)$. The cost is honesty about what
-remains quantum: per-cluster solving helps the classical solver
-identically, and the quantum claim reduces to the resource profile of
-section~\ref{sec:qsvt:resources} on whatever cluster sizes survive
-preprocessing.
+Chebyshev series resolving that needs degree
+$d\approx2W/h\approx700$; our realizability ladder confirms the
+arithmetic (at $d=240$ the realised filter still reads $0.88$ false
+rate at $\eff=0.985$, far from the optimum's $0.35$ on the same
+convention). Global realization at the fitted resolution is
+therefore expensive, hundreds of walk calls per repetition. The
+escape is structural: the same no-giant-component fact that made
+the spectrum measurable makes the problem block-diagonal. Solving
+per connected component (a classical $\mathcal{O}(n)$ preprocessing
+step) replaces one $4T^2$-dimensional filter problem by hundreds of
+$\le17$-dimensional ones, on which a degree-$\le17$ interpolating
+polynomial reproduces any response exactly, and as a bonus the
+register shrinks to $\lceil\log_2 17\rceil+2$ qubits and the
+success probability per cluster becomes $\mathcal{O}(1)$. The cost
+is honesty about what remains quantum: per-cluster solving helps
+the classical solver identically, and the quantum claim reduces to
+the resource profile of section~\ref{sec:qsvt:resources} on
+whatever cluster sizes survive preprocessing.
 
 \subsection{Generalization of the fit}
 \label{sec:limits:generalization}
 
-The response fitted on one event transfers poorly to its statistical
-siblings ($0.63$--$0.99$ false rate on cross-application, against
-$0.04$--$0.10$ in-sample). The decomposition is instructive: the
-\emph{root} positions are universal --- $s-1$ and $s\pm\sqrt2$ are
-motif properties, not event properties --- but the fitted \emph{pass}
-positions chase each event's particular contaminated-true modes, which
-shift with the noise realisation. A production design must therefore be
-a \emph{universal} response: roots pinned to the motif lines, passes
-wide enough to cover the contaminated-true spread measured across an
-event ensemble, fitted jointly rather than per event. The per-event fit
-of section~\ref{sec:fit} then plays the role its construction suggests:
-the measured ceiling that a universal design approaches. Building that
-universal response --- and quantifying the ceiling gap --- is the
-programme's clear next step.
+The response fitted on one event transfers poorly to its
+statistical siblings ($0.63$--$0.99$ false rate on
+cross-application, against $0.04$--$0.10$ in-sample). The
+decomposition is instructive. The root positions are universal
+($s-1$ and $s\pm\sqrt2$ are motif properties, not event
+properties), but the fitted pass positions chase each event's
+particular contaminated-true modes, which shift with the noise
+realisation. A production design must therefore be a universal
+response: roots pinned to the motif lines, passes wide enough to
+cover the contaminated-true spread measured across an event
+ensemble, fitted jointly rather than per event. The per-event fit
+of section~\ref{sec:fit} then plays the role its construction
+suggests, the measured ceiling that a universal design approaches.
+Building that universal response, and quantifying the ceiling gap,
+is the programme's clear next step.
 
 \subsection{Trotterization on hardware}
 \label{sec:limits:trotter}
 
 Everything above uses exact evolution. On hardware, the 1BQF's
-product-formula circuit is exact only in the uniform-coupling case; the
-moment coupling weights differ --- erf-weighted kernels, fractional
-fork strengths --- the naive per-pair formula scatters the readout by
-amounts that dominate the physics (section~\ref{sec:fork}). The
-structured-synthesis route (edge-coloured pair ordering, developed in
-the programme's DSS study, which also reaches 1BQF width for the comb
-via generalized QSP over $e^{-iAt}$) restores exactness at matched
-cost and is, on present evidence, mandatory for any weighted
-Hamiltonian on hardware.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.9\textwidth]{erf_exact_evolution_check.png}
-\caption{The exact-evolution arbiter on the erf angular-cost Hamiltonian:
-uniform-coupling kernels (step2x) show circuit $=$ exact (the deficit is
-physics); finite-width kernels (kink) are Trotter-dominated --- removing
-the product formula collapses the false rate from $0.83$ to $0.22$
-(moderate) and $0.94$ to $0.58$ (heavy).}
-\label{fig:erf}
-\end{figure}
+product-formula circuit is exact only in the uniform-coupling case;
+the moment coupling weights differ (erf-weighted kernels,
+fractional fork strengths) the naive per-pair formula scatters the
+readout by amounts that dominate the physics
+(section~\ref{sec:fork}). The structured-synthesis route
+(edge-coloured pair ordering, developed in the programme's DSS
+study, which also reaches 1BQF width for the comb via generalized
+QSP over $e^{-iAt}$) restores exactness at matched cost and is, on
+present evidence, mandatory for any weighted Hamiltonian on
+hardware.
 
 \subsection{Success probability and readout}
 \label{sec:limits:readout}
 
 The global filters run at $P_{\rm anc}\approx0.44/T$ (comb) and
-$\approx0.25/T$ (1BQF): thousandths at $T=1000$ before amplification.
-Amplitude amplification restores $\sqrt T$ scaling of total walk
-calls, and active-set readout (sampling until the $\mathcal{O}(T)$
-surviving segments are each seen) gives the measured
-$d\cdot T^{1.5}\log T$ walk-call budget against the classical
-$d\cdot T^{2}$ flop budget --- a square-root-class separation \emph{for
-that readout task}, and no more than that.
+$\approx0.25/T$ (1BQF): thousandths at $T=1000$ before
+amplification. Amplitude amplification restores $\sqrt T$ scaling
+of total walk calls, and active-set readout (sampling until the
+$\mathcal{O}(T)$ surviving segments are each seen) gives the
+measured $d\cdot T^{1.5}\log T$ walk-call budget against the
+classical $d\cdot T^{2}$ flop budget: a square-root-class
+separation for that readout task, and no more than that.
 
 \subsection{Dequantisation honesty}
 \label{sec:limits:dequant}
 
 Every response function in this paper can be applied classically by
-the Chebyshev recursion in $\mathcal{O}(d\cdot{\rm nnz}(A))$ flops ---
-seconds at $T=1000$. The discrimination physics --- combs, roots,
-floors --- is solver-independent mathematics of the segment
-Hamiltonian, and this paper's contribution to it stands whether or not
-a quantum computer is ever involved. The quantum claim is confined to
-the resource profile: width logarithmic in problem size, walk calls
-$d\sqrt T$ against classical $dT^2$ for the readout task above, and a
-hardware-native route to the same amplitudes. Readers allergic to
-quantum advantage claims may read the whole paper as classical
-spectral-filter engineering with a quantum implementation appendix;
-nothing in the physics sections would change.
+the Chebyshev recursion in $\mathcal{O}(d\cdot{\rm nnz}(A))$ flops,
+seconds at $T=1000$. The discrimination physics (combs, roots,
+floors) is solver-independent mathematics of the segment
+Hamiltonian, and this paper's contribution to it stands whether or
+not a quantum computer is ever involved. The quantum claim is
+confined to the resource profile: width logarithmic in problem
+size, walk calls $d\sqrt T$ against classical $dT^2$ for the
+readout task above, and a hardware-native route to the same
+amplitudes. Readers allergic to quantum advantage claims may read
+the whole paper as classical spectral-filter engineering with a
+quantum implementation appendix; nothing in the physics sections
+would change.
 
 \subsection{The toy's geometry, and what a real detector changes}
 \label{sec:limits:geometry}
 
-Finally, the elephant: the four-line comb exists because this toy pins
-every true track to five hits. Real VELO tracks have variable length,
-and a companion study on real Run-3 event geometry found the true
-spectrum smeared into a band, the P$_4$ comb keeping only $40\%$ of
-true segments, and a short-fragment floor ($m\le2$ tracks
-indistinguishable from noise at the segment level) capping \emph{all}
-segment-level solvers --- while the fork transfer and the
-band-plus-notch redesign behaved as the toy predicts. The honest
-statement of scope: this paper's method is \emph{response engineering
-on whatever spectral structure the geometry provides}, demonstrated
-exhaustively on a geometry that provides a lot of it; the measurement
-loop of section~\ref{sec:fit} (measure the pile-up, fit the response,
-locate the floor) is geometry-agnostic even where the specific comb is
-not.
+Finally, the largest caveat of all: the four-line comb exists
+because this toy pins every true track to five hits. Real VELO
+tracks have variable length, and a companion study on real Run-3
+event geometry found the true spectrum smeared into a band, the
+$P_4$ comb keeping only $40\%$ of true segments, and a
+short-fragment floor ($m\le2$ tracks indistinguishable from noise
+at the segment level) capping all segment-level solvers, while the
+fork transfer and the band-plus-notch redesign behaved as the toy
+predicts. The honest statement of scope is that this paper's method
+is response engineering on whatever spectral structure the geometry
+provides, demonstrated exhaustively on a geometry that provides a
+lot of it; the measurement loop of section~\ref{sec:fit} (measure
+the pile-up, fit the response, locate the floor) is
+geometry-agnostic even where the specific comb is not.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper set out to finish a thought that the one-bit quantum filter
-started. The 1BQF's insight was that track finding does not need a
-linear-system \emph{solution}, only a spectral \emph{separation}, and
-that one cosine with one zero buys the largest separation in the
-problem at almost no quantum cost. Promoting that cosine to the full
-QSVT polynomial family converts algorithm design into response design,
+This paper set out to finish a thought that the one-bit quantum
+filter started. The 1BQF's insight was that track finding does not
+need a linear-system solution, only a spectral separation, and that
+one cosine with one zero buys the largest separation in the problem
+at almost no quantum cost. Promoting that cosine to the full QSVT
+polynomial family converts algorithm design into response design,
 and response design turns out to be a measurement-driven loop:
 
 \begin{enumerate}[leftmargin=2em]
-\item \emph{Read the spectrum the problem gives you.} On clean events
-it hands you four exact lines, and a fixed forty-degree comb converts
+\item Read the spectrum the problem gives you. On clean events it
+hands you four exact lines, and a fixed forty-degree comb converts
 them into a false rate twenty times below classical at $T=1000$.
-\item \emph{When the problem changes, measure where the false weight
-went, and put roots there.} At heavy noise the pile-up sits on the
+\item When the problem changes, measure where the false weight
+went, and put roots there. At heavy noise the pile-up sits on the
 pair and triple motif lines; the fitted response beats classical at
-every attainable efficiency, and the fork term --- useless under a
-fixed response --- becomes a net win under a refitted one. Operator
+every attainable efficiency, and the fork term, useless under a
+fixed response, becomes a net win under a refitted one. Operator
 and response are one design, not two.
-\item \emph{Know what the spectrum cannot see, and collect it
-elsewhere.} Spectral twins --- false bridges on clean events,
-true fragments on noisy ones --- bound every function of $\lambda$,
-classical scoring included; at heavy noise they define a fragment
-floor at $\eff\approx0.98$. Constraint physics closes part of the
-gap, but only from \emph{outside} the Hamiltonian: as a
-post-selection gate on the raw classical solution it cuts the
-heavy-noise false rate from $65\%$ to $4\%$, and composed with the
-fitted filter to $1$--$2\%$, while as a Hamiltonian term the same
-physics destroys the notch it was meant to help.
+\item Know what the spectrum cannot see. Spectral twins, false
+bridges on clean events and true fragments on noisy ones, bound
+every function of $\lambda$, classical scoring included; at heavy
+noise they define a fragment floor at $\eff\approx0.98$. Constraint
+physics can close part of that gap, but only from outside the
+Hamiltonian: inside it, the same physics destroys the notch it was
+meant to help, which is the occupancy result of
+section~\ref{sec:occupancy}.
 \end{enumerate}
 
 The open problems are, I think, unusually crisp for this field: a
@@ -1333,13 +1321,13 @@ polynomial; edge-coloured synthesis for weighted couplings on
 hardware; and the transplant of the whole loop onto real detector
 geometry, where the first measurements say the method survives even
 though the comb does not. Every cloud has a silver lining: the same
-noise that broke the beautiful clean-event comb handed us a false
-population parked on nameable eigenvalue lines --- and a filter
-family with exactly enough roots to meet it.
+noise that broke the clean-event comb handed us a false population
+parked on nameable eigenvalue lines, and a filter family with
+exactly enough roots to meet it.
 
 \section*{Acknowledgements}
-To be completed (predecessor-paper co-authors, supervision, computing
-resources at Nikhef).
+To be completed (predecessor-paper co-authors, supervision,
+computing resources at Nikhef).
 
 % ══════════════════════════════════════════════════════════════════════════════
 \begin{thebibliography}{99}
@@ -1362,8 +1350,8 @@ reconstruction}, arXiv:2601.07766.
 
 \bibitem{denby1988}
 B.~Denby,
-\emph{Neural networks and cellular automata in experimental high energy
-physics}, Comput.\ Phys.\ Commun.\ \textbf{49} (1988) 429.
+\emph{Neural networks and cellular automata in experimental high
+energy physics}, Comput.\ Phys.\ Commun.\ \textbf{49} (1988) 429.
 
 \bibitem{peterson1989}
 C.~Peterson,
