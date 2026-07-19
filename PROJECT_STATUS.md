@@ -1,6 +1,23 @@
 # Project Status & TODO — Quantum Track Reconstruction
 
-_Last updated: 2026-07-17_
+_Last updated: 2026-07-19_
+
+### 🆕 2026-07-19 — paper review pass (25 points) · occupancy REVERSAL: refit wins + breaks the fragment floor
+George's 25-point review of the paper executed in full (`qsvt_velo_paper/main.tex`, 20→27 pp,
+10→17 figures; new `make_paper_figures.py` figure factory; zip standalone-verified). The review's
+item 12 ("does occupancy fail because we don't fit the QSVT?") forced a new measurement,
+`QSVT/Codesign/06_occupancy_fitted_check.py` (degree-d responses fitted directly in
+Chebyshev-coefficient space via moment vectors — works despite the occupancy giant component):
+- **The occupancy no-go was an unfitted-filter artifact.** Fitted response on A_occ (α=0.05,
+  heavy T=200): far **0.050/0.039** at matched eff 0.98/0.97 vs base-system fitted 0.085/0.071
+  and classical ≈0.12 — the best numbers in the study. α small wins (span 43 vs 242 at α=0.3).
+- **The fragment floor is base-Hamiltonian-specific.** Floor-bound event rep1 (fitted stuck at
+  0.654 @ eff 0.985 on A) fits to **0.062** on A_occ: the co-hit coupling breaks the
+  fragment/false-pair twin isomorphism. The 1BQF collapse (AUC 0.996→0.634) remains true.
+- Bonus: direct coefficient-space fitting kills the "realizability needs d≈700" claim — d=40
+  matches the binned optimum on the base system (0.099 vs 0.096 @ eff 0.98).
+- ⚠️ Revises the 2026-07-07 "occupancy is classical-side only, never a Hamiltonian term"
+  framing (which was notch-evidence-based). Provisional; George to verify (§7 + §9.4 of paper).
 
 ### 🆕 2026-07-17 — occupancy as post-selection · erf Trotter arbiter · fork quantum NO-GO
 Three studies closed in one pass (all store-backed, committed `7e755992`/`747fed7a`, write-ups
@@ -43,8 +60,10 @@ full paper programme (`QSVT/Paper_planning/PAPER_PLAN.md`, C1–C7 / WP1–WP7).
 package (LCU-of-Chebyshev qubitization; circuit == streaming == matrix-free to
 1e-9); the store campaign (`solver='qsvt'`, now to **T=1000**: comb far 1.0 %
 vs classical 20.5 %); the **line-comb inverse** (band fails at density) and the
-**minimax comb** (`design_minimax_comb`, degree 6–10); hit-drop fragments +
-**occupancy gate**; **per-solver efficiency-first thresholds** (T=400 clean:
+**minimax comb** (`design_minimax_comb`, degree 6–10); hit-drop fragments
+(a spectral floor — recovery is classical-side hit-uniqueness post-selection,
+not a comb "gate"; the earlier "occupancy gate" framing was retracted as creep,
+2026-07-18); **per-solver efficiency-first thresholds** (T=400 clean:
 classical 100 %/1.6 %, 1BQF 99.5 %/43.9 %, **QSVT 98.3 %/0.96 %**);
 **WP1** noise robustness (comb == classical to ≤0.7 % through the realistic
 range; acceptance wall + fragment degeneracy are encoding-level); **depth &
