@@ -180,7 +180,8 @@ fork term and the design rule that every operator change demands a
 response refit. Section~\ref{sec:fit} fits the polynomial to the
 measured false pile-up and presents the main comparison, including the
 refitted occupancy result. Section~\ref{sec:limits}
-collects the limitations: realizability, generalization, Trotterization,
+collects the limitations: realizability, the single-response question,
+Trotterization,
 and what a real detector geometry changes. Section~\ref{sec:conclusion}
 concludes.
 
@@ -309,15 +310,60 @@ x_{\rm inner}=\frac{5}{11}\approx0.455 ,
 \end{equation}
 where the outer levels belong to the two end segments (one continuation
 neighbour each) and the inner levels to the two middle segments (two
-neighbours each). More generally, a chain of $m$ segments has outer
-activation
+neighbours each).
+
+These numbers, and the whole family behind them, come from one small
+calculation that is worth doing explicitly. A chain of $m$ segments
+has the matrix $sI-P_m$ with $P_m$ the path adjacency, so the $j$-th
+row of $(sI-P_m)\,\mathbf{x}=\delta\mathbf{1}$ reads
+\[
+-x_{j-1}+s\,x_j-x_{j+1}=\delta ,\qquad j=1,\dots,m ,
+\]
+a three-term linear recurrence, provided we adopt the convention
+$x_0=x_{m+1}=0$: an end segment simply has no neighbour on one side,
+which is the same as coupling it to a phantom segment clamped at
+zero. A recurrence of this kind is solved by any particular solution
+plus the general homogeneous one. The natural particular solution is
+the constant
+\[
+\bar x=\frac{\delta}{s-2}=\frac12 \qquad (s=4,\ \delta=1),
+\]
+the activation of a segment deep inside an infinitely long chain,
+where both neighbours carry the same value and the row equation
+collapses to $(s-2)\,\bar x=\delta$. The homogeneous solutions of
+$-x_{j-1}+s\,x_j-x_{j+1}=0$ are the geometric sequences $r^{\,j}$
+with
+\[
+r+\frac{1}{r}=s
+\quad\Longrightarrow\quad
+r=\frac{s-\sqrt{s^{2}-4}}{2}=2-\sqrt3\approx0.268 ,
+\]
+a decaying root and its growing mirror $1/r$. Writing the general
+solution as $x_j=\bar x+A\,r^{\,j}+B\,r^{\,m+1-j}$ (one geometric
+correction anchored at each end) and imposing the two clamped-end
+conditions $x_0=x_{m+1}=0$ forces, by the chain's reflection
+symmetry, $A=B=-1/\big(2\,(1+r^{m+1})\big)$, so the entire
+activation profile has the closed form
+\[
+x_j=\frac12-\frac{r^{\,j}+r^{\,m+1-j}}{2\,(1+r^{m+1})} .
+\]
+The picture behind the algebra: each end of the chain is a cold
+boundary that drags the activation below the bulk value $\tfrac12$
+by a deficit decaying geometrically into the interior, with
+penetration depth $1/\ln(1/r)\approx0.76$ segments. Setting $j=1$
+(or, identically, $j=m$) gives the outer activation
 \begin{equation}
 x_{\rm outer}(m)=\frac12-\frac{r+r^{m}}{2\,(1+r^{m+1})},
 \qquad r=2-\sqrt3,
 \label{eq:ladder}
 \end{equation}
-which climbs the ladder $\{0.250,\ \tfrac13,\ \tfrac{5}{14},\
-\tfrac{4}{11},\dots\}\nearrow0.366$ for $m=1,2,3,4,\dots$ It is worth
+and $j=2$ at $m=4$ returns the inner $5/11$ of
+eq.~\eqref{eq:p4levels}. Equation~\eqref{eq:ladder} climbs the ladder
+$\{0.250,\ \tfrac13,\ \tfrac{5}{14},\
+\tfrac{4}{11},\dots\}\nearrow(1-r)/2=(\sqrt3-1)/2\approx0.366$ for
+$m=1,2,3,4,\dots$: a short chain sits low because the two boundary
+deficits overlap, and the ladder saturates once the ends are further
+apart than the penetration depth. It is worth
 working two rungs by hand. A two-hit fragment ($m{=}1$) sits at exactly
 the isolated-false attractor $0.250$, and a three-hit fragment ($m{=}2$)
 sits at $1/3$, only $0.083$ above it. Fragments are barely
@@ -1120,13 +1166,12 @@ offers no escape either. As a Hamiltonian term, occupancy is poison
 to a notch, and the classical intuition for the term does not
 transfer to it.\footnote{The occupancy constraint can also be applied
 entirely outside the Hamiltonian, as a classical hit-uniqueness
-post-selection applied evenly to every solver's output; the programme
-develops that tool in a separate study, deliberately kept out of this
-paper, whose subject is the spectral side.} But ``final for the
+post-selection applied evenly to every solver's output, deliberately kept out of this
+work, whose subject is the spectral side.} But ``final for the
 notch'' is not ``final for the filter family''. The fork term in the
-next section will teach the general lesson of this paper --- that an
+next section will teach the general lesson of this paper, that an
 operator modification can only be judged together with a response
-refitted to the spectrum it creates --- and
+refitted to the spectrum it creates, and
 section~\ref{sec:fit:occ} returns to the occupancy term with exactly
 that machinery. The verdict there reverses: what destroys the
 degree-one filter turns out to be the single most helpful operator
@@ -1409,8 +1454,7 @@ event, and the next subsection shows an operator that removes it.
 \subsection{The occupancy term, refitted}
 \label{sec:fit:occ}
 
-Section~\ref{sec:occupancy} ended with a debt: the occupancy verdict
-was passed on the notch, a filter with no freedom to follow the
+Section~\ref{sec:occupancy} ended with a debt: the occupancy was measured on the fixed 1BQF targeting the central, isolated, eigenvalue, a filter with no freedom to follow the
 spectrum the term creates, and the fork has since taught us that
 operator terms can only be judged with a refitted response. The
 occupancy system makes the refit technically harder --- the co-hit
@@ -1423,7 +1467,7 @@ and the amplitudes are linear in the Chebyshev coefficients. The fit
 of eq.~\eqref{eq:fit} then becomes an exact least-squares problem in
 $d{+}1$ coefficients, over \emph{every} segment of the event
 including the isolated bulk. Run identically on the base and
-occupancy systems (same machinery, same events, only the Hamiltonian
+occupancy systems (same algorithms, same events, only the Hamiltonian
 differs), it settles the question.
 
 The verdict of section~\ref{sec:occupancy} reverses
@@ -1455,15 +1499,16 @@ provably inseparable on the base Hamiltonian. The fragment floor of
 section~\ref{sec:fit:floor} is therefore a property of the
 \emph{base} Hamiltonian, not of the problem.
 
-Honesty requires the same caveats as the rest of this section: these
-are per-event fits, the measured ceiling of a universal design
-rather than a deployed algorithm
-(section~\ref{sec:limits:generalization}), and the degree budget
+One engineering note: the degree budget
 that collects the occupancy win is larger than the base system's
 (the span costs resolution; most of the gain arrives by degree
-$80$--$160$ at $\alpha=0.05$). Whether an ensemble-fitted universal
-response keeps the floor-breaking property is, with the universal
-response itself, the programme's clear next measurement.
+$80$--$160$ at $\alpha=0.05$). Like every fitted result in this
+section, the fit itself is mechanical --- the roots land on the
+enumerable motif structure the operator produces --- so the reversal
+is a property of the Hamiltonian, not of a tuning; folding it into
+the single fixed response of
+section~\ref{sec:limits:generalization} is part of that
+enumeration.
 
 \begin{figure}[t]
 \centering
@@ -1542,24 +1587,31 @@ the classical solver identically, and the quantum claim reduces to
 the resource profile of section~\ref{sec:qsvt:resources} on
 whatever cluster sizes survive preprocessing.
 
-\subsection{Generalization of the fit}
+\subsection{One response for all events}
 \label{sec:limits:generalization}
 
-The response fitted on one event transfers poorly to its
-statistical siblings ($0.63$--$0.99$ false rate on
-cross-application, against $0.04$--$0.10$ in-sample). The
-decomposition is instructive. The root positions are universal
-($s-1$ and $s\pm\sqrt2$ are motif properties, not event
-properties), but the fitted pass positions chase each event's
-particular contaminated-true modes, which shift with the noise
-realisation. A production design must therefore be a universal
-response: roots pinned to the motif lines, passes wide enough to
-cover the contaminated-true spread measured across an event
-ensemble, fitted jointly rather than per event. The per-event fit
-of section~\ref{sec:fit} then plays the role its construction
-suggests, the measured ceiling that a universal design approaches.
-Building that universal response, and quantifying the ceiling gap,
-is the programme's clear next step.
+On this toy the fit is not a statistical learning problem, and no
+train-and-test machinery is needed to understand it. The structures
+an event can contain are enumerable --- chains, hubs, bridges and
+their contaminated combinations, each pinned to closed-form
+eigenvalue lines --- and the fit is mechanical: the roots land on
+the motif lines because that is where the false weight must sit.
+The root positions are therefore universal ($s-1$ and $s\pm\sqrt2$
+are motif properties, not event properties). What does vary between
+events is the contaminated-true pass positions, which chase each
+noise realisation's particular contaminated modes: a response taken
+verbatim from one event and applied to another reads $0.63$--$0.99$
+false rate against $0.04$--$0.10$ on its own event, entirely
+because its narrow passes sit at the wrong contaminated positions.
+A production design is then an enumeration exercise, not a fitting
+one: roots pinned to the motif lines, passes wide enough to cover
+the contaminated-true spread of the ensemble. Building that single
+fixed response, and measuring what its wider passes cost against
+the per-event ceiling of section~\ref{sec:fit}, is the programme's
+clear next step. On noisier data --- real geometry, variable track
+length, denser contamination --- the structure will no longer be
+enumerable by hand, and how to fix the response there will need
+closer thought (section~\ref{sec:limits:geometry}).
 
 \subsection{Trotterization on hardware}
 \label{sec:limits:trotter}
@@ -1726,21 +1778,23 @@ $0.062$ on the occupancy system at the same matched efficiency.
 \end{enumerate}
 
 The open problems are, I think, unusually crisp for this field: a
-universal (event-ensemble) response to replace the per-event fit,
-which is the gap between the measured ceilings above and a deployed
-algorithm; the same universality question for the floor-breaking
-occupancy result; per-cluster realization as the structural
+single fixed response for the whole event ensemble --- on this toy
+an enumeration over the finite motif structure (roots on the motif
+lines, passes wide enough for the contaminated spread) rather than
+a fitting problem, with the floor-breaking occupancy system folded
+in; per-cluster realization as the structural
 alternative to global filtering; edge-coloured synthesis for
 weighted couplings on hardware; and the transplant of the whole
-loop onto real detector geometry, where the first measurements say
-the method survives even though the comb does not. Every cloud has
+loop onto real detector geometry, where the structure is no longer
+enumerable by hand, the response question needs closer thought, and
+the first measurements say the method survives even though the comb
+does not. Every cloud has
 a silver lining: the same noise that broke the clean-event comb
 handed us a false population parked on nameable eigenvalue lines,
 and a filter family with exactly enough roots to meet it.
 
 \section*{Acknowledgements}
-To be completed (predecessor-paper co-authors, supervision,
-computing resources at Nikhef).
+To be completed 
 
 % ══════════════════════════════════════════════════════════════════════════════
 \begin{thebibliography}{99}
