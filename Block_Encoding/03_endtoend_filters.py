@@ -39,9 +39,12 @@ os.makedirs(OUT, exist_ok=True)
 GAMMA, DELTA, EPS = 3.0, 1.0, 0.002
 S = GAMMA + DELTA
 P4_LINES_A = tuple(S - 2.0 * np.cos(k * np.pi / 5.0) for k in (1, 2, 3, 4))
-# normalized P4 path adjacency eigenvalues (exact): +-cos(pi/5), +-cos(2pi/5)
-P4_LINES_NORM = (np.cos(np.pi / 5), np.cos(2 * np.pi / 5),
-                 -np.cos(2 * np.pi / 5), -np.cos(np.pi / 5))
+# normalized P4 path spectrum is {+-1, +-1/2}; +-1 is shared by EVERY connected
+# bipartite component (Perron + bipartite symmetry), so the only distinguishing
+# true-track lines in the normalized domain are +-1/2.  P3 bridges sit at
+# {+-1, 0}, hubs K(1,m) at {+-1, 0^(m-1)}: a +-1/2 comb rejects them EXACTLY.
+P4_LINES_NORM = (0.5, -0.5)
+HW_NORM = 0.10          # the gaps around +-1/2 are 0.5 wide -> generous width
 HW_A = 0.18            # production comb half-width in A-units
 TOL = 0.02             # response fit tolerance (L_inf on the target grid)
 
@@ -62,8 +65,14 @@ def comb_target(x, lines, hw):
 
 
 def min_degree(lines_x, hw_x, dmax=600, tol=TOL):
-    """Min Chebyshev degree on [-1,1] fitting the comb to L_inf <= tol."""
+    """Min Chebyshev degree on [-1,1] fitting the comb to L_inf <= tol.
+
+    Returns nan when the passband is narrower than the fit grid can resolve
+    (a huge-alpha encoding): the degree is then >> dmax, not 'small'.
+    """
     x = np.linspace(-1, 1, 8000)
+    if hw_x < 4.0 * (2.0 / len(x)):
+        return np.nan
     y = comb_target(x, lines_x, hw_x)
     lo, hi = 4, dmax
     best = None
@@ -114,7 +123,7 @@ def part_A():
                 continue
         elif r.target == "Dnorm":
             lines_x = list(P4_LINES_NORM)
-            hw_x = 0.06   # normalized-domain width from the measured min gap
+            hw_x = HW_NORM
         else:
             continue
         d_req = min_degree(lines_x, hw_x)
@@ -163,7 +172,7 @@ def cheb_apply(p, M, v):
     return y
 
 
-def design_norm_comb(degree, hw=0.06):
+def design_norm_comb(degree, hw=HW_NORM):
     x = np.linspace(-1, 1, 8000)
     y = comb_target(x, P4_LINES_NORM, hw)
     p = cheb.Chebyshev.fit(x, y, degree, domain=[-1, 1])
@@ -197,7 +206,7 @@ def part_B():
             b = np.ones(d) / np.sqrt(d)
 
             # normalized comb (deg 60 default; alpha=1 encoding)
-            for degree in (40, 60, 90):
+            for degree in (12, 20, 40):
                 p = design_norm_comb(degree)
                 y = cheb_apply(p, Dm, b)
                 # isolated (deg 0) segments sit at Dm=0 (no self-loop here):
@@ -208,24 +217,34 @@ def part_B():
                 nrm = np.linalg.norm(sol)
                 sol = sol / nrm if nrm > 0 else sol
                 mQ = qp.quantum_metrics(sol, sol_C, truth, tau)
+                mW = qp.quantum_metrics_wp(sol, sol_C, truth)
                 rows.append(dict(T=T, kernel=kernel, solver=f"szegedy_comb_d{degree}",
                                  eff=mQ.get("segment_efficiency"),
                                  far=mQ.get("segment_false_rate"),
+                                 eff_wp=mW.get("segment_efficiency"),
+                                 far_wp=mW.get("segment_false_rate"),
+                                 tau_wp=mW.get("tau_wp"),
                                  cos_QC=mQ.get("cos_QC"),
                                  p_succ=float(np.vdot(y, y).real / l1 ** 2),
                                  l1=l1, p_at_0=float(p(0.0)),
                                  p_at_1=float(p(1.0))))
                 print(f"B: T={T} {kernel} szegedy_d{degree}: "
                       f"eff={mQ.get('segment_efficiency'):.3f} "
-                      f"far={mQ.get('segment_false_rate'):.3f}", flush=True)
+                      f"far={mQ.get('segment_false_rate'):.3f} | wp99 "
+                      f"eff={mW.get('segment_efficiency'):.3f} "
+                      f"far={mW.get('segment_false_rate'):.4f}", flush=True)
 
             # production comb reference (matrix-free, same harness)
             qd = qp.solve_qsvt(ham, degree=40)
             solq = qd["sol"] if isinstance(qd, dict) else qd[0]
             mQ4 = qp.quantum_metrics(np.asarray(solq), sol_C, truth, tau)
+            mW4 = qp.quantum_metrics_wp(np.asarray(solq), sol_C, truth)
             rows.append(dict(T=T, kernel=kernel, solver="qsvt_comb_d40",
                              eff=mQ4.get("segment_efficiency"),
                              far=mQ4.get("segment_false_rate"),
+                             eff_wp=mW4.get("segment_efficiency"),
+                             far_wp=mW4.get("segment_false_rate"),
+                             tau_wp=mW4.get("tau_wp"),
                              cos_QC=mQ4.get("cos_QC"),
                              p_succ=(qd.get("P_anc") if isinstance(qd, dict) else np.nan)))
             rows.append(dict(T=T, kernel=kernel, solver="classical",
@@ -300,7 +319,7 @@ def figures(dfa, dfb, ds):
         ax.set_yticklabels(kinds)
         ax.set_xlabel("eigenvalue of D$^{-1/2}$C D$^{-1/2}$")
         ax.set_title("Normalized-walk spectrum by cluster type (T=200, step, clean)\n"
-                     "dashes: P4 true lines ±cos(π/5), ±cos(2π/5); dots: hub/isolated lines {−1,0,1}")
+                     "dashes: P4 true lines ±1/2; dots: shared/false lines {−1,0,1}")
         ax.legend(fontsize=8, frameon=False, loc="upper left")
         fig.tight_layout()
         fig.savefig(os.path.join(OUT, "fig03_normalized_spectrum.png"), dpi=160)
@@ -309,17 +328,21 @@ def figures(dfa, dfb, ds):
     # metrics comparison bars
     if len(dfb):
         sub = dfb[(dfb.kernel == "step")]
-        solvers = ["classical", "qsvt_comb_d40", "szegedy_comb_d60", "szegedy_comb_d90"]
+        solvers = ["classical", "qsvt_comb_d40", "szegedy_comb_d20", "szegedy_comb_d40"]
         Ts = sorted(sub["T"].unique())
         fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
         w = 0.8 / len(solvers)
         cols = {"classical": "#52514e", "qsvt_comb_d40": "#4a3aa7",
-                "szegedy_comb_d60": "#eb6834", "szegedy_comb_d90": "#e34948"}
-        for ax, metric, title in ((axes[0], "eff", "segment efficiency"),
-                                  (axes[1], "far", "segment false rate")):
+                "szegedy_comb_d20": "#eb6834", "szegedy_comb_d40": "#e34948"}
+        for ax, metric, title in ((axes[0], "eff", "segment efficiency (wp99)"),
+                                  (axes[1], "far", "segment false rate (wp99)")):
             for si, sv in enumerate(solvers):
                 g = sub[sub.solver == sv].set_index("T").reindex(Ts)
-                ax.bar(np.arange(len(Ts)) + si * w, g[metric], width=w * 0.92,
+                vals = g[metric]
+                wp = metric + "_wp"      # headline = efficiency-first working point
+                if wp in g.columns:
+                    vals = g[wp].fillna(g[metric])
+                ax.bar(np.arange(len(Ts)) + si * w, vals, width=w * 0.92,
                        color=cols[sv], label=sv)
             ax.set_xticks(np.arange(len(Ts)) + 1.5 * w)
             ax.set_xticklabels([f"T={t}" for t in Ts])

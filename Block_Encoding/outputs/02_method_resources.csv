@@ -1,0 +1,187 @@
+T,kernel,noise,method,alpha,target,degree_mult,rot,cx,anc,note
+5,step,clean,fable,512.0,A,316.43340223994613,16384.0,16405.0,8,
+5,step,clean,sfable,430.0,A,265.75461516245474,,,8,rot from compression curve
+5,step,clean,lsfable,128.0,A,79.10835055998653,131.0,151.0,8,fixed approx err
+5,step,clean,camps,16.0,A,9.888543819998317,,4530.0,3,cx = one transposition-compiled O_c pass
+5,step,clean,camps_C,2.0,C,1.2360679774997896,,4530.0,2,
+5,step,clean,dictionary,6.0,A,3.7082039324993685,8.0,18120.0,5,erf: classes degenerate to per-entry
+5,step,clean,dictionary_C,2.0,C,1.2360679774997896,8.0,18120.0,5,
+5,step,clean,szegedy,1.0,Dnorm,1.0,,,7,alpha=1 by construction; operator changed
+5,step,clean,dilation,1.6180339887498951,A,1.0,,,1,dense 4^7 sim-only
+5,step,clean,hit_oracle,2.0,C,1.2360679774997896,,680.0,39,proposed; QROM over 5T hits
+5,step,clean,onebqf,,exp(-iAt),,,4530.0,1,native Givens/Trotter per exp(-iAt) call
+10,step,clean,fable,2048.0,A,1265.7336089597845,262144.0,262171.0,10,
+10,step,clean,sfable,1660.0,A,1025.9364213248252,,,10,rot from compression curve
+10,step,clean,lsfable,512.0,A,316.43340223994613,461.0,487.0,10,fixed approx err
+10,step,clean,camps,16.0,A,9.888543819998317,,13500.0,3,cx = one transposition-compiled O_c pass
+10,step,clean,camps_C,2.0,C,1.2360679774997896,,13500.0,2,
+10,step,clean,dictionary,6.0,A,3.7082039324993685,8.0,54000.0,5,erf: classes degenerate to per-entry
+10,step,clean,dictionary_C,2.0,C,1.2360679774997896,8.0,54000.0,5,
+10,step,clean,szegedy,1.0,Dnorm,1.0,,,9,alpha=1 by construction; operator changed
+10,step,clean,dilation,1.6180339887498951,A,1.0,,,1,dense 4^9 sim-only
+10,step,clean,hit_oracle,2.0,C,1.2360679774997896,,880.0,40,proposed; QROM over 5T hits
+10,step,clean,onebqf,,exp(-iAt),,,13500.0,1,native Givens/Trotter per exp(-iAt) call
+20,step,clean,fable,8192.0,A,5062.934435839138,4194304.0,4194337.0,12,
+20,step,clean,sfable,6520.0,A,4029.581606649314,,,12,rot from compression curve
+20,step,clean,lsfable,2048.0,A,1265.7336089597845,1721.0,1753.0,12,fixed approx err
+20,step,clean,camps,16.0,A,9.888543819998317,,35880.0,3,cx = one transposition-compiled O_c pass
+20,step,clean,camps_C,2.0,C,1.2360679774997896,,35880.0,2,
+20,step,clean,dictionary,6.0,A,3.7082039324993685,8.0,143520.0,5,erf: classes degenerate to per-entry
+20,step,clean,dictionary_C,2.0,C,1.2360679774997896,8.0,143520.0,5,
+20,step,clean,szegedy,1.0,Dnorm,1.0,,,11,alpha=1 by construction; operator changed
+20,step,clean,dilation,1.6180339887498951,A,1.0,,,1,dense 4^11 sim-only
+20,step,clean,hit_oracle,2.0,C,1.2360679774997896,,1280.0,41,proposed; QROM over 5T hits
+20,step,clean,onebqf,,exp(-iAt),,,35880.0,1,native Givens/Trotter per exp(-iAt) call
+50,step,clean,fable,65536.0,A,35467.82761918114,268435456.0,268435498.0,15,
+50,step,clean,lsfable,16384.0,A,8866.956904795285,10313.0,10354.0,15,fixed approx err
+50,step,clean,camps,16.0,A,8.659137602339145,,127920.0,3,cx = one transposition-compiled O_c pass
+50,step,clean,camps_C,4.0,C,2.1647844005847863,,127920.0,3,
+50,step,clean,dictionary,7.0,A,3.7883727010233756,8.0,511680.0,5,erf: classes degenerate to per-entry
+50,step,clean,dictionary_C,3.0,C,1.6235883004385896,8.0,511680.0,5,
+50,step,clean,szegedy,1.0,Dnorm,1.0,,,14,alpha=1 by construction; operator changed
+50,step,clean,dilation,1.847759065022575,A,1.0,,,1,dense 4^14 sim-only
+50,step,clean,hit_oracle,4.0,C,2.1647844005847863,,2480.0,42,proposed; QROM over 5T hits
+50,step,clean,onebqf,,exp(-iAt),,,127920.0,1,native Givens/Trotter per exp(-iAt) call
+100,step,clean,fable,262144.0,A,162013.90194685227,4294967296.0,4294967344.0,17,
+100,step,clean,lsfable,65536.0,A,40503.47548671307,40625.0,40672.0,17,fixed approx err
+100,step,clean,camps,16.0,A,9.888543819998308,,302016.0,3,cx = one transposition-compiled O_c pass
+100,step,clean,camps_C,2.0,C,1.2360679774997885,,302016.0,2,
+100,step,clean,dictionary,6.0,A,3.7082039324993654,8.0,1208064.0,5,erf: classes degenerate to per-entry
+100,step,clean,dictionary_C,2.0,C,1.2360679774997885,8.0,1208064.0,5,
+100,step,clean,szegedy,1.0,Dnorm,1.0,,,16,alpha=1 by construction; operator changed
+100,step,clean,dilation,1.6180339887498965,A,1.0,,,1,dense 4^16 sim-only
+100,step,clean,hit_oracle,2.0,C,1.2360679774997885,,4480.0,43,proposed; QROM over 5T hits
+100,step,clean,onebqf,,exp(-iAt),,,302016.0,1,native Givens/Trotter per exp(-iAt) call
+200,step,clean,fable,1048576.0,A,648055.607787409,68719476736.0,68719476790.0,19,
+200,step,clean,lsfable,262144.0,A,162013.90194685225,161343.0,161396.0,19,fixed approx err
+200,step,clean,camps,16.0,A,9.888543819998306,,748836.0,3,cx = one transposition-compiled O_c pass
+200,step,clean,camps_C,2.0,C,1.2360679774997883,,748836.0,2,
+200,step,clean,dictionary,6.0,A,3.708203932499365,8.0,2995344.0,5,erf: classes degenerate to per-entry
+200,step,clean,dictionary_C,2.0,C,1.2360679774997883,8.0,2995344.0,5,
+200,step,clean,szegedy,1.0,Dnorm,1.0,,,18,alpha=1 by construction; operator changed
+200,step,clean,dilation,1.6180339887498967,A,1.0,,,1,dense 4^18 sim-only
+200,step,clean,hit_oracle,2.0,C,1.2360679774997883,,8480.0,44,proposed; QROM over 5T hits
+200,step,clean,onebqf,,exp(-iAt),,,748836.0,1,native Givens/Trotter per exp(-iAt) call
+400,step,clean,fable,4194304.0,A,1498710.3172166466,1099511627776.0,1099511627836.0,21,
+400,step,clean,lsfable,1048576.0,A,374677.57930416166,643723.0,643782.0,21,fixed approx err
+400,step,clean,camps,32.0,A,11.434252298100636,,2352304.0,4,cx = one transposition-compiled O_c pass
+400,step,clean,camps_C,4.0,C,1.4292815372625796,,2352304.0,3,
+400,step,clean,dictionary,8.0,A,2.858563074525159,16.0,14113824.0,6,erf: classes degenerate to per-entry
+400,step,clean,dictionary_C,4.0,C,1.4292815372625796,16.0,14113824.0,6,
+400,step,clean,szegedy,1.0,Dnorm,1.0,,,20,alpha=1 by construction; operator changed
+400,step,clean,dilation,2.798608878458592,A,1.0,,,1,dense 4^20 sim-only
+400,step,clean,hit_oracle,4.0,C,1.4292815372625796,,16480.0,45,proposed; QROM over 5T hits
+400,step,clean,onebqf,,exp(-iAt),,,2352304.0,1,native Givens/Trotter per exp(-iAt) call
+100,step,noisy,fable,262144.0,A,141871.31047672464,4294967296.0,4294967344.0,17,
+100,step,noisy,lsfable,65536.0,A,35467.82761918116,40593.0,40640.0,17,fixed approx err
+100,step,noisy,camps,16.0,A,8.65913760233915,,286528.0,3,cx = one transposition-compiled O_c pass
+100,step,noisy,camps_C,4.0,C,2.1647844005847876,,286528.0,3,
+100,step,noisy,dictionary,7.0,A,3.788372701023378,8.0,1146112.0,5,erf: classes degenerate to per-entry
+100,step,noisy,dictionary_C,3.0,C,1.6235883004385907,8.0,1146112.0,5,
+100,step,noisy,szegedy,1.0,Dnorm,1.0,,,16,alpha=1 by construction; operator changed
+100,step,noisy,dilation,1.847759065022574,A,1.0,,,1,dense 4^16 sim-only
+100,step,noisy,hit_oracle,4.0,C,2.1647844005847876,,4480.0,43,proposed; QROM over 5T hits
+100,step,noisy,onebqf,,exp(-iAt),,,286528.0,1,native Givens/Trotter per exp(-iAt) call
+400,step,noisy,fable,4194304.0,A,2269940.967627594,1099511627776.0,1099511627836.0,21,
+400,step,noisy,lsfable,1048576.0,A,567485.2419068984,643613.0,643672.0,21,fixed approx err
+400,step,noisy,camps,16.0,A,8.659137602339149,,2282784.0,3,cx = one transposition-compiled O_c pass
+400,step,noisy,camps_C,4.0,C,2.164784400584787,,2282784.0,3,
+400,step,noisy,dictionary,7.0,A,3.7883727010233774,8.0,9131136.0,5,erf: classes degenerate to per-entry
+400,step,noisy,dictionary_C,3.0,C,1.6235883004385905,8.0,9131136.0,5,
+400,step,noisy,szegedy,1.0,Dnorm,1.0,,,20,alpha=1 by construction; operator changed
+400,step,noisy,dilation,1.8477590650225741,A,1.0,,,1,dense 4^20 sim-only
+400,step,noisy,hit_oracle,4.0,C,2.164784400584787,,16480.0,45,proposed; QROM over 5T hits
+400,step,noisy,onebqf,,exp(-iAt),,,2282784.0,1,native Givens/Trotter per exp(-iAt) call
+5,erf,clean,fable,512.0,A,158.5484528646561,16384.0,16405.0,8,
+5,erf,clean,sfable,459.8397563362148,A,142.39625377493613,,,8,rot from compression curve
+5,erf,clean,lsfable,128.0,A,39.637113216164025,131.0,151.0,8,fixed approx err
+5,erf,clean,camps,16.0,A,4.954639152020503,,4530.0,3,cx = one transposition-compiled O_c pass
+5,erf,clean,camps_C,2.0,C,0.6193298940025629,,4530.0,2,
+5,erf,clean,dictionary,33.91987816810744,A,10.503797275216913,8.0,18120.0,5,erf: classes degenerate to per-entry
+5,erf,clean,dictionary_C,29.919878168107438,C,9.265137487211787,8.0,18120.0,5,
+5,erf,clean,szegedy,1.0,Dnorm,1.0,,,7,alpha=1 by construction; operator changed
+5,erf,clean,dilation,3.2292967275881628,A,1.0,,,1,dense 4^7 sim-only
+5,erf,clean,hit_oracle,2.0,C,0.6193298940025629,,680.0,39,proposed; QROM over 5T hits
+5,erf,clean,onebqf,,exp(-iAt),,,4530.0,1,native Givens/Trotter per exp(-iAt) call
+10,erf,clean,fable,2048.0,A,634.1784697310977,262144.0,262171.0,10,
+10,erf,clean,sfable,1720.9279238862096,A,532.8981627381208,,,10,rot from compression curve
+10,erf,clean,lsfable,512.0,A,158.54461743277443,463.0,489.0,10,fixed approx err
+10,erf,clean,camps,16.0,A,4.954519294774201,,13950.0,3,cx = one transposition-compiled O_c pass
+10,erf,clean,camps_C,2.0,C,0.6193149118467751,,13950.0,2,
+10,erf,clean,dictionary,64.46396194310478,A,19.9617464540439,8.0,55800.0,5,erf: classes degenerate to per-entry
+10,erf,clean,dictionary_C,60.46396194310477,C,18.723116630350347,8.0,55800.0,5,
+10,erf,clean,szegedy,1.0,Dnorm,1.0,,,9,alpha=1 by construction; operator changed
+10,erf,clean,dilation,3.229374849115244,A,1.0,,,1,dense 4^9 sim-only
+10,erf,clean,hit_oracle,2.0,C,0.6193149118467751,,880.0,40,proposed; QROM over 5T hits
+10,erf,clean,onebqf,,exp(-iAt),,,13950.0,1,native Givens/Trotter per exp(-iAt) call
+20,erf,clean,fable,8192.0,A,2535.8174901500774,4194304.0,4194337.0,12,
+20,erf,clean,sfable,6639.508274232575,A,2055.246729467178,,,12,rot from compression curve
+20,erf,clean,lsfable,2048.0,A,633.9543725375194,1725.0,1757.0,12,fixed approx err
+20,erf,clean,camps,16.0,A,4.95276853544937,,37076.0,3,cx = one transposition-compiled O_c pass
+20,erf,clean,camps_C,2.0,C,0.6190960669311713,,37076.0,2,
+20,erf,clean,dictionary,123.7541371162875,A,38.30784977757723,8.0,148304.0,5,erf: classes degenerate to per-entry
+20,erf,clean,dictionary_C,119.7541371162875,C,37.06965764371489,8.0,148304.0,5,
+20,erf,clean,szegedy,1.0,Dnorm,1.0,,,11,alpha=1 by construction; operator changed
+20,erf,clean,dilation,3.2305164042050882,A,1.0,,,1,dense 4^11 sim-only
+20,erf,clean,hit_oracle,2.0,C,0.6190960669311713,,1280.0,41,proposed; QROM over 5T hits
+20,erf,clean,onebqf,,exp(-iAt),,,37076.0,1,native Givens/Trotter per exp(-iAt) call
+50,erf,clean,fable,65536.0,A,17785.27283600669,268435456.0,268435498.0,15,
+50,erf,clean,lsfable,16384.0,A,4446.318209001673,10393.0,10434.0,15,fixed approx err
+50,erf,clean,camps,32.0,A,8.684215251956392,,160720.0,4,cx = one transposition-compiled O_c pass
+50,erf,clean,camps_C,4.0,C,1.085526906494549,,160720.0,3,
+50,erf,clean,dictionary,317.8831730201308,A,86.26768435880352,16.0,964320.0,6,erf: classes degenerate to per-entry
+50,erf,clean,dictionary_C,313.8831730201308,C,85.18215745230897,16.0,964320.0,6,
+50,erf,clean,szegedy,1.0,Dnorm,1.0,,,14,alpha=1 by construction; operator changed
+50,erf,clean,dilation,3.6848464796851963,A,1.0,,,1,dense 4^14 sim-only
+50,erf,clean,hit_oracle,4.0,C,1.085526906494549,,2480.0,42,proposed; QROM over 5T hits
+50,erf,clean,onebqf,,exp(-iAt),,,160720.0,1,native Givens/Trotter per exp(-iAt) call
+100,erf,clean,fable,262144.0,A,79430.57607443364,4294967296.0,4294967344.0,17,
+100,erf,clean,lsfable,65536.0,A,19857.64401860841,40807.0,40854.0,17,fixed approx err
+100,erf,clean,camps,16.0,A,4.848057621730569,,390104.0,3,cx = one transposition-compiled O_c pass
+100,erf,clean,camps_C,4.0,C,1.2120144054326423,,390104.0,3,
+100,erf,clean,dictionary,632.6153078742288,A,191.68471656019287,8.0,1560416.0,5,erf: classes degenerate to per-entry
+100,erf,clean,dictionary_C,628.6153078742288,C,190.4727021547602,8.0,1560416.0,5,
+100,erf,clean,szegedy,1.0,Dnorm,1.0,,,16,alpha=1 by construction; operator changed
+100,erf,clean,dilation,3.300290806834226,A,1.0,,,1,dense 4^16 sim-only
+100,erf,clean,hit_oracle,4.0,C,1.2120144054326423,,4480.0,43,proposed; QROM over 5T hits
+100,erf,clean,onebqf,,exp(-iAt),,,390104.0,1,native Givens/Trotter per exp(-iAt) call
+200,erf,clean,fable,1048576.0,A,317617.653728643,68719476736.0,68719476790.0,19,
+200,erf,clean,lsfable,262144.0,A,79404.41343216076,162611.0,162664.0,19,fixed approx err
+200,erf,clean,camps,32.0,A,9.692921561543061,,1456380.0,4,cx = one transposition-compiled O_c pass
+200,erf,clean,camps_C,4.0,C,1.2116151951928826,,1456380.0,3,
+200,erf,clean,dictionary,1370.5134970180045,A,415.1337445509874,16.0,8738280.0,6,erf: classes degenerate to per-entry
+200,erf,clean,dictionary_C,1366.5134970180045,C,413.92212935579454,16.0,8738280.0,6,
+200,erf,clean,szegedy,1.0,Dnorm,1.0,,,18,alpha=1 by construction; operator changed
+200,erf,clean,dilation,3.301378206438903,A,1.0,,,1,dense 4^18 sim-only
+200,erf,clean,hit_oracle,4.0,C,1.2116151951928826,,8480.0,44,proposed; QROM over 5T hits
+200,erf,clean,onebqf,,exp(-iAt),,,1456380.0,1,native Givens/Trotter per exp(-iAt) call
+400,erf,clean,fable,4194304.0,A,791908.4537419523,1099511627776.0,1099511627836.0,21,
+400,erf,clean,lsfable,1048576.0,A,197977.11343548808,654065.0,654124.0,21,fixed approx err
+400,erf,clean,camps,32.0,A,6.041782026229495,,8888448.0,4,cx = one transposition-compiled O_c pass
+400,erf,clean,camps_C,8.0,C,1.5104455065573736,,8888448.0,4,
+400,erf,clean,dictionary,3832.7567318909378,A,723.6462729265239,16.0,53330688.0,6,erf: classes degenerate to per-entry
+400,erf,clean,dictionary_C,3828.7567318909378,C,722.8910501732453,16.0,53330688.0,6,
+400,erf,clean,szegedy,1.0,Dnorm,1.0,,,20,alpha=1 by construction; operator changed
+400,erf,clean,dilation,5.29645059372827,A,1.0,,,1,dense 4^20 sim-only
+400,erf,clean,hit_oracle,8.0,C,1.5104455065573736,,16480.0,45,proposed; QROM over 5T hits
+400,erf,clean,onebqf,,exp(-iAt),,,8888448.0,1,native Givens/Trotter per exp(-iAt) call
+100,erf,noisy,fable,262144.0,A,81948.14761705804,4294967296.0,4294967344.0,17,
+100,erf,noisy,lsfable,65536.0,A,20487.03690426451,40785.0,40832.0,17,fixed approx err
+100,erf,noisy,camps,16.0,A,5.001717994205203,,379456.0,3,cx = one transposition-compiled O_c pass
+100,erf,noisy,camps_C,4.0,C,1.2504294985513007,,379456.0,3,
+100,erf,noisy,dictionary,548.7420574633104,A,171.54081393696404,8.0,1517824.0,5,erf: classes degenerate to per-entry
+100,erf,noisy,dictionary_C,544.7420574633104,C,170.29038443841276,8.0,1517824.0,5,
+100,erf,noisy,szegedy,1.0,Dnorm,1.0,,,16,alpha=1 by construction; operator changed
+100,erf,noisy,dilation,3.1989008613714294,A,1.0,,,1,dense 4^16 sim-only
+100,erf,noisy,hit_oracle,4.0,C,1.2504294985513007,,4480.0,43,proposed; QROM over 5T hits
+100,erf,noisy,onebqf,,exp(-iAt),,,379456.0,1,native Givens/Trotter per exp(-iAt) call
+400,erf,noisy,fable,4194304.0,A,1196702.9091292385,1099511627776.0,1099511627836.0,21,
+400,erf,noisy,lsfable,1048576.0,A,299175.7272823096,654729.0,654788.0,21,fixed approx err
+400,erf,noisy,camps,32.0,A,9.130118630441578,,9308096.0,4,cx = one transposition-compiled O_c pass
+400,erf,noisy,camps_C,8.0,C,2.2825296576103944,,9308096.0,4,
+400,erf,noisy,dictionary,3551.7265616829063,A,1013.3651515954783,16.0,55848576.0,6,erf: classes degenerate to per-entry
+400,erf,noisy,dictionary_C,3547.7265616829063,C,1012.2238867666731,16.0,55848576.0,6,
+400,erf,noisy,szegedy,1.0,Dnorm,1.0,,,20,alpha=1 by construction; operator changed
+400,erf,noisy,dilation,3.504883265514845,A,1.0,,,1,dense 4^20 sim-only
+400,erf,noisy,hit_oracle,8.0,C,2.2825296576103944,,16480.0,45,proposed; QROM over 5T hits
+400,erf,noisy,onebqf,,exp(-iAt),,,9308096.0,1,native Givens/Trotter per exp(-iAt) call

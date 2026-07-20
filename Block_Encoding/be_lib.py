@@ -86,27 +86,24 @@ def gate_counts(qc, basis=("rz", "ry", "rx", "h", "x", "cx"), opt=1):
 # ----------------------------------------------------------------------
 
 def _sfwht(a):
-    """Scaled fast Walsh-Hadamard transform (in place on a copy)."""
+    """Scaled fast Walsh-Hadamard transform (vectorized, on a copy)."""
     a = np.asarray(a, float).copy()
     n = a.size
     k = 1
     while k < n:
-        for i in range(0, n, 2 * k):
-            x = a[i : i + k].copy()
-            y = a[i + k : i + 2 * k].copy()
-            a[i : i + k] = (x + y) / 2.0
-            a[i + k : i + 2 * k] = (x - y) / 2.0
+        v = a.reshape(n // (2 * k), 2, k)
+        x = v[:, 0, :].copy()
+        y = v[:, 1, :].copy()
+        v[:, 0, :] = (x + y) / 2.0
+        v[:, 1, :] = (x - y) / 2.0
         k *= 2
     return a
 
 
 def _gray_permutation(a):
     """Permute vector so entry g(k) -> position k (g = binary-reflected Gray)."""
-    n = a.size
-    out = np.empty_like(a)
-    for k in range(n):
-        out[k] = a[k ^ (k >> 1)]
-    return out
+    k = np.arange(a.size)
+    return np.asarray(a)[k ^ (k >> 1)]
 
 
 def _ucry_angles(theta):
@@ -661,16 +658,16 @@ def dilation_baseline(A, spectral_bounds=None, pad_frac=0.02):
 # ======================================================================
 
 def _wht_unnorm(x):
-    """Unnormalized Walsh-Hadamard transform of a vector (in place on copy)."""
+    """Unnormalized Walsh-Hadamard transform of a vector (vectorized, on copy)."""
     x = np.asarray(x, float).copy()
     n = x.size
     k = 1
     while k < n:
-        for i in range(0, n, 2 * k):
-            a = x[i : i + k].copy()
-            b = x[i + k : i + 2 * k].copy()
-            x[i : i + k] = a + b
-            x[i + k : i + 2 * k] = a - b
+        v = x.reshape(n // (2 * k), 2, k)
+        a = v[:, 0, :].copy()
+        b = v[:, 1, :].copy()
+        v[:, 0, :] = a + b
+        v[:, 1, :] = a - b
         k *= 2
     return x
 
@@ -702,11 +699,15 @@ def sfable_classical(A, thr=0.0):
 
 
 def lsfable_classical(A):
-    """Encoded matrix (times alpha=N): N * H sin(HAH) H; rotations = nnz."""
+    """Encoded matrix (times alpha=N): H sin(HAH) H ~ A; rotations = nnz.
+
+    (circuit block = H sin(HAH) H / N and alpha = N, so block*alpha is the
+    entrywise-sine conjugation itself -- verified vs the circuit in 01)
+    """
     d = A.shape[0]
     n, N = npad(d)
     HAH = _hadamard_conj(np.asarray(A, float), N)
-    out = _hadamard_conj(np.sin(HAH), N) * N
+    out = _hadamard_conj(np.sin(HAH), N)
     return out[:d, :d], int(np.count_nonzero(A)) + 1
 
 

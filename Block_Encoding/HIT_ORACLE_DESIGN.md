@@ -49,8 +49,17 @@ Within each layer, hits are **classically pre-sorted by slope/position**
    lookup of the inverse-CDF of sorted hit positions** — a table of 5T (not 4T²)
    entries — followed by an adder for +ℓ.
 
-**Value oracle O_A:** re-compute the kink angle from hit coordinates (two QROM
-reads + fixed-point arithmetic), then
+**Form of the encoding (important subtlety).** Camps' in-place `O_c` requires
+`c(·,ℓ)` injective per slot — false here: segments `(a,b)` and `(a',b)` sharing
+an endpoint have overlapping continuation windows. The construction therefore
+uses the **state-preparation-pair / Szegedy form** (Camps Thm 5.1, Gilyén
+Lemma 48): `U_R |0^n⟩|j⟩ = (1/√w) Σ_{ℓ<w} |window_ℓ(j)⟩|accept-flag⟩|j⟩`, and
+`U = U_L† · SWAP · U_R` block-encodes `C/w` — no injectivity needed, at the
+price of a second n-qubit register (which the qubitization walk carries anyway).
+The window enumeration + accept flag below implement U_R.
+
+**Value oracle (the accept flag):** re-compute the kink angle from hit
+coordinates (two QROM reads + fixed-point arithmetic), then
 - step kernel: **comparator** against ε → flag qubit (value −1 fixed rotation),
 - erf kernel: rotation by `arccos(erf-weight(angle))` evaluated arithmetically —
   **the erf kernel costs no extra data**, unlike the dictionary method where
