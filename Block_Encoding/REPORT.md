@@ -290,6 +290,34 @@ per-call cost coincides exactly with the native Givens curve (both
 transposition-priced), and the hit-oracle full-solve advantage over one native
 1BQF call grows from x5.5 (T=200) to x23 (T=1000).
 
+### 4.9 Classical loading cost (07)
+
+What it costs classically to get each encoding onto the computer, per event
+(`07_classical_cost.py`; measured constants + fitted scaling, step kernel):
+
+| method (T=400 / T=1000) | prep time | + bounds | memory |
+|---|---|---|---|
+| **hit oracle** (sort + tables; no A, no Lanczos) | **0.4 ms / 1.2 ms** | 0 | **8 / 20 KB** |
+| native 1BQF / classical solver (A build) | 0.7 s / 10.6 s | 0 | 10 / 64 MB |
+| szegedy generic (A + degrees; no Lanczos) | 0.7 s / 10.6 s | 0 | 10 / 64 MB |
+| LS-FABLE / camps / dictionary (A + extras) | 0.7-2 s / 11-19 s | +3.8-4.2 s / +13 s | 10 / 64 MB |
+| FABLE / S-FABLE (dense angles + sfwht) | 13 days / 8 months | +Lanczos | **8.8 / 141 TB** |
+| dilation, default QSVT (A + dense eigh O(N^3)) | **26 years / 1600 years** | +Lanczos | 8.8 / 141 TB |
+
+Readings: (i) the **default QSVT dilation circuit is classically unbuildable**
+(the eigendecomposition of the padded 2^n operator) -- which is precisely why
+production runs the matrix-free statevector emulation instead; (ii) the
+FABLE family hits the dense-memory wall (1 TB before T~200) independently of
+its other problems; (iii) among matrix-based methods the A build (O(T^3)
+middle-hit sweep) is the shared floor at ~1-10 s, and the **Lanczos bounds
+step costs 4-6x the A build itself** -- confirming it as the dominant
+classical pre-step of A/C-domain QSVT, which the szegedy and hit-oracle
+routes both eliminate (domain in [-1,1] by construction; ||C|| <= Delta <=
+w_pad); (iv) the **hit oracle is 3-4 orders below even the native path**,
+because it never materialises the matrix -- its classical prep (O(T log T)
+sort) is cheaper than the classical solver's own setup, and its circuit
+description carries O(T) numbers instead of O(nnz) gates.
+
 ## 5. Conclusion
 
 **Can any of the four methods improve our encoding? Directly, no — but two of
