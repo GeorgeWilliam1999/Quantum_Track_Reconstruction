@@ -280,6 +280,16 @@ cutting couplings below 0.3 removes ~44 % of nnz but only 1–2 % of
 are truncation-safe (far flat at 0.0025–0.01), but the dictionary route on erf
 stays dead; arithmetic values (hit oracle) remain the only erf answer.
 
+### 4.8 Write-up resource curves (06)
+
+`06_writeup_plots.py` renders the requested per-algorithm views (QSVT vs 1BQF
+separated, all encodings on each): qubits vs T, CX vs T (1BQF = one call;
+QSVT = d* x per-call), and FABLE-family error vs proportion of original gates
+(`outputs/fig06_*.png`, `outputs/06_resource_curves.csv`). Notable: Camps'
+per-call cost coincides exactly with the native Givens curve (both
+transposition-priced), and the hit-oracle full-solve advantage over one native
+1BQF call grows from x5.5 (T=200) to x23 (T=1000).
+
 ## 5. Conclusion
 
 **Can any of the four methods improve our encoding? Directly, no — but two of
