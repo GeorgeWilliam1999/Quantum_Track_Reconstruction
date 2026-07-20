@@ -222,6 +222,64 @@ kernel costs *nothing extra*: the value is an arithmetic function of the
 computed kink angle (vs the dictionary's α exploding to 3 829). Classical prep:
 one O(T log T) sort per event vs FABLE's O(N² log N) = O(T⁴ log T).
 
+### 4.7 Resource vs accuracy on the base Hamiltonians (05)
+
+George's question (2026-07-20): can a block encoding *meaningfully reduce
+circuit depth or qubit count* with a *measurably small* loss in accuracy /
+segment efficiency / false rate? Base Hamiltonians only (no fork, no occupancy
+term — as everywhere in this study). Four knobs measured
+(`05_resource_accuracy.py`, wp99 headline, 3 reps at T=200):
+
+**Depth — yes, and by a lot** (`05_degree_curves.csv`, figs
+`fig05_degree_curves`, `fig05_total_cost_pareto`):
+- The **metric-validated QSVT degree is 12–20**, not the production 40 and not
+  the L∞-0.02 fit requirement (26–78): at T=200 step, the dilation and C/α
+  combs reach wp99 far = 0.000 at eff ≥ 0.997 from **d=12–16**; the ±½
+  normalized comb from **d=20** (far 0.0033). At T=400: d=20 across domains.
+  Degree curves are **non-monotone** (ripple positions interact with tangle
+  eigenvalues — normalized d=24 spikes to 0.45 while d=20/28 are fine), so an
+  operating degree needs a stability margin, not a fit criterion.
+- Total depth at the validated points (T=400, `05_qubit_depth_table.csv`):
+  **hit-oracle comb solve = 3.3·10⁵ CX — 7× below a SINGLE native 1BQF
+  e^{-iAt} call** (2.35·10⁶); szegedy walk (hit-prep) 6.6·10⁵ (3.6× below)
+  with the best far (0.0013). The transposition-compiled camps/dict route is
+  20× *above* the 1BQF call. On the erf kernel the standard 1/λ comb
+  **collapses at every degree** (far 0.5–1.0 at wp99) — only the normalized
+  ±½ comb works (far 0.004–0.006 from d=28).
+
+**Qubits — no; the trade runs the other way** (`05_qubit_depth_table.csv`):
+implementable encodings *add* qubits over the 21-qubit native-1BQF floor:
++8 (camps/dict, 29 total), +47–49 (hit oracle, ~68–70, QROM workspace),
++65–69 (szegedy walk, ~86–90). The offer on the table is **qubits for depth
+and accuracy**: ~3–4× the qubits buys 4–7× less depth per solve *and* a
+false rate at or below the classical solve.
+
+**The geometry data needs 12 bits/coordinate — a hard cliff, not a slope**
+(`05_precision_bits.csv`, fig `fig05_precision_bits`; harness self-check:
+64-bit rebuild reproduces the library coupling with 0 edge diff): at b=12
+the rebuilt coupling differs by 6–42 edges of ~1.3–1.6k and the ±½ comb holds
+far 0.000 at eff ≥ 0.996; at b=10, 190–500 boundary edges flip and *both* the
+comb (far → 0.99) and the classical solve on the same quantized matrix
+(eff → 0.62) break — the cliff is a property of the ε-boundary geometry, not
+of the encoding. Fixed-point registers can be 12–16 bits; below that nothing
+survives.
+
+**Encoding error: magnitude is not the predictor — structure is**
+(`05_fable_pareto.csv`, fig `fig05_fable_pareto`): on step, even LS-FABLE's
+0.80 relative error leaves wp99 far = 0.000 (T=20; easy separation), and on
+erf S-FABLE compressed to 0.05 % of its rotations (err 0.006) is still clean —
+but at err 0.14 (Hadamard-domain truncation) erf collapses to far 0.95, while
+LS-FABLE's smooth sin-distortion at err 0.79 stays at far 0.0. The comb
+tolerates *smooth monotone* encoding error remarkably well and *structured
+delocalized* error badly. (The FABLE family stays dead regardless — the
+α = 2ⁿ wall multiplies the required degree by ~10⁵ before accuracy enters.)
+
+**erf value truncation does not rescue the dictionary** (`05_truncation.csv`):
+cutting couplings below 0.3 removes ~44 % of nnz but only 1–2 % of
+α = Σ|a|/2 (1390 → 1376) — the α mass sits in the mid/large values. Metrics
+are truncation-safe (far flat at 0.0025–0.01), but the dictionary route on erf
+stays dead; arithmetic values (hit oracle) remain the only erf answer.
+
 ## 5. Conclusion
 
 **Can any of the four methods improve our encoding? Directly, no — but two of
