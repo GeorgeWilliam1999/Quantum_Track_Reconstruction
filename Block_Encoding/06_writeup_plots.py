@@ -100,7 +100,7 @@ def resource_rows():
         entries = [
             # tag,            anc,       cx/call,   d* (QSVT), sim_only
             ("native",        1,         cx_native, None,      False),
-            ("dilation",      1,         None,      d_dil,     True),
+            ("dilation",      1,         int(23 / 48 * 4 ** (n + 1)), d_dil, True),
             ("fable",         n + 1,     cx_fable,  d_fab,     False),
             ("sfable",        n + 1,     cx_fable,  d_fab,     False),
             ("lsfable",       n + 1,     cx_lsf,    d_lsf,     False),
@@ -123,7 +123,7 @@ def resource_rows():
 
 
 LABELS = dict(native="native 1BQF (Givens exp(-iAt))",
-              dilation="dilation (simulation-only)",
+              dilation="dilation (default QSVT; naive QSD compile ~4$^{n}$)",
               fable="FABLE", sfable="S-FABLE", lsfable="LS-FABLE (broken acc.)",
               camps="Camps O_c/O_A (C/α)", dictionary="dictionary (C/α)",
               hit_oracle="hit-level oracle (C/α)", szegedy="szegedy walk (α=1, hit-prep)")
@@ -169,7 +169,7 @@ def figures(df):
     # ---- 2. gates vs T --------------------------------------------------
     for algo, col_g in (("1bqf", "cx_call"), ("qsvt", "cx_qsvt")):
         fig, ax = plt.subplots(figsize=(7.8, 5.0))
-        order = ["fable", "sfable", "lsfable", "dictionary", "camps",
+        order = ["dilation", "fable", "sfable", "lsfable", "dictionary", "camps",
                  "native", "szegedy", "hit_oracle"]
         for tag in order:
             if algo == "qsvt" and tag == "native":
@@ -179,7 +179,7 @@ def figures(df):
             if not vals.notna().any():
                 continue
             c = MCOL.get(tag, "#52514e")
-            ls = "--" if tag == "lsfable" else "-"
+            ls = "--" if tag in ("lsfable", "dilation") else "-"
             mk = "s" if tag == "native" else "o"
             ax.plot(g["T"], vals, ls + mk, color=c, lw=2, ms=4.5,
                     label=LABELS[tag])
@@ -190,7 +190,7 @@ def figures(df):
         ax.set_yscale("log")
         nm = "1BQF (CX per call of the encoding)" if algo == "1bqf" else \
              "QSVT comb solve (CX total = d* × per-call)"
-        style(ax, "CX gates", f"Gates vs tracks — {nm}\nstep, base H; dilation omitted (sim-only); Camps ≡ native Givens (both transposition-priced)")
+        style(ax, "CX gates", f"Gates vs tracks — {nm}\nstep, base H; dilation = default QSVT at naive dense-compile cost; Camps ≡ native Givens")
         fig.tight_layout()
         fig.savefig(os.path.join(OUT, f"fig06_gates_vs_T_{algo}.png"), dpi=160)
         plt.close(fig)
