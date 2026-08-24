@@ -58,7 +58,7 @@ scores each segment by how strongly its neighbours reinforce it. Two earlier
 papers solved this system with quantum linear algebra: first with the HHL
 algorithm, and then far more cheaply with a one-bit variant, the one-bit
 quantum filter (1BQF), which replaces the full inversion by a single cosine
-filter of the Hamiltonian with one spectral zero. In this paper I develop
+filter of the Hamiltonian with one spectral zero. In this work I develop
 that idea further. The 1BQF is the degree-one member of the family of
 polynomial spectral transforms provided by the quantum singular value
 transformation (QSVT), and once the problem is viewed this way the design
@@ -88,6 +88,7 @@ design rule: the operator shapes the spectrum, and the fitted response
 separates it; neither knob can be evaluated without the other.
 \end{abstract}
 
+\tableofcontents
 % ══════════════════════════════════════════════════════════════════════════════
 \section{Introduction}
 \label{sec:intro}
@@ -98,7 +99,7 @@ which hits belong together. At the High-Luminosity LHC this cloud becomes
 dense enough that the matching cost dominates real-time reconstruction
 budgets, and the tracking community has responded by testing essentially
 every alternative computing platform: GPUs, FPGAs, neural networks, and, in
-the line of work this paper continues, quantum computers.
+the line of work continued here, quantum computers.
 
 The lineage of this work is short and worth stating precisely. Nicotra et
 al.~\cite{nicotra2023} showed that track reconstruction in a simplified
@@ -116,7 +117,7 @@ fake segment, and reads out the survivors. It is cheap, it suits near-term
 hardware, and it was demonstrated on trapped-ion and superconducting
 devices.
 
-This paper asks the question that follows naturally from the 1BQF. A
+This work asks the question that follows naturally from the 1BQF. A
 cosine with one zero is a polynomial filter of degree
 one\footnote{Strictly, a trigonometric function realised at degree one in
 the Chebyshev basis of the walk operator; section~\ref{sec:qsvt} makes
@@ -127,7 +128,7 @@ linear in its degree. So, what could we do with more than one zero? Which
 polynomial should we choose? And what happens to that choice when the
 Hamiltonian itself changes, because the detector is noisy or because we
 have added constraint terms to help it? In my opinion this last question
-carries most of the physics, and most of this paper is spent answering
+carries most of the physics, and most of this work is spent answering
 it.
 
 I answer these questions on the same toy model as the two predecessor
@@ -163,7 +164,7 @@ the activations, and moving the activations changes the polynomial we
 have to fit.
 \end{enumerate}
 
-The paper is organised as follows. Section~\ref{sec:toy} builds the toy
+This work is organised as follows. Section~\ref{sec:toy} builds the toy
 model and the segment Hamiltonian from zero, including the exact
 activation levels that make everything else quantitative.
 Section~\ref{sec:onebit} reviews the 1BQF as a spectral filter and
@@ -181,11 +182,13 @@ response refit. Section~\ref{sec:fit} fits the polynomial to the
 measured false pile-up and presents the main comparison, including the
 refitted occupancy result. Section~\ref{sec:limits}
 collects the limitations: realizability, the single-response question,
-Trotterization,
-and what a real detector geometry changes. Section~\ref{sec:conclusion}
-concludes.
+Trotterization, the measured hardware-resource comparison of HHL, the
+1BQF and the comb with the error-correction requirements each implies,
+a hardware-native block encoding priced by detector hits rather than
+matrix entries, and what a real detector geometry changes.
+Section~\ref{sec:conclusion} concludes.
 
-A remark on style before we begin. This paper is deliberately verbose.
+A remark on style before we begin. This work is deliberately verbose.
 The predecessor papers compressed the segment-Hamiltonian formalism to a
 few paragraphs; here I want every level, every eigenvalue, and every
 convention on the table, because the physics of why filters succeed and
@@ -290,7 +293,7 @@ shows what that width admits.
 Because $A$ has constant diagonal, its action decomposes over the
 connected components of the compatibility graph, and small components can
 be solved by hand. This is worth doing once in full, because these little
-closed forms are the vocabulary of every result in the paper.
+closed forms are the vocabulary of every result in this work.
 
 An \emph{isolated} segment (no compatible neighbour) has the scalar
 equation $(\gamma+\delta)x=\delta$, so
@@ -377,7 +380,7 @@ fact returns as the fragment floor in section~\ref{sec:fit}.
 \caption{The amplitude atlas: exact activation level of every canonical
 cluster type (rows), classical (top) and 1BQF-filtered (bottom), with the
 fixed threshold $\tau=0.35$ marked. Green: true; pink: false. Everything
-quantitative in this paper is a statement about where these levels sit
+quantitative in this work is a statement about where these levels sit
 relative to a threshold.}
 \label{fig:atlas}
 \end{figure}
@@ -398,7 +401,7 @@ solver it is in general the wrong place to read the device: a filter
 reshapes the amplitude atlas, and a threshold inherited from the
 unfiltered atlas can land in the middle of a reshaped true band.
 Every threshold choice trades efficiency against false rate, and the
-convention this paper actually uses for filtered solvers is
+convention this work actually uses for filtered solvers is
 \emph{efficiency-first}: put the threshold where the wanted fraction of
 true segments survives, and quote the false rate that results.
 Section~\ref{sec:onebit} makes this concrete, with the trade-off shown
@@ -407,7 +410,7 @@ explicitly in figure~\ref{fig:threshold}.
 \subsection{Metric definitions}
 \label{sec:toy:metrics}
 
-Every number in this paper is one of the following, and I will never use
+Every number in this work is one of the following, and I will never use
 these words in any other sense:
 \begin{itemize}[leftmargin=2em]
 \item \textbf{segment efficiency} $\eff=n_{\rm true\,active}/n_{\rm true}$:
@@ -419,7 +422,7 @@ impurity, not a false-positive rate over all fakes);
 \item \textbf{working points}: either the \emph{fixed threshold} of
 eq.~\eqref{eq:tau}; or the \emph{efficiency-first working point}
 (the threshold placed just below the 1\% quantile of the true-segment
-amplitudes, so $\eff\ge0.99$ by construction --- whenever this paper
+amplitudes, so $\eff\ge0.99$ by construction, whenever this work
 says ``efficiency-first'' without qualification, this 99\% point is
 meant); or, in
 sections~\ref{sec:fork}--\ref{sec:fit}, the \emph{matched-efficiency}
@@ -452,7 +455,7 @@ eigenvalue of $C$, the $\varepsilon$-windowed 0/1 compatibility
 adjacency of section~\ref{sec:toy:ham} ($C_{ij}=1$ exactly when
 segments $i$ and $j$ continue one another head-to-tail within the
 angular acceptance $\varepsilon$, and $0$ otherwise). Every spectral
-statement in this paper is therefore a statement about the eigenvalues
+statement in this work is therefore a statement about the eigenvalues
 of small 0/1 graphs. Three families matter:
 \begin{enumerate}[leftmargin=2em]
 \item \textbf{Isolated segments}: $\lambda=s$ exactly. This single line
@@ -481,7 +484,7 @@ spectrum. The pair motif at $\lambda=s\pm1$ and the triple at
 $\{s,\,s\pm\sqrt2\}$ do most of the false-population work under noise,
 and their lines interleave the true lines of eq.~\eqref{eq:p4lines}
 without touching them. That gap, false lines close to but not on the
-true lines, is what this paper exploits. When noise is switched on in
+true lines, is what this work exploits. When noise is switched on in
 section~\ref{sec:noise}, the \emph{measured} spectral pile-up of a
 heavy-noise event (figure~\ref{fig:pileup}) lands exactly on the lines
 catalogued here. Motifs whose spectrum coincides
@@ -497,7 +500,7 @@ drawn in hit space (dots are hits, lines are segments; green true, red
 false). Bottom: the exact eigenvalue lines each motif contributes,
 from the closed forms of section~\ref{sec:toy:spectrum}, at
 $s=\gamma+\delta=4$. Every false family sits close to, but never on,
-the four true-track lines (green dotted) --- except for the spectral
+the four true-track lines (green dotted), except for the spectral
 twins of section~\ref{sec:comb:limits}.}
 \label{fig:motifs}
 \end{figure}
@@ -552,7 +555,7 @@ the isolated segments and nothing else; whatever false weight is
 alternative developed from section~\ref{sec:qsvt} onward: a degree-40
 polynomial with narrow passes at the four true-track lines and
 effective zeros everywhere else, including the isolated, pair and
-triple lines simultaneously. The one-sentence summary of this paper
+triple lines simultaneously. The one-sentence summary of this work
 is the difference between those two panels: a degree-one response owns
 one zero, a degree-$d$ response owns $d$, and the noisy-event false
 spectrum demands more than one.
@@ -589,17 +592,17 @@ placed below the endpoint band recovers them all.
 
 Figure~\ref{fig:threshold} shows the whole trade explicitly, on a
 stored $T=400$ clean event, by sweeping the threshold for all three
-solvers of this paper. The efficiency panel shows the plateau
+solvers of this work. The efficiency panel shows the plateau
 structure just described: the 1BQF efficiency steps down at the
 endpoint band around $\tau\approx0.28$, so the inherited $\tau=0.35$
-reads $75\%$ --- not because the filter lost the physics but because
+reads $75\%$, not because the filter lost the physics but because
 the cut sits above a reshaped true band. The false-rate panel shows
 what moving the threshold costs. Every solver is therefore read at
 its own \emph{efficiency-first working point} (dashed verticals):
 the threshold just below the 1\% quantile of that solver's true
 amplitudes, so that $99\%$ of true segments survive by construction,
 with the false rate quoted as the price. This is the convention for
-all 1BQF headlines in this paper; the fixed $\tau=0.35$ of
+all 1BQF headlines in this work; the fixed $\tau=0.35$ of
 eq.~\eqref{eq:tau} is retained only where the classical baseline is
 quoted on its own established operating point. On clean
 fixed-acceptance events at $\gamma=3$ the efficiency-first price is
@@ -618,7 +621,7 @@ rate as the threshold $\tau$ sweeps, for the classical solver, the
 scale). The grey vertical is the inherited fixed $\tau=0.35$; the
 dashed verticals are each solver's efficiency-first working point
 (99\% of its true segments kept). The fixed cut sits above the 1BQF's
-reshaped endpoint band --- the origin of its $75\%$ plateau --- while
+reshaped endpoint band, the origin of its $75\%$ plateau, while
 the comb holds both high efficiency and a $\sim10^{-2}$ false rate
 over the whole usable range.}
 \label{fig:threshold}
@@ -643,7 +646,7 @@ $\lambda=s$ line, out of the zero, and into the passband. The notch
 has no second zero to spend on it. As density or acceptance width
 grows, the coupled-false population grows, and the 1BQF's false rate
 grows with it. The 1BQF is, precisely, the statement that unconnected
-fakes are exactly removable; everything in this paper beyond
+fakes are exactly removable; everything in this work beyond
 section~\ref{sec:qsvt} is about the connected ones.
 
 On success probability: the kept-branch probability scales as
@@ -668,7 +671,7 @@ them here in the concrete, real-arithmetic form used by the
 simulations. Readers who trust the QSVT
 literature~\cite{gslw2019,lowchuang2019,childs2012,martyn2021} can
 skim to the resource summary in section~\ref{sec:qsvt:resources}; the
-details are included because the paper's cost claims (qubit counts,
+details are included because this work's cost claims (qubit counts,
 walk calls, success probabilities) are read directly off this
 construction.
 
@@ -691,15 +694,14 @@ picture I find most useful is a rotation in each eigenplane: for every
 eigenvalue $x$ of $X$ there is a two-dimensional invariant subspace in
 which $U$ rotates by the angle $\arccos x$.
 
-The word \emph{walk} deserves an explanation, because nothing in this
-paper has moved yet and the term is imported jargon. A walk operator
+The word \emph{walk} deserves an explanation, because nothing in this work has moved yet and the term is imported jargon. A walk operator
 is simply a fixed unitary that one applies over and over, taking one
 ``step'' per application, in analogy with a classical random walk
 where one transition matrix is applied repeatedly. The useful property
 is what repetition does. Because $U$ rotates each eigenplane by
 $\arccos x$, applying the walk $k$ times rotates it by $k\arccos x$,
 and the component that ends where it started is
-$\cos(k\arccos x)$ --- which is precisely the $k$-th Chebyshev
+$\cos(k\arccos x)$, which is precisely the $k$-th Chebyshev
 polynomial $T_k(x)$. One application of the walk knows only $x$;
 $k$ applications know $T_k(x)$. Repetition of a single fixed circuit
 therefore \emph{generates a polynomial family}, one degree per step,
@@ -738,7 +740,7 @@ P_{\rm anc}=\frac{\big\lVert p(X)\,|u\rangle\big\rVert^{2}}
 the usual LCU price: the one-norm of the coefficient vector. The 1BQF
 is recovered, exactly, as the $d=1$ row of this table ($\cos$ is
 $T_1$ of the appropriately rescaled operator), which is the formal
-content of the claim that this paper continues rather than replaces
+content of the claim that this work continues rather than replaces
 its predecessors.
 
 Simulation-side, eq.~\eqref{eq:walkcheb} gives a matrix-free
@@ -750,7 +752,7 @@ $d=40$ comb solve runs in $1.2$--$1.7$\,s at $T=1000$
 circuit and with a gate-streaming evaluation to better than
 $10^{-14}$ at circuit-affordable size (three-way maximum
 discrepancy $8\times10^{-15}$). All large-$T$ results below use this
-exact evaluator; nothing in this paper relies on an approximate
+exact evaluator; nothing in this work relies on an approximate
 simulation of the quantum readout.
 
 \subsection{Resource summary}
@@ -769,7 +771,7 @@ amplitude-amplification rounds.
 $\approx0.44$ for the comb of section~\ref{sec:comb}), so total walk
 calls scale as $d\sqrt{T}$.
 \end{itemize}
-The quantum content of this paper is this resource profile; the
+The quantum content of this work is this resource profile; the
 response functions themselves are classically simulable by the same
 recursion, and I return to what that does and does not concede in
 section~\ref{sec:limits:dequant}.
@@ -819,17 +821,26 @@ noisy events of section~\ref{sec:fit} will re-open.
 On the fixed-acceptance ($\varepsilon=2$\,mrad), $\gamma=3$ study, the
 canonical benchmark of the programme, with events and solutions shared
 segment-for-segment across all three solvers through a common data
-pipeline, the picture at the fixed threshold $\tau=0.35$ is:
+pipeline, each solver read at the working point fixed in
+section~\ref{sec:toy:metrics} (the classical solver and the comb at
+the fixed cut $\tau=0.35$, the 1BQF at its efficiency-first point), the picture is:
 \begin{itemize}[leftmargin=2em]
 \item \textbf{Classical}: efficiency $100\%$ throughout (the minimum
 true amplitude $4/11$ clears $\tau$ at every $T$); false rate grows
 from $\approx0$ at low $T$ to $2.25\%$ at $T=400$ and $20.5\%$ at
 $T=1000$ as the $\mathcal{O}(T^2)$ false pairing feeds the active
 set.
-\item \textbf{1BQF}: the fixed-$\tau$ efficiency plateau of
-section~\ref{sec:onebit} ($74.7\%$ at $T=400$, the endpoint cut);
-false rate at or just below classical ($1.73\%$ at $T=400$, $18.8\%$
-at $T=1000$).
+\item \textbf{1BQF}: at its efficiency-first working point the notch
+recovers essentially every true segment (efficiency
+$99.5$--$100\%$ at every $T$), and the false rate blows up to pay
+for it: $5.1\%$ at $T=100$, $43.9\%$ at $T=400$, $82.6\%$ at
+$T=1000$, far above the classical solver, because the single zero
+removes only the isolated-false bulk while every coupled fake sits
+off the notch and survives. (At the fixed threshold $\tau=0.35$ the
+same solver instead reads an $\approx75\%$ efficiency plateau at
+$T=400$, the endpoint cut of section~\ref{sec:onebit}, an
+artefact of that threshold and not a working point, kept only as the
+faded curve in figure~\ref{fig:clean2x2}.)
 \item \textbf{Comb}: efficiency $97$--$100\%$ with false rate
 $\le0.02\%$ through $T=400$ (zero to a few false actives per event
 where the classical solver admits tens), rising to $0.17\%$ at
@@ -893,13 +904,12 @@ a false pair are the same matrix, figure~\ref{fig:twins}), so
 fragments are a spectral
 floor \emph{on this Hamiltonian}, the first appearance of the twin
 obstruction that
-section~\ref{sec:fit} meets at full strength --- and that
+section~\ref{sec:fit} meets at full strength, and that
 section~\ref{sec:fit:occ} shows an operator modification can
 lift. Recovery on the unmodified Hamiltonian must come from
 information a spectral filter
 cannot see, namely hit-level constraint information, and that is
-classical post-processing, outside the scope of this
-paper.\footnote{An earlier version of this study paired a
+classical post-processing, outside the scope of this work.\footnote{An earlier version of this study paired a
 hit-occupancy recovery gate with the comb alone; it was retired as
 mission creep (no other solver received the same help, and the tool
 is orthogonal to the spectral question). Classical post-selection is
@@ -960,7 +970,7 @@ fitted or otherwise, and no classical amplitude scoring, can tell
 twins apart: whatever passes one passes the other.
 
 Figure~\ref{fig:twins} draws the pair of twins that will matter most
-in this paper. A true two-segment fragment (three surviving hits of a
+in this work. A true two-segment fragment (three surviving hits of a
 broken track) and a false pair (two fake segments that happen to
 continue one another inside the acceptance) are physically completely
 different objects; but both are two segments sharing one hit, both
@@ -997,10 +1007,10 @@ efficiency at a false-rate premium. Together these results closed the
 clean-toy design question. The production comb is optimal up to
 provable exceptions, and further progress must come from changing
 the operator or leaving the spectral domain, which is exactly where
-the rest of this paper goes.
+the rest of this work goes.
 
 % ══════════════════════════════════════════════════════════════════════════════
-\section{The heavy-noise operating point}
+\section{The heavy-noise events}
 \label{sec:noise}
 
 From here on the operating point is the heavy configuration:
@@ -1028,7 +1038,7 @@ actually look like in the detector: the component-size distribution,
 and real examples drawn from the event, from a pure-false pair to
 the largest seventeen-segment tangle. Seen at the micron scale of
 their internal kinks, the ``tangles'' are bundles of near-collinear
-competitors --- exactly the structures the widened acceptance
+competitors, exactly the structures the widened acceptance
 admits.
 \item \textbf{The false actives are motif-borne.} At the classical
 efficiency-first working point the event has $2238$ active segments
@@ -1084,7 +1094,7 @@ wide acceptance populates false motif lines (figure~\ref{fig:pileup})
 inside its pass windows. The important statement here is the
 diagnosis: at heavy noise all three solvers fail for the same
 reason, a false population that has moved onto spectral lines the
-designs were never told about --- and the cure, developed in
+designs were never told about, and the cure, developed in
 section~\ref{sec:fit}, is to measure those lines and refit the
 response to them. The classical literature also offers two
 Hamiltonian terms as candidate cures, occupancy and bifurcation. The
@@ -1120,7 +1130,7 @@ it.
 On the heavy $T=200$ benchmark event the in-matrix occupancy term at
 $\alpha=0.3$ does exactly what Denby promised: the classical
 efficiency-first false rate falls from $0.650$ to $0.210$ at
-efficiency $0.991$. If this paper were classical, the section would
+efficiency $0.991$. If this work were classical, the section would
 end here with a recommendation.
 
 For the 1BQF it is a disaster, and the mechanism is worth spelling
@@ -1169,7 +1179,7 @@ entirely outside the Hamiltonian, as a classical hit-uniqueness
 post-selection applied evenly to every solver's output, deliberately kept out of this
 work, whose subject is the spectral side.} But ``final for the
 notch'' is not ``final for the filter family''. The fork term in the
-next section will teach the general lesson of this paper, that an
+next section will teach the general lesson of this work, that an
 operator modification can only be judged together with a response
 refitted to the spectrum it creates, and
 section~\ref{sec:fit:occ} returns to the occupancy term with exactly
@@ -1224,13 +1234,13 @@ study to show they matter.
 
 One methodological point, learnt the hard way, belongs here rather
 than in a results table. Retuning a \emph{fixed} response to the fork
-system --- tracking the diagonal, rebuilding the comb on the shifted
-domain --- is not enough, because the retunes move the response's
+system, tracking the diagonal, rebuilding the comb on the shifted
+domain, is not enough, because the retunes move the response's
 centre and domain but never ask where the false weight now lives.
 Evaluated that way, both Denby--Peterson terms read as regressions,
 and the reading is a statement about the mismatch between an old
 response and a new spectrum, not about the terms. The correct
-procedure, used for every operator result in this paper, is to
+procedure, used for every operator result in this work, is to
 measure the modified system's false pile-up and refit the polynomial
 to it: change the Hamiltonian, and the activations and their spectral
 support move; when they move, the polynomial must be refitted to the
@@ -1244,14 +1254,14 @@ compare solvers at matched efficiency instead.)
 \subsection{A Trotter aside that will matter on hardware}
 \label{sec:fork:trotter}
 
-Everything in this paper so far treats the evolution $e^{iAt}$ as
+Everything in this work so far treats the evolution $e^{iAt}$ as
 exact. On hardware it is not: a quantum computer realises $e^{iAt}$
 by a circuit, and the standard cheap construction, the
 \emph{product formula} (or Trotterization), builds it from the
 pairwise pieces of the Hamiltonian. The idea is simple: $A$ is a sum
 of many small commuting-or-not terms, one per coupled segment pair,
 and while $e^{i(X+Y)t}$ is hard, the product
-$e^{iXt}e^{iYt}$ is easy --- one small gate per term. If $X$ and $Y$
+$e^{iXt}e^{iYt}$ is easy, one small gate per term. If $X$ and $Y$
 commute the product is exact; if not, it errs at order $t^2[X,Y]$,
 and one hopes the accumulated error stays below the physics. The
 1BQF circuit of ref.~\cite{trackhhl} is exactly such a per-pair
@@ -1260,7 +1270,7 @@ product.
 The programme's measurements show where that hope holds and where it
 breaks, and the split is clean (figure~\ref{fig:erf}). With
 \emph{uniform} coupling weights (every term the same strength, as in
-the step-kernel Hamiltonian of this paper) circuit and exact
+the step-kernel Hamiltonian of this work) circuit and exact
 evolution agree to cosine similarity $\approx0.985$: the product
 formula is safe. With \emph{heterogeneous} weights (the erf-weighted
 angular kernel, or a fractional fork $\beta=0.5$ riding on unit
@@ -1273,7 +1283,7 @@ hardware is that heterogeneous coupling weights break the naive
 product formula, and circuit realisations of weighted Hamiltonians
 need the structured synthesis route (edge-coloured pair ordering)
 developed in the programme's direct-structural-synthesis study. All
-fork and fit results in this paper use exact evolution precisely so
+fork and fit results in this work use exact evolution precisely so
 that filter physics and circuit error are never conflated;
 section~\ref{sec:limits:trotter} returns to what this means for
 deployment.
@@ -1313,8 +1323,31 @@ x_s(p)=\sum_i p(\lambda_i)\,\big(\mathbf{v}_i^{\!\top}\mathbf{b}\big)\,
 v_i(s),
 \label{eq:linresponse}
 \end{equation}
-linear in $p$, so the question of where the false amplitude comes
-from is well posed and exactly answerable. The answer, on the heavy
+which is nothing more than the spectral decomposition of the
+filtered solution $p(A)\mathbf{b}=\sum_i
+p(\lambda_i)\,\mathbf{v}_i\mathbf{v}_i^{\!\top}\mathbf{b}$ read off
+at segment $s$. The two geometric factors are fixed by the event
+alone, before any response is chosen: $\mathbf{v}_i^{\!\top}
+\mathbf{b}=\delta\sum_s v_i(s)$ is the projection of mode $i$ onto
+the uniform source (recall $\mathbf{b}=\delta\mathbf{1}$), and
+$v_i(s)$ is that mode's amplitude on segment $s$. The response
+enters only through the scalars $p(\lambda_i)$. Three consequences
+follow, and the section rests on all three. First, each mode
+deposits a definite \emph{formation weight}
+$(\mathbf{v}_i^{\!\top}\mathbf{b})\,v_i(s)$ onto every segment, so
+each segment's amplitude is a sum of contributions labelled by
+eigenvalue: a histogram of that weight against $\lambda$ is the
+spectral pile-up of figure~\ref{fig:pileup}. Second, each mode
+carries a definite true/false \emph{content}, the fraction
+$\sum_{s\,\in\,\rm true} v_i(s)^2$ of its weight landing on true
+segments, so the false part of the amplitude can be attributed to
+specific eigenvalues rather than to the solver. Third, and
+decisively for what follows, $x_s$ is \emph{linear} in the values
+$\{p(\lambda_i)\}$: freeze the geometry, treat the response samples
+as the unknowns, and every segment amplitude is a fixed linear
+combination of them. The question of where the false amplitude
+comes from is therefore well posed and exactly answerable. The
+answer, on the heavy
 $T=200$ events, is concentrated to a degree I did not expect. The
 false-active formation weight piles up on the \emph{pair line}
 $\lambda=s-1$: on the three events measured, that single bin carries
@@ -1327,23 +1360,50 @@ almost none of which are shared with true formation.
 
 \subsection{Fitting the response}
 
-With eq.~\eqref{eq:linresponse} linear in the response, the fit is a
-regularised least-squares problem over binned response values
-($\Delta\lambda=0.02$):
+Because eq.~\eqref{eq:linresponse} is linear in the response,
+choosing the response is a least-squares problem. Represent $p$ by
+its values on a grid of narrow bins in $\lambda$ (width
+$\Delta\lambda=0.02$, a few hundred bins spanning the spectrum);
+these binned values are the free parameters, and by
+eq.~\eqref{eq:linresponse} each segment amplitude is a fixed linear
+combination of them, $x_s(p)=(D\mathbf{p})_s$ with $D$ the design
+matrix that collects the formation weights into bins. The response
+is then the solution of
 \begin{equation}
-\min_{p}\ \sum_{s\,\in\,\rm false}x_s(p)^2
-\;+\;\mu\sum_{s\,\in\,\rm true}\big(x_s(p)-x_s^{\rm cls}\big)^2 ,
-\qquad |p|\le1,
+\min_{p}\ \underbrace{\sum_{s\,\in\,\rm false}x_s(p)^2}_{\text{purity}}
+\;+\;\mu\underbrace{\sum_{s\,\in\,\rm true}
+\big(x_s(p)-x_s^{\rm cls}\big)^2}_{\text{efficiency}} ,
+\qquad |p|\le1 .
 \label{eq:fit}
 \end{equation}
-with the isolated-false line pressured to zero and $\mu$ swept to
-trace the efficiency--purity trade. No root position is chosen by
-hand: zeros appear where false weight concentrates because that is
-what the objective rewards. The fitted response reproduces the
-comb's passes at the (contamination-shifted) true lines and drives
-deep roots through $s-1$ and $s\pm\sqrt2$: precisely the polynomial
-that no clean-event design could have anticipated, because the root
-locations are properties of the measured noise.
+The first term drives the false-segment amplitudes toward zero; the
+second pins the true-segment amplitudes to the values
+$x_s^{\rm cls}$ the classical inversion gives them, so the fit
+cannot manufacture a clean false spectrum simply by discarding true
+segments. Both terms are quadratic in the binned values, so the
+minimiser solves the linear normal equations
+\begin{equation}
+\big(D_F^{\!\top}D_F+\mu\,D_T^{\!\top}D_T\big)\,\mathbf{p}
+=\mu\,D_T^{\!\top}\mathbf{x}^{\rm cls},
+\label{eq:normal}
+\end{equation}
+with $D_F,D_T$ the rows of $D$ for false and true segments, and the
+$\mathcal{O}(10^5)$-strong isolated-false line at $\lambda=s$
+carried into $D_F$ as one heavily weighted row so it is held at the
+notch. The bound $|p|\le1$ is the QSVT realizability constraint of
+section~\ref{sec:qsvt}: only a response bounded by one on the
+spectrum can be implemented as a walk. The single knob is $\mu$,
+which trades the two terms against each other: $\mu\to0$ maximises
+purity at the cost of the true band, $\mu\to\infty$ recovers the
+classical efficiency at the cost of the false spectrum, and sweeping
+it traces the efficiency--purity frontier the results below report.
+No root position is chosen by hand: zeros appear where false weight
+concentrates because that is what the objective rewards. The fitted
+response reproduces the comb's passes at the (contamination-shifted)
+true lines and drives deep roots through $s-1$ and $s\pm\sqrt2$:
+precisely the polynomial that no clean-event design could have
+anticipated, because the root locations are properties of the
+measured noise.
 
 \subsection{Results}
 \label{sec:fit:results}
@@ -1354,8 +1414,8 @@ it is the same kind of object. Fix a system (a row block: the base
 Hamiltonian, or the fork system at its validity point) and a target
 efficiency (the ``eff'' column). For each solver, slide that
 solver's own threshold until exactly the target fraction of true
-segments survives --- the matched-efficiency convention of
-section~\ref{sec:toy:metrics} --- and record the false rate of the
+segments survives, the matched-efficiency convention of
+section~\ref{sec:toy:metrics}, and record the false rate of the
 selected sample at that threshold. Lower is better; solvers in the
 same row are compared at identical efficiency by construction, so
 the false rate is the \emph{entire} difference between them. All
@@ -1430,8 +1490,8 @@ Third, the wall at $\eff\ge0.99$ is real on these systems, and now
 has a name. At the strict $99\%$ point everything, classical
 included, floods back to $\far\approx0.65$. The per-component
 decomposition locates the cause exactly: about $2\%$ of \emph{true}
-segments --- a couple of dozen per event, counted directly and
-consistently on all three events --- are spectral twins of the false
+segments, a couple of dozen per event, counted directly and
+consistently on all three events, are spectral twins of the false
 motifs, in exactly the sense of
 section~\ref{sec:comb:limits} and figure~\ref{fig:twins}. They are
 the hit-drop fragments of section~\ref{sec:comb:drop}: a broken
@@ -1446,7 +1506,7 @@ generalisation of the clean floor theorem, no longer a curiosity but
 the binding constraint. The robust statement is the measured wall
 itself: on the base and fork systems every solver holds
 $\eff=0.98$ and none holds $\eff=0.99$, on all three events. On
-\emph{those} Hamiltonians no function of $\lambda$ can cross it ---
+\emph{those} Hamiltonians no function of $\lambda$ can cross it,
 but the floor is a twin degeneracy of the operator, not of the
 event, and the next subsection shows an operator that removes it.
 \label{sec:fit:floor}
@@ -1454,13 +1514,13 @@ event, and the next subsection shows an operator that removes it.
 \subsection{The occupancy term, refitted}
 \label{sec:fit:occ}
 
-Section~\ref{sec:occupancy} ended with a debt: the occupancy was measured on the fixed 1BQF targeting the central, isolated, eigenvalue, a filter with no freedom to follow the
+Section~\ref{sec:occupancy} ended with an issue: the occupancy was measured on the fixed 1BQF targeting the central, isolated, eigenvalue, a filter with no freedom to follow the
 spectrum the term creates, and the fork has since taught us that
 operator terms can only be judged with a refitted response. The
-occupancy system makes the refit technically harder --- the co-hit
+occupancy system makes the refit technically harder, the co-hit
 coupling $2\alpha B_{\rm all}$ merges the compatibility graph into a
 giant component, so the exact per-component measurement behind
-eq.~\eqref{eq:fit} is unavailable --- but not impossible: a degree-$d$
+eq.~\eqref{eq:fit} is unavailable, but not impossible: a degree-$d$
 response needs no eigendecomposition, because the moment vectors
 $T_k(X)\mathbf{b}$ are computable by sparse matrix--vector recursion
 and the amplitudes are linear in the Chebyshev coefficients. The fit
@@ -1470,7 +1530,7 @@ including the isolated bulk. Run identically on the base and
 occupancy systems (same algorithms, same events, only the Hamiltonian
 differs), it settles the question.
 
-The verdict of section~\ref{sec:occupancy} reverses
+The result of section~\ref{sec:occupancy} contradicts
 (figure~\ref{fig:occfit}). At matched efficiency $0.98$ the directly
 fitted response reads $0.085$ on the base system and $0.050$ on the
 occupancy system at $\alpha=0.05$; at $0.97$, $0.071$ against
@@ -1485,10 +1545,10 @@ $\alpha=0\to0.05\to0.3$) and a fixed degree budget loses resolution
 proportionally; the spectral benefit saturates long before the
 classical amplitude benefit does. Second, and most strikingly,
 \emph{the occupancy coupling breaks the fragment floor}. One of the
-three events is floor-bound on the base system --- its fitted
+three events is floor-bound on the base system, its fitted
 response cannot do better than $0.654$ at matched efficiency
 $0.985$, because its fragment twins are exactly degenerate with
-false pairs --- and on the occupancy system the same event fits to
+false pairs, and on the occupancy system the same event fits to
 $0.062$. The mechanism is the floor theorem read in reverse: the
 twin argument requires isomorphic components, and the co-hit
 coupling embeds every motif in its hit-sharing neighbourhood, which
@@ -1503,8 +1563,8 @@ One engineering note: the degree budget
 that collects the occupancy win is larger than the base system's
 (the span costs resolution; most of the gain arrives by degree
 $80$--$160$ at $\alpha=0.05$). Like every fitted result in this
-section, the fit itself is mechanical --- the roots land on the
-enumerable motif structure the operator produces --- so the reversal
+section, the fit itself is mechanical, the roots land on the
+enumerable motif structure the operator produces, so the reversal
 is a property of the Hamiltonian, not of a tuning; folding it into
 the single fixed response of
 section~\ref{sec:limits:generalization} is part of that
@@ -1521,7 +1581,7 @@ three-event means: the fitted response on the occupancy system at
 $\alpha=0.05$ beats both the classical solver and the fitted
 response on the base system. (b) Per event: the event that is
 fragment-floor-bound on the base system (event 1) escapes the floor
-on the occupancy system --- the co-hit coupling breaks the
+on the occupancy system, the co-hit coupling breaks the
 fragment/false-pair twin degeneracy.}
 \label{fig:occfit}
 \end{figure}
@@ -1563,8 +1623,8 @@ specific function} needs degree $d\approx2W/h\approx700$, and truncated
 series fitted to it at $d\le240$ performed terribly. But reproducing
 the binned optimum is the wrong problem. Fitting the objective of
 eq.~\eqref{eq:fit} \emph{directly in the degree-$d$ coefficient
-space} --- amplitudes are linear in the Chebyshev coefficients, so
-this is the same least-squares problem in $d{+}1$ unknowns --- finds
+space}, amplitudes are linear in the Chebyshev coefficients, so
+this is the same least-squares problem in $d{+}1$ unknowns, finds
 realisable responses that match the unlimited-degree optimum already
 at the production degree
 (figure~\ref{fig:fit}d: $0.099$ at $d=40$ against the binned
@@ -1592,9 +1652,9 @@ whatever cluster sizes survive preprocessing.
 
 On this toy the fit is not a statistical learning problem, and no
 train-and-test machinery is needed to understand it. The structures
-an event can contain are enumerable --- chains, hubs, bridges and
+an event can contain are enumerable, chains, hubs, bridges and
 their contaminated combinations, each pinned to closed-form
-eigenvalue lines --- and the fit is mechanical: the roots land on
+eigenvalue lines, and the fit is mechanical: the roots land on
 the motif lines because that is where the false weight must sit.
 The root positions are therefore universal ($s-1$ and $s\pm\sqrt2$
 are motif properties, not event properties). What does vary between
@@ -1608,8 +1668,8 @@ one: roots pinned to the motif lines, passes wide enough to cover
 the contaminated-true spread of the ensemble. Building that single
 fixed response, and measuring what its wider passes cost against
 the per-event ceiling of section~\ref{sec:fit}, is the programme's
-clear next step. On noisier data --- real geometry, variable track
-length, denser contamination --- the structure will no longer be
+clear next step. On noisier data, real geometry, variable track
+length, denser contamination, the structure will no longer be
 enumerable by hand, and how to fix the response there will need
 closer thought (section~\ref{sec:limits:geometry}).
 
@@ -1627,6 +1687,200 @@ study, which also reaches 1BQF width for the comb via generalized
 QSP over $e^{-iAt}$) restores exactness at matched cost and is, on
 present evidence, mandatory for any weighted Hamiltonian on
 hardware.
+
+\subsection{Hardware resources: HHL, the 1BQF, and the comb side by
+side}
+\label{sec:limits:resources}
+
+The three algorithms of this lineage are best compared in a common
+currency, because on this problem they genuinely share one: all
+three are built from repeated calls to the same controlled
+time-evolution $e^{\pm iAt}$, synthesised gate-by-gate from the
+Hamiltonian's pair structure (the direct-structural-synthesis
+construction of ref.~\cite{trackhhl}: one Givens unit per coupled
+segment pair, a CNOT ladder plus one multi-controlled rotation,
+transpiled to a \{CX, $R_z$, $\sqrt X$, $X$\} basis). What
+distinguishes the algorithms is only \emph{how many} calls they
+make: the 1BQF interferometer makes two; the degree-$d$ comb,
+realised as a Fourier comb over the same primitive, makes $d$; and
+HHL wraps the evolution in phase estimation, making
+$\approx2(2^{n_c}{-}1)$ calls for an $n_c$-bit clock register, an exponential price paid for amplitude information the selection
+task never uses, which was the founding observation of the 1BQF.
+Table~\ref{tab:resources} collects the measured numbers. Widths are
+exact register counts; two-qubit gate counts are measured on the
+stored events (the multi-controlled rotations transpiled, the CNOT
+ladders counted from the measured Hamming distances, $k\approx
+1.5$--$2.3\sqrt{N}$ coupled pairs); the accompanying one-qubit
+$R_z/\sqrt X$ counts are of the same order as the CX counts (each
+ladder CX is dressed by $\mathcal{O}(1)$ single-qubit rotations)
+and are subdominant in every error budget, so CX is quoted. The
+HHL column is a structure-level estimate at $n_c=6$--$8$ clock
+bits, the range a useful inversion on this spectrum would need;
+the predecessor implementations restricted the phase estimation
+precisely to tame this factor~\cite{nicotra2023,trackhhl_epj}.
+The dense-dilation block encoding used by this work's own
+simulations is excluded from the table deliberately: it is
+simulation-grade only ($\approx84$k CX already at $T=3$, with no
+structure for synthesis to exploit). Figure~\ref{fig:rescmp} shows
+how every row of the table scales with track count, measured from
+$T=10$ to $1000$.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+ & scaling with $T$ & HHL & 1BQF & comb (QSVT) \\
+\midrule
+\multicolumn{5}{l}{\emph{global event register}}\\
+logical qubits ($T=1000$) & $\lceil\log_2 4T^2\rceil+\mathrm{const}$
+ & $\approx29$--$31$ & $24$ & $24$ \\
+evolution calls per shot & constant &
+$\approx130$--$510$ & $2$ & $40$ \\
+CX per call ($T=400$) & $\propto k\,n_s$; measured
+$\approx T^{1.4}$ & \multicolumn{3}{c}{$6.2\times10^{5}$ (shared
+primitive)} \\
+CX per shot ($T=400$) & calls $\times$ per-call & $\sim10^{8}$ &
+$1.2\times10^{6}$ & $2.5\times10^{7}$ \\
+amplification rounds ($T=400$) & $\propto\sqrt T$ & n/a & \multicolumn{2}{c}{$24$} \\
+\midrule
+\multicolumn{5}{l}{\emph{per-cluster route
+(section~\ref{sec:limits:realizability}, $\le17$-dim blocks)}}\\
+logical qubits & independent of $T$ & $\approx12$--$14$ & $6$ & $6$ \\
+evolution calls per shot & constant & $\approx130$--$510$ & $2$ & $16$ \\
+CX per shot (largest cluster) & set by cluster size, not $T$ &
+$\sim10^{5}$ & $\approx1.8\times10^{3}$ & $1.4\times10^{4}$ \\
+amplification rounds & constant & n/a & \multicolumn{2}{c}{$3$} \\
+\bottomrule
+\end{tabular}
+\caption{Logical resources of the three filters on the shared
+events, in the common currency of controlled-$e^{\pm iAt}$ calls
+(all three use the same synthesised evolution circuit; one call
+costs $6.2\times10^{5}$ CX at $T=400$ globally, $\approx900$ CX on
+the largest 16-segment cluster). The scaling column gives the
+$T$-dependence of each row; anchors are quoted at the stated $T$.
+The HHL column is a structure-level estimate at $n_c=6$--$8$ clock
+bits; the 1BQF and comb columns are measured. In the per-cluster
+route only the \emph{number} of cluster instances grows with $T$
+(linearly); every per-instance resource is set by the cluster size,
+which the no-giant-component measurement caps at $\approx17$
+segments. One-qubit gate counts track the CX counts at the same
+order and are omitted.}
+\label{tab:resources}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.92\textwidth}
+\includegraphics[width=0.95\textwidth]{resource_comparison.pdf}
+\caption{The rows of table~\ref{tab:resources} against track count.
+(a) Logical register width: all constructions follow
+$\lceil\log_2 4T^2\rceil$ plus a constant: the 1BQF and
+DSS--QETU comb lines coincide exactly (the comb pays no width for
+its degree on this primitive), while the dense-dilation LCU pays
+$+5$ and the HHL clock band $+7$ to $+9$. (b) Measured two-qubit
+gate cost per shot: the shared evolution call grows as
+$\approx T^{1.4}$ (pair count $\times$ ladder length), the three
+algorithms sitting at fixed multiples of it (2, 40,
+$\approx130$--$510$ calls). The green diamonds are the largest
+single per-cluster instance at each $T$: set by the local cluster
+size, not by $T$, the flat exception to every other curve's
+growth.}
+\label{fig:rescmp}
+\end{figure}
+
+What error rates make each column viable? Run uncorrected, a
+circuit of $N_2$ two-qubit gates survives with probability
+$\approx(1-p_2)^{N_2}$, so the usable budget is $N_2\lesssim1/p_2$.
+At today's best two-qubit fidelities ($p_2\approx10^{-3}$) that
+budget is $\sim10^{3}$ gates: the per-cluster 1BQF
+($\approx2\times10^{3}$ CX on the largest cluster, far less on
+typical ones) sits exactly at this edge, which is why it is the
+member of the family that has run on real
+devices~\cite{trackhhl}. The per-cluster comb needs
+$p_2\approx10^{-4}$--$10^{-5}$, one to two orders beyond present
+hardware; every global column is out of uncorrected reach
+entirely.
+
+Beyond that budget the requirement becomes fault tolerance, and the
+arithmetic is standard~\cite{fowler2012}. A distance-$d_c$ surface
+code patch turns physical error $p$ into logical error per
+operation $p_L\approx0.1\,(p/p_{\rm th})^{(d_c+1)/2}$ with
+threshold $p_{\rm th}\approx10^{-2}$, at a cost of
+$\approx2d_c^{2}$ physical qubits per logical qubit. Demanding
+$p_L\lesssim1/N_2$ at $p=10^{-3}$: the per-cluster comb
+($N_2\approx10^{4}$, 6 logical qubits) needs $d_c\approx7$,
+i.e.\ $\sim10^{3}$ physical qubits, a near-term fault-tolerant
+demonstrator. The global comb ($N_2\approx2.5\times10^{7}$, 24
+logical qubits) needs $d_c\approx13$, $\sim10^{4}$ physical
+qubits; global HHL, another order deeper, needs
+$d_c\approx15$ on a wider register. Because the code distance
+grows only logarithmically in depth, all the global routes land
+within a factor of a few of $10^{4}$ physical qubits; the real separations between the columns are wall-clock time (the call
+counts) and the per-cluster row. Two honest caveats: these are
+logical-resource estimates from measured circuit counts and
+standard surface-code scaling, not a compilation study; and the
+Givens rotations carry arbitrary angles, so in a fault-tolerant
+run the dominant cost would shift from the CX counts quoted here
+to magic-state distillation for the rotation synthesis. The
+practical reading of the table is the same from either end: the
+per-cluster route of
+section~\ref{sec:limits:realizability} is where this family meets
+hardware first, the 1BQF already inside the uncorrected budget and
+the comb one hardware generation behind it.
+
+\subsection{A block encoding priced by hits, not matrix entries}
+\label{sec:limits:blockencoding}
+
+One assumption sits underneath every gate count in
+table~\ref{tab:resources}, and relaxing it is the most promising
+resource lever the programme has found. That assumption is how the
+Hamiltonian enters the circuit: the \emph{block encoding}, the
+unitary whose top-left corner is $A/\alpha$ and on which every
+walk call is built. The per-call cost in the table is priced the
+expensive way. The
+$6.2\times10^{5}$ CX evolution call carries one circuit element per matrix nonzero, and so does every literature block encoding the
+programme has benchmarked on these matrices (FABLE and its sparse
+variants, explicit sparse-oracle circuits~\cite{camps2023},
+dictionary encodings): all of them pay $\Omega(T^{2})$ gates per
+call, a circuit as large as the classical matrix. But $A$ is a
+derived object. The event itself is $5T$ hits,
+$\mathcal{O}(T\log T)$ bits of information, and the matrix is a
+fixed geometric function of them: two segments couple exactly when
+they share a hit and their kink angle passes the acceptance of
+eq.~\eqref{eq:epsilon}. A block encoding that queries \emph{hits}
+rather than matrix entries (a quantum read-only memory over the
+$5T$ sorted hit coordinates, fixed-point extrapolation arithmetic,
+and a comparator against $\varepsilon$, assembled in the standard
+state-preparation-pair form) costs $\mathcal{O}(T)$ gates per
+call instead of $\mathcal{O}(T^{2})$. The programme's
+block-encoding study has validated this construction on the stored
+events: the hit-window enumeration reproduces every accepted
+coupling exactly (coverage $1.0$ at every $T$ from $5$ to $1000$,
+clean and noisy events alike), the subnormalization sits at the
+local-occupancy floor ($\alpha=2$--$4$ up to $T=1000$, the same
+class as the best entry-priced encodings, near the provable
+$\lVert C\rVert$ lower bound), and the modelled per-call cost at
+$T=400$ is $1.6\times10^{4}$ CX against $2.4\times10^{6}$ for the entry-priced route, two orders of magnitude, and growing with
+$T$. Combined with the metric-validated comb degree (12--20
+suffices on the base Hamiltonians; the production $d=40$ is
+conservative), an entire hit-oracle comb solve costs
+$3.3\times10^{5}$ CX at $T=400$: less than a single entry-priced
+evolution call in table~\ref{tab:resources}. The price is width:
+the memory workspace adds $\approx47$--$49$ qubits over the
+21-qubit native floor, so the offer on the table is qubits for depth: roughly $3$--$4\times$ the register buys $4$--$7\times$
+less depth per solve at equal or better false rate. Two further
+measured facts complete the picture. The hit coordinates need $12$
+bits of fixed-point precision, and this is a hard cliff rather
+than a slope: at $10$ bits enough $\varepsilon$-boundary couplings
+flip that the \emph{classical} solve on the same quantized matrix
+breaks too, so the cliff is a property of the acceptance geometry,
+not of the encoding. And the erf-weighted kernel costs nothing
+extra, because the coupling weight is an arithmetic function of
+the kink angle the oracle already computes, where the entry-priced dictionary encoding sees its subnormalization explode
+on continuous values. None of this touches the floor theorem,
+which is representation-independent; it moves only the hardware
+accounting, and it moves it in the comb's favour.
 
 \subsection{Success probability and readout}
 \label{sec:limits:readout}
@@ -1669,17 +1923,16 @@ scaling.}
 \subsection{Classical simulability of the response family}
 \label{sec:limits:dequant}
 
-Every response function in this paper can be applied classically by
+Every response function in this work can be applied classically by
 the Chebyshev recursion in $\mathcal{O}(d\cdot{\rm nnz}(A))$ flops,
 seconds at $T=1000$. The discrimination physics (combs, roots,
 floors) is solver-independent mathematics of the segment
-Hamiltonian, and this paper's contribution to it stands whether or
+Hamiltonian, and this work's contribution to it stands whether or
 not a quantum computer is ever involved. The quantum claim is
 confined to the resource profile: width logarithmic in problem
 size, walk calls $d\sqrt T$ against classical $dT^2$ for the
 readout task above, and a hardware-native route to the same
-amplitudes. Readers allergic to quantum advantage claims may read
-the whole paper as classical spectral-filter engineering with a
+amplitudes. Readers allergic to quantum advantage claims may read the whole work as classical spectral-filter engineering with a
 quantum implementation appendix; nothing in the physics sections
 would change.
 
@@ -1702,7 +1955,7 @@ into a continuum, the fragment population ($m\le2$, orange) sits
 inside the false bulk for every solver, and the redesigned
 band-plus-notch response reproduces the toy's qualitative
 separation on the findable ($m\ge3$) population. The honest
-statement of scope is that this paper's method
+statement of scope is that this work's method
 is response engineering on whatever spectral structure the geometry
 provides, demonstrated exhaustively on a geometry that provides a
 lot of it; the measurement loop of section~\ref{sec:fit} (measure
@@ -1720,7 +1973,7 @@ band-plus-notch response. Pink: false segments; orange: true
 fragments ($m\le2$); green: findable true segments ($m\ge3$); the
 dotted line is the fixed threshold. Variable track length smears
 the discrete toy levels into bands, and the fragment population
-sits inside the false bulk for every solver --- the real-geometry
+sits inside the false bulk for every solver, the real-geometry
 form of the fragment floor.}
 \label{fig:run3}
 \end{figure}
@@ -1729,7 +1982,7 @@ form of the fragment floor.}
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper set out to finish a thought that the one-bit quantum
+This work set out to finish a thought that the one-bit quantum
 filter started. The 1BQF's insight was that track finding does not
 need a linear-system solution, only a spectral separation, and that
 one cosine with one zero buys the largest separation in the problem
@@ -1751,7 +2004,7 @@ and put roots there. At the heavy-noise operating point
 weight piles up on the pair and triple motif lines, and the response
 refitted to that measurement reads a false rate of $0.061$ at
 matched segment efficiency $0.97$ where the classical solver on the
-same events reads $0.124$ --- half the fakes at identical
+same events reads $0.124$, half the fakes at identical
 efficiency, on every event tested, at every efficiency below the
 fragment floor.
 \item Judge every Hamiltonian modification together with the
@@ -1759,11 +2012,11 @@ response fitted to it, never separately. Both Denby--Peterson terms
 destroy the degree-one filter, and both help the refitted
 polynomial: the fork system fits to $0.046$ at matched efficiency
 $0.97$ (against $0.061$ without the fork), and the occupancy system
-at small coupling $\alpha=0.05$ fits to $0.039$ --- the best number
+at small coupling $\alpha=0.05$ fits to $0.039$, the best number
 in the study, produced by the same term whose coupling collapses
 the 1BQF's separation (AUC $0.996\to0.634$). Operator and response
 are one design, not two.
-\item Know what the spectrum cannot see --- and know that the
+\item Know what the spectrum cannot see, and know that the
 operator can change what that is. Spectral twins bound every
 function of $\lambda$ on a fixed Hamiltonian, classical scoring
 included; at heavy noise the true fragments of broken tracks are
@@ -1778,7 +2031,7 @@ $0.062$ on the occupancy system at the same matched efficiency.
 \end{enumerate}
 
 The open problems are, I think, unusually crisp for this field: a
-single fixed response for the whole event ensemble --- on this toy
+single fixed response for the whole event ensemble, on this toy
 an enumeration over the finite motif structure (roots on the motif
 lines, passes wide enough for the contaminated spread) rather than
 a fitting problem, with the floor-breaking occupancy system folded
@@ -1852,6 +2105,17 @@ operations}, Quantum Inf.\ Comput.\ \textbf{12} (2012) 901.
 J.~M.~Martyn, Z.~M.~Rossi, A.~K.~Tan and I.~L.~Chuang,
 \emph{Grand unification of quantum algorithms},
 PRX Quantum \textbf{2} (2021) 040203.
+
+\bibitem{fowler2012}
+A.~G.~Fowler, M.~Mariantoni, J.~M.~Martinis and A.~N.~Cleland,
+\emph{Surface codes: towards practical large-scale quantum
+computation}, Phys.\ Rev.\ A \textbf{86} (2012) 032324.
+
+\bibitem{camps2023}
+D.~Camps, L.~Lin, R.~Van~Beeumen and C.~Yang,
+\emph{Explicit quantum circuits for block encodings of certain
+sparse matrices}, SIAM J.\ Matrix Anal.\ Appl.\ \textbf{45} (2024)
+801; arXiv:2203.10236.
 
 \end{thebibliography}
 

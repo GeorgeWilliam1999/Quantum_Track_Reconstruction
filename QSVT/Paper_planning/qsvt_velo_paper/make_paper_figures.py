@@ -324,6 +324,52 @@ def fig_run3crop():
     print(f"[saved] figures/run3_activation_spectra.png (cropped from {src})")
 
 
+def fig_resources_compare():
+    """Table-2 companion: measured resource scaling vs track count for
+    HHL (structure-level estimate band), the 1BQF, and the DSS-QETU comb."""
+    import pandas as pd
+    base = "/data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/DSS/outputs/"
+    gw = pd.read_csv(base + "dss_width.csv")
+    gg = pd.read_csv(base + "dss_gates.csv")
+    NC_LO, NC_HI = 6, 8
+    calls_lo, calls_hi = 2 * (2 ** NC_LO - 1), 2 * (2 ** NC_HI - 1)
+
+    fig, axes = plt.subplots(1, 2, figsize=(12.2, 4.7),
+                             constrained_layout=True)
+
+    ax = axes[0]
+    ax.fill_between(gw["T"], gw["n_s"] + NC_LO + 1, gw["n_s"] + NC_HI + 1,
+                    color=RED, alpha=0.25, label="HHL (clock $n_c=6$--$8$)")
+    ax.plot(gw["T"], gw["QSVT_LCU"], ":", color=GREY, lw=1.6,
+            label="comb, dense-dilation LCU (simulation only)")
+    ax.plot(gw["T"], gw["BQF_1"], "o-", color=RED, lw=1.8, ms=6,
+            label="1BQF")
+    ax.plot(gw["T"], gw["DSS_QETU"], "s--", color=BLUE, lw=1.8, ms=6,
+            label="comb (DSS--QETU)")
+    ax.set_xscale("log")
+    ax.set_xlabel("tracks per event $T$")
+    ax.set_ylabel("logical qubits")
+    ax.legend(fontsize=9, loc="upper left")
+    ax.set_title("(a) register width: $\\lceil\\log_2 4T^2\\rceil$ plus a "
+                 "constant", loc="left", fontsize=11)
+
+    ax = axes[1]
+    ax.fill_between(gg["T"], calls_lo * gg["call_CX"],
+                    calls_hi * gg["call_CX"], color=RED, alpha=0.25,
+                    label="HHL estimate ($2(2^{n_c}{-}1)$ calls)")
+    ax.loglog(gg["T"], gg["bqf_total"], "o-", color=RED, lw=1.8, ms=6,
+              label="1BQF (2 calls)")
+    ax.loglog(gg["T"], gg["comb_global"], "s--", color=BLUE, lw=1.8, ms=6,
+              label="comb, global ($d=40$ calls)")
+    ax.loglog(gg["T"], gg["comb_percluster_max_instance"], "D", color=GREEN,
+              ms=7, ls="none", label="comb, largest single cluster")
+    ax.set_xlabel("tracks per event $T$")
+    ax.set_ylabel("two-qubit (CX) gates per shot")
+    ax.legend(fontsize=9, loc="upper left")
+    ax.set_title("(b) measured gate cost per shot", loc="left", fontsize=11)
+    save(fig, "resource_comparison")
+
+
 def fig_occproofcrop():
     """Strip the baked suptitle and provenance footer from the occupancy
     proof (the panels themselves are untouched study output)."""
@@ -787,4 +833,5 @@ if __name__ == "__main__":
          "tangles": fig_tangles, "pileup": fig_pileup,
          "threshold": fig_threshold, "fitpaper": fig_fitpaper,
          "occfit": fig_occfit, "clean2x2": fig_clean2x2,
-         "occproofcrop": fig_occproofcrop}[c]()
+         "occproofcrop": fig_occproofcrop,
+         "rescompare": fig_resources_compare}[c]()

@@ -1,0 +1,44 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
+\contentsline {section}{\numberline {2}The toy model and the segment Hamiltonian}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Events}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}The Hamiltonian}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Exact activation levels: the atlas}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Metric definitions}{7}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}The spectrum}{7}{subsection.2.5}%
+\contentsline {section}{\numberline {3}The one-bit quantum filter, read as a spectral filter}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}The circuit and its response function}{8}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}What the notch cannot do}{9}{subsection.3.2}%
+\contentsline {section}{\numberline {4}From one bit to any polynomial: the QSVT construction}{11}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Block encoding and the qubitization walk}{11}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Summing the series: LCU}{12}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Resource summary}{12}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Fitting the polynomial to the clean events: the line comb}{13}{section.5}%
+\contentsline {subsection}{\numberline {5.1}The design insight: the true spectrum is discrete}{13}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Clean-event results}{13}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Hit inefficiency: the first appearance of fragments}{14}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Resource scaling and the depth ladder}{15}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Spectral twins and the floor theorem}{15}{subsection.5.5}%
+\contentsline {section}{\numberline {6}The heavy-noise events}{16}{section.6}%
+\contentsline {section}{\numberline {7}The occupancy term}{18}{section.7}%
+\contentsline {subsection}{\numberline {7.1}The term}{18}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Classically it works; the notch it destroys}{18}{subsection.7.2}%
+\contentsline {section}{\numberline {8}The fork term and the moving spectrum}{19}{section.8}%
+\contentsline {subsection}{\numberline {8.1}The term and its validity envelope}{20}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}The operator and the response are one design}{20}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}A Trotter aside that will matter on hardware}{20}{subsection.8.3}%
+\contentsline {section}{\numberline {9}Fitting the polynomial to noisy events: roots at the measured pile-up}{21}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Measuring the false pile-up}{21}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Fitting the response}{22}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Results}{22}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}The occupancy term, refitted}{24}{subsection.9.4}%
+\contentsline {subsection}{\numberline {9.5}Why the 1BQF specifically cannot follow}{25}{subsection.9.5}%
+\contentsline {section}{\numberline {10}Limitations}{25}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Realizability of the fitted response}{26}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}One response for all events}{26}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Trotterization on hardware}{26}{subsection.10.3}%
+\contentsline {subsection}{\numberline {10.4}Hardware resources: HHL, the 1BQF, and the comb side by side}{27}{subsection.10.4}%
+\contentsline {subsection}{\numberline {10.5}A block encoding priced by hits, not matrix entries}{28}{subsection.10.5}%
+\contentsline {subsection}{\numberline {10.6}Success probability and readout}{29}{subsection.10.6}%
+\contentsline {subsection}{\numberline {10.7}Classical simulability of the response family}{29}{subsection.10.7}%
+\contentsline {subsection}{\numberline {10.8}The toy's geometry, and what a real detector changes}{30}{subsection.10.8}%
+\contentsline {section}{\numberline {11}Conclusion}{30}{section.11}%
