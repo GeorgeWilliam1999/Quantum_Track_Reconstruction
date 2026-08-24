@@ -61,7 +61,8 @@ CACHE = OUT / "cache"
 CACHE.mkdir(parents=True, exist_ok=True)
 
 T = 200
-REPS = (0, 1, 2)
+REPS = tuple(range(10))   # 10 reps: the floor population is a small-count event
+                          # property (1-3% of trues), so 3 reps left +-2% spread
 GAMMA, DELTA = 3.0, 1.0
 S = GAMMA + DELTA
 REGIMES = {   # house triples (dp_matrix_characterisation.NOISES; drop=1% per George)
