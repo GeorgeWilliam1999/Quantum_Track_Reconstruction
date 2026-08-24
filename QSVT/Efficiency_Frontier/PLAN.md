@@ -8,13 +8,19 @@ where the residual deficit lives*?
 
 One experiment ≈ this folder ≈ one Notion write-up (at results time). To-do tracks progress.
 
+> **Scope ruling (George, 2026-08-25): this is quantum-computing work.** Classical
+> post-processing — specifically the hit-uniqueness post-selection gate, which exists as its
+> own prior study (`qtrk_pipeline.postselect`, write-up 2026-07-18) — is **out of scope**
+> here. No composed points, no gate arms, no slot-contest loss channel. Every number in this
+> experiment is a property of the quantum filter p(A) alone. (Reaffirms the 2026-07-18
+> mission-creep retraction.)
+
 ## 1. The deficit, as currently measured (baselines to beat)
 
 | Regime | Best known QSVT point | Classical reference | Deficit |
 |---|---|---|---|
 | clean/moderate T≤400 | comb d=40: eff ~0.97–1.00 @ far ≈ 0 | eff 1.00 @ far 0.023 (T=400) | up to ~3% eff |
-| heavy T=200 (composed) | XII fitted + uniqueness gate: eff 0.97–0.985 @ far 0.010–0.018 | eff ~0.99 @ far ~0.02 | ~0.5–2% eff |
-| heavy T=200 (gate alone) | eff 0.9416 @ far 0.0401 | in-matrix occ 0.9911 @ 0.2103 | ~5% eff |
+| heavy T=200 (quantum-only) | XII fitted response: far 0.061–0.096 at matched eff 0.97–0.98 | far 0.124 at both | ~2–3% eff below target |
 | normalized walk (BE study 03) | ±½ comb d=20: **eff 1.000 @ far 0.000** (step-clean T=100/200) | — | none (clean) |
 
 The last row is the standing hint that **full recovery is possible on clean events** — the
@@ -36,15 +42,10 @@ Every missed true segment at an operating point must be attributed to one of:
   degree/response choice.
 - **L3 — threshold overlap**: filtered amplitude of a true segment sits below τ at the far
   target because a *false* population overlaps from above. Fixable only by a response that
-  widens the amplitude gap (or by composition).
-- **L4 — gate slot-contest** (composed points only): true segment loses its (hit, role)
-  slot to a higher-amplitude competitor. τ-independent (postselect Prop 2), ~42
-  losses/event heavy T=200 (F5 hub centres 0.54–0.82 above the 0.44 true band +
-  true–true crossings). Irreducible under hard claiming; only a response that reorders
-  amplitudes (or margin information) moves it.
+  widens the amplitude gap.
 
-**The central deliverable is the stacked L1–L4 budget per configuration** — it converts
-"the comb loses 2%" into "1.2% is twins, 0.5% is ripple, 0.3% is slot contests", and says
+**The central deliverable is the stacked L1–L3 budget per configuration** — it converts
+"the comb loses 2%" into "1.2% is twins, 0.5% is ripple, 0.3% is overlap", and says
 which knob (if any) can pay each part back.
 
 ## 3. Axes
@@ -92,18 +93,15 @@ Varied one knob at a time from baseline, then the best combination:
   frontier is the object, not a point. Never judge at the classical τ=0.35
   (per-solver-thresholds rule). Report: the (eff, far) curve, wp99/wp995/wp999 cuts,
   far@eff∈{0.99, 0.995, 0.999}, and eff@far∈{0.001, 0.01}.
-- **Composition stage**: uniqueness gate (greedy, same-role slots) applied on/off to every
-  stored solution — composed frontier = threshold × gate sweep (composed-best τ, not wp99,
-  at degenerate corners).
-- Pareto set across all configs per regime; the current composed best
-  (0.985 eff, 0.018 far heavy T=200) is the point to dominate.
+- Pareto set across all configs per regime; the heavy quantum-only reference to dominate
+  is the XII fitted response (far 0.061–0.096 at matched eff 0.97–0.98, T=200).
 
 ## 4. Stages
 
 **Stage 0 — inventory + baseline frontier (no compute).** Harvest every existing cell:
 QSVT II store campaign (506 solves), Segment_level_studies degree_sweep + activation
 spectra, Codesign 04/06 (fitted comb, occupancy refit), Block_Encoding 03 CSV (normalized
-comb), postselect uniqueness_frontier outputs. Assemble the *existing* (eff, far, d,
+comb). Assemble the *existing* (eff, far, d,
 set-out) frontier first; freeze the config matrix to only the missing cells. Output:
 `outputs/00_inventory.csv` + the gap list.
 
@@ -115,10 +113,9 @@ and finds the 2–3 response families worth carrying.
 best-combo). Fitted response refit *per set-out* (H3 below). Clean + moderate first;
 includes the erf column.
 
-**Stage 3 — heavy-noise composition + loss decomposition.** Gate on/off, composed
-frontier, and the full L1–L4 budget per config (twin count, ripple test = filtered
-amplitude vs comb-line placement, threshold-overlap census, slot-contest census from the
-gate's claim log). The decisive stage.
+**Stage 3 — heavy-noise frontier + loss decomposition.** The full L1–L3 budget per
+config (twin count, ripple test = filtered amplitude vs comb-line placement,
+threshold-overlap census). The decisive stage.
 
 **Stage 4 — confirmation + write-up.** T=400 on the Pareto winners, d/d+4 stability
 stamp, per-rep spread; figures; Notion write-up (Intro · Aims · Method · Results ·
@@ -129,8 +126,8 @@ Conclusion) with provenance; PROJECT_STATUS + paper-feed note (candidate §9 upg
 - **H1**: on clean/moderate the deficit is dominated by L2/L3 (ripple + threshold overlap),
   not the floor ⇒ recoverable to eff ≥ 0.995 at far ≤ 0.01 by degree/response choice alone.
   (The BE-03 normalized row is the existence proof on clean.)
-- **H2**: on heavy the composed deficit splits into a *measurable* L1 + L4 irreducible part
-  and an L2/L3 recoverable part; the budget quantifies the ceiling of any spectral-only fix.
+- **H2**: on heavy the deficit splits into a *measurable* L1 irreducible part and an
+  L2/L3 recoverable part; the budget quantifies the ceiling of any spectral-only fix.
 - **H3**: the fitted response *per Hamiltonian set-out* beats any fixed comb across
   set-outs (activations move ⇒ polynomial refits — the XII mechanism, now used as a knob).
 - **H4**: occupancy α=0.05 (fitted) + normalized ±½ comb is the best single combination at
@@ -139,18 +136,18 @@ Conclusion) with provenance; PROJECT_STATUS + paper-feed note (candidate §9 upg
 ## 6. Success / failure criteria
 
 - **Success (recovery)**: a config with eff ≥ 0.995 @ far ≤ 0.01 on moderate T=200 *and*
-  a composed point strictly Pareto-better than (0.985, 0.018) on heavy T=200, stable at
-  d & d+4, confirmed at T=400.
-- **Success (honest negative)**: the L1–L4 budget shows the residual deficit is ≥90%
-  L1+L4 ⇒ the drop is *provably* not recoverable by any spectral filter on the same A —
+  a point strictly Pareto-better than the XII fitted response (far 0.061–0.096 at eff
+  0.97–0.98) on heavy T=200, stable at d & d+4, confirmed at T=400.
+- **Success (honest negative)**: the L1–L3 budget shows the residual deficit is ≥90%
+  L1 ⇒ the drop is *provably* not recoverable by any spectral filter on the same A —
   closing the question with the floor theorem rather than a scan, and pointing the
   recovery at Hamiltonian design (occupancy/ε) with quantified headroom.
-- Either outcome feeds the paper (§9 composition / §10 limits).
+- Either outcome feeds the paper (§9 fitted response / §10 limits).
 
 ## 7. Guardrails (house rules that bite here)
 
 - Per-solver working points; ROC always; absolute-τ comparisons only as a labelled
-  extra column. wp99-degenerate corners use composed-best τ.
+  extra column. wp99-degenerate corners use the frontier-best τ (matched-eff convention).
 - Degree stability margin d & d+4 on every quoted operating degree.
 - Store discipline: events by deterministic key, A regenerated never stored, erf pruning
   (val > 1e-9) so A stays sparse; metrics as a view.
@@ -173,7 +170,8 @@ Conclusion) with provenance; PROJECT_STATUS + paper-feed note (candidate §9 upg
 - `00_inventory.py` — Stage 0 harvest → `outputs/00_inventory.csv` + gap list
 - `01_degree_response_frontier.py` — Stage 1 grid → `outputs/01_frontier_clean_moderate.csv`
 - `02_hamiltonian_setouts.py` — Stage 2 knobs (+ refit hook into Codesign/04) → `outputs/02_setout_frontier.csv`
-- `03_heavy_composition.py` — Stage 3 gate on/off + composed frontier → `outputs/03_composed_frontier.csv`
-- `04_loss_decomposition.py` — L1–L4 budget per config → `outputs/04_loss_budget.csv`
-- `05_confirm_T400.py` — Stage 4 winners → `outputs/05_confirmation.csv`
-- `06_writeup_figs.py` — frontier plots, stacked loss budgets, Pareto overlays
+- `03_highT_frontier.py` — Stage 1+2 extension to T=1000 (+ stored-1BQF reference) → `outputs/03_highT_frontier.csv`, `outputs/03_1bqf_reference.csv` ✅
+- `04_heavy_frontier.py` — Stage 3 heavy quantum-only frontier → `outputs/04_heavy_frontier.csv`
+- `05_loss_decomposition.py` — L1–L3 budget per config → `outputs/05_loss_budget.csv`
+- `06_confirm_T400.py` — Stage 4 winners → `outputs/06_confirmation.csv`
+- `07_writeup_figs.py` — frontier plots, stacked loss budgets, Pareto overlays
