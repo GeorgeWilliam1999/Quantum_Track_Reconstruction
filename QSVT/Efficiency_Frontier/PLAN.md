@@ -81,8 +81,10 @@ Varied one knob at a time from baseline, then the best combination:
 
 ### C. Events / noise / size
 - Store-backed events, deterministic keys (`qtrk_pipeline.ensure_event`) — the standard
-  three regimes: clean, moderate (σ_res 10 µm, drop 0.5%), heavy (σ_res 20 µm, drop 1%,
-  σ_scatt 1e-4), formula ε, γ per config.
+  three regimes per `Bifurification/dp_matrix_characterisation.NOISES` (σ_scatt 1e-4
+  everywhere): clean (res 0, drop 0), moderate (σ_res 10 µm, **drop 1%**), heavy
+  (σ_res 20 µm, drop 1%), formula ε, γ per config. [Drop=1% confirmed by George
+  2026-08-24; this plan's earlier "0.5%" was a transcription slip vs the study code.]
 - T = 200 (workhorse grid), T = 400 (winners only), ≥3 reps per cell for spread.
 
 ### D. Frontier extraction + composition (the working-point discipline)
@@ -155,6 +157,13 @@ Conclusion) with provenance; PROJECT_STATUS + paper-feed note (candidate §9 upg
 - Matrix-free statevector solves; Condor sweeps via params CSV + params-preflight; heavy
   1BQF-style OOM traps don't apply (no Aer assembly in the QSVT emulation path) but
   per-solve subprocess isolation stays the pattern for big grids.
+- **Block encodings are a COSTING column, not a simulation path** (decided 2026-08-24):
+  the hit-oracle/Szegedy encodings add +49–69 ancilla qubits, so circuit-level statevector
+  simulation is out by factors of 2^49+; the matrix-free Chebyshev recursion computes the
+  *identical* amplitudes in seconds (the response physics is encoding-independent). The
+  oracle enters the experiment as (i) the α subnormalization → effective-degree bookkeeping
+  (deg ∝ α, BE-III degree law) and (ii) the measured CX/call prices (BE-II) attached to
+  every frontier point at write-up time — zero extra compute.
 - Figures: house palette, every panel labelled with its config; numbers in CSVs under
   `outputs/`, figures under `figures/`.
 
