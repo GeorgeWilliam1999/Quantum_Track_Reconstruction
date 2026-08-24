@@ -1,0 +1,77 @@
+regime,T,response_family,degree,reps_have,reps_needed,status,notes
+clean,200,comb_prod,8,3,3,covered,S1 production comb
+clean,200,comb_prod,12,3,3,covered,S1 production comb
+clean,200,comb_prod,16,3,3,covered,S1 production comb
+clean,200,comb_prod,20,3,3,covered,S1 production comb
+clean,200,comb_prod,24,3,3,covered,S1 production comb
+clean,200,comb_prod,28,3,3,covered,S1 production comb
+clean,200,comb_prod,32,3,3,covered,S1 production comb
+clean,200,comb_prod,40,10,3,covered,S1 production comb
+clean,200,comb_prod,48,0,3,missing,S1 production comb
+clean,200,comb_prod,64,0,3,missing,S1 production comb
+clean,200,band_inverse,8,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,12,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,16,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,20,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,24,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,28,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,32,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,40,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,48,0,3,missing,S1 band-limited inverse
+clean,200,band_inverse,64,0,3,missing,S1 band-limited inverse
+clean,200,sharp_comb,80,0,3,missing,S1 sharp high-purity (VIII)
+clean,200,sharp_comb,120,0,3,missing,S1 sharp high-purity (VIII)
+clean,200,fitted_ridge,20,0,3,missing,S1 fitted response (refit per regime)
+clean,200,fitted_ridge,28,0,3,missing,S1 fitted response (refit per regime)
+clean,200,fitted_ridge,40,0,3,missing,S1 fitted response (refit per regime)
+clean,200,normalized_half_comb,12,1,3,partial,S1 normalized +-1/2 comb
+clean,200,normalized_half_comb,20,1,3,partial,S1 normalized +-1/2 comb
+clean,200,normalized_half_comb,28,0,3,missing,S1 normalized +-1/2 comb
+clean,200,normalized_half_comb,32,0,3,missing,S1 normalized +-1/2 comb
+clean,200,normalized_half_comb,40,1,3,partial,S1 normalized +-1/2 comb
+moderate,200,comb_prod,8,0,3,missing,S1 production comb
+moderate,200,comb_prod,12,0,3,missing,S1 production comb
+moderate,200,comb_prod,16,0,3,missing,S1 production comb
+moderate,200,comb_prod,20,0,3,missing,S1 production comb
+moderate,200,comb_prod,24,0,3,missing,S1 production comb
+moderate,200,comb_prod,28,0,3,missing,S1 production comb
+moderate,200,comb_prod,32,0,3,missing,S1 production comb
+moderate,200,comb_prod,40,3,3,covered,S1 production comb
+moderate,200,comb_prod,48,0,3,missing,S1 production comb
+moderate,200,comb_prod,64,0,3,missing,S1 production comb
+moderate,200,band_inverse,8,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,12,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,16,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,20,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,24,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,28,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,32,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,40,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,48,0,3,missing,S1 band-limited inverse
+moderate,200,band_inverse,64,0,3,missing,S1 band-limited inverse
+moderate,200,sharp_comb,80,0,3,missing,S1 sharp high-purity (VIII)
+moderate,200,sharp_comb,120,0,3,missing,S1 sharp high-purity (VIII)
+moderate,200,fitted_ridge,20,0,3,missing,S1 fitted response (refit per regime)
+moderate,200,fitted_ridge,28,0,3,missing,S1 fitted response (refit per regime)
+moderate,200,fitted_ridge,40,0,3,missing,S1 fitted response (refit per regime)
+moderate,200,normalized_half_comb,12,0,3,missing,S1 normalized +-1/2 comb
+moderate,200,normalized_half_comb,20,0,3,missing,S1 normalized +-1/2 comb
+moderate,200,normalized_half_comb,28,0,3,missing,S1 normalized +-1/2 comb
+moderate,200,normalized_half_comb,32,0,3,missing,S1 normalized +-1/2 comb
+moderate,200,normalized_half_comb,40,0,3,missing,S1 normalized +-1/2 comb
+moderate,200,comb_prod_gamma1,40,0,3,missing,S2 gamma=1
+moderate,200,comb_prod_gamma2,40,0,3,missing,S2 gamma=2
+moderate,200,comb_erf_kernel,40,0,3,missing,S2 erf kernel (raw comb known to collapse; confirm on frontier)
+moderate,200,normalized_half_comb_erf,20,0,3,missing,"S2 erf kernel, normalized comb"
+moderate,200,normalized_half_comb_erf,40,0,3,missing,"S2 erf kernel, normalized comb"
+moderate,200,comb_prod_eps1.5,40,0,3,missing,S2 epsilon scale s=1.5 (suspected L3 driver)
+moderate,200,comb_prod_eps2.12,40,0,3,missing,S2 epsilon scale s=2.12 (suspected L3 driver)
+moderate,200,comb_prod_eps3.0,40,0,3,missing,S2 epsilon scale s=3.0 (suspected L3 driver)
+moderate,200,fitted_ridge_occ0.05,40,0,3,missing,"S2 occupancy alpha=0.05, refit per alpha"
+moderate,200,fitted_ridge_occ0.1,40,0,3,missing,"S2 occupancy alpha=0.1, refit per alpha"
+clean,200,comb_prod_fork0.5,40,0,3,missing,S2 fork beta=0.5 clean only (heavy NO-GO stands)
+heavy,200,fitted_ridge,40,3,3,covered,S3 composed (gate on/off) — H4 cell
+heavy,200,fitted_ridge,160,3,3,covered,S3 composed (gate on/off) — H4 cell
+heavy,200,normalized_half_comb,20,0,3,missing,S3 composed (gate on/off) — H4 cell
+heavy,200,normalized_half_comb,40,0,3,missing,S3 composed (gate on/off) — H4 cell
+heavy,200,fitted_ridge_occ0.05_normalized,40,0,3,missing,S3 composed (gate on/off) — H4 cell
