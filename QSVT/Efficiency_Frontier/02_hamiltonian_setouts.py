@@ -81,14 +81,16 @@ SETOUTS = [
     ("fork_b0.5", "clean",   dict(fork_beta=0.5)),
 ]
 
-FIT_DEGS = (32, 40, 44, 80, 160)      # 80/160 matter where the span widens
+FIT_DEGS = tuple(int(x) for x in os.environ["EF_DEGS"].split(",")) \
+    if "EF_DEGS" in os.environ else (32, 40, 44, 80, 160)  # 80/160: wide spans
 FIXED_DEGS = (40, 44)
 DMAX = max(FIT_DEGS)
 MUS = np.geomspace(3e-3, 30.0, 13)
 EFF_TARGETS = (0.99, 0.995, 0.999)
 FAR_TARGETS = (0.001, 0.01)
 
-LOG = open(OUT / "02_setouts.log", "w")
+OUTNAME = os.environ.get("EF_OUT", "02_setout_frontier.csv")
+LOG = open(OUT / (OUTNAME.replace(".csv", "") + ".log"), "w")
 
 
 def say(*a):
@@ -276,8 +278,7 @@ def main():
             say(f"[{tag} rep{rep}] n={n:,} lam=[{lo:.2f},{hi:.2f}] "
                 f"span {hi - lo:.1f} eps={eps * 1e3:.2f}mrad "
                 f"({time.time() - t0:.0f}s)")
-            pd.DataFrame(rows).to_csv(OUT / "02_setout_frontier.csv",
-                                      index=False)
+            pd.DataFrame(rows).to_csv(OUT / OUTNAME, index=False)
 
     df = pd.DataFrame(rows)
     say("\n== Stage 2: median eff@far<=1% per (setout, family) at the best "
