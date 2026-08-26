@@ -78,7 +78,12 @@ Varied one knob at a time from baseline, then the best combination:
   rep1 0.654→0.062) — the only knob that attacks L1 directly,
 - **normalization**: raw A vs degree-normalized discriminant D^{-1/2}CD^{-1/2}
   (spectrum {±1, ±½}; hubs/P3/isolated rejected exactly by the ±½ comb),
-- **fork β ∈ {0, 0.5}** on clean only (XI: measured NO-GO at heavy — do not re-litigate).
+- **fork (bifurcation) β ∈ {0, 0.5, 1.0}** at clean AND moderate AND heavy, **always with the
+  response refit** (George, 2026-08-26). *Scope correction:* the earlier "clean only, XI says
+  NO-GO" guardrail was stale — XI measured the fork under the **unfitted** production comb,
+  and XII then *redeemed* the fork by refitting (b0.5@γ\* fitted 0.085/0.046, beating
+  fitted-β0). Refitting per set-out is exactly this experiment's method, so the fork must be
+  judged under it. Also run the **occupancy × fork combination** (the "best combo" of §3B).
 
 ### C. Events / noise / size
 - Store-backed events, deterministic keys (`qtrk_pipeline.ensure_event`) — the standard

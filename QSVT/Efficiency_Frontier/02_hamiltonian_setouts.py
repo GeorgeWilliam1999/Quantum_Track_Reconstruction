@@ -79,6 +79,10 @@ SETOUTS = [
     ("gamma2",   "moderate", dict(gamma=2.0)),
     ("erf",      "moderate", dict(kernel="erf")),
     ("fork_b0.5", "clean",   dict(fork_beta=0.5)),
+    # 2026-08-26 (George): bifurcation belongs in scope, judged WITH the refit
+    ("fork_b0.5_mod", "moderate", dict(fork_beta=0.5)),
+    ("fork_b1.0_mod", "moderate", dict(fork_beta=1.0)),
+    ("occ0.05_fork0.5", "moderate", dict(occ_alpha=0.05, fork_beta=0.5)),
 ]
 
 FIT_DEGS = tuple(int(x) for x in os.environ["EF_DEGS"].split(",")) \

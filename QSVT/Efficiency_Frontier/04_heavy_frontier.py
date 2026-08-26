@@ -59,7 +59,10 @@ REPS = tuple(range(10))
 GAMMA_D, DELTA = 3.0, 1.0
 HEAVY = dict(sigma_scatt=1e-4, sigma_res=0.02, phi_max=0.2, hit_ineff=0.01)
 SETOUTS = [("base", {}), ("occ_a0.05", dict(occ_alpha=0.05)),
-           ("occ_a0.10", dict(occ_alpha=0.10)), ("erf", dict(kernel="erf"))]
+           ("occ_a0.10", dict(occ_alpha=0.10)), ("erf", dict(kernel="erf")),
+           # 2026-08-26 (George): bifurcation in scope, judged WITH the refit
+           ("fork_b0.5", dict(fork_beta=0.5)),
+           ("occ0.05_fork0.5", dict(occ_alpha=0.05, fork_beta=0.5))]
 FIT_DEGS = (40, 80, 84, 160)
 FIXED_DEGS = (40, 44)
 DMAX = max(FIT_DEGS)
@@ -172,6 +175,7 @@ def main():
     rows = []
     for tag, kn in setouts:
         alpha = float(kn.get("occ_alpha", 0.0))
+        beta = float(kn.get("fork_beta", 0.0))
         kernel = kn.get("kernel", "step")
         eps = float(compute_epsilon(HEAVY["sigma_res"], HEAVY["sigma_scatt"]))
         s_prime = GAMMA_D + DELTA + 4.0 * alpha
@@ -183,8 +187,9 @@ def main():
                 kw["erf_sigma"] = eps / 3.0
             ham = qp.build_hamiltonian(ev, **kw)
             truth = np.asarray(qp.truth_from_event(ev), bool)
-            A, b, tau_abs, _ = dp_terms.dp_system(ham, alpha=alpha,
-                                                  gamma=GAMMA_D, delta=DELTA)
+            A, b, tau_abs, _ = dp_terms.dp_system(
+                ham, beta=beta, eps_B=eps if beta else None, alpha=alpha,
+                gamma=GAMMA_D, delta=DELTA)
             A = A.tocsr()
             n = A.shape[0]
             lo = float(eigsh(A, k=1, which="SA", return_eigenvectors=False,
@@ -199,7 +204,8 @@ def main():
                 fm = frontier_metrics(x, truth, x_cls)
                 rows.append(dict(setout=tag, regime="heavy", T=T, rep=rep,
                                  family=family, degree=degree, gamma=GAMMA_D,
-                                 occ_alpha=alpha, kernel=kernel, eps=eps,
+                                 occ_alpha=alpha, fork_beta=beta,
+                                 kernel=kernel, eps=eps,
                                  n_seg=n, n_true=int(truth.sum()),
                                  lam_min=lo, lam_max=hi, **fm, notes=extra))
                 amps[f"{family}_d{degree}"] = x.astype(np.float32)
