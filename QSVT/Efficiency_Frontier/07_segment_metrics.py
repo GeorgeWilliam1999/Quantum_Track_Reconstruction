@@ -68,7 +68,8 @@ def load_all():
     specs = [("01_frontier_clean_moderate.csv", "base"),
              ("02_setout_frontier.csv", None), ("02_setout_dstab.csv", None),
              ("02_fork_frontier.csv", None), ("04_heavy_frontier.csv", None),
-             ("04_heavy_fork.csv", None), ("03_highT_frontier.csv", None)]
+             ("04_heavy_fork.csv", None), ("04_heavy_base_ref.csv", None),
+             ("03_highT_frontier.csv", None)]
     for fn, default_setout in specs:
         p = OUT / fn
         if not p.exists():
@@ -87,18 +88,22 @@ def load_all():
 
 
 def refs(regime, T=200):
-    """classical + 1BQF reference values (eff @ far<=1%, far @ eff 0.99)."""
+    """Matched references: classical inversion and the 1BQF, both on the BASE
+    Hamiltonian, at the SAME T, from the same events and machinery.
+
+    NB (2026-08-26 fix): an earlier version pooled classical across every
+    set-out (so the fork's rescue of classical leaked into the baseline) and
+    took the 1BQF from the high-T store rows (T=400-1000) while comparing
+    against QSVT at T=200.  Both made the baseline look worse than it is.
+    """
     out = {}
     df = load_all()
-    c = df[(df.family == "classical_invA") & (df.regime == regime) & (df["T"] == T)]
-    if len(c):
-        out["classical"] = (c.eff_f010.median(), c.far_e990.median())
-    p = OUT / "03_1bqf_reference.csv"
-    if p.exists():
-        b = pd.read_csv(p)
-        b = b[(b.regime == regime)]
-        if len(b):
-            out["1bqf"] = (b.eff_f010.median(), b.far_e990.median())
+    base = df[(df.setout == "base") & (df.regime == regime) & (df["T"] == T)]
+    for key, fam in [("classical", "classical_invA"),
+                     ("1bqf", "1bqf_cos"), ("1bqf", "onebqf_cos")]:
+        g = base[base.family == fam]
+        if len(g) and key not in out:
+            out[key] = (g.eff_f010.median(), g.far_e990.median())
     return out
 
 

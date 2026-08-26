@@ -223,6 +223,14 @@ def main():
                 record("comb_prod", d,
                        cheb_apply(design_line_comb_inverse(degree=d, s=s_prime,
                                                            domain=dom), A, b))
+            # matched 1BQF reference on the SAME events/machinery: the 1-bit
+            # cosine notch f(lam)=|cos(pi lam / 2 s')| as a Chebyshev fit
+            gr = np.linspace(dom[0], dom[1], 4000)
+            u = (2 * gr - (dom[0] + dom[1])) / (dom[1] - dom[0])
+            cf = npcheb.chebfit(u, np.abs(np.cos(np.pi * gr / (2 * s_prime))), 60)
+            p1b = npcheb.Chebyshev(cf, domain=list(dom))
+            record("onebqf_cos", 1, cheb_apply(p1b, A, b))
+
             Off = A.copy().tolil()
             Off.setdiag(0)
             Dm = discriminant(Off.tocsr())
