@@ -50,6 +50,7 @@ DELTA = 1.0
 REGIMES = {
     "clean":    dict(sigma_scatt=1e-4, sigma_res=0.0,  phi_max=0.2, hit_ineff=0.0),
     "moderate": dict(sigma_scatt=1e-4, sigma_res=0.01, phi_max=0.2, hit_ineff=0.01),
+    "heavy":    dict(sigma_scatt=1e-4, sigma_res=0.02, phi_max=0.2, hit_ineff=0.01),
 }
 
 TS = (400, 700, 1000)
@@ -57,14 +58,29 @@ REPS_BY_T = {400: (0, 1, 2, 3, 4), 700: (0, 1, 2), 1000: (0, 1, 2)}
 
 # (setout tag, regime, knobs) — the carried winners from Stages 1-2
 SETOUTS = [
-    ("base",      "clean",    {}),
-    ("base",      "moderate", {}),
-    ("occ_a0.05", "moderate", dict(occ_alpha=0.05)),
-    ("erf",       "moderate", dict(kernel="erf")),
+    ("base",            "clean",    {}),
+    ("occ_a0.05",       "clean",    dict(occ_alpha=0.05)),
+    ("fork_b0.5",       "clean",    dict(fork_beta=0.5)),
+    ("occ0.05_fork0.5", "clean",    dict(occ_alpha=0.05, fork_beta=0.5)),
+    ("base",            "moderate", {}),
+    ("occ_a0.05",       "moderate", dict(occ_alpha=0.05)),
+    ("occ_a0.10",       "moderate", dict(occ_alpha=0.10)),
+    ("fork_b0.5",       "moderate", dict(fork_beta=0.5)),
+    ("occ0.05_fork0.5", "moderate", dict(occ_alpha=0.05, fork_beta=0.5)),
+    ("erf",             "moderate", dict(kernel="erf")),
+    ("base",            "heavy",    {}),
+    ("occ_a0.05",       "heavy",    dict(occ_alpha=0.05)),
+    ("fork_b0.5",       "heavy",    dict(fork_beta=0.5)),
+    ("occ0.05_fork0.5", "heavy",    dict(occ_alpha=0.05, fork_beta=0.5)),
+    ("erf",             "heavy",    dict(kernel="erf")),
 ]
 
-FIT_DEGS = (40, 80)
-FIXED_DEGS = (40, 44)
+# George 2026-08-26: do NOT vary the degree — hold it at the production value
+# and show the improvement through A.  (Degree was measured to matter little on
+# the base operator; where it does bite — occupancy's span growth — that is
+# reported as a scoping limit, not re-optimised.)
+FIT_DEGS = (40,)
+FIXED_DEGS = (40,)
 DMAX = max(FIT_DEGS)
 MUS = np.geomspace(3e-3, 30.0, 13)
 EFF_TARGETS = (0.99, 0.995, 0.999)
@@ -209,7 +225,7 @@ def main():
             nz = REGIMES[regime]
             gamma = float(kn.get("gamma", 3.0))
             alpha = float(kn.get("occ_alpha", 0.0))
-            beta = 0.0
+            beta = float(kn.get("fork_beta", 0.0))
             kernel = kn.get("kernel", "step")
             scale = float(kn.get("eps_scale", 3.0))
             eps = float(compute_epsilon(nz["sigma_res"], nz["sigma_scatt"],
@@ -230,7 +246,7 @@ def main():
                 # but Ba = Hs Hs^T + He He^T - 2I with H the segment->hit
                 # incidence, so A_occ = A + 2*alpha*(Hs Hs^T + He He^T).
                 A0, b, tau_abs, _ = dp_terms.dp_system(
-                    ham, beta=beta, eps_B=None,
+                    ham, beta=beta, eps_B=(eps if beta else None),
                     alpha=0.0, gamma=gamma, delta=DELTA)
                 A0 = A0.tocsr()
                 n = A0.shape[0]
@@ -274,11 +290,13 @@ def main():
                     amps[f"{family}_d{degree}"] = x.astype(np.float32)
 
                 act = x_cls > tau_abs
+                cls_eff = float((act & truth).sum()) / max(int(truth.sum()), 1)
+                cls_far = float((act & ~truth).sum()) / max(int(act.sum()), 1)
                 record("classical_invA", np.nan, x_cls,
-                       extra=f"fixed-tau {tau_abs:.3f}: eff "
-                             f"{(act & truth).sum() / max(truth.sum(), 1):.4f}"
-                             f" far "
-                             f"{(act & ~truth).sum() / max(act.sum(), 1):.4f}")
+                       extra=f"fixed-tau {tau_abs:.3f}")
+                rows[-1]["eff_fixed_tau"] = cls_eff
+                rows[-1]["far_fixed_tau"] = cls_far
+                rows[-1]["tau_fixed"] = float(tau_abs)
 
                 M = cheb_moments(A, b, lo, hi, DMAX)
                 for d in FIT_DEGS:
