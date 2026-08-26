@@ -77,3 +77,20 @@ print(f"[7] manifest: {len(events)} events, {len(solves)} solves")
 print(f"    est solution storage ~ {gb:.1f} GB ; est event storage ~ {ev_gb:.2f} GB")
 print(solves.groupby('solver').size().to_string())
 print("ALL CHECKS PASSED")
+
+# 8) re-export identity: the thinned qtrk modules must BE the package
+#    implementations (same function objects), so drift cannot reopen.
+import lhcb_velo_toy.analysis.working_points as _wp
+import lhcb_velo_toy.solvers.postselect as _ps
+from lhcb_velo_toy.solvers.quantum.matrixfree import solve_one_bit_matrixfree as _mf
+import obqf_matrixfree as _obqf
+assert qp.metrics_at is _wp.metrics_at
+assert qp.threshold_for is _wp.threshold_for
+assert qp.working_point_threshold is _wp.working_point_threshold
+assert qp.quantum_metrics is _wp.quantum_metrics
+assert qp.quantum_metrics_wp is _wp.quantum_metrics_wp
+assert qp.rescale_to is _wp.rescale_quantum
+assert qp.hit_uniqueness_filter is _ps.hit_uniqueness_filter
+assert qp.uniqueness_frontier is _ps.uniqueness_frontier
+assert _obqf.solve_matrixfree is _mf
+print("[8] re-export identity OK (qtrk_pipeline == lhcb_velo_toy implementations)")

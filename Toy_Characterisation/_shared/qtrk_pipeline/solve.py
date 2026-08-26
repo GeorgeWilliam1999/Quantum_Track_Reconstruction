@@ -22,29 +22,17 @@ __all__ = ["solve_classical", "solve_quantum", "solve_qsvt", "spectral_bounds_fo
 
 
 def spectral_bounds_for(ham, pad: float = 0.10) -> tuple[float, float]:
-    """Cheap spectral bounds for A = sI - C: rho(C) via one Lanczos 'LA'.
+    """Cheap spectral bounds for A = sI - C — thin wrapper over the package.
 
-    C is symmetric non-negative, so (Perron-Frobenius) the spectral radius IS
-    lambda_max — a single 'LA' eigsh suffices; Gershgorin fallback.  Promoted
-    from QSVT/qsvt_store_campaign.py so Condor workers can run qsvt solves.
+    The implementation was promoted to
+    ``lhcb_velo_toy.solvers.quantum.spectral_bounds`` (centralise-2.1
+    Phase 5, 2026-08-26); this wrapper only extracts s = gamma + delta from
+    the Hamiltonian object.
     """
-    import scipy.sparse as sp
-    from scipy.sparse.linalg import eigsh
+    from lhcb_velo_toy.solvers.quantum import spectral_bounds
 
     s = float(getattr(ham, "gamma", 3.0)) + float(getattr(ham, "delta", 1.0))
-    n = ham.A.shape[0]
-    C = (s * sp.identity(n, format="csr") - ham.A.tocsr())
-    if n <= 256:
-        w = np.linalg.eigvalsh(C.toarray())
-        rho = float(max(abs(w[0]), abs(w[-1])))
-    else:
-        try:
-            rho = float(eigsh(C, k=1, which="LA",
-                              return_eigenvectors=False, maxiter=3000)[0])
-        except Exception:
-            d = np.asarray(abs(C).sum(axis=1)).ravel()
-            rho = float(d.max())  # Gershgorin on C
-    return s - rho - pad, s + rho + pad
+    return spectral_bounds(ham.A, s=s, pad=pad)
 
 
 def solve_classical(ham) -> tuple[np.ndarray, float]:
