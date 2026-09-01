@@ -1,0 +1,81 @@
+series,source,T,eff_pct,far_pct
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,10.0,100.0,0.0
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,20.0,100.0,0.0
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,30.0,100.0,0.0
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,50.0,100.0,0.1970491166763735
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,75.0,100.0,0.0
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,100.0,100.0,0.22234943680590652
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,150.0,100.0,0.412411626080124
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,200.0,100.0,0.757303506778861
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,300.0,100.0,1.3543887272703408
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,400.0,100.0,2.2465244495823202
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,550.0,100.0,5.485020090517116
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,700.0,100.0,9.644270809211543
+classical (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,1000.0,100.0,20.482120188842526
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,10.0,100.0,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,20.0,100.0,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,30.0,100.0,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,50.0,99.2,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,75.0,100.0,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,100.0,99.6,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,150.0,99.33333333333334,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,200.0,98.9,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,300.0,98.0,0.0
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,400.0,97.225,0.019511045457031
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,550.0,95.27272727272727,0.057636887608067996
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,700.0,94.28571428571429,0.166845116730386
+line comb (fixed $\tau{=}0.35$),seg_store fixed-eps campaign,1000.0,92.14000000000001,0.925649108113052
+line comb (matched 99% eff.),seg_store fixed-eps campaign,10.0,100.0,0.0
+line comb (matched 99% eff.),seg_store fixed-eps campaign,20.0,100.0,0.0
+line comb (matched 99% eff.),seg_store fixed-eps campaign,30.0,100.0,0.0
+line comb (matched 99% eff.),seg_store fixed-eps campaign,50.0,100.0,0.19607843137254902
+line comb (matched 99% eff.),seg_store fixed-eps campaign,75.0,100.0,0.0
+line comb (matched 99% eff.),seg_store fixed-eps campaign,100.0,99.7,0.0
+line comb (matched 99% eff.),seg_store fixed-eps campaign,150.0,99.76666666666667,0.13333333333333203
+line comb (matched 99% eff.),seg_store fixed-eps campaign,200.0,99.4,0.309831734112084
+line comb (matched 99% eff.),seg_store fixed-eps campaign,300.0,99.11666666666665,0.755805858946419
+line comb (matched 99% eff.),seg_store fixed-eps campaign,400.0,99.06875,1.4362821511562518
+line comb (matched 99% eff.),seg_store fixed-eps campaign,550.0,99.4,5.163945340106635
+line comb (matched 99% eff.),seg_store fixed-eps campaign,700.0,99.24285714285715,9.058950375028523
+line comb (matched 99% eff.),seg_store fixed-eps campaign,1000.0,99.19,20.66810130303812
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,10.0,100.0,0.0
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,20.0,100.0,0.24390243902439002
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,30.0,100.0,0.163934426229508
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,50.0,100.0,1.367005456860758
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,75.0,100.0,2.141877563302964
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,100.0,99.9,5.120622136301112
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,150.0,100.0,10.148202332511037
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,200.0,99.9,15.692467539443083
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,300.0,99.72222222222223,29.890368789137597
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,400.0,99.47916666666667,43.89745173948068
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,550.0,100.0,59.5906264498102
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,700.0,99.5,69.47703733790141
+1BQF (matched 99% eff.),seg_store fixed-eps campaign,1000.0,100.0,82.6059922980982
+"QSVT fitted, base $A$ (matched 99% eff.)",12_fig6_overlay.csv,10.0,100.0,0.0
+"QSVT fitted, base $A$ (matched 99% eff.)",12_fig6_overlay.csv,50.0,100.0,0.6535947712418301
+"QSVT fitted, base $A$ (matched 99% eff.)",12_fig6_overlay.csv,100.0,99.83333333333334,0.0
+"QSVT fitted, base $A$ (matched 99% eff.)",12_fig6_overlay.csv,200.0,99.66666666666667,0.0
+"QSVT fitted, base $A$ (matched 99% eff.)",12_fig6_overlay.csv,400.0,99.27083333333334,0.26998961578400665
+"QSVT fitted, base $A$ (matched 99% eff.)",12_fig6_overlay.csv,700.0,99.35714285714286,1.04386862922433
+"QSVT fitted, base $A$ (matched 99% eff.)",12_fig6_overlay.csv,1000.0,99.675,2.8033369942640665
+"QSVT fitted, $+$occupancy $\alpha{=}0.05$ (matched 99% eff.)",12_fig6_overlay.csv,10.0,100.0,0.0
+"QSVT fitted, $+$occupancy $\alpha{=}0.05$ (matched 99% eff.)",12_fig6_overlay.csv,50.0,99.33333333333333,0.33333333333333337
+"QSVT fitted, $+$occupancy $\alpha{=}0.05$ (matched 99% eff.)",12_fig6_overlay.csv,100.0,98.99999999999999,0.0
+"QSVT fitted, $+$occupancy $\alpha{=}0.05$ (matched 99% eff.)",12_fig6_overlay.csv,200.0,98.99999999999999,0.0
+"QSVT fitted, $+$occupancy $\alpha{=}0.05$ (matched 99% eff.)",12_fig6_overlay.csv,400.0,98.99999999999999,0.83471590584034
+"QSVT fitted, $+$occupancy $\alpha{=}0.05$ (matched 99% eff.)",12_fig6_overlay.csv,700.0,98.99999999999999,3.835470350765747
+"QSVT fitted, $+$occupancy $\alpha{=}0.05$ (matched 99% eff.)",12_fig6_overlay.csv,1000.0,98.99999999999999,5.718237008175303
+"QSVT fitted, $+$bifurcation $\beta{=}0.5$ (matched 99% eff.)",12_fig6_overlay.csv,10.0,100.0,0.0
+"QSVT fitted, $+$bifurcation $\beta{=}0.5$ (matched 99% eff.)",12_fig6_overlay.csv,50.0,100.0,0.6535947712418301
+"QSVT fitted, $+$bifurcation $\beta{=}0.5$ (matched 99% eff.)",12_fig6_overlay.csv,100.0,99.83333333333334,0.0
+"QSVT fitted, $+$bifurcation $\beta{=}0.5$ (matched 99% eff.)",12_fig6_overlay.csv,200.0,99.66666666666667,0.0
+"QSVT fitted, $+$bifurcation $\beta{=}0.5$ (matched 99% eff.)",12_fig6_overlay.csv,400.0,99.10416666666667,0.06295921539061666
+"QSVT fitted, $+$bifurcation $\beta{=}0.5$ (matched 99% eff.)",12_fig6_overlay.csv,700.0,99.3095238095238,1.1263050698844932
+"QSVT fitted, $+$bifurcation $\beta{=}0.5$ (matched 99% eff.)",12_fig6_overlay.csv,1000.0,99.46666666666667,2.5455020293015966
+"QSVT fitted, both terms (matched 99% eff.)",12_fig6_overlay.csv,10.0,100.0,0.0
+"QSVT fitted, both terms (matched 99% eff.)",12_fig6_overlay.csv,50.0,99.33333333333333,0.33333333333333337
+"QSVT fitted, both terms (matched 99% eff.)",12_fig6_overlay.csv,100.0,98.99999999999999,0.0
+"QSVT fitted, both terms (matched 99% eff.)",12_fig6_overlay.csv,200.0,98.99999999999999,0.0
+"QSVT fitted, both terms (matched 99% eff.)",12_fig6_overlay.csv,400.0,98.99999999999999,0.5024078751752135
+"QSVT fitted, both terms (matched 99% eff.)",12_fig6_overlay.csv,700.0,98.99999999999999,1.6025496157438732
+"QSVT fitted, both terms (matched 99% eff.)",12_fig6_overlay.csv,1000.0,98.99999999999999,3.5441379559853368

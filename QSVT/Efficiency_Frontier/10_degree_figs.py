@@ -66,7 +66,7 @@ def box_txt(regime, sub):
             f"$\\varepsilon{{=}}{eps:.2f}$ mrad · $\\gamma{{=}}3$, "
             "$\\delta{=}1$, step kernel · fitted = moment-space ridge, "
             "$\\mu$ by eff@far$\\leq$1% · clean regime omitted: every "
-            "operator reads 1.000 at every degree $\\geq$ 4")
+            "operator reads 1.000 (median of 10 reps) at every degree $\\geq$ 4")
 
 
 def degree_panels(df, family, fname, title_extra=""):
@@ -161,8 +161,9 @@ def fig_marginal(df):
     fig.suptitle("The marginal value of one more degree step (fitted "
                  "response, $T{=}200$)", fontsize=12)
     param_box(fig, "moderate + heavy noise as in the degree scan · marginal "
-                   "gain between consecutive degrees of the scan grid "
-                   "{4, 8, 12, ..., 160} · median of 10 reps")
+                   "gain between CONSECUTIVE degrees of the (non-uniformly "
+                   "spaced) scan grid {4, 8, ..., 48, 56, 64, 80, 84, 96, 120, 160} "
+                   "· median of 10 reps")
     for ext in ("png", "pdf"):
         fig.savefig(FIG / f"xiv_degree_marginal.{ext}", dpi=150,
                     bbox_inches="tight")
