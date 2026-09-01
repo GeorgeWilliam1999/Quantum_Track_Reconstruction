@@ -58,7 +58,13 @@ def load_frames():
     for fn in ["01_frontier_clean_moderate.csv", "02_setout_frontier.csv",
                "02_fork_frontier.csv", "04_heavy_frontier.csv",
                "04_heavy_fork.csv", "04_heavy_base_ref.csv",
-               "03_highT_frontier.csv"]:
+               "03_highT_frontier.csv",
+               # Stage 5 (2026-09-01): full degree scan at T=200 (all regimes,
+               # all set-outs, matched onebqf_cos included) + the high-T
+               # matched 1BQF reference — same events, same machinery
+               "06_degree_scan.csv", "06b_highT_onebqf.csv",
+               # classical fixed-tau at T=200 recomputed from the 06 caches
+               "06c_classical_fixed_tau.csv"]:
         p = OUT / fn
         if not p.exists():
             continue
@@ -96,6 +102,27 @@ def load_frames():
 
 def med(g, col):
     return g[col].median() if len(g) else np.nan
+
+
+NOISE_TXT = {
+    "clean":    "$\\sigma_{\\rm scatt}{=}10^{-4}$, $\\sigma_{\\rm res}{=}0$, drop 0",
+    "moderate": "$\\sigma_{\\rm scatt}{=}10^{-4}$, $\\sigma_{\\rm res}{=}10\\,\\mu$m, drop 1%",
+    "heavy":    "$\\sigma_{\\rm scatt}{=}10^{-4}$, $\\sigma_{\\rm res}{=}20\\,\\mu$m, drop 1%",
+}
+
+
+def param_box(fig, regime, sub, extra=""):
+    """George 2026-09-01: every figure carries its parameters."""
+    eps = sub["eps"].dropna()
+    eps_txt = f"formula $\\varepsilon{{=}}{eps.median()*1e3:.2f}$ mrad" \
+        if len(eps) else "formula $\\varepsilon$"
+    txt = (f"{NOISE_TXT.get(regime, regime)} · {eps_txt} · "
+           "$\\gamma{=}3$, $\\delta{=}1$, step kernel · "
+           "occupancy $\\alpha{=}0.05$ · fork $\\beta{=}0.5$, "
+           "$\\varepsilon_B{=}\\varepsilon$ · fitted = moment-space ridge, "
+           "$\\mu$ by eff@far$\\leq$1%" + (" · " + extra if extra else ""))
+    fig.text(0.5, -0.035, txt, ha="center", va="top", fontsize=8.2,
+             color="#55534d")
 
 
 def fig_metrics_vs_T(df):
@@ -174,6 +201,10 @@ def fig_metrics_vs_T(df):
         fig.suptitle(f"Segment metrics against track density — {regime} noise "
                      "(fitted response, $d{=}40$; quantum at wp99, classical "
                      "at fixed $\\tau$)", fontsize=12)
+        param_box(fig, regime, sub,
+                  extra="$T$ reps: 10 (200) / 5 (400) / 3 (700, 1000) · "
+                        "1BQF = matched cosine $|\\cos(\\pi\\lambda/2s')|$ "
+                        "on the same events")
         for ext in ("png", "pdf"):
             fig.savefig(FIG / f"xiv_metrics_vs_T_{regime}.{ext}", dpi=150,
                         bbox_inches="tight")

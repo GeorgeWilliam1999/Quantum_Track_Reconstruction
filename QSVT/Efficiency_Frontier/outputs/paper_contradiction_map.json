@@ -1,0 +1,1062 @@
+{
+ "upheld": [
+  {
+   "line": 68,
+   "quote": "it drives the segment false rate from $20.5\\%$ (classical, $T{=}1000$ tracks) to $0.9\\%$ at $92\\%$ efficiency",
+   "kind": "stale-number",
+   "why": "F9 supersedes the clean T=1000 result: clean is now solved at every T, with eff 0.9998 @ far<=0.1% at T=1000 (d=40 suffices) \u2014 strictly better than 0.9% far at 92% eff on both axes. Additionally F10 warns that classical baseline numbers predating the 2026-08-26 fix (commit 0164e633, 'baseline references flattered QSVT') are suspect, so the 20.5% classical figure must be re-derived from the fixed baseline machinery.",
+   "suggested_action": "Replace with the post-fix clean numbers, e.g. '... and it solves clean events outright at every multiplicity studied (segment efficiency 99.98% at a false rate below 0.1% at T=1000, at polynomial degree 40)', after verifying the classical comparator against the post-2026-08-26 baseline. Keep the sentence's comb framing unchanged.",
+   "section": "abstract+frontmatter (main.tex lines 1-92)",
+   "verdict": {
+    "upheld": true,
+    "reasoning": "Quote verified verbatim at main.tex lines 66-69, presented unqualified as this paper's headline clean-event result. Checked against the F9 source data (Efficiency_Frontier/outputs/03_highT_frontier.csv): at clean T=1000 base, comb_prod d=40 gives far=0 at eff 0.997-0.999 and eff 0.99975-1.0 at far<=0.1% \u2014 same regime, same T, same axes, strictly dominating 0.9% far @ 92% eff, so no operating-point or convention mismatch rescues the sentence. Worse, the same CSV refutes the classical comparator: classical_invA on clean T=1000 (fixed tau 0.35) gives eff 0.9998-1.0000 at far 0.0000-0.0025 across reps, so under the post-0164e633 machinery classical also solves clean T=1000; the 20.5% figure is not merely suspect (F10) but contradicted by the paper's own current data, and the clean-event classical-vs-quantum contrast is no longer valid at all. The results section built from this CSV will contradict the abstract on both numbers, so a reader would catch it.",
+    "severity": "must-fix",
+    "corrected_action": "Rewrite the clean-event clause to state the solve without a classical contrast, keeping the comb framing: e.g. \"On clean events the answer is a four-line comb pinned to the eigenvalues of a five-hit track, and it solves them outright at every multiplicity studied (segment efficiency 99.98% at a false rate below 0.1% at T=1000, at polynomial degree 40).\" Do NOT retain or merely refresh the 20.5% classical comparator \u2014 the post-fix baseline (03_highT_frontier.csv, classical_invA, clean T=1000, tau 0.35: eff ~1.0, far 0.007-0.25%) shows classical also solves clean T=1000, so the verification the auditor deferred already fails; any classical-vs-quantum gap claim on clean events must go. Leave the classical-superiority story to the noisy-regime sentence that follows, where it genuinely holds (F2/F6)."
+   }
+  },
+  {
+   "line": 81,
+   "quote": "roughly halving the fitted false rate at every matched efficiency",
+   "kind": "stale-number",
+   "why": "F2/F3 supersede the size of the effect and F4/F9 bound its scope. At moderate, matched eff 0.99, occupancy takes far from 0.3137 to 0.0102 \u2014 a factor ~30, not a halving (it undersells the headline purity result of the new study). 'Roughly halving' only matches the heavy regime (0.633 -> 0.356, F5). And 'at every matched efficiency' cannot survive the T axis: F4 shows eff@far<=1% collapsing 0.9905 (T=200) -> 0.022 (T=700) -> 0.003 (T=1000), and F9 closes the moderate frontier for every operator between T=700 and T=1000.",
+   "suggested_action": "Split the claim by axis, mirroring F2: e.g. 'cutting the false rate at the matched 99%-efficiency point by a factor of thirty at moderate noise and roughly halving it at heavy noise'. Scope it to the T=200 working point (see next finding for the T caveat).",
+   "section": "abstract+frontmatter (main.tex lines 1-92)",
+   "verdict": {
+    "upheld": true,
+    "reasoning": "The quote exists verbatim at main.tex lines 81-82 (\"the strongest configuration in the study, roughly halving the fitted false rate at every matched efficiency\") and carries no regime or T qualifier \u2014 the nearest scoping is \"On noisy events\" several sentences earlier, which does not distinguish moderate from heavy, and the abstract elsewhere quotes T=1000 (clean-event claim), so a reader has no cue the occupancy claim is T=200-only. Adversarial reading against the fact sheet: (1) The phrase does have an honest origin \u2014 it summarises the current body's heavy-T=200 occupancy-refit section (lines 1534-1542: 0.085\u21920.050 at matched eff 0.98, 0.071\u21920.039 at 0.97, \"roughly halves\"), and F5/F11 confirm halving remains true at heavy (0.633\u21920.356 at eff 0.99; base 0.0771 at 0.98 inside the XII band). So the paper is internally consistent TODAY. But (2) under the new results the sentence is wrong as a summary of the study's strongest configuration: F2/F3 make the moderate matched-eff-0.99 point the headline (base fitted far 0.3137 \u2192 0.0102 with occupancy, a factor ~30, and eff@far<=1% 0.978\u21920.9905), so \"roughly halving\" undersells the flagship number by ~15x and would directly contradict the results section once F2/F3 land. (3) The universal quantifier \"at every matched efficiency\" is falsified along T by F4 (occ eff@far<=1% moderate: 0.9905 at T=200 \u2192 0.022 at T=700 \u2192 0.003 at T=1000 \u2014 occupancy is a low-T technique) and F9 (the moderate far<=1% frontier closes for every operator between T=700 and T=1000); an unscoped \"every\" in an abstract that quotes T=1000 elsewhere pre-contradicts the planned density-scan content (repo commit 3568903d already has the T=400-1000 scan). Attempted refutations fail: reading \"every matched efficiency\" as \"along the efficiency axis at one working point\" saves the quantifier but not the effect size (one number cannot be both 30x and 2x); reading it as heavy-scoped has no textual support. The suggested split-by-axis rewrite mirrors F2 correctly and does not break the abstract's argument \u2014 it strengthens the two-part design rule the abstract closes on. One gap in the action: the identical phrase is echoed in the intro contributions list at lines 160-161 (\"with a refitted response it roughly halves the false rate at every matched efficiency\"), which must be fixed in the same way or the contradiction just moves 80 lines down.",
+    "severity": "must-fix",
+    "corrected_action": "Apply the suggested split-by-axis rewrite, keeping the word \"fitted\" so the comparator stays the F2 baseline (the best fitted polynomial on base A, which pays the same 0.3137 flood as classical and the 1BQF): e.g. \"...it becomes the strongest configuration in the study, cutting the fitted false rate at the matched 99%-efficiency point by a factor of thirty at moderate noise (0.31 to 0.010) and roughly halving it at heavy noise (0.63 to 0.36), at the T=200 working point\". Make the identical edit to the echo in the intro contributions list at main.tex lines 160-161. Leave the fork sentence to state that the occupancy+fork combination is the best heavy configuration (F5: 0.225), so the \"strongest configuration\" superlative stays defensible. Defer the full T-scaling caveat (F4/F9) to the separate finding, but the \"at every matched efficiency\" quantifier must not survive in either location."
+   }
+  },
+  {
+   "line": 871,
+   "quote": "efficiency-first false rates cross ($\\approx21\\%$ comb vs $17.5\\%$ classical, crossover near $T=700$)",
+   "kind": "contradicted",
+   "why": "F9 states clean is solved at every T: eff 0.9998 @ far<=0.1% at T=1000 with d=40. A 21% comb false rate at the efficiency-first point on CLEAN T=1000, and a crossover where classical beats the comb, is falsified. F10 also warns these efficiency-first cells likely predate the 2026-08-26 baseline fix (pooled set-outs).",
+   "suggested_action": "Rewrite the crossover sentence: on clean events the comb (matched-eff working point, d=40) holds eff 0.9998 at far<=0.1% even at T=1000 \u2014 no crossover; state that the composition wall closes the far<=1% frontier only under noise (moderate), between T=700 and T=1000 (forward-ref to sec:fit). Keep the paragraph structure, replace the numbers.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)",
+   "verdict": {
+    "upheld": true,
+    "reasoning": "The quoted sentence exists at main.tex lines 869-872 and means what the auditor says: on clean events at the efficiency-first working point, the comb false rate at T=1000 is claimed to be ~21% vs classical 17.5%, with a crossover near T=700, and a footnote calls the crossover robust. The paper defines efficiency-first (lines 423-426) as the threshold just below the 1% quantile of true amplitudes (eff>=0.99 by construction) \u2014 i.e. exactly the far@eff0.99 quantity of the new study, so no working-point mismatch can save the sentence. F9 (clean solved at every T: eff 0.9998 at far<=0.1% at T=1000, d=40) arithmetically bounds far@eff0.99 on clean T=1000 at ~0.1% (raising the threshold from the 0.9998-eff point to the 0.99-eff point only sheds false actives), falsifying both the 21% figure and the crossover. Same regime (clean, gamma=3, fixed acceptance), same degree (40), and section S5's comb IS the polynomial fitted to the clean events, so the refit-vs-production distinction does not rescue it. The footnote's own admission that the classical number swings 17.5%->10% under whole-store aggregation is the pooled set-outs artifact F10 says was fixed 2026-08-26, making the cell provenance-suspect as well. The paper even contradicts itself locally: the next paragraph (lines 881-888) says the comb collapses the false population to <=10^-2 of the true median and 'simply leaves a gap' \u2014 incompatible with a 21% impurity at the eff-0.99 point on clean.",
+    "severity": "must-fix",
+    "corrected_action": "The suggested rewrite is correct in substance but under-scoped. Do it, plus two consequential edits in the same paragraph: (1) rewrite the crossover sentence to state that on clean events the comb (matched-eff working point, d=40) holds eff 0.9998 at far<=0.1% even at T=1000 \u2014 no crossover on clean; the composition pressure (n_F/n_T ~ T-1) is real but the comb's separation absorbs it on clean, and the far<=1% frontier closes only under noise (moderate), between T=700 and T=1000, forward-ref to sec:fit. (2) Delete the footnote at lines 872-877 (\"The crossover is robust...\") \u2014 its aggregation-dependence caveat is the pooled set-outs bug fixed 2026-08-26 and its operative statement is now false. (3) Rework the closing sentence at lines 877-881 (\"The two regimes... bracket the operational truth\"): the bracket is no longer fixed-tau vs efficiency-first-at-density, but clean (solved at every T) vs noise (where sec:fit's composition wall bites). Leave the fixed-tau comb bullet (0.9% at T=1000, eff 92.1%) untouched \u2014 it is a different working point and not contradicted."
+   }
+  },
+  {
+   "line": 877,
+   "quote": "two regimes, fixed-$\\tau$ where the comb wins by an order of magnitude and more, and the strict efficiency-first point at extreme density where composition flattens everyone, bracket the operational truth",
+   "kind": "contradicted",
+   "why": "The second 'regime' rests on the falsified clean crossover: per F9 the efficiency-first point at extreme density on clean is NOT flattened (0.9998 @ <=0.1% at T=1000). The bracketing framing collapses to 'the comb wins at both working points on clean'.",
+   "suggested_action": "Replace with: on clean events the comb wins at both working points at every T; the composition wall that flattens everyone is a property of the noisy regimes and is met in sec:fit (F9).",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)",
+   "verdict": {
+    "upheld": true,
+    "reasoning": "The quote exists at lines 877-882 and means what the auditor says: it erects a second \"regime\" (strict efficiency-first at extreme density on clean, where \"composition flattens everyone\") as one bracket of the operational truth. F9 falsifies that bracket on clean: eff 0.9998 @ far<=0.1% at T=1000 with d=40 \u2014 and the paper's own line 750 identifies the comb as a d=40 response, so this is the same degree class at the same matched-eff working point, not a convention gap. The supporting crossover paragraph (lines 866-872, ~21% comb vs 17.5% classical at T=1000) rests on a footnote citing a \"whole-store aggregate\" \u2014 the pooled-set-out baseline pattern F10 flags as bugged and fixed 2026-08-26. The paper's own intro (line 144: comb separates \"essentially perfectly up to T=1000\") already agrees with F9 and internally contradicts this sentence. Once sec:fit reports F9 (clean solved at every T; the far<=1% frontier closes between T=700 and T=1000 only in the noisy regimes), a reader would catch the contradiction directly. The bracketing framing collapses to: on clean the comb wins at both working points at every T.",
+    "severity": "must-fix",
+    "corrected_action": "The suggested replacement is right in content but too narrow: swapping only the bracketing sentence leaves it contradicting its own paragraph, since lines 866-872 plus the footnote still assert the crossover (\"composition effect dominates everyone... ~21% comb vs 17.5% classical, crossover near T=700... the crossover is robust\"). Rewrite lines ~866-882 as one unit: (1) delete the clean efficiency-first crossover claim and its footnote (the numbers predate the 2026-08-26 baseline fix \u2014 F10; the whole-store aggregate is the pooled-set-out bug); (2) state that on clean the comb wins at both working points at every simulated T, citing F9 (eff 0.9998 @ far<=0.1% at T=1000, d=40 suffices); (3) keep the composition mechanism n_F/n_T ~ T-1 as a real pressure, but as one the clean discrete spectrum absorbs \u2014 the wall it creates (the far<=1% frontier closing between T=700 and T=1000 for every operator) is a property of the noisy regimes and is met in sec:fit. No change needed to the abstract or intro, which already agree with F9."
+   }
+  }
+ ],
+ "refuted": [
+  {
+   "section": "S1 Introduction (main.tex lines 93-197)",
+   "line": 145,
+   "quote": "million segments), where the classical solver's false rate has climbed to\n$20.5\\%$.",
+   "why_refuted": "The 20.5% figure is not stale and does not come from a pre-fix Efficiency_Frontier table. It belongs to the paper's fixed-acceptance (epsilon = 2 mrad), gamma=3 canonical clean benchmark at the fixed cut tau=0.35 (main.tex lines 820-834 state the convention; the abstract at line 68 repeats the number), not to the Efficiency_Frontier study the fact sheet covers (formula epsilon ~4.25e-4, matched-eff quantum working points) \u2014 so its absence from the fact sheet is expected, not suspicious. I re-derived it today from the live recomputed metrics view (seg_store.fixed_eps_metrics(), which recomputes metrics from the qtrk_store as a view, never trusting a cached table): classical, clean, gamma=3, eps=2mrad, tau=0.35 gives far = 2.247% at T=400 and 20.48% at T=1000 (eff 100%, n_seg = 4,000,000 \u2014 matching the paper's \"four million segments\" \u2014 over 20 reps). The paper's 2.25% and 20.5% match to rounding. The F10 bug class (pooled set-outs; classical/1BQF judged from store rows at different T) does not apply: the clean-headline aggregation groups strictly per n_trk on events shared segment-for-segment across solvers, and the paper already self-flags its one aggregation-sensitive nearby number (the whole-store 10% efficiency-first footnote at line ~871). The suggested action would actually introduce an error: re-deriving from post-fix Efficiency_Frontier runs would substitute formula-epsilon events, where classical clean T=1000 far at fixed tau is ~0.0-0.25% (outputs/03_highT_frontier.csv) \u2014 a different experiment than the sentence describes."
+  },
+  {
+   "section": "S1 Introduction (main.tex lines 93-197)",
+   "line": 160,
+   "quote": "response it roughly halves the false rate at every matched efficiency,",
+   "why_refuted": "Regime mismatch: the paper's occupancy-refit study is heavy-noise only (\"From here on the operating point is the heavy configuration\", main.tex line 1016; all sec:fit numbers stamped \"heavy noise, T=200, three-event means\", lines 1422/1455/1577). The intro sentence summarizes that measurement, and it holds: body reads base 0.085->occ 0.050 at matched eff 0.98 and 0.071->0.039 at 0.97 (lines 1534-1537, \"roughly halves\" verbatim), and the NEW fact sheet confirms rather than contradicts it at heavy \u2014 F5 gives 0.633->0.356 at matched eff 0.99 (x1.78, so \"every matched efficiency\" now holds at 0.97, 0.98 AND 0.99 in the paper's regime), and F11 validates the paper's fitted band (0.0771 inside 0.061-0.096; the paper's table reads 0.096/0.061). That also refutes the auditor's F10 provenance theory: these are post-fix-validated numbers, not pre-fix flattered baselines. The x31 (0.3137->0.0102, F2+F3) is the MODERATE regime (sigma_res 10um), which the paper's occupancy comparison never presents \u2014 importing it to falsify a sentence scoped to the paper's heavy study is the different-regimes false positive. The paper's own x10 outlier (floor-bound event 0.654->0.062 at eff 0.985) is already carved out by the sentence's second clause (\"at small coupling it lifts the fragment floor\"), mirroring sec:fit:occ's structure exactly. Residual risk is only prospective: if the moderate-regime occupancy results are later merged into the manuscript, the unqualified \"at every matched efficiency\" (also in the abstract, line 82) would then understate and need regime splitting \u2014 but citing 0.31->0.010 in the intro today would reference a measurement no section, figure, or table of the manuscript contains, creating a dangling claim."
+  },
+  {
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)",
+   "line": 625,
+   "quote": "the comb holds both high efficiency and a $\\sim10^{-2}$ false rate over the whole usable range.",
+   "why_refuted": "The claimed conflict does not survive scrutiny, on three grounds. (1) The number is accurate to the figure it captions. I recomputed the curve from the exact stored solutions the figure script uses (make_paper_figures.py fig_threshold, stored T=400 rep-0 clean event, gamma=3, qsvt solver rescaled to signal scale): comb far = 1.12e-2 at the efficiency-first threshold (tau99=0.162, eff 0.9906), 1.55e-2 at the low end of the usable sweep, 0.0 at tau>=0.25. The caption's \"~1e-2 false rate over the whole usable range\" is a worst-case-over-the-sweep robustness statement about panel (b), and panel (b) really shows that. It is also consistent with the paper's own quoted comb efficiency-first number at T=400 (\"1.3% vs classical 3.1%\", sec:comb:results, line ~866). (2) The comparison in the claim mixes objects and conventions. F9's far<=1e-3 is a matched-eff working-point number at T=1000 under the frontier study's per-operator refit machinery; the caption's ~1e-2 is a sweep-wide bound for the canonical production comb on the stored T=400 campaign event. The paper does not present the sweep bound as the comb's headline clean performance \u2014 the same section's headline (sec:comb:results) already quotes the comb at fixed tau=0.35 as far<=0.02% (2e-4) through T=400, an order of magnitude BELOW F9's 1e-3, so no reader can mistake ~1e-2 for the comb's clean working-point rate. The clause's argumentative role is the contrast with the 1BQF (\"several tens of percent by T=400\"), which stands regardless of refit. (3) The auditor's premise that the figure \"plausibly uses the pre-refit comb\" is true but is a deliberate design decision, not staleness: the function docstring states it uses \"the STORED T=400 rep-0 solutions of the canonical fixed-acceptance campaign (same store rows as the headline figures), so every curve here is consistent with the paper's quoted numbers.\" The figure lives in sec:onebit, three sections before refitting is introduced (sec:fit), and exists to establish the efficiency-first convention and explain the 1BQF 75% plateau on the canonical campaign. The suggested action is harmful either way: amending the caption to \"far <= 1e-3\" while panel (b) visibly shows the comb curve at ~1.1-1.6e-2 at the sweep's low end would CREATE a caption-figure contradiction; regenerating panel (b) with the fitted response would decouple this figure from every number the section quotes (1BQF 43.9%, classical 2.25%, comb <=0.02% at T=400) and break the narrative sequencing. File: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex line 626; script: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/make_paper_figures.py lines 537-597."
+  },
+  {
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)",
+   "line": 609,
+   "quote": "the 1BQF false rate climbs to several tens of percent by $T=400$ and beyond, and section~\\ref{sec:comb} quantifies this against the comb.",
+   "why_refuted": "The quoted sentence (main.tex ~lines 607-612) is not sourced from the pre-fix pathway and its magnitude re-verifies against the current store. The 2026-08-26 fix (commit 0164e633) corrected two bugs specific to Efficiency_Frontier/07_segment_metrics.py::refs(): (1) classical pooled across ALL set-outs, and (2) the 1BQF reference taken from T=400/700/1000 store rows while compared against QSVT at T=200. The paper's number comes from a different, older pathway (make_paper_figures.py::fig_threshold + seg_store), which loads classical/1BQF/comb from the SAME canonical-campaign store rows at the SAME T=400 clean event (base A only; that campaign has no set-outs) and computes the efficiency-first working point by direct threshold sweep \u2014 i.e., it already satisfies the matched-T, matched-events, matched-machinery condition the fix enforced. The fix also never claimed the T>=400 1BQF rows were wrong (it made the 1BQF look BETTER at T=200; its rationale 'far grows like n_F/n_T ~ T' is precisely the paper's claim). Decisively: the store was untouched by the fix, so I re-derived the number from today's (post-fix) store on the exact figure-factory pathway: 1BQF T=400 clean rep-0 at the efficiency-first point gives eff=0.9956, far=0.4471 (paper's multi-rep sec:comb aggregate: 43.9%), comb far=0.0112 \u2014 'several tens of percent by T=400 and beyond' is correct, and QSVT beats the 1BQF on the same rows, consistent with F10. The auditor's suggested re-check has effectively been executed and the magnitude did not change; the sentence, the sec:comb quantification, and fig:threshold all stand as written."
+  },
+  {
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)",
+   "line": 872,
+   "quote": "\\footnote{The crossover is robust; its size is aggregation-dependent. A whole-store aggregate reads the classical efficiency-first false rate at $T=1000$ as low as $10\\%$. Both sources agree the comb no longer wins at the efficiency-first point beyond $T\\approx700$...}",
+   "why_refuted": "Both prongs of the claimed contradiction dissolve on checking regimes and provenance. (1) F9's \"clean is solved at every T\" comes from the Efficiency Frontier study under FORMULA epsilon: outputs/03_highT_frontier.csv rows at regime=clean, T=1000 carry eps=0.000425 rad (~0.43 mrad; PLAN.md line 68 confirms \"formula \u03b5\"), where classical_invA reads far ~0.1-0.25% and comb d=40 reads far~0 at eff~0.998. The paper's crossover paragraph is explicitly scoped (main.tex line 820) to the fixed-acceptance eps=2 mrad canonical benchmark, where the classical solver alone pays 20.5% false at T=1000 \u2014 a false population two orders of magnitude denser (a ~5x wider angular acceptance admits coupled fakes on the P4 lines that the comb passes). Different acceptance conventions define different problems; F9 cannot \"directly falsify\" the fixed-2mrad crossover, and F9's own composition-wall clause is about moderate. (2) The footnote's \"whole-store aggregate\" is not the F10 pooled-set-out bug: the 2026-08-26 fix (07_segment_metrics.py lines 94-98, 06b_highT_onebqf.py header, commit 0164e633) fixed frontier-study baselines \u2014 classical pooled across SET-OUTS at T=200 and 1BQF taken from store rows at mismatched T \u2014 bugs that made baselines look WORSE (flattering QSVT). The footnote's aggregate is over the fixed-eps seg_store (make_paper_figures.py fig_clean2x2 uses seg_store.fixed_eps_metrics()), concerns the classical efficiency-first rate at T=1000, and reads the baseline BETTER (10% vs fresh 17.5%) \u2014 different study, different dataset, opposite direction; set-outs do not even exist in the fixed-eps clean study. The footnote already treats matched fresh solves as primary and the aggregate as a robustness cross-check, i.e. it applies the F10 lesson rather than violating it. The suggested deletion is also wrong: \"the corrected per-set-out matched numbers\" are frontier numbers that do not underlie this passage, and removing the footnote would strip a genuine caveat while leaving the main-text crossover numbers unchanged."
+  },
+  {
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)",
+   "line": 867,
+   "quote": "$T=400$ ($1.3\\%$ vs classical $3.1\\%$ on matched fresh solves)",
+   "why_refuted": "The claimed conflict compares numbers from two different set-outs. The paper's sentence sits inside a subsection scoped in its first line to \"the fixed-acceptance (epsilon=2 mrad), gamma=3 study, the canonical benchmark of the programme\", and its 1.3% (comb) vs 3.1% (classical) at T=400 efficiency-first is corroborated by the benchmark's own store aggregate (headline_both_conventions.csv: wp99 far at T=400 = 1.44% comb, 1.49% classical \u2014 same scale), with the fresh-vs-store aggregation sensitivity already flagged in the paper's footnote. F9's \"clean solved at every T, far<=0.1%\" comes from the Efficiency_Frontier machinery, which uses formula epsilon: 03_highT_frontier.py calls compute_epsilon and outputs/03_highT_frontier.csv records eps=0.000425 rad (~0.42 mrad) for clean \u2014 about 5x tighter acceptance, hence a radically smaller false-candidate pool. In that set-out even the CLASSICAL baseline at clean T=400 reads far ~0.12% (vs 1.5-3.1% at 2 mrad), so the <=0.1% level is a property of the tighter acceptance, not evidence the paper's 2 mrad cell is stale. The F10 staleness argument also fails: the 2026-08-26 fix repaired the Efficiency_Frontier's baseline references (pooled set-outs; 1BQF from store rows at mismatched T); the paper's S5 clean numbers come from the Segment_level_studies canonical benchmark and matched fresh solves, a different pipeline that never carried that bug. The suggested substitution would break the section: swapping formula-epsilon numbers into the 2 mrad narrative would contradict the adjacent itemize (classical 2.25%/20.5%, 1BQF 43.9%/82.6%, comb <=0.02%/0.9%), the clean_headline figure, and would erase the T~700 efficiency-first crossover / composition argument the section is built on."
+  },
+  {
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)",
+   "line": 836,
+   "quote": "for it: $5.1\\%$ at $T=100$, $43.9\\%$ at $T=400$, $82.6\\%$ at $T=1000$",
+   "why_refuted": "The three cells reproduce exactly, today, from the live data via the paper's own code path. fig_clean2x2 in Paper_planning/qsvt_velo_paper/make_paper_figures.py reads seg_store.fixed_eps_metrics() (Toy_Characterisation/Segment_level_studies), filters gamma=3, drop=0, and reads the 1BQF at its working-point columns (fr_wp_m); running that aggregation now gives far 5.12% at T=100, 43.90% at T=400, 82.61% at T=1000, with eff 99.90/99.48/100% \u2014 matching the paper's \"5.1%, 43.9%, 82.6%\" and \"99.5-100%\" to every quoted digit. The F10 bug does not touch this source: fix commit 0164e633 (2026-08-26) patched Efficiency_Frontier/07_segment_metrics.py::refs(), whose two bugs were (1) classical pooled across set-outs and (2) the 1BQF reference drawn from high-T store rows (T=400-1000) while compared against QSVT at T=200. The paper's clean-headline cells come from a different pipeline (fixed eps=2mrad canonical store, not Efficiency_Frontier's formula-eps runs), and agg_by_ntrk groups per n_trk, so each 1BQF cell is structurally at the same T as its classical/comb comparators \u2014 the cross-T mismatch cannot arise; nor do set-outs exist in that store for the pooling bug to contaminate. Direction also agrees with F10 (comb far <=0.02%-0.9% beats every 1BQF cell). The suggested action's fallback (\"substitute the post-fix values\") would actually be wrong: the post-fix matched baseline in Efficiency_Frontier/outputs/03_1bqf_reference.csv (clean far@eff0.99 means 46.3% at T=400, 79.6% at T=1000) is a formula-epsilon, different-events pipeline, and splicing it into the fixed-eps section would create a real convention mismatch. The re-check the auditor asked for has now been performed and the cells pass unchanged."
+  },
+  {
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})",
+   "line": 1087,
+   "quote": "At the efficiency-first working point the classical false rate is $0.65$; the 1BQF's is $0.65$ as well",
+   "why_refuted": "The claimed staleness dissolves on re-derivation. The post-fix Efficiency_Frontier machinery itself (outputs/04_heavy_base_ref.csv, generated by 04_heavy_frontier.py after the 2026-08-26 baseline fix, using the matched onebqf_cos Chebyshev-cosine reference on the same events at the same T) reproduces BOTH quoted values exactly: base heavy T=200 rep 0 gives classical_invA far_e990 = 0.6496872 and onebqf_cos far_e990 = 0.6496872 \u2014 identical, as the sentence says. The far convention matches too: the code defines far = (nact-ntru)/nact, so 1454/2238 = 0.6497 is the same quantity, and the F2 response-independent identity is not an extrapolation from moderate \u2014 it holds per-rep in the post-fix heavy data (rep 1: all solvers 0.6667; rep 2: 0.6272/0.6270). F5's \"0.633\" is not a conflicting measurement: 08_writeup_figs.py computes it as the MEDIAN of far_e990 over the extended 10-rep heavy ensemble (sorted per-rep values 0.176...0.667, median 0.633), a between-modes statistic of exactly the bimodal distribution F11 warns about; rep 0 sits in the upper mode at 0.6497. The context already qualifies the number: the section preamble (lines 1019-1020) states \"where a single event is dissected, it is rep~0\", the scoreboard sentence directly continues the rep-0 dissection (2238/1454, lines 1043-1046), and the paper's later table (line 1452) quotes the three-event eff-0.99 ranges (classical 0.63-0.76, 1BQF 0.65-0.96) that contain 0.65. The auditor's proposed fix would itself introduce errors: 0.633 is a 10-rep median, not a \"3-rep aggregate\", and headlining it next to 0.65 violates F11's per-rep-dots-never-means rule while implying a discrepancy the post-fix data refutes."
+  },
+  {
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})",
+   "line": 1132,
+   "quote": "the classical efficiency-first false rate falls from $0.650$ to $0.210$ at efficiency $0.991$",
+   "why_refuted": "The claim fails on all three tests. (a) Provenance: the 0.650/0.210 numbers come from Toy_Characterisation/Bifurification/dp_occupancy_proof.py (commit a4c2eccb, results/dp_occupancy_proof.log: base classical far 0.6497 at eff_wp 0.9949, occ classical far 0.2103 at eff_wp 0.9911, alpha=0.3, heavy T=200 rep0), a self-contained study that solves classical minres directly per-config on a single in-script event. The 2026-08-26 fix (0164e633) touched only QSVT/Efficiency_Frontier/07_segment_metrics.py refs() and 04_heavy_frontier.py, and its two bugs (classical pooled across set-outs; 1BQF read from high-T store rows) structurally cannot apply to a single-event, single-T, no-store, no-pooling computation \u2014 same for the fig:occproof(b) tau sweep, computed in the same script. (b) No conflict with the 0.12 figure: that is classical at matched-eff 0.98, three-event means (tab:fit row: 0.124), whereas 0.650 is at the efficiency-first ~0.99 point on rep 0 \u2014 and the paper's own post-fix table tab:fit shows classical at eff 0.99 heavy as 0.63\u20130.76, exactly bracketing 0.650. The 0.12-vs-0.65 gap is the threshold-degeneracy flood between eff 0.98 and 0.99 that the paper states repeatedly (lines 1491, 2025) \u2014 two points on one steep curve, not stale vs fresh. The convention split is deliberate and stated: sec:toy:metrics defines both working points, and lines 1249-1253 explicitly say sections sec:fit onward switch to matched efficiency because efficiency-first degenerates at heavy noise; sec:fit:occ then revisits alpha=0.3 vs 0.05 with the 0.12 classical reference in view. (c) The suggested action would damage the section: re-deriving at matched-eff 0.98 would show classical occ ~= classical base (~0.12 both), erasing the \"classically it works\" observation that the section's narrative arc (and sec:fit:occ's reversal) is built on \u2014 yet the eff-first improvement 0.65->0.21 is real, verified data. No edit is required."
+  },
+  {
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)",
+   "line": 1295,
+   "quote": "exact evolution against the implemented product-formula circuit and the classical baseline on the same events",
+   "why_refuted": "The claimed staleness does not survive a provenance trace. The F10 fix (commit 0164e633, 2026-08-26) patched two bugs in QSVT/Efficiency_Frontier/07_segment_metrics.refs(): (1) classical pooled across ALL set-outs, (2) 1BQF references taken from store rows at different T. That script belongs to the Efficiency_Frontier study (started 2026-08-24) and is not in the figure's provenance chain at all: fig:erf is built by Paper_planning/qsvt_velo_paper/make_paper_figures.py (fig_erf, lines 275-313) from Toy_Characterisation/ERF/results/erf_exact_evolution_check.csv, produced by Toy_Characterisation/ERF/erf_exact_evolution_check.py \u2014 a different study, different code. Structurally, neither bug mode can occur in that pipeline: the classical solution is computed inline per cell via minres on the SAME operator A (the erf/step Hamiltonian of that cell) and the SAME event (qp.ensure_event(n_trk=200, rep=0, ...)), with the same wp99 working-point applied to all three solutions \u2014 the CSV shows four distinct classical values (0.029, 0.033, 0.233, 0.135), direct evidence against pooling; and the circuit solve is loaded from the store keyed by sol_key(ekey, hkey, ...) with ekey from that identical T=200 event, so no cross-T comparison exists. The figure's pipeline already meets the standard the fix imposed ('matched T, same events and same machinery'), and the caption's phrase 'on the same events' is literally verified in the code. Nor is there numeric tension with F2's corrected classical baseline (far 0.3137 @ eff 0.99): that number is for base A in the Efficiency_Frontier regimes (sigma_scatt 1e-4, moderate sigma_res 10um), while the figure's classical bars are solved on the erf-kernel operators in the ERF study's own noise pairs (sigma_scatt 3e-4/5e-4) \u2014 a different operator and regime, and F6 shows classical performance legitimately moves by large factors with the operator. The suggested action would be actively harmful: swapping in the Efficiency_Frontier base-A refs() machinery would replace a same-operator, same-event classical comparison with a different-operator reference, breaking the panel's argument (which needs classical on the very Hamiltonian whose circuit-vs-exact gap is being arbitrated). Section-level checks: the body-text numbers (0.96 vs 0.73 fork; 0.83 -> 0.22 erf) are circuit-vs-exact comparisons untouched by any baseline fix, and the section does not pre-contradict F13."
+  },
+  {
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget",
+   "line": 1447,
+   "quote": "base ($\\beta=0$)        & 0.98 & 0.124 & 0.199 & \\textbf{0.096}\\\\",
+   "why_refuted": "The claimed staleness does not survive provenance tracing. Every cell of tab:fit (including the floor-row ranges, which are spans of the three config means) reproduces exactly from QSVT/Codesign/outputs/fork_noisy/fit_comb.csv, produced 2026-07-17 by QSVT/Codesign/04_fit_comb_to_measured_spectrum.py (commit fa5dce9b). The 2026-08-26 fix (commit 0164e633) repaired two bugs in a different pipeline \u2014 Efficiency_Frontier/07_segment_metrics.py refs() \u2014 and neither bug exists in the Codesign pipeline that produced this table: (1) classical is computed per system (x_cls = amplitudes(sysd, 1/\u03bb) on the same event's eigen-decomposition, cross-checked against a MINRES solve of the same A with an asserted cosine similarity > 0.999999), and the table itself proves non-pooling since classical differs between base (0.124) and fork (0.463/0.292) rows; (2) the 1BQF baseline is the exact |cos(\u03c0\u03bb/2s')| response evaluated in the same system's eigenbasis at the same T=200 on the same events with matched-efficiency thresholds \u2014 no store rows are read anywhere. This already satisfies the post-fix matched-machinery convention; the fix's own heavy remedy (onebqf_cos, a degree-60 Chebyshev fit of the same cosine) is a degree-limited approximation of what the paper computes exactly. Cross-checks agree: fitted beats 1BQF in every sub-floor cell (F10 holds), and F11's post-fix heavy base fitted d160 = 0.0771 lands inside the table's 0.061-0.096 band, while the fitted column \u2014 which the auditor accepts \u2014 shares the identical amplitudes() machinery with the suspected classical/1BQF columns. F10's warning about pre-fix tables refers to Efficiency_Frontier's own earlier reference tables (e.g. the classical 0.00/0.99 moderate quote), not this Codesign-derived table."
+  }
+ ],
+ "tensions": [
+  {
+   "line": 80,
+   "quote": "but paired with a response refitted to that spectrum it becomes the strongest configuration in the study",
+   "kind": "tension",
+   "why": "F5: 'strongest' is regime-dependent. At moderate, occupancy alone is indeed the best (0.9905 @ far<=1%, ranking occ > occ+fork > fork > base), but at heavy the best quantum configuration is occupancy+fork (far@eff0.99 = 0.225 vs occupancy alone 0.356). Once the new heavy results are integrated, 'the strongest configuration in the study' for occupancy alone is no longer accurate without a regime qualifier.",
+   "suggested_action": "Add a qualifier: 'it becomes the strongest single-term configuration in the study' or '...the strongest configuration at moderate noise (and, combined with the fork term, at heavy noise)'. One clause, no restructuring.",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 78,
+   "quote": "The Denby--Peterson occupancy term destroys the one-bit filter, whose single zero cannot follow the spectrum it creates; but paired with a response refitted to that spectrum it becomes the strongest configuration in the study",
+   "kind": "wording-risk",
+   "why": "F4: occupancy is presented with no T-scaling limit anywhere in the abstract. The co-hit term's spectral span grows as ~4*alpha*(max hit degree) (measured 143 @ T=700, 202 @ T=1000) and fixed-degree responses lose resolution as span/d, so eff@far<=1% collapses from 0.9905 at T=200 to 0.003 at T=1000 \u2014 in-matrix occupancy is a low-T technique. An unconditional 'strongest configuration' claim in the abstract will read as contradicted by the new metrics-vs-T figure.",
+   "suggested_action": "Append one clause after the occupancy claims, before line 84: e.g. 'This gain is bought at low track multiplicity: the occupancy term widens the spectrum with the busiest hit, and at fixed polynomial degree its advantage is gone by $T\\sim700$.' Single sentence, keeps the paragraph arc intact.",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 84,
+   "quote": "The bifurcation (fork) term behaves the same way, a regression under the clean-event comb and a net win under the refitted response.",
+   "kind": "wording-risk",
+   "why": "F5 confirms the redemption framing itself (the earlier no-go was under the unfitted production comb; refit gives 0.9802 vs base 0.9783 at moderate), so the sentence's direction is right. But 'behaves the same way' overstates the parallel with occupancy: fork's solo win at moderate is marginal (0.9802 vs 0.9783, shallow in beta), at moderate the occ+fork combination is worse than occupancy alone (0.9867 < 0.9905), and the combination only wins at heavy (best quantum far@eff0.99 = 0.225). F6 also gives fork a distinct role occupancy does not have: it rescues the classical baseline (eff@far<=1% 0.49 -> 0.97), which 'the same way' erases.",
+   "suggested_action": "Tighten to reflect the asymmetry, e.g. 'The bifurcation (fork) term follows the same rule \u2014 a regression under the clean-event comb, a modest net win under the refitted response \u2014 and where it earns its place is at high noise, where combined with the occupancy term it gives the best false rate in the study; it is also the one modification that rescues the classical solver.'",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 72,
+   "quote": "beats the classical\nbaseline at every attainable efficiency below a sharply defined\n\\emph{fragment floor}",
+   "kind": "wording-risk",
+   "why": "Not contradicted \u2014 the 'below the floor' guard is exactly what F2 requires (at matched eff 0.99, above the floor, classical inversion, the 1BQF and the best fitted polynomial all pay the identical far 0.3137, so the polynomial beats nothing there). Two risks: (a) any later edit that drops the 'below the floor' qualifier would falsify the sentence against F2; (b) per F10 the classical-baseline comparison must be confirmed to use the post-2026-08-26 fixed baselines, since the pre-fix references flattered QSVT.",
+   "suggested_action": "Keep the qualifier verbatim; optionally strengthen with F2's complementary fact in the same sentence or the design-rule sentence (lines 86-88): above the floor the flood is response-independent and only the operator buys purity (0.314 -> 0.010 at fixed eff 0.99). Verify the underlying comparison is post-baseline-fix.",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 158,
+   "quote": "sharpest case: it breaks the notch outright, yet with a refitted",
+   "kind": "wording-risk",
+   "why": "The occupancy story in item 3 (lines 158-162) carries no density caveat. F4: in-matrix occupancy does not scale in T \u2014 eff@far<=1% at moderate collapses 0.9905 (T=200) -> 0.952 (400) -> 0.022 (700) -> 0.003 (1000), because the co-hit term's spectral span grows ~4*alpha*(max hit degree) (143 at T=700, 202 at T=1000) and fixed-degree responses lose resolution ~span/d. As written, a reader takes occupancy as an unconditional win; the new density-scan figure directly contradicts that reading.",
+   "suggested_action": "Append one scoping clause at the end of the occupancy sentence (after line 162's 'spectral-twin degeneracy that causes it'): e.g. 'a gain that holds while the term's added spectral span still fits inside the response's resolution \u2014 in-matrix occupancy is a low-density technique, a limit quantified in section~\\ref{sec:occupancy}'. No restructuring.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 151,
+   "quote": "to the measured pile-up. Once it is, the quantum false rate drops below\nthe classical one at every efficiency below a floor that I can identify,",
+   "kind": "wording-risk",
+   "why": "Two unstated scopes. (a) F9: the moderate far<=1% frontier closes between T=700 and T=1000 for EVERY operator (best far@eff0.99 ~0.83-0.92 at T=1000), so the below-floor superiority claim holds at the reference density, not unconditionally. (b) F6: with the fork term the classical solver itself recovers (eff@far<=1% 0.49 -> 0.97 at moderate), so 'the classical one' must mean the classical inversion on the same operator, or the comparison becomes ambiguous once operator engineering enters.",
+   "suggested_action": "Minimal edit: 'the quantum false rate drops below that of the classical solver on the same operator at every efficiency below a floor..., at the densities studied' (or name T=200 as the reference working density here and point the density limit at the wall discussion). Preserves the enumerate structure.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 150,
+   "quote": "The correct response cannot be written down a priori; it must be fitted",
+   "kind": "wording-risk",
+   "why": "F13's planned addition gives closed-form modified atlas/ladder positions under each added term (occupancy on a pure chain: s -> s+4*alpha, delta -> delta+4*alpha, eq. 7's ladder verbatim; fork pairs +beta; combined 2*alpha+beta). A reader of the new math could take it as contradicting 'cannot be written down a priori'. The true distinction is that the LINE POSITIONS follow in closed form while the POPULATIONS on those lines (which motifs pile up, how heavily) must be measured \u2014 the intro currently conflates the two.",
+   "suggested_action": "Sharpen the sentence without moving it: e.g. 'The positions of the false lines follow from the operator in closed form, but which lines the pile-up populates, and how heavily, cannot be written down a priori; the response must be fitted to the measured pile-up.' This pre-clears the ground for the F13 atlas instead of pre-contradicting it.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 217,
+   "quote": "heavy configuration used from section~\\ref{sec:noise} onward is $(10^{-4},\\,20\\,\\mu\\mathrm{m},\\,1\\%)$.",
+   "kind": "wording-risk",
+   "why": "The Efficiency Frontier results (F1-F7, F9) are chiefly at the MODERATE triple (sigma_res 10um, drop 1%), which this section never defines; only clean and heavy triples exist here. Later text (lines 1281, 1296) already says 'moderate noise' with no definition behind it. 'Heavy ... from sec:noise onward' reads as claiming all noise results are at heavy, which the incoming moderate-regime numbers would contradict.",
+   "suggested_action": "In sec:toy:events, define both noise triples alongside clean: 'the moderate configuration $(10^{-4},\\,10\\,\\mu\\mathrm{m},\\,1\\%)$ and the heavy configuration $(10^{-4},\\,20\\,\\mu\\mathrm{m},\\,1\\%)$', and rephrase the 'onward' clause to name which sections use which regime.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 413,
+   "quote": "Every number in this work is one of the following, and I will never use these words in any other sense:",
+   "kind": "wording-risk",
+   "why": "The itemized working points are fixed-tau, efficiency-first (eff>=0.99), and matched-efficiency. The new study's headline numbers (F1, F3, F4, F5, F7, F9, F11) are quoted at a false-rate-budget working point (eff at far<=1%), which is none of the three \u2014 integrating them without amending the list breaks the section's explicit exhaustiveness promise.",
+   "suggested_action": "Add a fourth bullet to the working-points item defining the far-budget working point: threshold placed so the segment false rate stays <=1% (or <=0.1%), quoting the efficiency that results \u2014 the dual of the efficiency-first point.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 452,
+   "quote": "Because $A=sI-C$, its spectrum is a rigid reflection of the compatibility graph's ... Every spectral statement in this work is therefore a statement about the eigenvalues of small 0/1 graphs.",
+   "kind": "wording-risk",
+   "why": "Once the modified operators land (F3 occupancy: 2*alpha same-role off-diagonals and degree-dependent diagonal; F5 fork: +beta couplings; F13 modified atlas), A is no longer sI-C and the relevant graphs are weighted, not 0/1. F4's measured occupancy spectral span (lambda_max ~ 4*alpha*max hit degree, 143 at T=700, 202 at T=1000) is exactly a spectral statement this framing cannot cover.",
+   "suggested_action": "Scope the sentence to the base operator ('For the base operator $A=sI-C$ ...') and add one forward-reference sentence: each added term of section X shifts and weights these same motif lines in closed form (chains: s -> s+4*alpha; same-role pairs: 2*alpha off-diagonal; forked pairs: +beta).",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 293,
+   "quote": "Because $A$ has constant diagonal, its action decomposes over the connected components of the compatibility graph, and small components can be solved by hand.",
+   "kind": "wording-risk",
+   "why": "With the occupancy term the diagonal is hit-degree-dependent (F4), so 'constant diagonal' is base-A-only. Per F13 the modified atlas most naturally continues this very subsection (the ladder of eq. 7 generalises verbatim on pure chains via s -> s+4*alpha, delta -> delta+4*alpha), so the opening sentence's unscoped reason would sit directly above material that violates it.",
+   "suggested_action": "Minimal edit: 'Because the base $A$ has constant diagonal ...', or attribute the component-wise decomposition to the block structure of the compatibility graph (which survives the modified operators) and keep constant diagonal as the reason the base levels are so simple.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 558,
+   "quote": "The one-sentence summary of this work is the difference between those two panels: a degree-one response owns one zero, a degree-$d$ response owns $d$, and the noisy-event false spectrum demands more than one.",
+   "kind": "tension",
+   "why": "F1: on noisy (moderate) base A no polynomial response of any degree beats eff ~0.973-0.978 at far<=1% \u2014 the entire deficit is L1 spectral twins that sit ON the true lines, so no zero can remove them without killing trues. F2: at the eff-0.99 target the 1BQF and the best fitted polynomial pay the IDENTICAL far 0.3137 \u2014 extra zeros buy efficiency at fixed far, never purity; only operator modification does. Elevating the zeros-count contrast to THE one-sentence summary pre-contradicts the new headline that on noisy events the response axis exhausts and the operator (occupancy/fork) is what buys purity.",
+   "suggested_action": "Keep the sentence but extend it with a forward-pointing clause, e.g. \"...demands more than one --- and, as section~\\ref{sec:<frontier>} shows, contains a component (false segments spectrally degenerate with the true lines) that no zero of any degree can touch, forcing modification of $A$ itself.\" No restructuring needed.",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 570,
+   "quote": "(b) The degree-40 line comb: passes at the four true-track lines only, with the isolated, pair and triple lines all rejected.",
+   "kind": "wording-risk",
+   "why": "True on the clean motif atlas, but F1 shows the noisy-event false population that matters (spectral twins) sits exactly ON the four true-track lines, so \"passes at the four true-track lines only\" is precisely the mechanism by which twins pass. Once the frontier material is in, a reader can take this caption as claiming the comb rejects all false lines, which the twin floor contradicts.",
+   "suggested_action": "Add one clause to the caption, e.g. \"...all rejected; false weight that lands on the true lines themselves (the spectral twins of section~\\ref{sec:<frontier>}) passes by construction.\"",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 590,
+   "quote": "the endpoint amplitudes remain perfectly well ordered above the false ones, so a threshold placed below the endpoint band recovers them all.",
+   "kind": "wording-risk",
+   "why": "Stated without a clean-event qualifier. On noisy events F1/F2 show the ordering fails: twins interleave the true band at every amplitude, and recovering 99% of trues costs the 1BQF far 0.3137 at moderate T=200 (F2). Read out of its clean-track context, the sentence contradicts the twin floor.",
+   "suggested_action": "Insert a two-word qualifier: \"on a clean chain the endpoint amplitudes remain perfectly well ordered above the false ones...\" (the closed-form 0.364->0.258 argument two sentences earlier is already per clean track, so this is consistent).",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 765,
+   "quote": "With the production degree $d=40$ this is 21 qubits at $T=50$ rising to 29 at $T=1000$. Width is cheap, and grows only logarithmically.",
+   "kind": "wording-risk",
+   "why": "F11's heavy working points are fitted at d=160 (base fitted d160 far 0.0771; occ d160 eff 0.9336) and F3 notes alpha=0.10 needs ~2x the degree of alpha=0.05. Once the new results are integrated, 'the production degree d=40' reads as the degree of all quantum results, and the 21/29 qubit counts silently exclude the refit working points the Results section will now headline. d=40 itself is not stale (F9: d=40 suffices for clean at every T; the density scan held degree at 40), so this is framing, not a wrong number.",
+   "suggested_action": "Minimal edit inside the same bullet: 'With the baseline production degree $d=40$ this is 21 qubits at $T=50$ rising to 29 at $T=1000$; the refit responses of section~\\ref{...} reach $d=160$, costing only $m=8$ index qubits (23 and 31).' Keeps the bullet structure and the logarithmic-width punchline.",
+   "section": "S4 QSVT construction (main.tex lines 664-779)"
+  },
+  {
+   "line": 770,
+   "quote": "\\item \\textbf{Success}: $P_{\\rm anc}\\propto 1/T$ (measured constant $\\approx0.44$ for the comb of section~\\ref{sec:comb}), so total walk calls scale as $d\\sqrt{T}$.",
+   "kind": "wording-risk",
+   "why": "F4: the occupancy co-hit term's spectral span grows with T (lambda_max ~ 4*alpha*(max hit degree); measured 143 at T=700, 202 at T=1000) and fixed-degree responses lose resolution ~ span/d, so for the modified operators the paper now adds, d is not a T-independent constant and the clean d*sqrt(T) walk-call law holds only for operators whose span stays O(1) (the base A). Also the 0.44 constant is measured for the base comb; per-operator refit responses (F5's method) have their own one-norm constants. As written the bullet is true for base A but will read as covering every operator in the integrated paper.",
+   "suggested_action": "Add one scoping clause, no restructuring: '...scale as $d\\sqrt{T}$ for the base operator; terms that widen the spectrum (the occupancy term of section~\\ref{...}) force $d$ to track the spectral span to hold resolution, which is why in-matrix occupancy is a low-$T$ technique (section~\\ref{...}).' Alternatively keep the bullet untouched and put the caveat where F4 is presented, with a back-\\ref to sec:qsvt:resources.",
+   "section": "S4 QSVT construction (main.tex lines 664-779)"
+  },
+  {
+   "line": 843,
+   "quote": "rising to $0.17\\%$ at $T=700$ and $0.9\\%$ at $T=1000$ against the classical $20.5\\%$, at efficiency $92.1\\%$",
+   "kind": "tension",
+   "why": "Defensible as the fixed-tau=0.35 production-comb reading, but it now reads as clean-event degradation at T=1000, whereas F9's fitted/matched result reaches eff 0.9998 @ far<=0.1% at T=1000 with d=40. A reader would see 92.1% and 99.98% as contradictory unless the working-point distinction is made explicit.",
+   "suggested_action": "Keep the bullet labelled as the fixed-tau reading and append one sentence: at the matched-efficiency working point the same d=40 comb reads eff 0.9998 at far<=0.1% at T=1000 \u2014 clean is solved at every T (cite the frontier study figure/CSV).",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 908,
+   "quote": "section~\\ref{sec:fit:occ} shows an operator modification can lift",
+   "kind": "wording-risk",
+   "why": "True per F3 (occupancy lifts the twin floor: 0.9905 @ far<=1% moderate), but F4 shows the lift does not scale in T (0.9905 at T=200 -> 0.003 at T=1000); an unqualified 'can lift' risks over-promising against the T-scan the new material adds.",
+   "suggested_action": "Add a two-word qualifier, e.g. 'an operator modification can lift at moderate multiplicity' or '...can lift (at fixed T; sec:fit:occ)'.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 916,
+   "quote": "Classical post-selection is developed and reported separately in the programme's occupancy study.",
+   "kind": "wording-risk",
+   "why": "F12 confirms the scope split (good), but 'occupancy study' now collides with the in-matrix occupancy TERM reported inside this paper (sec:fit:occ, F3/F4/F13); a reader could conflate the classical hit-occupancy gate with the occupancy Hamiltonian modification.",
+   "suggested_action": "Rename the pointer to disambiguate, e.g. 'the programme's hit-uniqueness post-selection study', and/or add 'not to be confused with the occupancy operator term of sec:fit:occ'.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 1097,
+   "quote": "the cure, developed in section~\\ref{sec:fit}, is to measure those lines and refit the response to them",
+   "kind": "tension",
+   "why": "F1 proves the refit alone cannot cure heavy noise: no polynomial p(A) on the unmodified A beats the spectral-twin floor (L1 = 100% of the deficit; twin fraction of trues 87% at heavy per F3). F2 separates the axes: the polynomial buys efficiency at fixed far; only the operator buys purity. F5: the best heavy quantum result (far@eff0.99 = 0.225) requires occupancy+fork WITH the refit, vs base fitted 0.633. The sentence names the refit as THE cure and demotes the Hamiltonian terms to secondary 'candidate cures'.",
+   "suggested_action": "Minimal rewording that keeps the hand-off structure: e.g. 'and half the cure, developed in section~\\ref{sec:fit}, is to measure those lines and refit the response to them; the other half \u2014 moving the lines themselves by modifying the operator \u2014 is what the next two sections supply, and at heavy noise only the two together close the gap.' This also pre-loads the L1-L3 budget without restructuring.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1054,
+   "quote": "the pair line $s-1$ and the triple lines $s\\pm\\sqrt2$, interleaving but not touching the four true lines",
+   "kind": "wording-risk",
+   "why": "F1/F3: the entire base-A deficit is spectral twins \u2014 true FRAGMENTS (from the 1% hit drop) that land ON the same motif lines as false pairs/triples; at heavy the twin fraction of true segments is 87%. 'Interleaving but not touching' invites the reader to conclude a sharp enough response could separate true from false spectrally, which F1's floor theorem forbids. The statement is literally about the four full-track lines, but the separability inference is the natural reading.",
+   "suggested_action": "Add one clause: the four full-track lines stay clean, but true fragments broken by the hit drop land exactly on the pair and triple lines \u2014 the 'spectral twins' the loss budget of the new study quantifies (87% of trues at heavy) \u2014 so shared motif lines, not the full-track lines, are where the real fight happens.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1081,
+   "quote": "(figure~\\ref{fig:motifs}), close to but never on the four true-track lines (green dotted).",
+   "kind": "wording-risk",
+   "why": "Same issue as line 1054, in the fig:pileup caption: F1/F3 say true-fragment weight shares the motif lines with false weight (spectral twins). If the caption only says false weight is 'never on the four true-track lines' without noting the shared fragment lines, it pre-contradicts the L1 budget the new material introduces.",
+   "suggested_action": "Extend the caption by half a sentence noting that green (true) weight from drop-broken fragments also sits on the pair/triple lines \u2014 the twin population \u2014 mirroring whatever the figure actually shows.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1019,
+   "quote": "Three reps of every event are used throughout; where a single event is dissected, it is rep~0.",
+   "kind": "wording-risk",
+   "why": "F11: heavy is strongly bimodal per rep \u2014 results must be shown as per-rep dots, never means; and the new study's density-scan CSV carries extra reps (commit 7c653219). If new-study numbers with more reps are integrated, 'three reps ... throughout' becomes false, and 3-rep means at heavy would be actively misleading.",
+   "suggested_action": "Either keep 'three reps' but add that heavy per-rep results are bimodal and are therefore always displayed per rep, or generalise to 'at least three reps' and state the per-rep display convention here once.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1101,
+   "quote": "neither behaves the way its classical reputation suggests, and neither can be judged separately from the refit.",
+   "kind": "wording-risk",
+   "why": "The second half exactly matches F5's refit-redemption methodology (good \u2014 the paper already carries that framing). The first half is defensible via mechanism (F3: occupancy breaks graph isomorphism rather than improving the response; F5: fork needs the refit) but risks being read as 'neither delivers', which F3/F5 contradict: at heavy occ is the best single term (eff@far<=1% 0.9336 vs base 0.9231; far@eff0.99 0.356 vs 0.633) and occ+fork is the overall heavy winner (0.225). Also occupancy's F4 T-scaling limit must land in the forecast sections, not be omitted.",
+   "suggested_action": "Tighten to something like 'each helps, but for a different reason than its classical reputation suggests \u2014 and neither can be judged separately from the refit', and make sure the occupancy section this points to carries the F4 caveat (in-matrix occupancy is a low-T technique: 0.9905 at T=200 collapsing to 0.003 at T=1000).",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1186,
+   "quote": "The verdict there reverses: what destroys the degree-one filter turns out to be the single most helpful operator modification in the study once the polynomial is allowed to follow it.",
+   "kind": "tension",
+   "why": "F4: in-matrix occupancy is a low-T technique \u2014 eff@far<=1% moderate collapses 0.9905 (T=200) -> 0.952 (400) -> 0.022 (700) -> 0.003 (1000), span lambda_max ~ 4*alpha*(max hit degree) \u2014 so an unqualified 'single most helpful ... in the study' now over-claims once the density scan is in the study. F5: at heavy the best quantum far@eff0.99 is occupancy+fork (0.225), not occupancy alone (0.356); occ alone tops the ranking only at moderate (0.9905). 'Single most helpful' is defensible for a single modification but reads as unconditional.",
+   "suggested_action": "Scope the sentence minimally, e.g. '...the single most helpful operator modification in the study at this multiplicity once the polynomial is allowed to follow it' and extend the existing forward reference: '...returns to the occupancy term with exactly that machinery, and section X bounds its reach in track count' (plus, if desired, a clause noting that at heavy noise its combination with the fork term does best). Keeps the closing paragraph's structure intact.",
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})"
+  },
+  {
+   "line": 1130,
+   "quote": "the in-matrix occupancy term at $\\alpha=0.3$ does exactly what Denby promised",
+   "kind": "wording-risk",
+   "why": "F3: the new study's operating knob is alpha=0.05 (alpha=0.10 identical at ~2x degree), and F4's span mechanism (lambda_max ~ 4*alpha*max-degree) is why large alpha is costly. The paper does resolve this downstream (sec:fit:occ line 1541: 'alpha=0.05 beats the classically-motivated alpha=0.3'), but within this section alpha=0.3 is presented without a hint that it is the classically-motivated value, not the study's operating point \u2014 a reader carrying alpha=0.3 forward mis-reads the refit results.",
+   "suggested_action": "Add two words: 'at the classically natural $\\alpha=0.3$' (or a parenthetical '(the refit study will land on a smaller coupling)'), matching the 'classically-motivated' phrasing sec:fit:occ already uses. No numbers change.",
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})"
+  },
+  {
+   "line": 1228,
+   "quote": "Every fork result below carries these retunes; a window-violating control ($\\beta=0.5$ at $\\gamma=3$) is kept in the study to show they matter.",
+   "kind": "tension",
+   "why": "The Efficiency Frontier fork results (F5: fork beta=0.5 moderate fitted 0.9802 @ far<=1%; heavy occ+fork far@eff0.99 = 0.225) run at the study default gamma=3 (fact-sheet header; F5 states no other gamma) with a per-operator refit polynomial, not the retuned cosine comb. Once integrated, 'every fork result below carries these retunes' is false, and beta=0.5 at gamma=3 is no longer only a 'window-violating control' \u2014 it is the setting of the new headline fork numbers. The one-period condition the paper invokes is a property of cosine-family filters; a refit polynomial need not satisfy it.",
+   "suggested_action": "Scope the sentence to the comb response: 'Every comb-based fork result below carries these retunes', and append a clause that the fitted responses of section~\\ref{sec:fit} are refit directly on the measured shifted spectrum at the production $\\gamma=3$, which sidesteps the one-period condition; keep the gamma=3 comb run as the control it is.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1224,
+   "quote": "At heavy $T=200$ the measured requirement is $\\gamma^*\\approx3.4$ at $\\beta=0.5$ and $\\approx4.4$ at $\\beta=1$.",
+   "kind": "wording-risk",
+   "why": "Reads as a binding requirement on all fork operation, but F5's heavy winner (occ+fork, far@eff0.99 = 0.225) and moderate fork win (0.9802) were obtained at gamma=3 < gamma* with refit responses. A reader will ask how the new results can sit below the stated requirement.",
+   "suggested_action": "Add 'for the cosine-comb response' (or equivalent) so gamma* is explicitly a property of the comb filter family, not of the fork operator.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1216,
+   "quote": "Adding a positive semi-definite coupling widens the spectrum, and the solver imposes two validity conditions with closed forms.",
+   "kind": "tension",
+   "why": "The paragraph presents spectrum widening as fully manageable by rigid gamma retunes. F4 shows the occupancy co-hit span grows as ~4*alpha*(max hit degree) with multiplicity (measured 143 @ T=700, 202 @ T=1000) and defeats any fixed-degree response (resolution ~ span/d) regardless of gamma: eff@far<=1% falls 0.9905 -> 0.952 -> 0.022 -> 0.003 from T=200 to 1000. In a section titled 'the moving spectrum', silence on this leaves the false impression that retuning always restores validity AND performance.",
+   "suggested_action": "After the closed forms, add one sentence: the retunes keep the response inside its validity window but cannot restore resolution when the added term's span itself grows with occupancy \u2014 forward-reference the T-scan / metrics-vs-T figure where the occupancy span mechanism (F4) is shown.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1207,
+   "quote": "Unlike the occupancy term, the fork is surgical where it matters.",
+   "kind": "wording-risk",
+   "why": "'Surgical where it matters' vs occupancy reads as a performance verdict. F3/F5 rank moderate as occ alone 0.9905 > occ+fork 0.9867 > fork alone 0.9802 > base 0.9783: the blunter occupancy term is the moderate winner precisely because its broad co-hit touch breaks the twin isomorphism (twin fraction 2.7%->0.76%). Sparsity (~2% of segments touched) is true; superiority is not.",
+   "suggested_action": "Keep the sparsity fact but decouple it from merit, e.g. 'the fork is sparse and surgical \u2014 a structural contrast, not a performance ranking; section~\\ref{sec:fit} shows the blunter occupancy term wins at moderate noise while the combination wins at heavy.'",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1278,
+   "quote": "on the fork system the circuit reads false rate $0.96$ where the exact evolution reads $0.73$",
+   "kind": "wording-risk",
+   "why": "0.73 is an exact-evolution false rate on the fork system under the unrefitted production comb \u2014 exactly the setting F5 identifies as the source of the retracted 'fork no-go at heavy'. After F5's numbers are integrated (heavy occ+fork far 0.225; fork redeemed with refit), a reader can mistake 0.73 for the fork system's actual performance.",
+   "suggested_action": "Add a parenthetical that both numbers sit at the unrefitted-comb working point and serve only as the circuit-vs-exact arbiter; the fork system's refit performance is given in section~\\ref{sec:fit}.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1279,
+   "quote": "on the erf kernel removing the product formula alone collapses the false rate from $0.83$ to $0.22$ at moderate noise",
+   "kind": "wording-risk",
+   "why": "0.22 is the pre-refit efficiency-first number. F7's refit erf at moderate reaches far<=1% at eff 0.9847-0.9853, so 0.22 must not be read as the erf kernel's moderate performance; F7 also shows the erf reverses at heavy (far@eff0.98 = 0.350), which the heavy panel of this figure adjoins without comment.",
+   "suggested_action": "Mark 0.83->0.22 explicitly as unrefitted-comb arbiter numbers (same parenthetical as the fork pair), and let the refit erf story \u2014 moderate second-best, heavy collapse \u2014 live in section~\\ref{sec:fit}.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1296,
+   "quote": "(a) False rate at the efficiency-first working point: exact evolution against the implemented product-formula circuit and the classical baseline",
+   "kind": "wording-risk",
+   "why": "The figure includes heavy noise, and F11 warns heavy is strongly bimodal per rep \u2014 per-rep dots, never means. If panel (a) shows mean false rates at heavy, it conflicts with the presentation convention the new results establish; it also uses the efficiency-first convention that line 1249-1252 says is abandoned from sec:fit onward, which is internally consistent here but should be stated in the caption.",
+   "suggested_action": "When regenerating for the baseline check, show heavy as per-rep dots (or add a caption note that heavy means mask bimodality), and note in the caption that efficiency-first is used here only because it predates the matched-efficiency convention of section~\\ref{sec:fit}.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1492,
+   "quote": "about $2\\%$ of \\emph{true} segments, a couple of dozen per event, counted directly and consistently on all three events, are spectral twins of the false motifs",
+   "kind": "tension",
+   "why": "F3's new fingerprint census (K-probe amplitude agreement = graph isomorphism, F1) measures the twin fraction of true segments at heavy base-A as 87%, falling to 1.3% under occupancy (moderate: 2.7% -> 0.76%). The paper's ~2% counts only the exactly-degenerate pair-line hit-drop fragments \u2014 defensible as a different (stricter) criterion, but once the 87% number is integrated the two counts will read as contradictory.",
+   "suggested_action": "Qualify the 2% as the exactly-degenerate pair-line fragment population that binds the 1% efficiency budget, and when the fingerprint census lands add one sentence distinguishing the broader isomorphism-test twin fraction (87% heavy -> 1.3% with occupancy) from this exact-fragment count.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1477,
+   "quote": "while the classical solver on the same fork system reads $0.292$",
+   "kind": "tension",
+   "why": "Here (heavy, matched eff) the fork appears to hurt the classical baseline (0.463/0.292 vs 0.124 on base). F6's new moderate result is the opposite: the fork rescues classical, eff@far<=1% 0.49 -> 0.97, by breaking the threshold degeneracy. Both can be true (different regime and metric), but integrating the moderate results without a qualifier creates an apparent contradiction.",
+   "suggested_action": "Add one clause noting the regime dependence: at heavy the fork degrades the classical matched-eff false rate, while at moderate it rescues the classical solver outright (0.49 -> 0.97 eff at far<=1%) by lifting the threshold degeneracy.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1511,
+   "quote": "event, and the next subsection shows an operator that removes it.",
+   "kind": "wording-risk",
+   "why": "F5/F11: at heavy no operator makes eff=0.99 affordable \u2014 occupancy alone leaves far@eff0.99 = 0.356 and the best combination (occ+fork) 0.225, vs base 0.633. Occupancy lifts the twin degeneracy (F3) but 'removes it' at heavy overstates; full removal shows only at moderate (occ far@eff0.99 = 0.0102, F3).",
+   "suggested_action": "Soften to 'an operator that breaks the degeneracy behind it', and in sec:fit:occ state that at heavy the eff=0.99 wall is lowered, not abolished (0.633 base -> 0.356 occ -> 0.225 occ+fork), with the clean removal reserved for the moderate regime (0.0102).",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1559,
+   "quote": "The fragment floor of section~\\ref{sec:fit:floor} is therefore a property of the \\emph{base} Hamiltonian, not of the problem.",
+   "kind": "wording-risk",
+   "why": "F9: the far<=1% frontier closes between T=700 and T=1000 for EVERY operator (best far@eff0.99 ~ 0.83-0.92 at T=1000, all set-outs; n_F/n_T grows ~ T). At high multiplicity the flood IS a property of the problem for every operator tried. 'Not of the problem' is correct at T=200 but reads as an unbounded claim the composition-wall result will contradict.",
+   "suggested_action": "Scope the sentence to the studied multiplicity ('at this multiplicity, a property of the base Hamiltonian') and add a forward reference to the composition-wall result when it is integrated.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1562,
+   "quote": "One engineering note: the degree budget that collects the occupancy win is larger than the base system's (the span costs resolution; most of the gain arrives by degree $80$--$160$ at $\\alpha=0.05$).",
+   "kind": "wording-risk",
+   "why": "The occupancy subsection presents the win with no T-scaling limit. F4: eff@far<=1% at moderate collapses 0.9905 (T=200) -> 0.952 (400) -> 0.022 (700) -> 0.003 (1000), because the co-hit span lambda_max ~ 4*alpha*(max hit degree) grows with occupancy (measured 143 @ T=700, 202 @ T=1000) and fixed-degree responses lose resolution ~ span/d. The section's own span argument (line 1543, '6.7 -> 43 -> 242') is exactly this mechanism, so the omission will read as contradiction once the metrics-vs-T figure lands.",
+   "suggested_action": "Extend this engineering note with one sentence: the span grows with the maximum hit degree, which grows with T, so in-matrix occupancy at fixed degree is a low-multiplicity technique \u2014 the T-scan quantifies the collapse.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1422,
+   "quote": "numbers are means over three events, heavy noise, $T=200$.",
+   "kind": "wording-risk",
+   "why": "F11: heavy is strongly bimodal per rep \u2014 per-rep dots, never means. The table and captions (lines 1434, 1458, 1580) headline three-event means; the section itself demonstrates the bimodality (the floor-bound event at 0.654 vs the others), so means blur exactly the structure the new results emphasize.",
+   "suggested_action": "Keep the table but add the per-event spread (or a bimodality note) to the caption, and present any newly integrated heavy numbers as per-rep dots, matching fig:occfit(b)'s existing per-event style.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1668,
+   "quote": "Building that single fixed response, and measuring what its wider passes cost against the per-event ceiling of section~\\ref{sec:fit}, is the programme's clear next step.",
+   "kind": "tension",
+   "why": "F1 proves the response axis on base A is exhausted (ceiling ~0.973-0.978, deficit 100% L1 spectral twins) and F2/F3/F5 show the productive axis is the operator (occupancy 0.9905 @ far<=1% moderate; fork refit 0.9802; occ+fork best at heavy). Calling the fixed-response enumeration THE clear next step predates the frontier study; the study's headline is that the larger headroom is operator engineering, not response engineering.",
+   "suggested_action": "Keep the fixed-response programme but add one sentence: the frontier study (cross-ref new section) shows the per-event response ceiling is a twin floor no polynomial can pass, and the companion step with more headroom is modifying the operator itself (occupancy/fork with per-operator refit).",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1949,
+   "quote": "while the fork transfer and the band-plus-notch redesign behaved as the toy predicts",
+   "kind": "tension",
+   "why": "F5: the toy's fork prediction has changed \u2014 the earlier heavy no-go was an artifact of the unfitted production comb; with the response refit per operator, fork beta=0.5 beats base at moderate (0.9802 vs 0.9783) and occupancy+fork is the best quantum far@eff0.99 at heavy (0.225). If the Run-3 companion's fork transfer was matched against the old unfitted-comb prediction, this sentence is anchored to a superseded result.",
+   "suggested_action": "Verify which fork prediction the Run-3 companion matched. If the unfitted one, either qualify ('behaved as the toy's unfitted-comb measurement predicts') or re-anchor to the refit-redemption result of the new section.",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1659,
+   "quote": "The root positions are therefore universal ($s-1$ and $s\\pm\\sqrt2$ are motif properties, not event properties).",
+   "kind": "wording-risk",
+   "why": "F13: once the modified operators enter the paper, these specific positions hold only for the base Hamiltonian \u2014 occupancy shifts the pure-chain ladder verbatim (s -> s+4*alpha, delta -> delta+4*alpha), same-role false pairs pick up a 2*alpha off-diagonal and split from their twins, fork pairs gain +beta. A reader of the integrated paper could read 'universal' as operator-independent, which the new closed-form atlas contradicts.",
+   "suggested_action": "Insert 'on the base Hamiltonian' (or equivalent) and optionally note the positions shift closed-form under the added terms \u2014 which strengthens the universality claim rather than weakening it \u2014 with a cross-ref to the modified-atlas material.",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1657,
+   "quote": "the fit is mechanical: the roots land on the motif lines because that is where the false weight must sit",
+   "kind": "wording-risk",
+   "why": "F1: a measurable slice of false weight sits exactly ON the true positions (spectral twins, 2.7% of trues moderate, 87% heavy) and accounts for 100% of the residual deficit \u2014 no root placement reaches it. As written the sentence can be read as 'all false weight is root-separable at motif lines'. The subsection does cite the per-event ceiling, so this is phrasing, not error.",
+   "suggested_action": "Add a subordinate clause: '...where the separable false weight must sit; the remainder \u2014 the twin population of section [new L1-L3 budget] \u2014 sits on the true lines and no root reaches it.'",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1865,
+   "quote": "Combined with the metric-validated comb degree (12--20 suffices on the base Hamiltonians; the production $d=40$ is conservative)",
+   "kind": "wording-risk",
+   "why": "Consistent for base A (F1/F9/F11 confirm degree is not the bottleneck; d160 at heavy lands inside the fitted band 0.061-0.096). But the new material introduces operators where degree DOES bind: F4 \u2014 the occupancy term's spectral span grows as ~4*alpha*(max hit degree) (measured 143 at T=700, 202 at T=1000) so fixed-degree responses lose resolution ~span/d, and F3 \u2014 alpha=0.10 needs ~2x the degree of alpha=0.05. A reader who has just seen d=160 fits and the T-collapse of occupancy could read '12-20 suffices' against them.",
+   "suggested_action": "Add a qualifier: the modified operators of the new section need degree tracking their enlarged spectral span (occupancy at high T is the extreme case), so the 12-20 figure is a base-operator statement; the hit-oracle cost per call is unchanged, only the call count d grows.",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1609,
+   "quote": "I collect here, deliberately and in one place, everything that stands between the results above and a deployable algorithm.",
+   "kind": "wording-risk",
+   "why": "After integration, two new measured limitations exist that this section does not yet carry, so 'everything ... in one place' becomes false by omission: F4 \u2014 in-matrix occupancy is a low-T technique (eff@far<=1% moderate 0.9905 at T=200 -> 0.952 at 400 -> 0.022 at 700 -> 0.003 at 1000, span-vs-degree mechanism), and F9 \u2014 the composition wall: the moderate far<=1% frontier closes between T=700 and T=1000 for EVERY operator (n_F/n_T ~ T; best far@eff0.99 ~ 0.83-0.92 at T=1000), while clean stays solved at every T.",
+   "suggested_action": "Add one new subsection (e.g. 'Occupancy in $T$, and the composition wall') between the readout and dequantization subsections, carrying F4's T-ladder, the span mechanism, and F9's frontier closure with the metrics-vs-T figure; note clean remains solved at T=1000, d=40 (F9), and that heavy is bimodal per rep so per-rep dots, not means (F11).",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 2005,
+   "quote": "the response refitted to that measurement reads a false rate of $0.061$ at matched segment efficiency $0.97$ where the classical solver on the same events reads $0.124$, half the fakes at identical efficiency, on every event tested",
+   "kind": "tension",
+   "why": "F11: the new base fitted d160 point at heavy is far 0.0771 at matched-eff 0.98, and 0.061 is the optimistic edge of the XII fitted band 0.061-0.096 \u2014 quoting the band edge as the single number overstates. F11 also stresses heavy is strongly bimodal per rep (per-rep dots, never means), so 'on every event tested' is exposed; and the classical 0.124 predates the 2026-08-26 baseline fix (F10).",
+   "suggested_action": "Replace the single 0.061 with the band ('$0.061$-$0.096$ across fits, $0.0771$ at degree 160') or the d160 point; verify 0.124 against post-fix baselines; soften 'on every event tested' to per-rep phrasing consistent with the bimodal heavy distribution.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 2013,
+   "quote": "the fork system fits to $0.046$ at matched efficiency $0.97$ (against $0.061$ without the fork), and the occupancy system at small coupling $\\alpha=0.05$ fits to $0.039$, the best number in the study",
+   "kind": "wording-risk",
+   "why": "F5: once the new material lands, the best heavy quantum working point is occupancy+fork (far@eff0.99 = 0.225, vs occ alone 0.356, base 0.633), and at moderate the ranking is occ 0.9905 > occ+fork 0.9867 > fork 0.9802 > base 0.9783 \u2014 so 'the best number in the study' (occupancy alone) will read as contradicted by the new combined-term result, and the conclusion never mentions the combination. The refit-redemption framing itself is already present and matches F5's spirit; only the superlative and the missing occ+fork are at risk. F10 also puts a verify flag on 0.046/0.039 as pre-fix-era numbers.",
+   "suggested_action": "Scope the superlative ('the best single-term number at this operating point') and add one clause for the combination: 'and combining the two takes the eff-$0.99$ false rate at heavy from $0.633$ (base) to $0.225$'; re-verify 0.046/0.039 against post-2026-08-26 machinery.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 2023,
+   "quote": "on the base and fork systems they floor every solver at segment efficiency $\\approx0.98$: pushing to $0.99$ floods the selection back to a $\\approx0.65$ false rate for everything",
+   "kind": "wording-risk",
+   "why": "The base figure is confirmed (F5: base heavy far@eff0.99 = 0.633), but 'for everything' on 'the base and fork systems' collides with the new results: F5 shows the refitted fork system beats base at moderate and occ+fork reaches 0.225 at heavy eff 0.99, and F13's atlas gives fork pairs a +beta coupling that splits fork-pair twins \u2014 so the fork system is not simply floor-equivalent to base once refit.",
+   "suggested_action": "Scope the flood to the base system ('on the base system... $0.633$ for every response') and let fork's partial twin-breaking be stated via the new per-operator numbers (base 0.633 / occ 0.356 / occ+fork 0.225).",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 2028,
+   "quote": "the one event that was floor-bound at $0.654$ on the base system fits to $0.062$ on the occupancy system at the same matched efficiency",
+   "kind": "wording-risk",
+   "why": "The single-event 0.062 anecdote sits far below the new ensemble figures (F5: occupancy heavy far@eff0.99 = 0.356 ensemble; occ+fork 0.225) and F11 warns heavy is strongly bimodal per rep \u2014 a reader integrating the new ensemble numbers could read 0.062 as the typical occupancy gain and then see the 0.356 ensemble value as a contradiction.",
+   "suggested_action": "Mark it explicitly as one event of a bimodal population and add the ensemble anchor in the same sentence: '...fits to $0.062$ on the occupancy system (a single event; the heavy ensemble sits at $0.356$, and $0.225$ with the fork added)'.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 2033,
+   "quote": "a single fixed response for the whole event ensemble, on this toy an enumeration over the finite motif structure ... with the floor-breaking occupancy system folded in",
+   "kind": "tension",
+   "why": "F4: occupancy does not scale in T \u2014 eff@far<=1% falls 0.9905 (T=200) -> 0.952 (400) -> 0.022 (700) -> 0.003 (1000), because the co-hit term's spectral span grows ~4*alpha*(max hit degree) (143 @ T=700, 202 @ T=1000) and fixed-degree responses lose resolution ~span/d; F9: the moderate far<=1% frontier closes between T=700 and T=1000 for EVERY operator. Proposing occupancy folded into a single fixed ensemble response, with no T caveat, pre-contradicts both \u2014 the conclusion elsewhere celebrates T=1000 (item 1), so the reader will assume the fixed response is meant to hold there.",
+   "suggested_action": "Add one clause bounding the ambition: the occupancy term is a low-T technique (its spectral span grows with occupancy itself, ~4\\alpha times the maximum hit degree), so the fixed-response program is per-density-regime, and at moderate noise the far<=1% frontier closes for every operator between T=700 and T=1000.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  }
+ ],
+ "anchors": [
+  {
+   "line": 66,
+   "quote": "it is no longer a question of which algorithm inverts\n$A$, but of which function of $\\lambda$ separates true from false segments.",
+   "note": "The thesis statement of the reframing \u2014 the natural hook for the L1/L2/L3 loss-budget language (F1) and the degree scans: 'which function of lambda' is exactly the question the response-exhaustion proof closes on base A. A clause here can foreshadow that the question has a provable answer.",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 74,
+   "quote": "\\emph{fragment floor}, the small population of true fragments that are\nspectral twins of the false motifs and that, on that Hamiltonian, no\nfunction of $\\lambda$ can separate.",
+   "note": "Already states F1's conclusion; the ideal anchor to upgrade 'sharply defined' from empirical to proven \u2014 the fingerprinting/floor-theorem result (amplitude agreement across K probe responses = graph isomorphism) and the L1=100%/L2=0/L3=0 budget cross-reference here. Also the anchor for the erf-kernel contrast (F7: smallest twin floor 0.25% but L3=1.27%).",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 82,
+   "quote": "and, at small coupling, it breaks\nthe spectral-twin degeneracy behind the fragment floor: the floor is a\nproperty of the base Hamiltonian, not of the problem.",
+   "note": "Confirmed by F3 (twin fractions 2.7%->0.76% moderate, 87%->1.3% heavy) and the natural attachment point for the F13 closed-form modified atlas: occupancy on a pure chain acts as s->s+4alpha, delta->delta+4alpha (eq 7's ladder generalises verbatim) while same-role false pairs pick up the 2*alpha off-diagonal and split from their twins \u2014 that IS the mechanism this clause asserts, so the atlas math slots in as its derivation.",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 84,
+   "quote": "The bifurcation\n(fork) term behaves the same way, a regression under the clean-event comb\nand a net win under the refitted response.",
+   "note": "Cross-reference point for the F13 fork atlas (fork pairs get +beta coupling; B_fork subset of B_all so combined forked pairs carry 2*alpha+beta) and for the F5/F6 numbers (heavy-regime occ+fork winner, classical rescue).",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 86,
+   "quote": "The result is a two-part\ndesign rule: the operator shapes the spectrum, and the fitted response\nseparates it; neither knob can be evaluated without the other.",
+   "note": "The closing rule is F2 in prose; the sharpest available strengthening is F2's quantitative axis separation (the response buys efficiency at fixed far, 0.49->0.978; only the operator buys purity at fixed eff, 0.314->0.010) and F4/F9's completion of the rule in T (the metrics-vs-T figure and the composition wall between T=700 and T=1000 belong to this sentence's scope).",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 67,
+   "quote": "On clean events the answer is a four-line comb pinned to the eigenvalues of\na five-hit track",
+   "note": "Anchor for the F9 clean degree-scan result (solved at every T, d=40 suffices at T=1000) once the stale numbers on lines 68-69 are replaced.",
+   "section": "abstract+frontmatter (main.tex lines 1-92)"
+  },
+  {
+   "line": 152,
+   "quote": "the classical one at every efficiency below a floor that I can identify,\ncount, and explain segment by segment.",
+   "note": "Natural cross-reference point for the new L1/L2/L3 loss budget and the floor-theorem fingerprinting proof (F1). The claim can now be upgraded from 'identify, count, and explain' to 'prove': L1 spectral twins account for 100% of the base-A deficit, so no polynomial on the unmodified A can beat ~0.978. One added clause plus a forward \\ref to the comb/fit section carries it.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 144,
+   "quote": "perfectly up to the densities I can simulate ($T=1000$ tracks, four\nmillion segments), where the classical solver's false rate has climbed to",
+   "note": "The one place the intro already talks about density scaling \u2014 the natural hook for the new metrics-vs-T material and the F9 composition wall (clean solved at every T; the noisy far<=1% frontier closing between T=700 and T=1000 for every operator). A forward reference to the density-scan figure/section fits here without restructuring.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 167,
+   "quote": "This work is organised as follows. Section~\\ref{sec:toy} builds the toy\nmodel and the segment Hamiltonian from zero, including the exact\nactivation levels that make everything else quantitative.",
+   "note": "Roadmap sentence for sec:toy \u2014 the F13 closed-form modified atlas/ladder (s -> s+4*alpha shifts, fork +beta couplings, eq. 7 generalisation) extends exactly this blurb: '...including the exact activation levels, and how each added operator term shifts them in closed form'.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 175,
+   "quote": "Section~\\ref{sec:comb} designs and evaluates the line comb on clean\nevents, including its resource scaling and its provable limits.",
+   "note": "'Provable limits' is the ready-made slot for the floor theorem / fingerprinting argument (F1) and the degree scans (d=40 sufficing at T=1000 clean, F9); the roadmap wording already anticipates a proof, so the new material lands without changing the sentence.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 178,
+   "quote": "to each solver. Section~\\ref{sec:occupancy} dissects the occupancy\nterm's collision with the notch.",
+   "note": "Roadmap slot for the occupancy section \u2014 extend with its two new results: the alpha=0.05 refit win (F3) and the T-scaling failure with the lambda_max ~ 4*alpha*(max hit degree) mechanism (F4), plus the F13 ladder shift. One appended clause suffices.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 179,
+   "quote": "term's collision with the notch. Section~\\ref{sec:fork} introduces the\nfork term and the design rule that every operator change demands a\nresponse refit.",
+   "note": "Roadmap slot for the fork section \u2014 the design rule stated here is exactly F5's refit-redemption method (fork beta=0.5 fitted 0.9802 > base 0.9783 at moderate; occ+fork best at heavy, far@eff0.99 0.225) and F6's classical rescue; the new fork numbers and the F13 +beta coupling attach here.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 181,
+   "quote": "response refit. Section~\\ref{sec:fit} fits the polynomial to the\nmeasured false pile-up and presents the main comparison, including the\nrefitted occupancy result.",
+   "note": "The main-comparison slot: the matched-efficiency working-point tables (F2 response-independent flood, F3 occupancy far@eff0.99 0.0102, F10 1BQF parity on the fixed baselines, F11 heavy per-rep dots) all belong under this sentence; mention the response-vs-operator axis separation ('the polynomial buys efficiency, only the operator buys purity') here.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 184,
+   "quote": "collects the limitations: realizability, the single-response question,",
+   "note": "The limitations list is where the two new hard limits go: the F9 composition wall (the moderate far<=1% frontier closing for every operator between T=700 and T=1000, n_F/n_T ~ T) and occupancy's low-T scope (F4). Adding two items to this comma-list requires no restructuring; 'the single-response question' also pairs naturally with the F1 proof that response engineering alone is exhausted.",
+   "section": "S1 Introduction (main.tex lines 93-197)"
+  },
+  {
+   "line": 233,
+   "quote": "Any segment classifier, classical or quantum, fights this composition before it fights anything else.",
+   "note": "Directly anticipates F9's composition wall (moderate far<=1% frontier closing between T=700 and T=1000, n_F/n_T ~ T). Natural place for a forward reference to the metrics-vs-T figure and the density-scan result.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 296,
+   "quote": "This is worth doing once in full, because these little closed forms are the vocabulary of every result in this work.",
+   "note": "The modified-operator atlas (F13) is literally more of this vocabulary; a one-clause extension here ('including the modified operators of section X') licenses appending the occupancy/fork closed forms to this subsection without restructuring.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 359,
+   "quote": "x_{\\rm outer}(m)=\\frac12-\\frac{r+r^{m}}{2\\,(1+r^{m+1})}, \\qquad r=2-\\sqrt3,",
+   "note": "This is eq. 7, which F13 says generalises verbatim under s -> s+4*alpha, delta -> delta+4*alpha. The derivation above it already keeps s and delta symbolic (bar x = delta/(s-2), r = (s-sqrt(s^2-4))/2), so the substitution drops straight in \u2014 worth displaying r as r(s) with 2-sqrt3 as the s=4 value so the modified ladder can cite the equation unchanged.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 372,
+   "quote": "Fragments are barely distinguishable from noise by amplitude alone; this innocent-looking fact returns as the fragment floor in section~\\ref{sec:fit}.",
+   "note": "This is the L1 (spectral-twin) leg of F1's L1/L2/L3 loss budget \u2014 the m=1 fragment at exactly 0.250 is a spectral twin of the isolated false segment. The forward reference could name the budget and the fingerprinting/floor theorem explicitly, and F3's twin-fraction numbers (2.7% -> 0.76% moderate under occupancy) hang off this sentence.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 476,
+   "quote": "\\item \\textbf{Stars} $K_{1,m}$ (one hit shared by $m$ segments of the same role): $\\lambda=s\\pm\\sqrt m$ plus $m{-}1$ copies of $s$.",
+   "note": "Same-role co-hit motifs are exactly where F13's occupancy 2*alpha off-diagonal lands (same-role false pairs split from their twins); the modified motif lines extend this enumerate item naturally.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 490,
+   "quote": "Motifs whose spectrum coincides with a true motif's are the exception, and they return in sections~\\ref{sec:comb:limits} and~\\ref{sec:fit} as the limiting factor.",
+   "note": "Anchor for F1's proof (amplitude agreement across K probe responses = graph isomorphism) and for F3's mechanism (the occupancy term breaks the isomorphism between true fragments and false motifs). One added clause can foreshadow that breaking these coincidences \u2014 not reshaping the response \u2014 is what the modified operators buy.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 271,
+   "quote": "the single most consequential experimental knob. It is set by a closed-form formula from the expected root-mean-square kink",
+   "note": "F8's epsilon-shrink no-go (s=1.5 strips couplings, twin fraction 14.45%, eff collapses to 0.866-0.890) is the empirical payoff of the 3-sigma margin defended here; a forward reference to the shrink no-go would justify the formula epsilon used throughout the new study.",
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)"
+  },
+  {
+   "line": 540,
+   "quote": "each application of the filter buys exactly one zero of the response, and the 1BQF spends its one zero on the largest false population in the problem.",
+   "note": "The accounting-rule language generalises directly to the L1/L2/L3 loss budget of the frontier study: zeros pay for separable populations (L2 ripple, L3 overlap), while L1 twins are invisible to any zero. Natural place to seed the budget vocabulary or forward-reference the budget figure.",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 560,
+   "quote": "a degree-one response owns one zero, a degree-$d$ response owns $d$, and the noisy-event false spectrum demands more than one.",
+   "note": "The section's thesis sentence \u2014 the single cheapest integration point for the response-exhaustion result (F1) and the two-axes separation (F2): one appended clause turns the degree story into the full response-vs-operator story without restructuring.",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 601,
+   "quote": "its own \\emph{efficiency-first working point} (dashed verticals): the threshold just below the 1\\% quantile of that solver's true amplitudes, so that $99\\%$ of true segments survive by construction",
+   "note": "This is exactly the matched-eff working-point convention (far@eff0.99 / eff@far<=1%) every frontier number is quoted at. The new sections should cite this definition (\"the efficiency-first working point of section~\\ref{sec:onebit}\") rather than re-define it \u2014 terminology already unified.",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 635,
+   "quote": "Classical outer activation climbs eq.~\\eqref{eq:ladder} toward $0.366$ (above $\\tau$)",
+   "note": "eq:ladder (line 361) and fig:ladder are the base-operator chain atlas that F13's closed-form modified atlas generalises verbatim (occupancy: s->s+4*alpha, delta->delta+4*alpha on pure chains; fork pairs +beta; same-role false pairs pick up the 2*alpha off-diagonal and split from their twins). The modified ladder can be presented as a direct companion to this equation/figure.",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 648,
+   "quote": "The 1BQF is, precisely, the statement that unconnected fakes are exactly removable; everything in this work beyond section~\\ref{sec:qsvt} is about the connected ones.",
+   "note": "The section's hand-off sentence. It already frames the rest of the paper as the connected-false problem; extending it by one clause (\"...and, ultimately, about the connected ones that imitate true fragments exactly\") lets it launch the twin/operator-modification narrative and the metrics-vs-T composition-wall material without touching the section arc.",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 581,
+   "quote": "modes (eq.~\\eqref{eq:p4lines}) sit symmetrically about $s$",
+   "note": "eq:p4lines (line 470) is the true-line atlas; the earlier text at line 485 already notes false lines interleave it. The F13 modified-operator line atlas slots in as the same kind of object, and cross-references here keep the atlas lineage explicit.",
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)"
+  },
+  {
+   "line": 680,
+   "quote": "Rescale the Hamiltonian affinely so its spectrum fits in $[-1,1]$: $X=(A-c_0 I)/c_1$ with $c_0$ the spectrum centre and $c_1$ slightly more than its half-width",
+   "note": "The single entry point for all modified operators (F13): occupancy, fork, and combinations enter the identical construction with only c_0, c_1 changed. This is also where F4's mechanism lives \u2014 occupancy inflates c_1 (span 143 at T=700, 202 at T=1000), so after rescaling a fixed-degree comb's features shrink ~ span/d. One sentence here can carry the whole modified-operator hand-off without restructuring.",
+   "section": "S4 QSVT construction (main.tex lines 664-779)"
+  },
+  {
+   "line": 682,
+   "quote": "The implementation pads the user-supplied spectral bounds by a few percent; an early campaign bug taught us that the polynomial's fit domain must exceed the padded bounds or the constructor rightly refuses.",
+   "note": "The refit-per-operator method (F5) exercises exactly this fit-domain machinery for each modified A; the measured co-hit spans (F4) are the concrete numbers this footnote's bounds machinery had to absorb. Natural place for a forward \\ref rather than new text.",
+   "section": "S4 QSVT construction (main.tex lines 664-779)"
+  },
+  {
+   "line": 740,
+   "quote": "The 1BQF is recovered, exactly, as the $d=1$ row of this table ($\\cos$ is $T_1$ of the appropriately rescaled operator), which is the formal content of the claim that this work continues rather than replaces its predecessors.",
+   "note": "The formal hook for F10's parity result: 1BQF and QSVT compared on matched events and matched machinery (the matched Chebyshev-cosine reference at heavy) is the empirical companion of this d=1 identity. A \\ref from the parity table back to this sentence closes the loop.",
+   "section": "S4 QSVT construction (main.tex lines 664-779)"
+  },
+  {
+   "line": 746,
+   "quote": "Simulation-side, eq.~\\eqref{eq:walkcheb} gives a matrix-free evaluator: $p(A)\\mathbf{b}$ by the Chebyshev three-term recursion on sparse matrix-vector products, $\\mathcal{O}(d\\cdot{\\rm nnz}(A))$ flops.",
+   "note": "The degree scans (d up to 160) and the added terms both price directly here: occupancy adds co-hit couplings and fork adds B_fork entries to nnz(A), and refit degree multiplies the flop count. The cost statement generalises verbatim to the modified operators \u2014 worth saying so in half a sentence.",
+   "section": "S4 QSVT construction (main.tex lines 664-779)"
+  },
+  {
+   "line": 754,
+   "quote": "All large-$T$ results below use this exact evaluator; nothing in this work relies on an approximate simulation of the quantum readout.",
+   "note": "Already-written umbrella for the new T=400-1000 density-scan results and the metrics-vs-T figure (F4, F9): the new figures inherit this exactness guarantee with no edit, and this sentence is where a \\ref to the T-scan figure naturally lands.",
+   "section": "S4 QSVT construction (main.tex lines 664-779)"
+  },
+  {
+   "line": 774,
+   "quote": "The quantum content of this work is this resource profile; the response functions themselves are classically simulable by the same recursion, and I return to what that does and does not concede in section~\\ref{sec:limits:dequant}.",
+   "note": "Where F4's 'in-matrix occupancy is a low-T technique' becomes a resource-profile statement (holding resolution forces d proportional to span, inflating depth), and consistent with F12's scope (every number a property of p(A) plus the operator). A forward \\ref to the occupancy T-scaling discussion fits the existing hand-off pattern.",
+   "section": "S4 QSVT construction (main.tex lines 664-779)"
+  },
+  {
+   "line": 815,
+   "quote": "Degree, width, and line spacing are one budget, and this is the budget the noisy events of section~\\ref{sec:fit} will re-open.",
+   "note": "Direct hook for the new degree scans and the L1/L2/L3 loss budget \u2014 the 'budget' metaphor is already in place; a parenthetical can name the three losses (twins, ripple, threshold overlap) that the re-opened budget decomposes into.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 813,
+   "quote": "no narrower than $\\approx 2W/d$ on a domain of half-width $W$",
+   "note": "The Chebyshev resolution law that F4's occupancy-in-T mechanism reuses (resolution ~ span/d with lambda_max ~ 4*alpha*maxdeg, measured 143 @ T=700, 202 @ T=1000); cross-reference here when explaining why in-matrix occupancy is a low-T technique.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 905,
+   "quote": "fragments are a spectral floor \\emph{on this Hamiltonian}, the first appearance of the twin obstruction that section~\\ref{sec:fit} meets at full strength, and that section~\\ref{sec:fit:occ} shows an operator modification can lift.",
+   "note": "The section already carries the operator-modification redemption framing \u2014 this is the natural forward-reference point for F3 (occupancy breaks the isomorphism, twin fraction 2.7%->0.76% moderate, 87%->1.3% heavy) and for the F13 closed-form atlas (occupancy on a pure chain = s->s+4alpha, delta->delta+4alpha; same-role false pairs pick up the 2alpha off-diagonal and split from their twins).",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 965,
+   "quote": "The consequence is the \\emph{floor theorem}: for every function $f$, $f(A)\\mathbf{b}$ assigns twin clusters identical amplitudes",
+   "note": "Foundation of F1's response-exhaustion proof (fingerprinting: amplitude agreement across K independent probe responses = graph isomorphism). One sentence here can promote the theorem from ceiling to exact accounting: at moderate T=200 the twin floor is 100% of the base-A deficit (L1=100%, L2=L3=0).",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 981,
+   "quote": "but they are the true ceiling of the design, and under noise they return, as a population, in section~\\ref{sec:fit}.",
+   "note": "Natural place to quote the new twin-population numbers (2.7% of true segments at moderate, 87% at heavy on base A; F3) and to trail the L1-L3 budget figure.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 930,
+   "quote": "And the degree axis is not monotonic: intermediate degrees ($d\\approx20$--$32$) can cliff at the efficiency-first working point",
+   "note": "Anchor for the new degree scans (base fitted d160 at heavy: far@matched-eff0.98 = 0.0771 inside the fitted band 0.061-0.096; F11) \u2014 the 'every production degree must be validated' rule is the same discipline the new scans follow.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 1007,
+   "quote": "The production comb is optimal up to provable exceptions, and further progress must come from changing the operator or leaving the spectral domain, which is exactly where the rest of this work goes.",
+   "note": "The launch sentence for the entire new study: F1 (response exhaustion proves the 'optimal up to provable exceptions' clause on base A), F2 (the axes separate \u2014 polynomial buys efficiency, only the operator buys purity: 0.314->0.010 at eff 0.99), F5 (fork), and the F13 modified atlas all hang off this sentence; it can absorb a one-line forward-reference without restructuring.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 993,
+   "quote": "this is the floor theorem, and under noise it becomes the fragment floor of section~\\ref{sec:fit}.",
+   "note": "Figure fig:twins caption already forward-references sec:fit; the new material's fingerprinting figure can be cited alongside, keeping the twin-pair drawing as the canonical illustration.",
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)"
+  },
+  {
+   "line": 1022,
+   "quote": "The acceptance width is the story. At $\\varepsilon=2$\\,mrad a false segment rarely finds an angular partner; at $6.3$\\,mrad the compatibility graph fills with small false structures.",
+   "note": "Natural point to forward-reference the epsilon-shrink no-go (F8): the reflex cure 'narrow epsilon back' fails \u2014 s=1.5 strips couplings and converts trues into twins (14.45% twin fraction, eff collapse to 0.866-0.890) \u2014 which motivates operator terms as the only remaining knob.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1034,
+   "quote": "Every spectral statement in sections~\\ref{sec:occupancy}--\\ref{sec:fit} is exact, not approximate.",
+   "note": "Anchor for the closed-form modified atlas/ladder (F13): per-component exact diagonalisation is precisely what validates the analytic line shifts under added terms (occupancy on pure chains: s -> s+4*alpha, delta -> delta+4*alpha verbatim in eq 7's ladder; same-role false pairs pick up the 2*alpha off-diagonal and split from their twins; fork pairs +beta; combined 2*alpha+beta). One sentence here can promise that the modified spectra remain exactly computable and closed-form.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1050,
+   "quote": "Spectrally, this population lands exactly where the motif dictionary of figure~\\ref{fig:motifs} says it must: ... the pair line $s-1$ and the triple lines $s\\pm\\sqrt2$",
+   "note": "The load-bearing sentence the modified-operator atlas generalises: the F13 math says exactly how these dictionary lines MOVE under occupancy (+4*alpha diagonal shift, 2*alpha same-role splitting) and fork (+beta), i.e. how the terms un-twin the motifs. The new atlas material should cross-reference fig:motifs and this pile-up discussion directly.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1028,
+   "quote": "\\textbf{There is no giant tangle.} The compatibility graph at heavy $T=200$ splits into $869$ nontrivial connected components of at most $17$ segments",
+   "note": "Anchor for the composition wall / metrics-vs-T figure (F9): the benign small-motif picture is a T=200 property \u2014 n_F/n_T grows ~T and the far<=1% frontier closes for every operator between T=700 and T=1000. A scoped forward reference here ('at this T; section X shows how this picture degrades with multiplicity') integrates the density scan without restructuring the enumerate.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1094,
+   "quote": "The important statement here is the diagnosis: at heavy noise all three solvers fail for the same reason, a false population that has moved onto spectral lines the designs were never told about",
+   "note": "Anchor for the L1-L3 loss budget and the degree scans (F1): the budget is the quantitative version of this diagnosis \u2014 it says how much of the failure the refit can recover (L2 ripple, L3 threshold overlap) versus what only the operator can touch (L1 twins = 100% of the base-A deficit). The refit-vs-operator two-axis statement (F2) also slots here.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1099,
+   "quote": "The classical literature also offers two Hamiltonian terms as candidate cures, occupancy and bifurcation. The next two sections take them in turn",
+   "note": "The hand-off sentence for all the new headline results: F3 (occupancy 0.9905 moderate / heavy twin collapse 87%->1.3%), F4 (the T-scaling limit that must accompany occupancy), F5 (fork redeemed with refit; occ+fork best at heavy, 0.225), F6 (fork rescues classical), and F13's combined-term coupling (B_fork subset of B_all, 2*alpha+beta). Whatever ordering the new sections take, this sentence is where the forecast must match them.",
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})"
+  },
+  {
+   "line": 1117,
+   "quote": "A_{\\rm occ}=A+4\\alpha I+2\\alpha B_{\\rm all},\\qquad \\mathbf{b}\\to\\mathbf{b}+4\\alpha\\mathbf{1},",
+   "note": "eq:occ is the hook for the F13 modified-atlas math: B_fork is a subset of B_all, so the combined operator's forked pairs carry 2*alpha+beta off-diagonal \u2014 state the composition rule directly off this equation when the fork section's combined operator is introduced.",
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})"
+  },
+  {
+   "line": 1123,
+   "quote": "Consecutive segments of one track share their interior hit in opposite roles and are not coupled.",
+   "note": "Exactly the pure-chain fact F13 needs (pure chains carry no same-role co-hit pairs); the natural place to add that occupancy therefore acts on a pure chain as s -> s+4*alpha, delta -> delta+4*alpha, so the ladder of eq.~\\eqref{eq:ladder} (line 361) generalises verbatim, while same-role false pairs pick up the 2*alpha off-diagonal and split from their twins.",
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})"
+  },
+  {
+   "line": 1124,
+   "quote": "The isolated attractor moves to $(\\delta+4\\alpha)/(\\gamma+\\delta+4\\alpha)$ and the threshold tracks it.",
+   "note": "Already the first rung of the generalised closed-form atlas \u2014 the F13 ladder statement extends this sentence into the full atlas without any restructuring; it also confirms the section does not pre-contradict the planned addition.",
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})"
+  },
+  {
+   "line": 1141,
+   "quote": "On the benchmark event the co-hit false bulk, notched to amplitudes $\\sim10^{-19}$ under the base Hamiltonian ($99\\%$ of it below $10^{-17}$), re-emerges under $A_{\\rm occ}$",
+   "note": "The spectral restatement of this observation is F13's same-role false pairs splitting off the twin line under 2*alpha coupling \u2014 a one-clause cross-reference to the modified atlas would tie the amplitude picture to the closed-form level positions.",
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})"
+  },
+  {
+   "line": 1168,
+   "quote": "The mechanism generalises to any \\emph{fixed} response: a spectral filter earns its living from populations pinned to known eigenvalues, and any Hamiltonian term that couples a pinned population unpins it.",
+   "note": "Natural cross-reference to the L1-L3 loss-budget machinery (F1): the fixed-response failure here is the budget's language (pinned populations = L2/L3 collapse), while the refit gain in sec:fit:occ is an L1 (twin) story \u2014 one forward \\ref links the two vocabularies.",
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})"
+  },
+  {
+   "line": 1185,
+   "quote": "section~\\ref{sec:fit:occ} returns to the occupancy term with exactly that machinery.",
+   "note": "The closing forward-reference paragraph is where the new material's other forward pointers belong without restructuring: the twin-fraction/graph-isomorphism mechanism (F3: 2.7%->0.76% moderate, 87%->1.3% heavy), the T-ceiling and metrics-vs-T figure (F4), and the heavy occ+fork combination (F5).",
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})"
+  },
+  {
+   "line": 1203,
+   "quote": "A'=A+\\beta\\,B_{\\rm fork}(\\varepsilon_B),",
+   "note": "eq:fork is the natural hook for the F13 closed-form modified atlas: fork pairs gain +beta coupling, and since B_fork is a subset of B_all, combined (occupancy+fork) forked pairs carry 2*alpha+beta off-diagonal. The generalised ladder can be stated immediately after this equation or as a cross-ref to where eq 7's ladder is generalised.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1209,
+   "quote": "provably no pure-true chain carries a fork edge, so the true comb lines are $\\beta$-invariant.",
+   "note": "Direct anchor for F13's pure-chain lemma. The same argument (pure chains carry no same-role co-hit pairs) gives the occupancy counterpart \u2014 under occupancy the true lines shift rigidly s->s+4*alpha, delta->delta+4*alpha, while same-role false pairs pick up the 2*alpha off-diagonal and split from their twins. One sentence here contrasting beta-invariance with the alpha rigid shift ties the two terms into one atlas and cross-references the modified ladder.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1213,
+   "quote": "whether real solvers can collect that migration is settled in section~\\ref{sec:fit}.",
+   "note": "The forward reference where F5's redemption numbers land (fork beta=0.5 moderate fitted 0.9802 > base 0.9783; heavy occ+fork far@eff0.99 = 0.225, best quantum). The sentence needs no edit \u2014 it guarantees sec:fit must carry those results and the shallow-beta-optimum note (beta=1.0 -> 0.9796).",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1216,
+   "quote": "Adding a positive semi-definite coupling widens the spectrum, and the solver imposes two validity conditions with closed forms.",
+   "note": "Natural insertion point for F4's span-vs-T mechanism (occupancy span lambda_max ~ 4*alpha*max-degree: 143 @ T=700, 202 @ T=1000; fixed-degree resolution ~ span/d) and a forward-ref to the metrics-vs-T figure \u2014 the 'moving spectrum' of the section title is exactly this, moving with T as well as with beta/gamma.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1242,
+   "quote": "The correct procedure, used for every operator result in this work, is to measure the modified system's false pile-up and refit the polynomial",
+   "note": "Anchor for the L1-L3 loss budget (F1): the budget is the quantitative form of 'ask where the false weight now lives' (L1 spectral twins / L2 ripple / L3 threshold overlap), and F1's exhaustion proof (L1 = 100% of the base-A deficit; no p(A) on unmodified A beats ~0.973-0.978) is the theorem this doctrine culminates in. A cross-ref to the budget's definition/figure fits in this sentence.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1247,
+   "quote": "Carrying out that refit, for the fork and then for the occupancy term, is the subject of section~\\ref{sec:fit}.",
+   "note": "Anchor for the degree scans and the full operator ranking. Consider extending to '...for the fork, the occupancy term, and their combination' since occ+fork is the heavy winner (F5) \u2014 a two-word edit that pre-announces the new material without restructuring.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1249,
+   "quote": "at heavy noise the efficiency-first convention degenerates for an unrefitted comb, whose contaminated-true amplitudes collapse toward zero, so sections~\\ref{sec:fit} onward compare solvers at matched efficiency",
+   "note": "Already states the matched-efficiency convention the fact sheet uses (matched-eff working points, never fixed tau). Natural place to also plant F11's presentation rule \u2014 heavy is bimodal per rep, so per-rep dots, never means \u2014 as one appended clause.",
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)"
+  },
+  {
+   "line": 1349,
+   "quote": "comes from is therefore well posed and exactly answerable.",
+   "note": "The per-mode formation/content measurement is precisely the machinery the new L1/L2/L3 loss budget formalizes (F1: L1 twins = 100% of the moderate deficit, L2 ripple = 0, L3 overlap = 0); the budget decomposition cross-references naturally here.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1436,
+   "quote": "degree: production-scale degrees already realise the measured optimum (section~\\ref{sec:limits:realizability}).}",
+   "note": "Fig:fit(d)'s fixed-degree panel is the direct hook for the new degree scans (F11: d160 = 0.0771 inside the fitted band) and the exhaustion proof (F1: no p(A) on base A can beat ~0.973-0.978).",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1509,
+   "quote": "\\emph{those} Hamiltonians no function of $\\lambda$ can cross it,",
+   "note": "The floor-theorem fingerprinting proof (F1: proved, not scanned \u2014 probe-response agreement = graph isomorphism) upgrades this measured wall to a proof; cite the fingerprinting result here.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1521,
+   "quote": "coupling $2\\alpha B_{\\rm all}$ merges the compatibility graph into a giant component, so the exact per-component measurement behind",
+   "note": "Natural insertion point for the F13 closed-form modified atlas/ladder: occupancy on pure chains acts as s -> s+4*alpha, delta -> delta+4*alpha (no same-role co-hit pairs on pure chains), same-role false pairs pick up the 2*alpha off-diagonal and split from their twins, fork pairs get +beta, and combined forked pairs carry 2*alpha+beta (B_fork subset of B_all) \u2014 the analytic complement to the numerical coefficient-space fit described here.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1552,
+   "quote": "$0.062$. The mechanism is the floor theorem read in reverse: the",
+   "note": "This isomorphism-breaking mechanism paragraph is where F3's census numbers (twin fraction 2.7% -> 0.76% moderate, 87% -> 1.3% heavy) and the explicit 'it does NOT improve the response, it breaks the isomorphism' statement slot in, plus F2's axes-separation (polynomial buys efficiency, operator buys purity).",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1475,
+   "quote": "Second, the fork earns its keep, but only through the refit. On the",
+   "note": "The expanded fork results extend this paragraph without restructuring: beta is a shallow optimum (0.9802 @ beta=0.5 vs 0.9796 @ beta=1.0 at moderate), the moderate ranking occ > occ+fork > fork > base, and occ+fork as the best heavy quantum point (far@eff0.99 = 0.225) \u2014 F5.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1565,
+   "quote": "$80$--$160$ at $\\alpha=0.05$). Like every fitted result in this",
+   "note": "The engineering note is the seam for the degree-scan detail (F3: alpha=0.10 identical at ~2x the degree, making alpha=0.05 the operating knob) and the metrics-vs-T figure (F4 span measurements 143/202 at T=700/1000).",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1602,
+   "quote": "in my opinion the cleanest justification for the whole QSVT",
+   "note": "The root-budget coda gets its full-T empirical backing from F10 (QSVT beats every 1BQF cell at every T on matched events/machinery); a one-line cross-reference to the parity result closes the argument.",
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget"
+  },
+  {
+   "line": 1632,
+   "quote": "The measured discrimination of section~\\ref{sec:fit} is therefore available at circuit-affordable degree; nothing about the polynomial family was ever in the way, only the indirect two-step fit.",
+   "note": "Natural landing point for the L1-L3 loss budget (F1): the budget completes this post-mortem \u2014 the residual deficit on base A is 100% L1 spectral twins, 0% ripple, 0% threshold overlap, so realizability is not merely acquitted but the entire remaining gap is proved response-independent (floor-theorem fingerprinting / graph isomorphism).",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1654,
+   "quote": "The structures an event can contain are enumerable, chains, hubs, bridges and their contaminated combinations, each pinned to closed-form eigenvalue lines",
+   "note": "Exactly where the modified-operator atlas/ladder (F13) plugs in without restructuring: occupancy on a pure chain acts as s -> s+4*alpha, delta -> delta+4*alpha so eq 7's ladder generalises verbatim; same-role false pairs gain the 2*alpha off-diagonal and split from their twins; fork pairs gain +beta; B_fork subset of B_all gives 2*alpha+beta for combined forked pairs. One added sentence plus a cross-ref suffices.",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1738,
+   "quote": "evolution calls per shot & constant &",
+   "note": "The resource table's calls-per-shot row is where the degree-scan material cross-references: constant-in-T holds for the base comb at fixed d, but the modified operators' degree must track spectral span (F4), so a footnote or caption clause scoping this row to the base operator keeps the table honest once the new operators are in the paper.",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1878,
+   "quote": "And the erf-weighted kernel costs nothing extra, because the coupling weight is an arithmetic function of the kink angle the oracle already computes",
+   "note": "Natural extension point for pricing the new operators in the hit oracle: the occupancy term is a function of hit degree (which the hit-window enumeration already touches) and fork pairs come from the same shared-hit enumeration, so the hit-priced block encoding covers the modified Hamiltonians too \u2014 one sentence parallel to the erf one.",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1961,
+   "quote": "the measurement loop of section~\\ref{sec:fit} (measure the pile-up, fit the response, locate the floor) is geometry-agnostic even where the specific comb is not.",
+   "note": "Hook for the frontier study's method statement: the same loop run per operator (refit per operator, matched-eff working points \u2014 the method that redeemed the fork, F5) and per density (the metrics-vs-T figure, F4/F9) \u2014 a closing clause here can point at both new figures without restructuring the geometry subsection.",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 1636,
+   "quote": "A structural escape remains available on top: the same no-giant-component fact that made the spectrum measurable makes the problem block-diagonal.",
+   "note": "Secondary anchor: the composition wall (F9, n_F/n_T ~ T) and occupancy span (F4, driven by max hit degree \u2014 a local-occupancy quantity) are both statements about how the escape routes and the operator terms interact with event density; if the new density subsection is added, this per-cluster paragraph is the place it should cross-reference for the 'does clustering survive high T' question.",
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)"
+  },
+  {
+   "line": 2010,
+   "quote": "Judge every Hamiltonian modification together with the response fitted to it, never separately.",
+   "note": "Natural home for the L1/L2/L3 loss-budget result (F1: L1 spectral twins = 100% of the base-A deficit, L2 = L3 = 0) and the two-axes separation (F2: the polynomial buys efficiency at fixed far, only the operator buys purity at fixed eff) \u2014 the budget upgrades this item's lesson from heuristic to theorem, and the section's inline-number prose style absorbs it as one added sentence.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 2020,
+   "quote": "Spectral twins bound every function of $\\lambda$ on a fixed Hamiltonian, classical scoring included",
+   "note": "Anchor for the floor-theorem fingerprinting proof (F1: amplitude agreement across K independent probe responses = graph isomorphism) and the twin-fraction numbers (F3: 2.7%->0.76% moderate, 87%->1.3% heavy under occupancy) \u2014 the exact quantitative backing for this sentence.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 2027,
+   "quote": "the occupancy coupling embeds each motif in its hit-sharing neighbourhood, breaks the twin isomorphism",
+   "note": "Direct cross-reference point for the F13 closed-form modified atlas/ladder: on a pure chain occupancy acts as s -> s+4\\alpha, \\delta -> \\delta+4\\alpha while same-role false pairs pick up the 2\\alpha off-diagonal and split from their twins \u2014 the closed-form mechanism behind exactly this claim.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 2035,
+   "quote": "an enumeration over the finite motif structure (roots on the motif lines, passes wide enough for the contaminated spread) rather than a fitting problem",
+   "note": "The F13 modified atlas partly answers this stated open problem in closed form (eq 7's ladder generalises verbatim under occupancy; fork pairs get +\\beta; combined forked pairs carry 2\\alpha+\\beta) \u2014 the new math section should be cross-referenced here as the first step of the enumeration program.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 1997,
+   "quote": "$T=1000$ tracks from a $20.5\\%$ false rate",
+   "note": "Anchor for the metrics-vs-T figure and the composition wall (F9): clean solved at every T (0.9998 eff @ far<=0.1%, d=40) versus the moderate frontier closing between T=700 and T=1000 for every operator \u2014 the T-scan naturally extends this item's clean-event story.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  },
+  {
+   "line": 2046,
+   "quote": "handed us a false population parked on nameable eigenvalue lines, and a filter family with exactly enough roots to meet it",
+   "note": "Closing sentence pairs naturally with the degree scans (d=40 suffices clean, d160 at heavy) and F4's resolution ~ span/d law \u2014 'exactly enough roots' can be given its quantitative meaning here without restructuring.",
+   "section": "S11 Conclusion (main.tex lines 1982-2122)"
+  }
+ ],
+ "structure": [
+  {
+   "section": "abstract+frontmatter (main.tex lines 1-92)",
+   "notes": "Frontmatter arc: lines 1-38 preamble (packages, fancyhdr running heads 'Spectral filters for track finding' / 'G. W. Scriven', a theorem environment, and two semantic macros \\eff = varepsilon_seg and \\far = f_seg defined at lines 36-37 \u2014 note the abstract does NOT use them, spelling out 'segment false rate'/'efficiency' in words with inline $...\\%$ numbers, a convention any abstract edit should preserve); lines 40-49 title/author; lines 54-89 a single-paragraph abstract; line 91 TOC. The abstract has a strict seven-beat arc: (1) problem as linear system over segments, (2) lineage HHL -> 1BQF, (3) QSVT reframing ('which function of lambda'), (4) clean-event comb result with numbers, (5) noisy-event fitted polynomial + fragment floor, (6) operator modifications judged with the refit response \u2014 occupancy first, fork second, (7) closing two-part design rule. No \\\\ref, \\\\cite, \\\\eff/\\\\far, or figure references appear in the range (natbib and subcaption are loaded; \\\\graphicspath{{figures/}} at line 24 says figures live in figures/, relevant only to later sections). New material integrates without restructuring as clauses/sentences at the seams between beats: the F1 exhaustion proof and L1-L3 budget as a strengthening clause inside beat 5 (lines 73-76); the F4 T-scaling caveat as one sentence appended to beat 6's occupancy claims (after line 84's colon clause, before the fork sentence); the F13 closed-form atlas as a derivational clause on the 'floor is a property of the base Hamiltonian' claim; F2's quantitative axis split and the F9 composition wall as a strengthening of beat 7 (lines 86-88). All abstract numbers are implicitly at the T=200 working point except the clean T=1000 sentence \u2014 when the T-dependence results land, the abstract needs one explicit multiplicity qualifier so 'strongest configuration' and 'every matched efficiency' claims are scoped. The abstract is per F12 correctly silent on the post-selection gate; keep it that way."
+  },
+  {
+   "section": "S1 Introduction (main.tex lines 93-197)",
+   "notes": "Arc: (1) motivation \u2014 HL-LHC combinatorics, platforms survey (lines 96-102); (2) precise lineage \u2014 Nicotra et al. HHL, restricted-PE variant, 1BQF follow-up (104-118); (3) research questions culminating in 'what happens when the Hamiltonian changes' as the central physics question (120-132); (4) a three-item enumerate summarising the method 'fitting the response to the spectrum' \u2014 clean comb / noisy fit / operator-response coupling (137-164); (5) section roadmap in one paragraph (167-189); (6) style remark (191-195). Referencing conventions: \\\\cite{key} with ~ ties for literature; Section~\\\\ref{sec:...} capitalised at sentence starts, lowercase 'section~\\\\ref' mid-sentence (footnote line 123); first-person singular voice ('I answer', 'I can identify'); no figures or equations in the intro \u2014 numbers set inline in math mode ($T=1000$, $20.5\\\\%$); forward references only via the roadmap. Where the new material fits without restructuring: the enumerate is the headline-number surface, so F1-F3/F5 updates are in-place edits to items 2 and 3 (one clause each for the floor proof, the corrected occupancy factors, and the T-scaling caveat); the F13 atlas/ladder gets a clause in the sec:toy roadmap sentence (167-169); the degree scans and floor theorem slot under sec:comb's existing 'provable limits' phrase (175-176); the metrics-vs-T / composition-wall material attaches at the existing T=1000 density mention (144-146) and as added items in the sec:limits comma-list (183-188); F5/F6 fork numbers extend the sec:fork blurb (179-181). Nothing in the section's ordering needs to move; every fix is a sentence-level edit or an appended clause. Note the section already carries the refit-redemption framing for both Denby-Peterson terms (matching F3/F5), so integration is number-correction and scoping, not re-framing."
+  },
+  {
+   "section": "S2 toy model + Hamiltonian + atlas + spectrum (main.tex lines 198-508)",
+   "notes": "Arc: five subsections in strict pedagogical order \u2014 events (detector, noise triples, combinatorics eq. 1) -> Hamiltonian (energy eq. 2, linear system eq. 3, epsilon formula eq. 4) -> exact activation atlas (isolated attractor eq. 5, P4 levels eq. 6, full symbolic ladder derivation culminating in eq. 7, then the threshold-convention discussion around eq. 8/tau) -> metric definitions (an explicitly exhaustive itemize of eff/far/working points/AUC) -> spectrum (lambda(A)=s-mu(C), a three-family enumerate of motif eigenvalues, motif-dictionary figure). Referencing conventions: sections as section~\\ref{sec:...}, equations as eq.~\\eqref{...} (Equation~\\eqref{...} at sentence start), figures as figure~\\ref{fig:...}; figures are [t]-floats of PDFs with \\captionsetup{width=0.85-0.95\\textwidth}, didactic full-sentence captions, green=true / pink-red=false color convention; first-person singular voice; heavy use of promissory forward references (sec:noise, sec:fit, sec:comb:limits, sec:occupancy) that pay off later \u2014 new material should be introduced the same way, promised here and delivered in its own section. Integration without restructuring: (1) define the moderate noise triple beside heavy in sec:toy:events; (2) add the far-budget working point as a fourth bullet in sec:toy:metrics; (3) append the modified-operator atlas/ladder (F13) as a short continuation directly after eq. 7 \u2014 the derivation is already symbolic in s and delta, so occupancy is a two-line substitution \u2014 or as a compact new subsection after sec:toy:spectrum; (4) extend the spectrum enumerate/motif dictionary with the alpha/beta-shifted lines while scoping the rigid-reflection and 0/1-graph claims to the base operator; (5) hang the L1-L3 budget and floor-theorem cross-references off the existing fragment-floor (line 372) and spectral-coincidence (line 490) sentences. File: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex."
+  },
+  {
+   "section": "S3 one-bit filter (sec:onebit, lines 509-663)",
+   "notes": "Arc: (1) circuit -> single real response function, eqs. \\eqref{eq:onebitresponse} and \\eqref{eq:notch} (lines 514-545), closing with the one-zero accounting rule; (2) geometry made visible in the two-panel fig:responses, 1BQF cosine vs degree-40 comb over the populated spectrum, culminating in the thesis sentence at 558-561; (3) subsection \\\"What the notch cannot do\\\" with two consequences: (a) true-amplitude reshaping / endpoint halving (0.364->0.258), which motivates and defines the efficiency-first working-point convention used for ALL quantum headlines (fig:threshold on the stored T=400 clean event, fig:ladder), and (b) coupled falses pass, the hand-off sentence at 648-650; (4) a short success-probability paragraph deferring resources to sec:comb:resources via a footnote. Referencing conventions: equations as eq.~\\eqref{eq:...} (Equation~\\eqref{} at sentence start), figures as Figure~\\ref{fig:...} opening a paragraph, sections as section~\\ref{sec:...} lowercase mid-sentence; heavy use of forward references (\\\"section~\\ref{sec:comb} quantifies this\\\"); figures are [t] floats, \\captionsetup{width=...} + \\includegraphics of PDFs, with long discursive captions that restate the argument self-containedly; first-person singular voice (\\\"why I defer\\\"). Integration without restructuring: the new material belongs downstream, and this section only needs (i) a forward-reference clause at the thesis sentence (line 560-561) and optionally at the hand-off (650) pointing to the frontier section; (ii) the modified atlas/ladder (F13) referenced as a generalisation of eq:p4lines/eq:ladder rather than inserted here; (iii) the frontier sections should reuse this section's efficiency-first working-point definition (600-607) verbatim by reference; (iv) figure updates confined to fig:threshold's comb curve/caption number if it predates the refit. No claim in the section requires the fork/occupancy redemption story to be told here \u2014 occupancy, fork, T-scaling (F4) and the composition wall (F9) are untouched topics, so they land cleanly in later sections."
+  },
+  {
+   "section": "S4 QSVT construction (main.tex lines 664-779)",
+   "notes": "Arc: three subsections in strict construction order \u2014 (1) 'Block encoding and the qubitization walk' (rescale A into X, dilation eq.~\\eqref{eq:dilation}, an intuition paragraph on why repetition generates Chebyshev polynomials, the exact walk identity eq.~\\eqref{eq:walkcheb}); (2) 'Summing the series: LCU' (index register, success probability eq.~\\eqref{eq:psucc}, the 1BQF-as-d=1 continuity claim, then the simulation-side exact matrix-free evaluator with its benchmark); (3) 'Resource summary' (\\\\label{sec:qsvt:resources}, a three-bullet itemize: Width/Depth/Success), closing with a one-sentence scope hand-off to sec:limits:dequant. Referencing conventions: equations as eq.~\\\\eqref{eq:...} with namespaced labels (eq:dilation, eq:walkcheb, eq:psucc); sections as lowercase 'section~\\\\ref{sec:...}' with colon-namespaced labels (sec:qsvt, sec:qsvt:resources, sec:comb, sec:limits:dequant); implementation caveats go in footnotes; first-person singular voice ('I assemble', 'The picture I find most useful'); NO figures or tables anywhere in this section \u2014 figures live in the results sections, so new figures (degree scans, metrics-vs-T, L1-L3 budget) should not be placed here. Where new material fits without restructuring: the section is deliberately operator-agnostic and should stay so \u2014 the modified-operator atlas/ladder math (F13) belongs in the operator/results sections, with this section touched only by (a) one sentence at the rescale step (line 680-685) saying every modified operator of the new study enters this identical construction with only c_0, c_1, and nnz(A) changed, (b) the two minimal edits flagged in findings (width bullet d-range; Success-bullet scoping for the span/degree trade), and (c) forward \\\\refs from the evaluator paragraph (line 746-756) to the degree-scan and T-scan material. The existing 'All large-T results below use this exact evaluator' sentence already covers the new T=400-1000 results' provenance unchanged."
+  },
+  {
+   "section": "S5 (sec:comb): Fitting the polynomial to the clean events \u2014 the line comb + floor theorem (lines 780-1012)",
+   "notes": "Arc: (1) design insight \u2014 the true spectrum is four discrete lines, comb design d=40/h_w=0.18 with the 2W/d resolution law and the 'one budget' framing (780-816); (2) clean-event results as a three-bullet itemize (classical / 1BQF / comb) at fixed working points, headline figure fig:clean2x2, then an efficiency-first paragraph with the (now falsified) crossover and a footnote, then the amplitude picture (818-889); (3) hit inefficiency \u2014 fragments, first twins, scope footnote excluding classical post-selection (891-918); (4) resources and depth ladder, fig:resources with subfigures (920-952); (5) spectral twins + floor theorem + fig:twins + shared-line theorem + mirror tax, closing on 'further progress must come from changing the operator' (954-1012). Conventions: subsection labels sec:comb:{results,drop,resources,limits}; forward references via section~\\\\ref{sec:fit} and section~\\\\ref{sec:fit:occ} (the redemption/atlas material is expected THERE, this section only points); figures are [t]-floats with \\\\captionsetup{width=0.9x\\\\textwidth}, \\\\includegraphics of named PDFs, long self-contained captions restating the key numbers; footnotes carry caveats and retired-history notes; all numbers inline in math mode with \\\\%. Where new material fits without restructuring: (a) the clean-solved-at-every-T result (F9) replaces the crossover paragraph at 866-880 in place \u2014 same paragraph slot, same 'two regimes' rhetorical position; (b) a one-sentence L1/L2/L3 forward-reference attaches to the floor-theorem statement at 965-970 or to 981-983; (c) the F13 atlas belongs in sec:fit:occ, with only the existing pointer at 905-910 lightly qualified for the T-limit (F4); (d) a degree-scan cross-reference attaches to the non-monotonic-degree sentence at 930-933; (e) the metrics-vs-T figure (density scan T=400-1000) is cited from the rewritten 866-880 paragraph. NOTE for other sections: the clean 20.5%/T=1000 classical number recurs outside this range at lines 68, 146, 1997 \u2014 whoever audits those ranges should check them against the same post-fix baselines. File: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex."
+  },
+  {
+   "section": "S6 heavy-noise events (lines 1013-1105, \\section{The heavy-noise events}, \\label{sec:noise})",
+   "notes": "Arc: (1) lines 1016-1020 fix the heavy operating point (sigma_scatt 1e-4, sigma_res 20um, drop 1%, T=200, formula epsilon 6.3 mrad \u2014 all confirmed by the fact sheet) and the rep convention; (2) lines 1022-1056 an enumerate with two bolded structural facts about the compatibility graph ('There is no giant tangle', 'The false actives are motif-borne'), each backed by a dedicated figure (fig:tangles at 1058-1070, fig:pileup at 1072-1084); (3) lines 1086-1103 the solver scoreboard (classical = 1BQF = comb all fail identically), the spectral-line diagnosis, and a hand-off: refit in sec:fit, then occupancy and bifurcation 'in turn' in the next two sections. Referencing conventions: lowercase in-text refs 'section~\\\\ref{sec:fit}', 'sections~\\\\ref{sec:occupancy}--\\\\ref{sec:fit}', 'figure~\\\\ref{fig:pileup}' (lowercase f even sentence-internal); figures are \\\\begin{figure}[t] with \\\\captionsetup{width=0.90-0.95\\\\textwidth} and \\\\includegraphics width 0.92-0.98\\\\textwidth; captions are narrative full sentences that state the operating point '(heavy $T=200$, rep~0)', enumerate panels (a)-(e), and declare the color code 'Green segments are true, red false'; numbers in math mode with $155{,}371$-style thousands separators; labels sec:xxx / fig:xxx; section ends with a box-drawing comment rule at 1105. Where new material fits without restructuring: the section is diagnosis-only, so new results enter as forward references, not new content blocks \u2014 (a) the modified atlas/ladder math (F13) belongs in the occupancy/fork sections this one hands off to, with a one-clause promise at line 1034-1036 that exactness survives the added terms; (b) the L1-L3 budget and degree scans attach to the diagnosis paragraph (1094-1099) via the two-part-cure rewording; (c) the metrics-vs-T / composition-wall figure gets a scoped forward reference inside item 1 (line 1031, 'at this operating point'); (d) the epsilon-shrink no-go gets one sentence after line 1024. The two headline dissection figures (fig:tangles, fig:pileup) are rep-0 based and stay valid, but any refreshed scoreboard numbers must postdate the 2026-08-26 baseline fix."
+  },
+  {
+   "section": "S7 occupancy term (lines 1106-1191, \\section{The occupancy term}, \\label{sec:occupancy})",
+   "notes": "Arc: two subsections. (i) 'The term' (1109-1126): Denby citation, the quadratic constraint, the matrix form eq:occ, the coupling structure of B_all (same-role pairs coupled, consecutive chain segments not), and the isolated-attractor shift \u2014 pure setup, and already fully consistent with the F13 atlas (delta -> delta+4*alpha on uncoupled segments). (ii) 'Classically it works; the notch it destroys' (1128-1189): classical success on the heavy T=200 benchmark (two sentences), then the 1BQF destruction with mechanism spelled out (unpinning the notched population), the four-panel proof figure fig:occproof, generalisation to any fixed response, finality for the 1BQF (response family exhausted by t; no gamma escape), a footnote scoping OUT classical hit-uniqueness post-selection (matches F12 exactly), and a closing forward reference to sec:fit:occ promising the reversal (the paper ALREADY carries the refit-redemption framing; the detailed refit numbers live downstream in sec:fit:occ at 1514-1590, not here). Referencing conventions: lowercase 'section~\\ref{sec:...}' and 'figure~\\ref{fig:...}' mid-sentence, panel letters appended outside the \\ref (e.g. figure~\\ref{fig:occproof}(c)); equations \\label{eq:...}, referenced elsewhere as eq.~\\eqref{...}; the pure-chain ladder is eq:ladder at line 361. Figures: [t]-placed, \\captionsetup{width=0.90\\textwidth}, \\includegraphics[width=0.95\\textwidth], long multi-panel captions labelling (a)-(d), filename dp_occupancy_proof.png (the refit section uses occupancy_fitted.pdf). Prose style: claim-then-mechanism narrative, numbers inline in math mode, no tables. Where new material fits without restructuring: the F13 closed-form modified ladder as 2-4 sentences at the end of subsection 'The term' (after line 1126), citing eq~\\eqref{eq:ladder}; the T-scaling caveat (F4), the heavy occ+fork result (F5), and a pointer to the L1-L3 budget (F1) as clauses in the closing paragraph (1180-1189); the alpha=0.3 vs alpha=0.05 reconciliation as a two-word parenthetical at line 1130-1131. Full quantitative treatment (degree scans, metrics-vs-T figure, twin fractions) belongs downstream in sec:fit:occ / a density-scan section, referenced from here."
+  },
+  {
+   "section": "S8 fork term + moving spectrum (main.tex lines 1192-1306, \\section{The fork term and the moving spectrum}, sec:fork)",
+   "notes": "Arc: three subsections. (1) 'The term and its validity envelope' (1195-1230): defines eq:fork, the sparsity/beta-invariance structure, then the closed-form validity conditions (gamma_pd, gamma_win), the measured gamma* at heavy, and the retune protocol with a window-violating control. (2) 'The operator and the response are one design' (sec:fork:nogo, 1232-1252): the methodological core \u2014 an unfitted comb misreads both Denby-Peterson terms as regressions; the refit doctrine; ALL performance numbers deferred to \\ref{sec:fit}; parenthetical establishing matched-efficiency from sec:fit onward. (3) 'A Trotter aside' (sec:fork:trotter, 1254-1289) + fig:erf (1291-1304): uniform vs heterogeneous weights, forward-ref to sec:limits:trotter. Referencing conventions: lowercase 'section~\\ref{...}', 'figure~\\ref{fig:erf}', 'ref.~\\cite{trackhhl}'; equations via \\label{eq:...}; figures [t]-placed with \\captionsetup{width=0.92\\textwidth}, \\includegraphics width=0.95\\textwidth, multi-panel (a)/(b) captions written as prose, files in figures/ referenced by bare filename. Integration without restructuring: the section deliberately carries no fork/occupancy performance tables, so F3/F5 numbers, the degree scans, F4's T-scan, and the ranking all belong in sec:fit, not here. What fits in-section: (a) the F13 modified ladder (or a cross-ref to it) after eq:fork / the beta-invariance sentence in subsection 1; (b) a one-sentence span-vs-T caveat with forward-ref at the end of the validity-envelope paragraph; (c) scoping edits to the two retune sentences (comb-only gamma*); (d) an L1-L3 cross-ref inside the sec:fork:nogo doctrine sentence; (e) 'and their combination' at line 1247-1248. The Trotter aside is self-contained and should stay \u2014 it only needs the pre-refit-arbiter parentheticals and a post-2026-08-26 baseline re-verification of fig:erf (figure last committed 2026-07-19, commit 605e84cb). File: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex; figure: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/figures/erf_exact_evolution_paper.pdf."
+  },
+  {
+   "section": "S9 \u2014 Fitting the polynomial to noisy events (sec:fit, lines 1307-1605): pile-up measurement, response fit, results table, occupancy refit, 1BQF root budget",
+   "notes": "Arc: (1) sec:fit opens by measuring the false pile-up exactly via per-component eigendecomposition \u2014 eq.~\\eqref{eq:linresponse}, formation weight, mode content, linearity in {p(lambda_i)} \u2014 landing on the heavy T=200 pair-line concentration; (2) 'Fitting the response' recasts response choice as least-squares (eq:fit, eq:normal) with the single knob mu tracing the efficiency-purity frontier and the |p|<=1 QSVT realizability bound; (3) sec:fit:results delivers tab:fit (row-blocks per system, matched-efficiency convention from sec:toy:metrics, three-event means, heavy T=200) and three numbered conclusions, ending with the fragment floor (sec:fit:floor label placed mid-text at line 1512) and the operator-not-event handoff; (4) sec:fit:occ redoes the fit in Chebyshev coefficient space (giant component blocks per-component measurement), headlines the halved false rate, gives two structural findings (small coupling wins via span/resolution; floor broken per event) and an engineering note pointing at sec:limits:generalization; (5) sec:fit:rootbudget closes with the degree-one root-budget argument against the 1BQF. Conventions: prose references as section~\\ref{...} inline or parenthetical; figures as figure~\\ref{fig:...} with lettered panels (a)-(d) described in long \\captionsetup-width captions; booktabs tables with \\midrule separating the floor row; equations via eq.~\\eqref{...}; first-person authorial asides ('a degree I did not expect', 'in my opinion'). New material fits without restructuring: moderate-regime numbers and the L1-L3 budget enter sec:fit:results as an added row-block in tab:fit (its per-system block structure extends naturally) plus one paragraph; the fingerprinting proof attaches at line 1509; the closed-form ladder (F13) inserts as a short passage after line 1523 where per-component measurement is declared unavailable (or in the atlas section it will cite); occupancy T-scaling and span measurements extend the engineering note at 1562-1567; occ+fork and the beta optimum extend the fork paragraph at 1475 or the end of sec:fit:occ; per-rep heavy presentation follows the fig:occfit(b) per-event precedent. File: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex."
+  },
+  {
+   "section": "S10 Limitations (lines 1606-1981 of /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex)",
+   "notes": "Arc: seven self-contained \\subsection blocks under \\section{Limitations} (\\label{sec:limits}), each in first-person essay prose following the pattern 'limitation + measured size + escape route', ordered response-side worries (realizability, one-response generalization) -> hardware (Trotterization, resources side-by-side, hit-priced block encoding, readout) -> honesty caveats (classical simulability, real-detector geometry as 'the largest caveat of all'). No bullet lists anywhere; numbers are always inline with their provenance clause. Referencing conventions: lowercase mid-sentence 'eq.~\\eqref{...}', 'section~\\ref{...}', 'figure~\\ref{...}', 'table~\\ref{...}'; labels namespaced sec:limits:<name>; figures use [t] with \\captionsetup{width=0.92-0.95\\textwidth} and long narrative captions that restate the physics (see fig:rescmp 1772-1790, fig:readout 1910-1921, fig:run3 1965-1979); the one table uses [H] + \\small with an extended caption (1728-1770). Where new material fits without restructuring: (1) a single new subsection carrying F4 (occupancy T-ladder + span mechanism) and F9 (composition wall + metrics-vs-T figure), best placed after \\ref{sec:limits:readout} and before \\ref{sec:limits:dequant} \u2014 it is a physics limitation, so it belongs before the two closing honesty caveats and preserves the 'largest caveat of all' superlative at \\ref{sec:limits:geometry} (or demands softening it); (2) sentence-level insertions at the anchors above (L1-L3 budget at 1632, modified atlas at 1654, operator-axis next step at 1668, hit-oracle pricing of the new terms at 1878, per-operator/per-density loop at 1961); (3) a scoping clause in the table caption or the calls-per-shot row noting degree is operator-dependent. Nothing in the section needs reordering; every fix is additive or a qualifier."
+  },
+  {
+   "section": "S11 Conclusion (main.tex lines 1982-2122)",
+   "notes": "Arc: \\section{Conclusion} (line 1982, \\label{sec:conclusion}) opens with a framing paragraph (1BQF insight -> QSVT turns algorithm design into response design, lines 1985-1991), then a four-item enumerate (lines 1993-2031) where each item is one lesson of the 'measurement-driven loop' with its headline numbers restated inline: (1) clean-event comb at T=1000, (2) heavy-noise refit vs classical, (3) judge operator+response together (fork/occupancy redemption \u2014 the refit-redemption framing is ALREADY present, so only numbers and superlatives need updating), (4) spectral twins and the occupancy floor-break. A single open-problems paragraph follows (lines 2033-2047), then \\section*{Acknowledgements} (line 2049, 'To be completed'), thebibliography (lines 2053-2119, 13 entries), \\end{document} at 2121. Referencing conventions: the section uses NO \\\\ref, \\\\cite, figure, or table references at all \u2014 every number is restated in self-contained prose with inline math ($0.061$, $\\\\sigma_{\\\\rm res}=20\\\\,\\\\mu$m), so integrated material should quote numbers directly in prose rather than pointing at figures; regime parameters are given parenthetically on first use. Where new material fits without restructuring: (a) stale numbers in items 1-4 update in place as clause-level edits; (b) the T-composition wall + occupancy T-limit (F4/F9) and the L1-L3 budget / two-axes separation (F1/F2) fit either as one added fifth enumerate item ('know how the frontier closes with density') or as added sentences inside items 3-4 \u2014 the enumerate is the section's only expandable container; (c) the F13 modified atlas slots into the open-problems paragraph at line 2035 as a partial answer to the enumeration problem (one clause, keeping the semicolon-separated list structure of that paragraph); (d) nothing can be added after the open-problems paragraph, since Acknowledgements and the bibliography follow immediately \u2014 no room for subsections, only list items and clauses. File path: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/main.tex."
+  }
+ ]
+}
