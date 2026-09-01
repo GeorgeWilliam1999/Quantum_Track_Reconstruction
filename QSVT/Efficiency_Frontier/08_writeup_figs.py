@@ -262,3 +262,78 @@ if __name__ == "__main__":
     df = load_frames()
     fig_metrics_vs_T(df)
     fig_loss_budget()
+
+
+def fig_metrics_composite(df):
+    """Paper composite: 3 regimes x (eff, far) in one fig-6-style block."""
+    fig, axes = plt.subplots(3, 2, figsize=(12.0, 12.2),
+                             constrained_layout=True)
+    for row, regime in enumerate(("clean", "moderate", "heavy")):
+        sub = df[df.regime == regime]
+        Ts = sorted(sub["T"].unique())
+        axE, axF = axes[row]
+        ce, cf, cT = [], [], []
+        for T in Ts:
+            g = sub[(sub.setout == "base") & (sub["T"] == T)
+                    & (sub.family == "classical_invA")]
+            e = med(g, "eff_fixed_tau") if "eff_fixed_tau" in g and \
+                g["eff_fixed_tau"].notna().any() else med(g, "eff_fixed")
+            f = med(g, "far_fixed_tau") if "far_fixed_tau" in g and \
+                g["far_fixed_tau"].notna().any() else med(g, "far_fixed")
+            if np.isfinite(e):
+                cT.append(T); ce.append(e); cf.append(f)
+        axE.plot(cT, ce, "--", color=INK, lw=1.9, marker="x", ms=6,
+                 label="classical (fixed $\\tau$)")
+        axF.plot(cT, np.maximum(cf, 2e-4), "--", color=INK, lw=1.9,
+                 marker="x", ms=6, label="classical (fixed $\\tau$)")
+        be, bf, bT = [], [], []
+        for T in Ts:
+            g = sub[(sub.setout == "base") & (sub["T"] == T)
+                    & (sub.family.isin(["1bqf_cos", "onebqf_cos"]))]
+            if len(g):
+                bT.append(T); be.append(med(g, "eff_e990"))
+                bf.append(med(g, "far_e990"))
+        if bT:
+            axE.plot(bT, be, "-.", color=RED, lw=1.7, marker="+", ms=7,
+                     label="1BQF (wp99)")
+            axF.plot(bT, np.maximum(bf, 2e-4), "-.", color=RED, lw=1.7,
+                     marker="+", ms=7, label="1BQF (wp99)")
+        for so, (col, ls, mk, lab) in SETOUT_STYLE.items():
+            if so in ("occ_a0.10", "erf"):
+                continue      # the paper carries the four headline operators
+            xe, xf, xT = [], [], []
+            for T in Ts:
+                g = sub[(sub.setout == so) & (sub["T"] == T)
+                        & (sub.family == "fitted_moment")
+                        & (sub.degree == D_HEAD)]
+                if len(g):
+                    xT.append(T); xe.append(med(g, "eff_e990"))
+                    xf.append(med(g, "far_e990"))
+            if xT:
+                axE.plot(xT, xe, ls, color=col, lw=2.0, marker=mk, ms=5,
+                         label=lab)
+                axF.plot(xT, np.maximum(xf, 2e-4), ls, color=col, lw=2.0,
+                         marker=mk, ms=5, label=lab)
+        axE.set_ylim(0.985, 1.001)
+        axE.set_ylabel(f"{regime}\nsegment efficiency")
+        axF.set_yscale("log")
+        axF.set_ylim(2e-4, 1.4)
+        axF.set_ylabel("segment false rate")
+        for ax in (axE, axF):
+            ax.set_xscale("log")
+            ax.set_xticks(Ts)
+            ax.set_xticklabels([str(t) for t in Ts])
+            ax.grid(alpha=0.25, lw=0.5)
+        if row == 0:
+            axE.set_title("(a) segment efficiency (quantum at wp99)",
+                          loc="left")
+            axF.set_title("(b) segment false rate", loc="left")
+            axF.legend(loc="lower right", fontsize=7.8, ncol=2)
+        if row == 2:
+            for ax in (axE, axF):
+                ax.set_xlabel("tracks per event $T$")
+    for ext in ("png", "pdf"):
+        fig.savefig(FIG / f"xiv_metrics_composite.{ext}", dpi=150,
+                    bbox_inches="tight")
+    plt.close(fig)
+    print("[saved] figures/xiv_metrics_composite.png")

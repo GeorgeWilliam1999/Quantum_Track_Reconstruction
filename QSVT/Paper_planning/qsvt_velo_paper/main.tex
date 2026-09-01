@@ -65,8 +65,10 @@ transformation (QSVT), and once the problem is viewed this way the design
 question changes: it is no longer a question of which algorithm inverts
 $A$, but of which function of $\lambda$ separates true from false segments.
 On clean events the answer is a four-line comb pinned to the eigenvalues of
-a five-hit track, and it drives the segment false rate from $20.5\%$
-(classical, $T{=}1000$ tracks) to $0.9\%$ at $92\%$ efficiency. On noisy
+a five-hit track: at the wide fixed $2$\,mrad acceptance it drives the
+segment false rate from $20.5\%$ (classical, $T{=}1000$ tracks) to $0.9\%$
+at $92\%$ efficiency, and at the formula acceptance the same multiplicity
+is solved outright ($99.98\%$ efficiency at a false rate below $0.1\%$). On noisy
 events the answer must be measured: the false weight piles up on the
 eigenvalue lines of specific two- and three-segment motifs, and a
 polynomial fitted with roots at the measured pile-up beats the classical
@@ -78,8 +80,9 @@ inherited from the classical literature can only be judged together with
 the response applied to them. The Denby--Peterson occupancy term destroys
 the one-bit filter, whose single zero cannot follow the spectrum it
 creates; but paired with a response refitted to that spectrum it becomes
-the strongest configuration in the study, roughly halving the fitted
-false rate at every matched efficiency, and, at small coupling, it breaks
+the strongest configuration in the study: at the matched $99\%$-efficiency
+point ($T{=}200$) it cuts the false rate thirtyfold at moderate noise
+($0.31$ to $0.010$) and roughly halves it at heavy noise, and, at small coupling, it breaks
 the spectral-twin degeneracy behind the fragment floor: the floor is a
 property of the base Hamiltonian, not of the problem. The bifurcation
 (fork) term behaves the same way, a regression under the clean-event comb
@@ -142,8 +145,8 @@ geometry pins every true track to the same five-hit chain, whose four
 eigenvalues are known in closed form. A comb of narrow passes at those
 four lines, and nothing else, separates true from false essentially
 perfectly up to the densities I can simulate ($T=1000$ tracks, four
-million segments), where the classical solver's false rate has climbed to
-$20.5\%$.
+million segments), where at the wide fixed $2$\,mrad acceptance the
+classical solver's false rate has climbed to $20.5\%$.
 \item On noisy events the false population moves: it concentrates on the
 eigenvalue lines of specific small \emph{motifs} (hit-sharing pairs and
 triples), which sit off the true lines but inside any naive pass window.
@@ -157,8 +160,9 @@ penalties destroy the one-bit filter and read as regressions under the
 fixed clean-event comb; both become net wins once the polynomial is
 refitted to the spectrum they produce. The occupancy term is the
 sharpest case: it breaks the notch outright, yet with a refitted
-response it roughly halves the false rate at every matched efficiency,
-and at small coupling it lifts the fragment floor by breaking the
+response it cuts the false rate at the matched $99\%$-efficiency point
+thirtyfold at moderate noise and roughly in half at heavy noise
+($T{=}200$), and at small coupling it lifts the fragment floor by breaking the
 spectral-twin degeneracy that causes it. Changing the operator moves
 the activations, and moving the activations changes the polynomial we
 have to fit.
@@ -873,11 +877,20 @@ classical, crossover near $T=700$).\footnote{The crossover is robust;
 its size is aggregation-dependent. A whole-store aggregate reads the
 classical efficiency-first false rate at $T=1000$ as low as $10\%$.
 Both sources agree the comb no longer wins at the efficiency-first
-point beyond $T\approx700$, which is the operative statement.} The
-two regimes, fixed-$\tau$ where the comb wins by an order of
-magnitude and more, and the strict efficiency-first point at extreme
-density where composition flattens everyone, bracket the operational
-truth.
+point beyond $T\approx700$, which is the operative statement.} One
+qualifier matters enough to state here rather than in a caption: the
+wall is set by the \emph{acceptance}, not by multiplicity alone.
+This whole section runs at the wide fixed $\varepsilon=2$\,mrad of
+the benchmark configuration, whose window admits several times more
+false candidates than the formula acceptance of
+eq.~\eqref{eq:epsilon}; at the formula acceptance the same $T=1000$
+multiplicity is solved outright ($99.98\%$ efficiency at a false rate
+below $0.1\%$, section~\ref{sec:atscale}) — a direct measurement of
+section~\ref{sec:toy:ham}'s claim that $\varepsilon$ is the most
+consequential experimental knob. The two regimes, fixed-$\tau$ where
+the comb wins by an order of magnitude and more, and the strict
+efficiency-first point at extreme density where, at this acceptance,
+composition flattens everyone, bracket the operational truth.
 
 The comb's amplitude picture explains the numbers. Under the comb
 response the false population collapses to $\lesssim10^{-2}$ of the
@@ -1110,9 +1123,11 @@ from the refit.
 
 Denby's original network~\cite{denby1988} constrains each hit to be
 used by at most one selected segment per role. The quadratic form of
-that constraint, per-hit occupancy, adds
-$E_{\rm occ}=\alpha\sum_h(o_h-1)^2$ with $o_h=\sum_{s\ni h}x_s$,
-which at the matrix level reads
+that constraint, per-hit \emph{and per-role} occupancy (a hit's
+departing and its arriving segments are counted separately), adds
+$E_{\rm occ}=\alpha\sum_h\sum_{r\in\{\rm in,\,out\}}(o_h^{\,r}-1)^2$
+with $o_h^{\,r}$ the summed activation of the segments using hit $h$
+in role $r$, which at the matrix level reads
 \begin{equation}
 A_{\rm occ}=A+4\alpha I+2\alpha B_{\rm all},\qquad
 \mathbf{b}\to\mathbf{b}+4\alpha\mathbf{1},
@@ -1124,6 +1139,49 @@ at it. Consecutive segments of one track share their interior hit in
 opposite roles and are not coupled. The isolated attractor moves to
 $(\delta+4\alpha)/(\gamma+\delta+4\alpha)$ and the threshold tracks
 it.
+
+That role structure has an exact consequence worth deriving before
+any experiment: \emph{on every pure chain the occupancy term is
+nothing but the substitution} $(s,\delta)\to(s{+}4\alpha,\,
+\delta{+}4\alpha)$. No same-role pair lives inside a chain, so
+restricted to a chain of $m$ segments eq.~\eqref{eq:occ} reads
+$(s+4\alpha)I-P_m$ with bias $\delta+4\alpha$, and the entire
+closed-form vocabulary of section~\ref{sec:toy:levels} survives
+verbatim. The ladder of eq.~\eqref{eq:ladder} generalises with
+$\bar x'=(\delta+4\alpha)/(s+4\alpha-2)$ and
+$r'+1/r'=s+4\alpha$:
+\begin{equation}
+x_j=\bar x'\left[1-\frac{r'^{\,j}+r'^{\,m+1-j}}{1+r'^{\,m+1}}\right],
+\label{eq:laddocc}
+\end{equation}
+so at $\alpha=0.05$ the attractor sits at
+$1.2/4.2=0.2857$, the $P_4$ outer and inner levels rise from
+$4/11,\,5/11$ to $0.4052,\,0.5017$, and every chain eigenvalue line
+of figure~\ref{fig:motifs} shifts rigidly by $+4\alpha$. The whole
+true-track atlas moves as one block: nothing about the term touches
+the structures we want to keep.
+
+What it does touch is exactly the structures the base Hamiltonian
+cannot see. A same-role pair with no continuation edge, invisible to
+$A$ (both segments sit on the isolated line), acquires the
+$2\alpha$ coupling and solves to $(\delta+4\alpha)/(s+6\alpha)
+=0.2791$ at $\alpha=0.05$ — \emph{below} the shifted attractor by
+$\approx 2\alpha\delta/s^2$, with its degenerate line split to
+$s+2\alpha$ and $s+6\alpha$. This is the analytic seed of the
+floor-break measured in section~\ref{sec:atscale}: the
+floor theorem's invariant grows from the compatibility graph alone
+to the pair $(C, B_{\rm all})$, so two structures are twins only if
+they agree in their chain shape \emph{and} in their hits' same-role
+degrees — and the hit drop that creates a true fragment has just
+lowered those degrees. Isomorphism becomes rare instead of generic.
+The same algebra also prices the term's cost at scale: the
+same-role $k$-clique at a single hit contributes $k{-}1$ lines at
+$s+2\alpha$ and one at $s+4\alpha+2\alpha(k{-}1)$, so the top of the
+spectrum grows linearly with the busiest hit's degree. That linear
+growth is the span wall that section~\ref{sec:atscale} measures
+($\lambda_{\max}\approx143$ at $T{=}700$, $202$ at $T{=}1000$), and
+it is why in-matrix occupancy will emerge there as a low-multiplicity
+technique.
 
 \subsection{Classically it works; the notch it destroys}
 
@@ -1204,11 +1262,32 @@ A'=A+\beta\,B_{\rm fork}(\varepsilon_B),
 \label{eq:fork}
 \end{equation}
 where $B_{\rm fork}$ couples co-hit same-role pairs within angular
-window $\varepsilon_B$ (default: the acceptance itself). Unlike the
+window $\varepsilon_B$ (default: the acceptance itself), and the bias
+$\mathbf{b}$ is untouched. Unlike the
 occupancy term, the fork is surgical where it matters. On clean
 events it touches $\approx2\%$ of segments, and provably no
-pure-true chain carries a fork edge, so the true comb lines are
-$\beta$-invariant. Earlier classical-side work in this programme
+pure-true chain carries a fork edge — so not just the true comb
+lines but the \emph{entire true-chain solution} is exactly
+$\beta$-invariant: the ladder of eq.~\eqref{eq:ladder} survives
+untouched, atlas levels included. What moves is precisely the
+topology the acceptance cannot resolve. An isolated competing pair
+(two same-role segments inside the window, no continuation edge)
+solves to $\delta/(s+\beta)=0.222$ at $\beta=0.5$, below the
+$0.250$ attractor, with its degenerate line split to $s\pm\beta$:
+the fork prices exactly the closely-competing candidates it was
+built for. One caution comes from the same algebra: when a
+\emph{false} prong forks onto a \emph{true} chain's outer segment,
+the exact five-segment solve shows both ends move (the prong drops
+far below the attractor, the outer chain level dips with it), so the
+term's net effect on the true band is not sign-definite a priori —
+which is one more reason the fork can only be judged together with
+the response, the subject of section~\ref{sec:fork:nogo}. Finally,
+$B_{\rm fork}\subset B_{\rm all}$, so under occupancy \emph{and}
+fork a windowed pair carries the combined coupling $2\alpha+\beta$
+and solves to $(\delta+4\alpha)/(s+6\alpha+\beta)=0.250$ at the
+production knobs $(\alpha,\beta)=(0.05,0.5)$ — numerically back at
+the base attractor, a coincidence of the operating point rather
+than anything deep. Earlier classical-side work in this programme
 established that the fork migrates contaminated-true spectral weight
 back toward the comb bands; whether real solvers can collect that
 migration is settled in section~\ref{sec:fit}.
@@ -1603,6 +1682,287 @@ in my opinion the cleanest justification for the whole QSVT
 programme that the toy has produced.
 
 % ══════════════════════════════════════════════════════════════════════════════
+\section{The operator axis at scale: degree, density, and the loss
+budget}
+\label{sec:atscale}
+
+The preceding sections established the method — measure the modified
+spectrum, refit the response — one operator at a time. This section
+reports the systematic campaign that crosses the two axes: every
+operator (base $A$, occupancy $\alpha=0.05$, fork $\beta=0.5$, and
+the combination) against every polynomial degree ($d=4$ to $160$,
+response refitted at each), at all three noise configurations
+(clean, moderate, heavy; formula $\varepsilon$ throughout), on the
+same stored events with the same matched-efficiency working points,
+ten event repetitions per cell. The classical solver and a matched
+1BQF — the cosine $|\cos(\pi\lambda/2s')|$ realised as a degree-60
+Chebyshev on the same operator — are computed on the same events, so
+every comparison in this section is like for like.\footnote{All
+numbers in this section derive from
+\texttt{QSVT/Efficiency\_Frontier/} outputs; the degree scan is
+\texttt{06\_degree\_scan.csv}, the density scan
+\texttt{03\_highT\_frontier.csv} + \texttt{06b}, the loss budget
+\texttt{05\_loss\_budget.csv}. Classical post-processing (the
+hit-uniqueness gate studied elsewhere in this programme) is out of
+scope: every number is a property of the operator and the function
+applied to it.}
+
+\subsection{The degree axis: what the polynomial can and cannot buy}
+\label{sec:atscale:degree}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{xiv_degree_scan_moderate.pdf}
+\caption{Polynomial degree against the two segment metrics on
+moderate noise ($T{=}200$, ten repetitions; per-repetition dots,
+median lines; response refitted at every degree). Stars at the left
+edge: the matched 1BQF, a degree-one filter, on each operator. (a)
+Efficiency at a $1\%$ false-rate budget: every operator is flat from
+$d{\approx}8$ — the response axis is exhausted almost immediately,
+at $0.975$--$0.978$ on base $A$ against the classical $0.492$. (b)
+False rate at the matched $99\%$-efficiency point: base $A$ and the
+fork sit pinned at the $0.31$ twin flood at \emph{every} degree,
+while the occupancy operators alone drop to the $10^{-2}$ scale —
+purity at high efficiency is bought by the operator, not the
+polynomial.}
+\label{fig:degmod}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{xiv_degree_scan_heavy.pdf}
+\caption{The same scan on heavy noise. The efficiency curves are
+sigmoids in $\log d$ whose onset degree is set by the operator: the
+fork rises first ($0.91$ by $d{=}16$), base $A$ next
+($d{\approx}20$), the occupancy operators last ($d\gtrsim64$),
+because the co-hit term widens the spectral domain and a fixed
+degree loses resolution proportionally (the span wall of
+section~\ref{sec:atscale:density}). The 1BQF stars sit at zero for
+every operator here.}
+\label{fig:degheavy}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.90\textwidth}
+\includegraphics[width=0.92\textwidth]{xiv_degree_marginal.pdf}
+\caption{The marginal value of one more degree step (the derivative
+of the sigmoids of figures~\ref{fig:degmod}--\ref{fig:degheavy}).
+(a) Moderate: after occupancy's onset step ($+0.94$ from $d{=}4$ to
+$8$, off scale) every operator's marginal gain is consistent with
+zero at every degree. (b) Heavy: the marginal gain peaks at the
+operator's onset and decays to zero past it, with the non-monotone
+ripple of the fitted family visible as negative excursions.}
+\label{fig:degmarg}
+\end{figure}
+
+Figures~\ref{fig:degmod}--\ref{fig:degmarg} answer the degree
+question in full, and the answer has a shape: a sigmoid in $\log d$,
+saturating completely. On moderate noise the saturation is already
+complete at $d{\approx}8$ for every operator — raising the degree
+from 8 to 160, a twenty-fold increase in circuit depth, buys a
+fraction of a percent of efficiency. On heavy noise the sigmoid is
+resolved: each operator has an onset degree below which the fitted
+response cannot place its roots and passes ($d{\approx}16$ for the
+fork system, $20$ for base $A$, $64$ and beyond for the occupancy
+operators), a steep rise, and a plateau ($0.928$ base, $0.938$
+fork, $0.935$ occupancy at $d{=}160$) that no further degree
+improves. The marginal-gain plot (figure~\ref{fig:degmarg}) is the
+operational summary: past the onset, one more degree step is worth
+nothing, and the budget question \emph{which degree} reduces to
+\emph{which operator}.
+
+Two reference points sharpen this. First, the matched 1BQF: on base
+$A$ it reads $1.000$ (clean), $0.488$ (moderate), $0.004$ (heavy)
+at the $1\%$ budget — and exactly $0.000$ on \emph{every} occupancy
+operator at \emph{every} noise level, clean included. The
+degree-one filter does not merely degrade under the occupancy
+spectrum, as section~\ref{sec:occupancy} showed; it dies entirely,
+while the refitted $d{=}4$ polynomial on the same operator keeps
+clean events perfect. Second, the \emph{unfitted} production comb
+run over the same grid: on the occupancy operators it reads
+$0.487$ (moderate) and $0.000$--$0.004$ (heavy) where the fitted
+response reads $0.990$ and $0.935$. A fixed response on a moved
+spectrum is not a weaker version of the method; it is a different,
+failing experiment — the strongest quantitative form of
+section~\ref{sec:fork:nogo}'s doctrine that the operator and the
+response are one design.
+
+\subsection{The refitted responses, seen against the moved lines}
+\label{sec:atscale:lines}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{xiv_motif_lines_modified.pdf}
+\caption{The motif dictionary of figure~\ref{fig:motifs} under each
+operator, from the closed forms of
+sections~\ref{sec:occupancy}--\ref{sec:fork} (grey: base-$A$
+positions). The fork moves only the competing-pair lines
+($s\pm\beta$); occupancy shifts the true chains rigidly by
+$+4\alpha$ and splits the same-role pair to $s+2\alpha$,
+$s+6\alpha$; the same-role $k$-clique line
+$s+4\alpha+2\alpha(k{-}1)$ (purple) grows linearly with hit degree
+and sets the spectral span.}
+\label{fig:linesmod}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{xiv_responses_modified.pdf}
+\caption{Figure~\ref{fig:responses}'s question asked of the fitted
+responses: $|p(\lambda)|$ per operator (rep-0 universal response,
+moderate noise) against that operator's exact motif lines. The fork
+system's response concentrates into a single dominant pass — the
+term has simplified the spectrum the fit must explain. The
+occupancy responses live on a span-widened domain (insets; the
+motif window is the shaded sliver), so their $d{=}80$ passes are
+visibly coarser inside it — the resolution cost
+$\mathrm{span}/d$ paid for breaking the twins.}
+\label{fig:respmod}
+\end{figure}
+
+Figure~\ref{fig:linesmod} draws the modified motif dictionary —
+every line position an exact closed form from
+sections~\ref{sec:occupancy} and~\ref{sec:fork} — and
+figure~\ref{fig:respmod} shows what the fit does about it. The two
+figures carry the section's mechanism in miniature: the fork
+\emph{sharpens} the spectrum (competing pairs leave the isolated
+line; the response collapses to one clean pass and its onset degree
+drops), while occupancy \emph{stretches} it (the clique line drags
+the domain out to $\lambda\approx44$ at moderate $T{=}200$, and the
+same degree spends its resolution over a window seven times wider).
+Both effects are visible in the degree scan of
+figure~\ref{fig:degheavy} as the ordering of the sigmoid onsets.
+
+\subsection{The loss budget: where the missing efficiency lives}
+\label{sec:atscale:budget}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{xiv_loss_budget.pdf}
+\caption{(a) The stacked L1--L3 decomposition of the efficiency
+lost at the $1\%$ false-rate budget, per operator (fitted response
+at its best degree). On base $A$ the entire deficit is L1 —
+spectral twins, irreducible for any response. (b) The twin fraction
+of true segments per operator (log scale): the operator sets the
+twin population; the response cannot touch it.}
+\label{fig:budget}
+\end{figure}
+
+Every true segment missed at an operating point is assigned to one
+of three channels: \textbf{L1}, spectral twins — the segment's
+filtered amplitude agrees with a false segment's under \emph{every}
+member of a set of independent probe responses, which by the floor
+theorem of section~\ref{sec:comb:limits} certifies graph
+isomorphism; \textbf{L2}, ripple — recovered by another degree of
+the same family; \textbf{L3}, threshold overlap — the remainder.
+The channels sum to the total loss by construction, and
+figure~\ref{fig:budget} shows the result. On base $A$ at moderate
+noise the best fitted response reaches $0.974$ at the $1\%$ budget
+with $\mathrm{L2}=\mathrm{L3}=0$: \emph{the deficit is one hundred
+percent twins}, and no function of $\lambda$ on the unmodified
+operator can do better — the honest-negative bound of
+section~\ref{sec:fit} promoted from a scan result to a proof. The
+operator modifications act on exactly this channel. The twin
+fraction of true segments falls from $3.6\%$ (base) to $0.76\%$
+under occupancy at moderate noise, and — the decisive number — from
+$87\%$ to $1.3\%$ at heavy noise, where on base $A$ the twin flood
+forces a false rate of $0.633$ at the $99\%$-efficiency point for
+\emph{every} solver, classical included. The no-go knobs earn their
+verdicts in the same currency: shrinking the acceptance
+($\varepsilon$-scale $1.5$) \emph{creates} twins ($11\%$ of trues)
+by stripping couplings, and moving $\gamma$ moves the floor the
+wrong way. Section~\ref{sec:occupancy}'s closed forms say why the
+occupancy term is the twin-breaker: the invariant that twins must
+match grew from the compatibility graph to the pair
+$(C,B_{\rm all})$.
+
+\subsection{Density: the five solvers to $T=1000$}
+\label{sec:atscale:density}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.80\textwidth}
+\includegraphics[width=0.84\textwidth]{xiv_metrics_composite.pdf}
+\caption{The figure~\ref{fig:clean2x2} pair for all five series —
+classical (fixed $\tau$), matched 1BQF (wp99), and the fitted
+$d{=}40$ response on base $A$, $+$occupancy, $+$fork, and both — at
+clean, moderate and heavy noise (rows), formula $\varepsilon$,
+$T=200$--$1000$. Clean is solved at every multiplicity by every
+QSVT operator. Under noise, every wp99 curve converges to the false
+prevalence as the twin flood completes: past the wall the matched
+$99\%$-efficiency point stops being a working point at all.}
+\label{fig:density5}
+\end{figure}
+
+Figure~\ref{fig:density5} carries the campaign to $T=1000$ at the
+formula acceptance. Three structural statements survive to that
+scale. First, \emph{clean events are solved at every multiplicity}:
+the fitted $d{=}40$ response holds $99.85$--$100\%$ efficiency at
+zero measured false rate to four million segments, on every
+operator — while the matched 1BQF's false rate climbs through
+$0.10$ ($T{=}400$) to $0.68$ ($T{=}1000$) on the same events.
+Second, under noise there is a \emph{composition wall}: the
+false-to-true ratio grows $\propto T$, and between $T{=}700$ and
+$T{=}1000$ the moderate-noise $1\%$-budget frontier closes for
+every operator alike; at the flooded wp99 points all five series
+read the same number — the false prevalence — which is the
+solver-independence of a completed twin flood, not a tie. Third,
+the occupancy term's floor-break \emph{does not scale}: its
+spectral span grows linearly with the busiest hit's degree
+(section~\ref{sec:occupancy}; measured $\lambda_{\max}\approx143$
+at $T{=}700$, $202$ at $T{=}1000$), so at fixed degree the
+refitted response loses resolution and the moderate advantage
+decays from $0.9905$ at $T{=}200$ through $0.952$ at $T{=}400$ to
+nothing by $T{=}700$. In-matrix occupancy, as measured, is a
+low-multiplicity technique; the win it demonstrates at $T{=}200$ is
+a statement about what breaking the twin invariant is worth, not a
+recipe that survives density.
+
+\subsection{The two-axis rule}
+\label{sec:atscale:rule}
+
+\begin{table}[t]
+\centering
+\captionsetup{width=0.9\textwidth}
+\caption{The two axes separated (moderate noise, $T{=}200$, medians
+of ten repetitions; every solver on the same events). Efficiency is
+quoted at a $1\%$ false-rate budget; the false rate at the matched
+$99\%$-efficiency point. Fitted responses at their best scanned
+degree (base $d{=}32$, occupancy $d{=}80$).}
+\label{tab:twoaxis}
+\begin{tabular}{lcc}
+\hline
+solver / operator & eff.\ @ far $\le1\%$ & far @ eff.\ $0.99$\\
+\hline
+classical inversion, base $A$ & $0.492$ & $0.314$\\
+1BQF, base $A$                & $0.491$ & $0.314$\\
+QSVT fitted, base $A$         & $0.978$ & $0.314$\\
+QSVT fitted, $+$occupancy     & $\mathbf{0.9905}$ & $\mathbf{0.010}$\\
+\hline
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:twoaxis} is the study in four lines. Reading down
+the first column, the polynomial buys efficiency at a fixed
+false-rate budget: $0.49\to0.978$ with no change to the operator.
+Reading down the second, the response buys \emph{nothing} at the
+matched high-efficiency point — classical, 1BQF and the best fitted
+polynomial all pay the identical $0.314$, the twin flood of
+figure~\ref{fig:budget}, exactly as the L1 budget predicts — and
+only the operator moves that number, thirtyfold, to $0.010$. At
+heavy noise the same split holds in weaker form, and the
+combination earns its place: occupancy$+$fork gives the best
+false rate at the $99\%$-efficiency point ($0.225$, against
+$0.356$ for occupancy alone and $0.633$ for base $A$). The
+two-part design rule of this paper's abstract is these two columns.
+
+% ══════════════════════════════════════════════════════════════════════════════
 \section{Limitations}
 \label{sec:limits}
 
@@ -1610,6 +1970,28 @@ I collect here, deliberately and in one place, everything that
 stands between the results above and a deployable algorithm. Each
 limitation comes with its measured size and, where we have one, its
 escape route.
+
+\subsection{The occupancy win does not survive density}
+\label{sec:limits:occdensity}
+
+The strongest configuration of section~\ref{sec:atscale} — the
+occupancy operator with its refitted response — is, as measured, a
+low-multiplicity technique. Its spectral span grows linearly with
+the busiest hit's degree (the $k$-clique line of
+section~\ref{sec:occupancy}), so a fixed-degree response loses
+resolution $\propto\mathrm{span}/d$ and the moderate-noise
+advantage decays from $0.9905$ at $T{=}200$ to nothing by
+$T{=}700$. What the $T{=}200$ result establishes is the \emph{value}
+of breaking the twin invariant, not a recipe that scales. The
+untested escape routes are a multiplicity-dependent coupling
+($\alpha\propto1/\deg_{\max}$, pinning the span), a
+degree-normalised form of the co-hit term, and any operator that
+distinguishes fragments from false motifs without coupling entire
+co-hit cliques. Separately, the erf-kernel operator leaves the one
+piece of pure response headroom in the study: its twin floor is the
+smallest measured ($0.25\%$ at moderate noise) but its loss is
+threshold overlap ($1.3\%$), the one channel a better-shaped
+response can still buy back.
 
 \subsection{Realizability of the fitted response}
 \label{sec:limits:realizability}
@@ -1994,10 +2376,13 @@ and response design turns out to be a measurement-driven loop:
 \item Read the spectrum the problem gives you. On clean events the
 detector geometry hands you four exact eigenvalue lines, and a fixed
 forty-degree comb pinned to them converts the segment selection at
-$T=1000$ tracks from a $20.5\%$ false rate (the classical solver at
-its fixed threshold) to $0.9\%$ (the comb at the same threshold, at
-$92\%$ segment efficiency): a factor twenty fewer fakes in the
-selected sample.
+$T=1000$ tracks and the wide $2$\,mrad benchmark acceptance from a
+$20.5\%$ false rate (the classical solver at its fixed threshold) to
+$0.9\%$ (the comb at the same threshold, at $92\%$ segment
+efficiency): a factor twenty fewer fakes in the selected sample. At
+the formula acceptance the same multiplicity is solved outright —
+$99.85\%$ efficiency at zero measured false rate
+(section~\ref{sec:atscale}).
 \item When the problem changes, measure where the false weight went,
 and put roots there. At the heavy-noise operating point
 ($\sigma_{\rm res}=20\,\mu$m, $1\%$ hit drop, $T=200$) the false
