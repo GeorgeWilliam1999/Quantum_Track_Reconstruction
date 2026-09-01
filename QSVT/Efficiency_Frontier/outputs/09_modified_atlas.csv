@@ -1,0 +1,30 @@
+operator,motif,level,lines
+base,isolated (false attractor),0.25,4.000
+base,fragment m=1,0.2499999999999999,4.000
+base,fragment m=2,0.33333333333333326,"3.000, 5.000"
+base,fragment m=3,0.3571428571428571,"2.586, 4.000, 5.414"
+base,true track P4 outer,0.3636363636363636,"2.382, 3.382, 4.618, 5.618"
+base,true track P4 inner,0.45454545454545453,
+occ_a0.05,isolated (false attractor),0.2857142857142857,4.200
+occ_a0.05,fragment m=1,0.28571428571428553,4.200
+occ_a0.05,fragment m=2,0.37499999999999983,"3.200, 5.200"
+occ_a0.05,fragment m=3,0.39897698209718657,"2.786, 4.200, 5.614"
+occ_a0.05,true track P4 outer,0.40514469453376195,"2.582, 3.582, 4.818, 5.818"
+occ_a0.05,true track P4 inner,0.5016077170418005,
+occ_a0.05,same-role competing pair (in window),0.27906976744186046,"4.100, 4.300"
+occ_a0.05,same-role pair (outside window),0.27906976744186046,"4.100, 4.300"
+fork_b0.5,isolated (false attractor),0.25,4.000
+fork_b0.5,fragment m=1,0.2499999999999999,4.000
+fork_b0.5,fragment m=2,0.33333333333333326,"3.000, 5.000"
+fork_b0.5,fragment m=3,0.3571428571428571,"2.586, 4.000, 5.414"
+fork_b0.5,true track P4 outer,0.3636363636363636,"2.382, 3.382, 4.618, 5.618"
+fork_b0.5,true track P4 inner,0.45454545454545453,
+fork_b0.5,same-role competing pair (in window),0.2222222222222222,"3.500, 4.500"
+occ0.05_fork0.5,isolated (false attractor),0.2857142857142857,4.200
+occ0.05_fork0.5,fragment m=1,0.28571428571428553,4.200
+occ0.05_fork0.5,fragment m=2,0.37499999999999983,"3.200, 5.200"
+occ0.05_fork0.5,fragment m=3,0.39897698209718657,"2.786, 4.200, 5.614"
+occ0.05_fork0.5,true track P4 outer,0.40514469453376195,"2.582, 3.582, 4.818, 5.818"
+occ0.05_fork0.5,true track P4 inner,0.5016077170418005,
+occ0.05_fork0.5,same-role competing pair (in window),0.25,"3.600, 4.800"
+occ0.05_fork0.5,same-role pair (outside window),0.27906976744186046,"4.100, 4.300"

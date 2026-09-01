@@ -163,9 +163,9 @@ def fig_metrics_vs_T(df):
                                  series="1bqf_wp99", eff=be[-1], far=bf[-1]))
         if bT:
             axes[0].plot(bT, be, "-.", color=RED, lw=1.8, marker="+", ms=7,
-                         label="1BQF (wp99)")
+                         label="1BQF (matched 99% eff.)")
             axes[1].plot(bT, np.maximum(bf, 2e-4), "-.", color=RED, lw=1.8,
-                         marker="+", ms=7, label="1BQF (wp99)")
+                         marker="+", ms=7, label="1BQF (matched 99% eff.)")
         # fitted d=40 per set-out at wp99
         for so, (col, ls, mk, lab) in SETOUT_STYLE.items():
             xe, xf, xT = [], [], []
@@ -199,8 +199,8 @@ def fig_metrics_vs_T(df):
             ax.grid(alpha=0.25, lw=0.5)
         axes[1].legend(loc="lower right", ncol=2)
         fig.suptitle(f"Segment metrics against track density — {regime} noise "
-                     "(fitted response, $d{=}40$; quantum at wp99, classical "
-                     "at fixed $\\tau$)", fontsize=12)
+                     "(fitted response, $d{=}40$; quantum at its matched "
+                     "99%-efficiency point, classical at fixed $\\tau$)", fontsize=12)
         param_box(fig, regime, sub,
                   extra="$T$ reps: 10 (200) / 5 (400) / 3 (700, 1000) · "
                         "1BQF = matched cosine $|\\cos(\\pi\\lambda/2s')|$ "
@@ -230,9 +230,9 @@ def fig_loss_budget():
     lab = [f"{r.regime[:3]} · {r.setout}" for _, r in best.iterrows()]
     y = np.arange(len(best))
     left = np.zeros(len(best))
-    for ch, col, name in [("L1", INK, "L1 twins (irreducible)"),
-                          ("L2", BLUE, "L2 ripple"),
-                          ("L3", ORANGE, "L3 threshold overlap")]:
+    for ch, col, name in [("L1", INK, "twin loss (irreducible)"),
+                          ("L2", BLUE, "response-ripple loss"),
+                          ("L3", ORANGE, "threshold-overlap loss")]:
         axes[0].barh(y, best[ch], left=left, color=col, height=0.7, label=name)
         left += best[ch].values
     axes[0].set_yticks(y); axes[0].set_yticklabels(lab, fontsize=8.5)
@@ -295,9 +295,9 @@ def fig_metrics_composite(df):
                 bf.append(med(g, "far_e990"))
         if bT:
             axE.plot(bT, be, "-.", color=RED, lw=1.7, marker="+", ms=7,
-                     label="1BQF (wp99)")
+                     label="1BQF (matched 99% eff.)")
             axF.plot(bT, np.maximum(bf, 2e-4), "-.", color=RED, lw=1.7,
-                     marker="+", ms=7, label="1BQF (wp99)")
+                     marker="+", ms=7, label="1BQF (matched 99% eff.)")
         for so, (col, ls, mk, lab) in SETOUT_STYLE.items():
             if so in ("occ_a0.10", "erf"):
                 continue      # the paper carries the four headline operators

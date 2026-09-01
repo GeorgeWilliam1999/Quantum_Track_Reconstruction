@@ -195,7 +195,9 @@ def verify_on_event(regime, noise, alpha, beta, rep=0, T=200):
                                     alpha=alpha, gamma=3.0, delta=DELTA)
     A = A.tocsr()
     n = A.shape[0]
-    x = np.asarray(sp.linalg.spsolve(A.tocsc(), b)).ravel()
+    from scipy.sparse.linalg import minres as _mr
+    xm, _ = _mr(A.tocsc(), b, rtol=1e-10, maxiter=20000)
+    x = np.asarray(xm).ravel()
 
     # off-diagonal support graph of the FULL modified operator
     Off = A.copy().tolil(); Off.setdiag(0); Off = Off.tocsr()

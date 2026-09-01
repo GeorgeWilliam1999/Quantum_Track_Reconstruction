@@ -1845,9 +1845,10 @@ figure~\ref{fig:degheavy} as the ordering of the sigmoid onsets.
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{xiv_loss_budget.pdf}
-\caption{(a) The stacked L1--L3 decomposition of the efficiency
-lost at the $1\%$ false-rate budget, per operator (fitted response
-at its best degree). On base $A$ the entire deficit is L1 —
+\caption{(a) The efficiency lost at the $1\%$ false-rate budget,
+per operator (fitted response at its best degree), decomposed into
+its three named channels: twin loss, ripple loss, and
+threshold-overlap loss. On base $A$ the entire deficit is twin loss —
 spectral twins, irreducible for any response. (b) The twin fraction
 of true segments per operator (log scale): the operator sets the
 twin population; the response cannot touch it.}
@@ -1855,16 +1856,16 @@ twin population; the response cannot touch it.}
 \end{figure}
 
 Every true segment missed at an operating point is assigned to one
-of three channels: \textbf{L1}, spectral twins — the segment's
+of three named channels: \emph{twin loss} — the segment's
 filtered amplitude agrees with a false segment's under \emph{every}
 member of a set of independent probe responses, which by the floor
 theorem of section~\ref{sec:comb:limits} certifies graph
-isomorphism; \textbf{L2}, ripple — recovered by another degree of
-the same family; \textbf{L3}, threshold overlap — the remainder.
+isomorphism; \emph{ripple loss} — recovered by another degree of
+the same family; \emph{threshold-overlap loss} — the remainder.
 The channels sum to the total loss by construction, and
 figure~\ref{fig:budget} shows the result. On base $A$ at moderate
 noise the best fitted response reaches $0.974$ at the $1\%$ budget
-with $\mathrm{L2}=\mathrm{L3}=0$: \emph{the deficit is one hundred
+with zero ripple loss and zero threshold-overlap loss: \emph{the deficit is one hundred
 percent twins}, and no function of $\lambda$ on the unmodified
 operator can do better — the honest-negative bound of
 section~\ref{sec:fit} promoted from a scan result to a proof. The
@@ -1890,11 +1891,13 @@ $(C,B_{\rm all})$.
 \captionsetup{width=0.80\textwidth}
 \includegraphics[width=0.84\textwidth]{xiv_metrics_composite.pdf}
 \caption{The figure~\ref{fig:clean2x2} pair for all five series —
-classical (fixed $\tau$), matched 1BQF (wp99), and the fitted
+classical (fixed $\tau$), the matched 1BQF at its
+$99\%$-efficiency working point, and the fitted
 $d{=}40$ response on base $A$, $+$occupancy, $+$fork, and both — at
 clean, moderate and heavy noise (rows), formula $\varepsilon$,
 $T=200$--$1000$. Clean is solved at every multiplicity by every
-QSVT operator. Under noise, every wp99 curve converges to the false
+QSVT operator. Under noise, every matched-efficiency curve
+converges to the false
 prevalence as the twin flood completes: past the wall the matched
 $99\%$-efficiency point stops being a working point at all.}
 \label{fig:density5}
@@ -1910,7 +1913,8 @@ $0.10$ ($T{=}400$) to $0.68$ ($T{=}1000$) on the same events.
 Second, under noise there is a \emph{composition wall}: the
 false-to-true ratio grows $\propto T$, and between $T{=}700$ and
 $T{=}1000$ the moderate-noise $1\%$-budget frontier closes for
-every operator alike; at the flooded wp99 points all five series
+every operator alike; at the flooded matched-$99\%$-efficiency
+points all five series
 read the same number — the false prevalence — which is the
 solver-independence of a completed twin flood, not a tie. Third,
 the occupancy term's floor-break \emph{does not scale}: its
@@ -1954,7 +1958,7 @@ false-rate budget: $0.49\to0.978$ with no change to the operator.
 Reading down the second, the response buys \emph{nothing} at the
 matched high-efficiency point — classical, 1BQF and the best fitted
 polynomial all pay the identical $0.314$, the twin flood of
-figure~\ref{fig:budget}, exactly as the L1 budget predicts — and
+figure~\ref{fig:budget}, exactly as the twin-loss budget predicts — and
 only the operator moves that number, thirtyfold, to $0.010$. At
 heavy noise the same split holds in weaker form, and the
 combination earns its place: occupancy$+$fork gives the best
