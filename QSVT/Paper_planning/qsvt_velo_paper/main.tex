@@ -136,9 +136,18 @@ devices themselves remains to be done.
 
 This work asks the question that follows naturally from the 1BQF. A
 cosine with one zero is a polynomial filter of degree
-one\footnote{Strictly, a trigonometric function realised at degree one in
-the Chebyshev basis of the walk operator; section~\ref{sec:qsvt} makes
-this exact.}. The quantum singular value transformation
+one\footnote{Explicitly, from the circuit of
+section~\ref{sec:onebit}: the interferometer keeps the branch
+$\tfrac12\big(I+e^{iAt}\big)=e^{iAt/2}\cos(At/2)$, and the leading
+unitary drops out of the read-out of $|\langle j|\psi\rangle|$, so the
+device applies $\cos(At/2)$ exactly. In the variable
+$u=\cos(\lambda t/2)$ that response \emph{is} the polynomial
+$p(u)=u$: degree one, and therefore one root, at $u=0$, i.e.\ at
+$\lambda=\pi/t=s$. Each further application of the same controlled
+evolution buys one more degree and with it one more root;
+section~\ref{sec:qsvt} gives the general construction, in which $d$
+calls of a fixed walk operator realise any bounded polynomial of
+degree $d$.}. The quantum singular value transformation
 (QSVT)~\cite{gslw2019,martyn2021} tells us that a quantum computer can
 apply essentially any bounded polynomial of the Hamiltonian at a cost
 linear in its degree. So, what could we do with more than one zero? Which
