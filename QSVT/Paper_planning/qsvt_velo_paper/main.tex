@@ -1842,6 +1842,37 @@ $+9$ at eight clock bits. Every route fits an LHCb-multiplicity event in
 $24$ to $31$ logical qubits; the block-encoding routes can trade width for
 depth by adding the $45$-qubit workspace of the hit-priced encoding below.
 
+Figure~\ref{fig:qubitscaling} draws the width and the depth in the
+presentation of the predecessor papers~\cite{trackhhl_epj,trackhhl}: against
+the matrix size $N=4T^{2}$, with the HL-LHC-scale event annotated. The
+predecessors' headline --- HHL's $2\lceil\log_2N\rceil+2$ against the
+one-bit filter's $\lceil\log_2N\rceil+2$, $50$ against $26$ qubits at
+$T=1500$ --- is the top and bottom curve of panel (a); the comb sits between
+them, at the one-bit filter's own width when it runs on $e^{-iAt}$ and two to
+five qubits above it on a block encoding, plus the workspace if that block
+encoding is priced by hits. Panel (b) is the depth: two-qubit gates per
+shot, which is the calls of table~\ref{tab:realisations} times the two
+per-call prices.
+
+\begin{figure}[tbp]
+\centering
+\captionsetup{width=0.97\textwidth}
+\includegraphics[width=0.99\textwidth]{qubit_scaling.pdf}
+\caption{Qubit and depth scaling against matrix size $N=4T^{2}$ (tracks
+per event on the top axis), in the presentation of the predecessor papers.
+(a) Logical qubits: exact staircases $\lceil\log_2N\rceil+$constant for
+HHL with a full-precision clock ($2\lceil\log_2N\rceil+2$) and with an
+eight-bit clock, the comb on a block encoding (LCU $+7$, phase sequence
+$+4$), and the comb over $e^{-iAt}$ and the one-bit filter, which coincide
+at $+2$; the faint lines add the $45$ workspace qubits of the hit-priced
+block encoding. The box lists the counts at the HL-LHC-scale event,
+$T=1500$. (b) Two-qubit gates per shot: calls per shot times gates per
+call, with the measured Givens-product price $152\,T^{1.37}$ for the
+evolution-based routes (open markers beyond the measured range, $T>400$)
+and the hit-oracle model $103\,T^{0.85}$ for the block-encoding routes.}
+\label{fig:qubitscaling}
+\end{figure}
+
 \emph{Calls per shot} are independent of $T$: $2$, $40$, $63$, $160$ and
 $510$ for the 1BQF, the trigonometric comb, the one-norm build, the phase
 sequence and eight-bit HHL respectively (table~\ref{tab:realisations}).

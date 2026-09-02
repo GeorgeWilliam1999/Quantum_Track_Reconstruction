@@ -26,15 +26,15 @@
 \contentsline {subsection}{\numberline {4.3}Finding the polynomial}{28}{subsection.4.3}%
 \contentsline {subsection}{\numberline {4.4}Classical cost}{30}{subsection.4.4}%
 \contentsline {subsection}{\numberline {4.5}Quantum cost}{31}{subsection.4.5}%
-\contentsline {section}{\numberline {5}Fitting the polynomial to the clean events: the line comb}{32}{section.5}%
-\contentsline {subsection}{\numberline {5.1}The design insight: the true spectrum is discrete}{32}{subsection.5.1}%
+\contentsline {section}{\numberline {5}Fitting the polynomial to the clean events: the line comb}{34}{section.5}%
+\contentsline {subsection}{\numberline {5.1}The design insight: the true spectrum is discrete}{34}{subsection.5.1}%
 \contentsline {subsection}{\numberline {5.2}Clean-event results}{34}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Hit inefficiency: the first appearance of fragments}{35}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Resource scaling and the depth ladder}{35}{subsection.5.4}%
-\contentsline {subsection}{\numberline {5.5}Spectral twins: a degeneracy no response can lift}{36}{subsection.5.5}%
-\contentsline {section}{\numberline {6}The heavy-noise events}{37}{section.6}%
+\contentsline {subsection}{\numberline {5.4}Resource scaling and the depth ladder}{36}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Spectral twins: a degeneracy no response can lift}{37}{subsection.5.5}%
+\contentsline {section}{\numberline {6}The heavy-noise events}{38}{section.6}%
 \contentsline {section}{\numberline {7}The occupancy term}{38}{section.7}%
-\contentsline {subsection}{\numberline {7.1}The term}{39}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.1}The term}{38}{subsection.7.1}%
 \contentsline {subsection}{\numberline {7.2}Classically it works; the notch it destroys}{40}{subsection.7.2}%
 \contentsline {section}{\numberline {8}The fork term and the moving spectrum}{41}{section.8}%
 \contentsline {subsection}{\numberline {8.1}The term and its validity envelope}{41}{subsection.8.1}%
@@ -46,20 +46,20 @@
 \contentsline {subsection}{\numberline {9.3}Results}{44}{subsection.9.3}%
 \contentsline {subsection}{\numberline {9.4}The occupancy term, refitted}{46}{subsection.9.4}%
 \contentsline {subsection}{\numberline {9.5}Why the 1BQF specifically cannot follow}{47}{subsection.9.5}%
-\contentsline {section}{\numberline {10}The operator axis at scale: degree, density, and the loss budget}{48}{section.10}%
+\contentsline {section}{\numberline {10}The operator axis at scale: degree, density, and the loss budget}{47}{section.10}%
 \contentsline {subsection}{\numberline {10.1}The degree axis: what the polynomial can and cannot buy}{48}{subsection.10.1}%
 \contentsline {subsection}{\numberline {10.2}The refitted responses, seen against the moved lines}{49}{subsection.10.2}%
 \contentsline {subsection}{\numberline {10.3}The loss budget: where the missing efficiency lives}{49}{subsection.10.3}%
 \contentsline {subsection}{\numberline {10.4}Density: every solver to $T=1000$}{50}{subsection.10.4}%
 \contentsline {subsection}{\numberline {10.5}The two-axis rule}{50}{subsection.10.5}%
 \contentsline {section}{\numberline {11}Limitations}{51}{section.11}%
-\contentsline {subsection}{\numberline {11.1}The occupancy win does not survive density}{52}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.1}The occupancy win does not survive density}{51}{subsection.11.1}%
 \contentsline {subsection}{\numberline {11.2}Realizability of the fitted response}{52}{subsection.11.2}%
 \contentsline {subsection}{\numberline {11.3}One response for all events}{53}{subsection.11.3}%
 \contentsline {subsection}{\numberline {11.4}Trotterization on hardware}{53}{subsection.11.4}%
-\contentsline {subsection}{\numberline {11.5}Hardware resources: HHL, the 1BQF, and the QSVT side by side}{54}{subsection.11.5}%
+\contentsline {subsection}{\numberline {11.5}Hardware resources: HHL, the 1BQF, and the QSVT side by side}{53}{subsection.11.5}%
 \contentsline {subsection}{\numberline {11.6}A block encoding priced by hits, not matrix entries}{55}{subsection.11.6}%
 \contentsline {subsection}{\numberline {11.7}Success probability and readout}{56}{subsection.11.7}%
 \contentsline {subsection}{\numberline {11.8}Classical simulability of the response family}{56}{subsection.11.8}%
-\contentsline {subsection}{\numberline {11.9}The toy's geometry, and what a real detector changes}{56}{subsection.11.9}%
-\contentsline {section}{\numberline {12}Conclusion}{56}{section.12}%
+\contentsline {subsection}{\numberline {11.9}The toy's geometry, and what a real detector changes}{57}{subsection.11.9}%
+\contentsline {section}{\numberline {12}Conclusion}{57}{section.12}%

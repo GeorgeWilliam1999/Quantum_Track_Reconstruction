@@ -1062,6 +1062,80 @@ def fig_resource_model():
         ax.set_xticklabels(["10", "20", "50", "100", "200", "400", "700", "1000"])
     save(fig, "resource_model")
 
+
+def fig_qubit_scaling():
+    """Section 4.5, in the presentation of the predecessor papers (EPJ Web Conf.
+    337 (2025) 01181, figure 4): logical qubits and two-qubit gates per shot
+    against matrix size N = 4T^2, for HHL, the one-bit filter and the comb with
+    and without a block encoding.  Widths are exact staircases; gate counts use
+    the measured Givens product for the evolution-based routes (power-law
+    extrapolated beyond T=400) and the hit-oracle model for the block-encoding
+    routes.  The HL-LHC-scale event (T=1500) is annotated."""
+    import json, pandas as pd
+    d = pd.read_csv(HERE.parent / "section4_qsvt" / "outputs" / "02_resource_model.csv")
+    F = json.loads((HERE.parent / "section4_qsvt" / "outputs" / "02_resource_fits.json").read_text())
+    gA, gB = F["givens_extrapolation"]["prefactor"], F["givens_extrapolation"]["exponent"]
+    hA, hB = F["hit_cx_per_call"]["prefactor"], F["hit_cx_per_call"]["exponent"]
+    Tg = np.array([10, 20, 50, 100, 200, 400, 700, 1000, 1500, 2000])
+    N = 4 * Tg ** 2; ns = np.ceil(np.log2(N)).astype(int)
+    Ts = np.logspace(1, np.log10(2000), 400); Ns = 4 * Ts ** 2; nss = np.ceil(np.log2(Ns))
+    C_HHL, C_HHL8, C_1B, C_Q, C_PH, C_LCU = "#492EAB", "#8C6FD6", "#06A77D", "#E08A2E", "#2A78D6", "#08306B"
+    plt.rcParams.update({"axes.grid": True})
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(15.5, 6.4), constrained_layout=True)
+
+    # ── (a) qubits ─────────────────────────────────────────────────────────
+    series = [("HHL, full-precision clock:  $2\\lceil\\log_2 N\\rceil+2$", nss * 2 + 2, ns * 2 + 2, C_HHL, "o", "--"),
+              ("HHL, 8-bit clock:  $\\lceil\\log_2 N\\rceil+9$", nss + 9, ns + 9, C_HHL8, "v", "--"),
+              ("comb, LCU on a block encoding:  $\\lceil\\log_2 N\\rceil+7$", nss + 7, ns + 7, C_LCU, "D", "-."),
+              ("comb, phase sequence on a block encoding:  $\\lceil\\log_2 N\\rceil+4$", nss + 4, ns + 4, C_PH, "d", "-."),
+              ("comb over $e^{-iAt}$, no block encoding:  $\\lceil\\log_2 N\\rceil+2$", nss + 2, ns + 2, C_Q, "s", ":"),
+              ("1BQF:  $\\lceil\\log_2 N\\rceil+2$", nss + 2, ns + 2, C_1B, "^", "-")]
+    for lab, ys, yp, col, mk, ls in series:
+        ax.plot(Ns, ys, ls, color=col, lw=2.4, alpha=0.9, zorder=3)
+        ax.scatter(N, yp, marker=mk, s=110, color=col, edgecolors="black", linewidth=1.3, zorder=5, label=lab)
+    ax.plot(Ns, nss + 7 + 45, "-.", color=C_LCU, lw=1.4, alpha=0.5, zorder=2)
+    ax.plot(Ns, nss + 4 + 45, "-.", color=C_PH, lw=1.4, alpha=0.5, zorder=2)
+    ax.text(2.2e7, 66.0, "$+45$ hit-oracle workspace qubits", ha="right", fontsize=9.5, color="#33322e")
+    # HL-LHC-scale event: one summary box, in the manner of the predecessor figure
+    iT = list(Tg).index(1500); nT = ns[iT]; NT = N[iT]
+    ax.axvline(NT, color="#33322e", lw=1.0, ls=":", alpha=0.7)
+    box = ("HL-LHC-scale event, $T=1500$\n$N=9\\times10^{6}$, $\\lceil\\log_2 N\\rceil=%d$\n"
+           "HHL, full clock: %d\nHHL, 8-bit clock: %d\ncomb, LCU: %d\ncomb, phase sequence: %d\n1BQF, comb over $e^{-iAt}$: %d"
+           % (nT, 2 * nT + 2, nT + 9, nT + 7, nT + 4, nT + 2))
+    ax.text(3.0e2, 56.5, box, ha="left", va="top", fontsize=9.6, family="monospace",
+            bbox=dict(boxstyle="round,pad=0.45", facecolor="#FBEFD5", alpha=0.95, edgecolor="#8f8d86", linewidth=1.0), zorder=7)
+    ax.set_xscale("log"); ax.set_ylim(8, 82); ax.set_xlim(2.5e2, 2.5e7)
+    ax.set_xlabel("Matrix size $N=4T^{2}$", fontsize=13, fontweight="bold"); ax.set_ylabel("Logical qubits", fontsize=13, fontweight="bold")
+    ax.set_title("(a) Qubit scaling\n" + r"width $=\lceil\log_2 N\rceil+$ constant", fontsize=14, fontweight="bold", pad=10)
+    ax.legend(loc="upper left", fontsize=9.6, framealpha=0.95)
+    ax.grid(True, alpha=0.3, which="both")
+    top = ax.secondary_xaxis("top", functions=(lambda n: np.sqrt(np.maximum(n, 1) / 4), lambda t: 4 * t ** 2))
+    top.set_xlabel("Tracks per event $T$", fontsize=11); top.set_xticks([10, 100, 1000])
+
+    # ── (b) two-qubit gates per shot ───────────────────────────────────────
+    giv = lambda T: gA * T ** gB; hit = lambda T: hA * T ** hB
+    rows = [("1BQF:  $2$ evolution calls", 2 * giv(Ts), 2 * giv(Tg), C_1B, "^", "-"),
+            ("comb over $e^{-iAt}$, no block encoding:  $K=40$ calls", 40 * giv(Ts), 40 * giv(Tg), C_Q, "s", ":"),
+            ("HHL, 8-bit clock:  $510$ evolution calls", 510 * giv(Ts), 510 * giv(Tg), C_HHL8, "v", "--"),
+            ("comb, LCU on the hit-priced block encoding:  $63$ calls", 63 * hit(Ts), 63 * hit(Tg), C_LCU, "D", "-."),
+            ("comb, phase sequence on the hit-priced block encoding:  $160$ calls", 160 * hit(Ts), 160 * hit(Tg), C_PH, "d", "-.")]
+    for lab, ys, yp, col, mk, ls in rows:
+        bx.plot(Ns, ys, ls, color=col, lw=2.4, alpha=0.9, zorder=3)
+        meas = Tg <= 400 if col in (C_1B, C_Q, C_HHL8) else np.ones_like(Tg, bool)
+        bx.scatter(N[meas], yp[meas], marker=mk, s=110, color=col, edgecolors="black", linewidth=1.3, zorder=5, label=lab)
+        bx.scatter(N[~meas], yp[~meas], marker=mk, s=110, facecolors="white", edgecolors=col, linewidth=1.6, zorder=5)
+    bx.scatter([], [], marker="o", s=90, facecolors="white", edgecolors="black", linewidth=1.4, label="open: beyond the measured range ($T>400$), power-law extrapolation")
+    bx.axvline(NT, color="#33322e", lw=1.0, ls=":", alpha=0.7)
+    bx.set_xscale("log"); bx.set_yscale("log"); bx.set_xlim(2.5e2, 2.5e7)
+    bx.set_xlabel("Matrix size $N=4T^{2}$", fontsize=13, fontweight="bold"); bx.set_ylabel("Two-qubit gates per shot", fontsize=13, fontweight="bold")
+    bx.set_title("(b) Depth scaling\n" + r"gates per shot $=$ calls $\times$ gates per call;  $e^{-iAT}$: $%.0f\,T^{%.2f}$,  hit oracle: $%.0f\,T^{%.2f}$" % (gA, gB, hA, hB),
+                 fontsize=14, fontweight="bold", pad=10)
+    bx.legend(loc="upper left", fontsize=9.2, framealpha=0.95); bx.grid(True, alpha=0.3, which="both")
+    top2 = bx.secondary_xaxis("top", functions=(lambda n: np.sqrt(np.maximum(n, 1) / 4), lambda t: 4 * t ** 2))
+    top2.set_xlabel("Tracks per event $T$", fontsize=11); top2.set_xticks([10, 100, 1000])
+    plt.rcParams.update({"axes.grid": True})
+    save(fig, "qubit_scaling")
+
 def fig_occfit():
     """§7 correction: the occupancy no-go dissolves under a fitted response."""
     import pandas as pd
@@ -1598,7 +1672,7 @@ if __name__ == "__main__":
         {"motifs": fig_motifs, "twin": fig_twin, "responses": fig_responses,
          "correspondence": fig_correspondence, "trackmodes": fig_track_modes,
          "hhl": fig_hhl_onebit, "notchspec": fig_notch_spectrum,
-         "combdeg": fig_comb_degrees, "resmodel": fig_resource_model,
+         "combdeg": fig_comb_degrees, "resmodel": fig_resource_model, "qubits": fig_qubit_scaling,
          "fragmentation": fig_fragmentation, "gershgorin": fig_gershgorin,
          "readout": fig_readout, "erf": fig_erf, "run3crop": fig_run3crop,
          "tangles": fig_tangles, "pileup": fig_pileup,

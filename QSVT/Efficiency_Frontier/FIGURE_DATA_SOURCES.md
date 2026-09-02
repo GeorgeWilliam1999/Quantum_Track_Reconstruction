@@ -70,6 +70,11 @@ or working-point conventions without saying so on the figure itself.
 ## figures/threshold_tradeoff.pdf (fig_threshold) — 2026-09-02 anchor change
 - The quantum curves are placed on the classical scale by norm-matching on the classical solver's own efficiency-first (99%) support; the previous anchor was the classical support at the retired fixed cut 0.35. Quantile metrics unchanged; horizontal placement changed. The 1BQF curve is the stored package circuit (four efficiency steps = the four labelling-order-dependent levels of a track in that circuit).
 
+## figures/qubit_scaling.pdf + .png (fig_qubit_scaling, section 4.5)
+- **New 2026-09-03**, in the presentation of the predecessor papers' figure 4 (EPJ Web Conf. 337 (2025) 01181): logical qubits and two-qubit gates per shot vs matrix size N = 4T^2, T = 10..2000, HL-LHC-scale event T = 1500 annotated.
+- **Data:** widths are exact formulas (HHL full clock 2 ceil(log2 N)+2 as in the predecessors; HHL 8-bit +9; LCU +7; phase sequence +4; QETU and 1BQF +2; hit-oracle workspace +45). Gates per call from section4_qsvt/outputs/02_resource_fits.json: Givens product 152 T^1.37 (measured to T = 400, open markers beyond), hit-oracle model 103 T^0.85. Calls per shot as in tab:realisations.
+- Flags: no event data drawn directly; every curve is a formula or a fit of measured/modelled per-call costs.
+
 ## figures/circuits_qsvt.tex (fig:circuitsqsvt, section 4.2) — hand-drawn TikZ
 - **New 2026-09-02.** The phase-sequence realisation (QSVT proper) and the trigonometric comb over e^{-iAt} (QETU), same conventions as figures/circuits.tex; styles shared via figures/circuit_styles.tex (loaded in the preamble). No data.
 
