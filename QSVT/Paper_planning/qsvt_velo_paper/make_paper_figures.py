@@ -320,6 +320,117 @@ def fig_erf():
     save(fig, "erf_exact_evolution_paper")
 
 
+def fig_epsilon():
+    """Section 2: where the acceptance formula comes from.
+
+    (a) the geometry of one measured kink: a scattering kick at the shared
+        plane plus three independent hit smears (schematic, not to scale);
+    (b) the resulting 3D kink is Rayleigh-distributed, measured on real
+        generated events against the closed form, with the acceptance drawn.
+
+    Derivation and Monte-Carlo validation:
+    Toy_Characterisation/Epsilon_study_2/{theory.md,gen_epsilon_derivation_figs.py}.
+    """
+    sys.path.insert(0, "/data/bfys/gscriven/Quantum_Track_Reconstruction/"
+                    "Toy_Characterisation/_shared")
+    import helpers
+    from lhcb_velo_toy.analysis.segment_metrics import (
+        compute_epsilon, DEFAULT_DZ, DEFAULT_SCALE)
+
+    DZ, SC = DEFAULT_DZ, DEFAULT_SCALE
+    SIG_R, SIG_S = 0.02, 1e-4                      # heavy configuration
+    geom = helpers.make_geometry()
+
+    def true_kinks(event):
+        pos = {h.hit_id: np.array([h.x, h.y, h.z]) for h in event.hits}
+        out = []
+        for trk in event.tracks:
+            ids = trk.hit_ids
+            for k in range(1, len(ids) - 1):
+                v1 = pos[ids[k]] - pos[ids[k - 1]]
+                v2 = pos[ids[k + 1]] - pos[ids[k]]
+                c = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+                out.append(np.arccos(np.clip(c, -1.0, 1.0)))
+        return out
+
+    kinks = []
+    for rep in range(6):
+        ev = helpers.safe_generate(200, seed=90_000 + rep, geom=geom,
+                                   measurement_error=SIG_R,
+                                   collision_noise=SIG_S)
+        kinks += true_kinks(ev)
+    kinks = np.asarray(kinks)
+    sig_p = np.sqrt(SIG_S ** 2 + 6.0 * (SIG_R / DZ) ** 2)
+    eps = compute_epsilon(SIG_R, SIG_S)
+
+    fig, axes = plt.subplots(1, 2, figsize=(12.6, 4.5),
+                             gridspec_kw=dict(width_ratios=[1.15, 1]))
+
+    # ---- (a) schematic -----------------------------------------------------
+    ax = axes[0]
+    for xz, lab in ((0, "plane $k{-}1$"), (1, "plane $k$"), (2, "plane $k{+}1$")):
+        ax.axvline(xz, color="0.82", lw=7, zorder=0)
+        ax.text(xz, 1.42, lab, ha="center", fontsize=10)
+    ax.text(0.5, 1.28, r"$\Delta z$", ha="center", fontsize=10, color="0.4")
+    ax.annotate("", xy=(1.0, 1.24), xytext=(0.0, 1.24),
+                arrowprops=dict(arrowstyle="<->", color="0.4", lw=1.0))
+    ax.plot([-0.35, 2.3], [-0.14, 0.92], ls="--", color="0.45", lw=1.4,
+            label="undisturbed straight trajectory")
+    x_tr = np.array([-0.35, 0, 1, 2, 2.3])
+    y_tr = np.array([-0.14, 0.0, 0.40, 1.05, 1.245])
+    ax.plot(x_tr[:3], y_tr[:3], color=BLUE, lw=2.2,
+            label="true trajectory (scattering kick at each plane)")
+    ax.plot(x_tr[2:], y_tr[2:], color=BLUE, lw=2.2)
+    true_pts = [(0, 0.0), (1, 0.40), (2, 1.05)]
+    meas_pts = [(0, 0.10), (1, 0.33), (2, 1.13)]
+    for (zt, yt), (zm, ym) in zip(true_pts, meas_pts):
+        ax.plot(zt, yt, "o", color=BLUE, ms=7, zorder=5)
+        ax.plot(zm, ym, "s", color=RED, ms=8, zorder=6)
+        ax.annotate("", xy=(zm, ym), xytext=(zt, yt),
+                    arrowprops=dict(arrowstyle="->", color=RED, lw=1.3))
+    ax.plot([], [], "o", color=BLUE, label="true crossing point")
+    ax.plot([], [], "s", color=RED,
+            label=r"recorded hit ($\pm\sigma_{\rm res}$ in $x$ and $y$)")
+    ax.plot([p[0] for p in meas_pts], [p[1] for p in meas_pts], color=RED,
+            lw=2.2, label=r"measured segments, kink $\theta$ at plane $k$")
+    ax.annotate(r"$\theta$", xy=(1.24, 0.60), fontsize=13, color=RED)
+    ax.annotate(r"scattering kick $\sim\mathcal{N}(0,\sigma_{\rm scatt}^2)$"
+                "\nper projection, at the plane",
+                xy=(1.02, 0.42), xytext=(0.38, 0.86), fontsize=9, color=BLUE,
+                arrowprops=dict(arrowstyle="->", color=BLUE, lw=0.9))
+    ax.set_xlim(-0.5, 2.75); ax.set_ylim(-0.35, 1.62)
+    ax.axis("off")
+    ax.legend(loc="lower right", fontsize=8.2, frameon=True)
+    ax.set_title("(a) one measured kink: one scattering kick, three hit "
+                 "smears\n(schematic, angles hugely exaggerated)",
+                 loc="left", fontsize=11)
+
+    # ---- (b) Rayleigh ------------------------------------------------------
+    ax = axes[1]
+    hi = max(eps * 1.25, np.quantile(kinks, 0.999))
+    ax.hist(kinks, bins=70, range=(0, hi), density=True, color="#9ecae1",
+            edgecolor="none", label=f"measured true kinks ({len(kinks)})")
+    g = np.linspace(0, hi, 600)
+    ax.plot(g, g / sig_p ** 2 * np.exp(-g ** 2 / (2 * sig_p ** 2)), color="#33322e",
+            lw=2.0,
+            label=r"Rayleigh($\sigma_p$), $\sigma_p^2=\sigma_{\rm scatt}^2"
+                  r"+6\sigma_{\rm res}^2/\Delta z^2$")
+    ax.axvline(eps, color=GREEN, lw=2.0,
+               label=rf"$\varepsilon=3\sqrt{{2}}\,\sigma_p={eps*1e3:.2f}$ mrad"
+                     "\n" + r"(misses $e^{-9}=1.2\times10^{-4}$ of true kinks)")
+    ax.set_xlabel(r"3D kink angle $\theta$ at the shared hit [rad]")
+    ax.set_ylabel("density")
+    ax.set_xlim(0, hi)
+    ax.legend(fontsize=8.4, loc="upper right")
+    ax.set_title("(b) the kink is Rayleigh, and its tail sets the acceptance",
+                 loc="left", fontsize=11)
+    print(f"    [eps fig] sigma_p={sig_p:.3e}  eps={eps:.4e} "
+          f"({eps*1e3:.3f} mrad)  measured mean={kinks.mean():.4e}  "
+          f"Rayleigh mean={sig_p*np.sqrt(np.pi/2):.4e}  "
+          f"fraction above eps={float((kinks>eps).mean()):.2e}")
+    save(fig, "epsilon_derivation")
+
+
 def fig_run3crop():
     from PIL import Image
     src = ("/data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Run3/"
@@ -841,4 +952,5 @@ if __name__ == "__main__":
          "threshold": fig_threshold, "fitpaper": fig_fitpaper,
          "occfit": fig_occfit, "clean2x2": fig_clean2x2,
          "occproofcrop": fig_occproofcrop,
+         "epsilon": fig_epsilon,
          "rescompare": fig_resources_compare}[c]()
