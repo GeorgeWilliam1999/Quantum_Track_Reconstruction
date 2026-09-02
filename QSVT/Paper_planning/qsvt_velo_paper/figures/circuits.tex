@@ -3,26 +3,6 @@
 % the wires it spans; the meter is a measurement with post-selection on the
 % value written beside it.  |Psi_k> labels mark the states written out in
 % section 3 (1BQF), section 11.5 (HHL) and section 4 (QSVT).
-\tikzset{
-  wire/.style={line width=0.55pt},
-  gate/.style={draw,fill=white,minimum height=6.2mm,minimum width=7.5mm,inner sep=1.5pt,font=\small,line width=0.55pt},
-  wgate/.style={gate,minimum width=13mm},
-  ctrl/.style={circle,fill=black,inner sep=0pt,minimum size=1.9mm},
-  octrl/.style={circle,draw,fill=white,inner sep=0pt,minimum size=1.9mm,line width=0.55pt},
-  targ/.style={circle,draw,inner sep=0pt,minimum size=3.2mm,line width=0.55pt},
-  meter/.style={draw,fill=white,minimum height=6.2mm,minimum width=7.5mm,line width=0.55pt},
-  reg/.style={font=\small,anchor=east},
-  blk/.style={font=\footnotesize,anchor=north,text=black!65},
-  st/.style={font=\footnotesize,anchor=south,text=blue!45!black},
-  brace/.style={decorate,decoration={brace,mirror,amplitude=2.2pt},line width=0.4pt,black!60},
-  slash/.style={},
-}
-\newcommand{\slashwire}[3]{% x y label : the /n mark on a multi-qubit wire
-  \draw[line width=0.7pt] (#1cm-1.3mm,#2cm-1.6mm) -- (#1cm+1.3mm,#2cm+1.6mm);
-  \node[font=\scriptsize,anchor=south west,inner sep=0.4pt] at (#1cm+0.9mm,#2cm+0.9mm) {#3};}
-\newcommand{\vsep}[3]{% x ybot ytop : a dashed block boundary
-  \draw[dashed,black!45,line width=0.4pt] (#1cm,#2cm) -- (#1cm,#3cm);}
-
 \begin{tikzpicture}[x=1cm,y=1cm]
 % ─────────────────────────── (a) HHL ────────────────────────────────────────
 \begin{scope}[shift={(0,0)}]

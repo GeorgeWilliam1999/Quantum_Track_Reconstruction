@@ -1,0 +1,58 @@
+% Two further realisations of the same polynomial response (section 4.2), to
+% the conventions of figure~\ref{fig:circuits}: (a) the phase sequence, the
+% literature's QSVT; (b) the trigonometric comb over the one-bit filter's own
+% evolution (QETU).  The LCU realisation is figure~\ref{fig:circuits}(c).
+\begin{tikzpicture}[x=1cm,y=1cm]
+% ─────────────── (a) the phase sequence ───────────────
+\begin{scope}[shift={(0,0)}]
+\node[anchor=west,font=\small\bfseries] at (-2.2,1.95) {(a) the phase sequence (QSVT proper)};
+\node[reg] at (-0.15,0.9)  {$|0\rangle_{\phi}$};
+\node[reg] at (-0.15,0)    {$|0\rangle_{D}$};
+\node[reg] at (-0.15,-0.9) {$|0\rangle^{\otimes n}_{S}$};
+\draw[wire] (0,0.9) -- (12.6,0.9); \draw[wire] (0,0) -- (12.6,0); \draw[wire] (0,-0.9) -- (12.6,-0.9);
+\slashwire{0.35}{-0.9}{$n$}
+\node[gate] at (1.1,-0.9) {$H^{\otimes n}$};
+\node[gate,minimum width=13mm] at (1.1,0.9) {$e^{i\phi_0 Z}$};
+\vsep{1.85}{-1.45}{1.25}
+% one repetition: U on (D,S), then the projector-controlled phase on the signal qubit
+\node[gate,minimum height=19mm,minimum width=9mm] at (2.9,-0.45) {$U$};
+\node[octrl] at (4.0,0) {}; \draw[wire] (4.0,0.09) -- (4.0,0.62);
+\node[gate,minimum width=13mm] at (4.0,0.9) {$e^{i\phi_k Z}$};
+\vsep{5.0}{-1.45}{1.25}
+\node[gate,minimum height=19mm,minimum width=9mm] at (5.9,-0.45) {$U^{\dagger}$};
+\node[octrl] at (7.0,0) {}; \draw[wire] (7.0,0.09) -- (7.0,0.62);
+\node[gate,minimum width=13mm] at (7.0,0.9) {$e^{i\phi_{k+1} Z}$};
+\vsep{8.0}{-1.45}{1.25}
+\node[font=\small] at (8.55,-0.45) {$\cdots$};
+\draw[brace] (1.9,-1.55) -- (8.0,-1.55); \node[blk] at (4.95,-1.72) {$d$ calls, alternating $U$ and $U^{\dagger}$; $d{+}1$ phases, each conditioned on dilation $=|0\rangle$};
+\node[meter] at (9.6,0.9) {}; \draw[wire] (9.35,0.78) arc (160:20:0.27); \draw[wire,-latex] (9.6,0.78) -- (9.8,1.02);
+\node[font=\scriptsize,anchor=west] at (9.95,0.9) {$=0$};
+\node[meter] at (9.6,0) {}; \draw[wire] (9.35,-0.12) arc (160:20:0.27); \draw[wire,-latex] (9.6,-0.12) -- (9.8,0.12);
+\node[font=\scriptsize,anchor=west] at (9.95,0) {$=0$};
+\node[font=\small,anchor=north west] at (10.3,-1.0) {$\propto\ P(X)\,|u\rangle,\ \ \mathrm{Re}\,P=q$};
+\node[st] at (1.85,1.3) {$|\Phi_1\rangle$}; \node[st] at (8.0,1.3) {$|\Phi_2\rangle$}; \node[st] at (9.95,1.3) {$|\Phi_3\rangle$};
+\node[anchor=north west,font=\footnotesize,text=black!65,text width=11.5cm,align=left] at (-2.2,-2.25) {real part: one more ancilla and the sequence with $-\phi$ in superposition; a polynomial without definite parity: one more ancilla, an even and an odd sequence};
+\end{scope}
+% ─────────────── (b) the trigonometric comb over e^{-iAt} ───────────────
+\begin{scope}[shift={(0,-6.2)}]
+\node[anchor=west,font=\small\bfseries] at (-2.2,1.95) {(b) the trigonometric comb over $e^{-iAt}$ (QETU)};
+\node[reg] at (-0.15,0.45)  {$|0\rangle_{A}$};
+\node[reg] at (-0.15,-0.9) {$|0\rangle^{\otimes n}_{S}$};
+\draw[wire] (0,0.45) -- (12.6,0.45); \draw[wire] (0,-0.9) -- (12.6,-0.9);
+\slashwire{0.35}{-0.9}{$n$}
+\node[gate] at (1.1,-0.9) {$H^{\otimes n}$};
+\node[gate,minimum width=13mm] at (1.1,0.45) {$e^{i\varphi_0 X}$};
+\vsep{1.85}{-1.45}{1.0}
+\node[ctrl] at (2.7,0.45) {}; \draw[wire] (2.7,0.45) -- (2.7,-0.9); \node[gate,minimum width=11mm] at (2.7,-0.9) {$e^{-iAt}$};
+\node[octrl] at (3.9,0.45) {}; \draw[wire] (3.9,0.36) -- (3.9,-0.9); \node[gate,minimum width=11mm] at (3.9,-0.9) {$e^{+iAt}$};
+\node[gate,minimum width=13mm] at (5.15,0.45) {$e^{i\varphi_k X}$};
+\vsep{6.0}{-1.45}{1.0}
+\node[font=\small] at (6.55,-0.3) {$\cdots$};
+\draw[brace] (1.9,-1.55) -- (6.0,-1.55); \node[blk] at (3.95,-1.72) {$K$ controlled evolutions, $K{+}1$ rotations $\varphi_0,\dots,\varphi_K$};
+\node[meter] at (7.6,0.45) {}; \draw[wire] (7.35,0.33) arc (160:20:0.27); \draw[wire,-latex] (7.6,0.33) -- (7.8,0.57);
+\node[font=\scriptsize,anchor=west] at (7.95,0.45) {$=0$};
+\node[font=\small,anchor=north west] at (8.3,-1.0) {$\propto\ \Big(\sum_{k=0}^{K} c_k\cos(kAt)\Big)|u\rangle$};
+\node[st] at (1.85,0.85) {$|\Theta_1\rangle$}; \node[st] at (6.0,0.85) {$|\Theta_2\rangle$}; \node[st] at (7.95,0.85) {$|\Theta_3\rangle$};
+\node[anchor=north west,font=\footnotesize,text=black!65,text width=11.5cm,align=left] at (-2.2,-2.25) {the one-bit filter is $K=1$: $\cos(At/2)$ up to the choice of $t$; the circuit as built realises $e^{-iAt}$ as a per-pair product (section~\ref{sec:fork:trotter})};
+\end{scope}
+\end{tikzpicture}

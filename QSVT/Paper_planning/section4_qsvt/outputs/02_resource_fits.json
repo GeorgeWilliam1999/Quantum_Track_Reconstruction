@@ -1,0 +1,44 @@
+{
+ "P_1bqf": {
+  "exponent": -0.7866681923445688,
+  "prefactor": 0.0942477633543859
+ },
+ "P_lcu_measured": {
+  "exponent": -0.9983989110249958,
+  "prefactor": 0.43154433157419775
+ },
+ "P_phase": {
+  "exponent": -1.0004655875998505,
+  "prefactor": 0.946692202033608
+ },
+ "P_qetu": {
+  "exponent": -1.0014210449261032,
+  "prefactor": 0.959923139833658
+ },
+ "P_hhl8": {
+  "exponent": -0.39833689473382866,
+  "prefactor": 1.5550258717089818
+ },
+ "givens_cx_per_call": {
+  "exponent": 1.3714358353834137,
+  "prefactor": 151.67868522010875
+ },
+ "hit_cx_per_call": {
+  "exponent": 0.8488639076277763,
+  "prefactor": 102.55408020602448
+ },
+ "givens_extrapolation": {
+  "exponent": 1.371435835383413,
+  "prefactor": 151.67868522010875,
+  "measured_T_max": 400
+ },
+ "comb": {
+  "degree": 40,
+  "l1": 0.5143919951404361,
+  "pmax": 0.34943554120909276,
+  "parity_penalty": 1.0008426026200279,
+  "trig_K": 40,
+  "trig_t": 0.3976699561506067,
+  "trig_l1": 1.5176123028851973
+ }
+}

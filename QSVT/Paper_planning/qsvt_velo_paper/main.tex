@@ -18,6 +18,7 @@
 \usepackage{microtype}
 \usepackage{tikz}
 \usetikzlibrary{decorations.pathreplacing,calc}
+\input{figures/circuit_styles.tex}
 \usepackage{parskip}
 \usepackage{enumitem}
 \usepackage{fancyhdr}
@@ -1490,117 +1491,461 @@ its first term.
 \section{From one bit to any polynomial: the QSVT construction}
 \label{sec:qsvt}
 
-The promotion from eq.~\eqref{eq:notch} to an arbitrary polynomial
-response rests on three standard ingredients: block encoding,
-qubitization, and a linear combination of unitaries (LCU). I assemble
-them here in the concrete, real-arithmetic form used by the
-simulations. Readers who trust the QSVT
-literature~\cite{gslw2019,lowchuang2019,childs2012,martyn2021} can
-skim to the resource summary in section~\ref{sec:qsvt:resources}; the
-details are included because this work's cost claims (qubit counts,
-walk calls, success probabilities) are read directly off this
-construction.
+The one-bit filter weighs every eigencomponent by one cosine. Everything
+from here on weighs it by a polynomial, and this section is the deep dive
+into what that means: what the theorem behind it actually says, the three
+circuits that realise it, how the polynomial is found, and what it costs
+--- classically and on a quantum computer --- with every number measured or
+modelled on the same events as the rest of the paper.
+Readers who trust the QSVT
+literature~\cite{gslw2019,lowchuang2019,childs2012,martyn2021} can skim to
+the cost model of section~\ref{sec:qsvt:resources}; the details are
+included because every resource claim in this work is read directly off
+these constructions.
 
-\subsection{Block encoding and the qubitization walk}
+\subsection{What a polynomial of a matrix buys, and what QSVT is}
+\label{sec:qsvt:what}
 
-Rescale the Hamiltonian affinely so its spectrum fits in $[-1,1]$:
-$X=(A-c_0 I)/c_1$ with $c_0$ the spectrum centre and $c_1$ slightly
-more than its half-width\footnote{The implementation pads the
-user-supplied spectral bounds by a few percent; an early campaign bug
-taught us that the polynomial's fit domain must exceed the padded
-bounds or the constructor rightly refuses.}. A block encoding is a
-unitary that hides $X$ in its top-left corner:
+A function $f$ of the Hamiltonian acts mode by mode, $f(A)\mathbf{u}=
+\sum_j f(\lambda_j)\beta_j|u_j\rangle$, so choosing $f$ is choosing a
+weight for every eigenvalue. A polynomial of degree $d$ has $d$ roots to
+place, and it is the class of functions a quantum circuit can apply with a
+number of operator calls equal to the degree. The theorem that says so is
+the quantum singular value transformation~\cite{gslw2019}, which in the
+Hermitian form this work needs reads as follows. Rescale the Hamiltonian
+affinely so that its spectrum fits in $[-1,1]$: $X=(A-c_0I)/c_1$, with
+$c_0$ the centre of the polynomial's domain and $c_1$ its
+half-width\footnote{The implementation pads the estimated spectral bounds
+by a few percent; an early campaign bug taught us that the polynomial's
+domain must contain the padded spectrum or the constructor rightly
+refuses.}. A \emph{block encoding} of $X$ is a unitary $U$ on the system
+register plus one more qubit whose top-left block is $X$,
 \begin{equation}
+(\langle0|\otimes I)\,U\,(|0\rangle\otimes I)=X,
+\qquad\text{for instance}\qquad
 U=\begin{pmatrix} X & \sqrt{I-X^{2}}\\[2pt] \sqrt{I-X^{2}} & -X
 \end{pmatrix},
 \label{eq:dilation}
 \end{equation}
-acting on the segment register plus one \emph{dilation} qubit. The
-picture I find most useful is a rotation in each eigenplane: for every
-eigenvalue $x$ of $X$ there is a two-dimensional invariant subspace in
-which $U$ rotates by the angle $\arccos x$.
+the \emph{dilation}, which is the block encoding the simulations use.
+Because $X$ is symmetric, $U$ decomposes over the eigenvectors of $X$: for
+every eigenvalue $x$ there is a two-dimensional invariant plane, spanned by
+$|u_j\rangle$ with the extra qubit in $|0\rangle$ and in $|1\rangle$, in
+which $U$ acts as the reflection
+\begin{equation}
+R(x)=\begin{pmatrix} x & \sqrt{1-x^{2}}\\ \sqrt{1-x^{2}} & -x\end{pmatrix}.
+\label{eq:eigenplane}
+\end{equation}
+Now let $\Pi$ be the projector onto ``extra qubit in $|0\rangle$'' and
+$e^{i\phi(2\Pi-I)}$ the rotation that phases the two halves of every
+eigenplane oppositely --- in each plane it is $e^{i\phi Z}$. The theorem:
+\begin{quote}
+\emph{For every real polynomial $q$ of degree $d$ with definite parity,
+$q(-x)=\pm q(x)$, and $|q(x)|\le1$ on $[-1,1]$, there exist phases
+$\phi_0,\dots,\phi_d$ such that the circuit}
+\begin{equation}
+U_{\Phi}=e^{i\phi_0(2\Pi-I)}\prod_{k=1}^{d}\Big[U^{(\dagger)}\,e^{i\phi_k(2\Pi-I)}\Big],
+\label{eq:qsvt}
+\end{equation}
+\emph{with $U$ and $U^{\dagger}$ alternating, satisfies
+$(\langle0|\otimes I)\,U_{\Phi}\,(|0\rangle\otimes I)=P(X)$ for a
+polynomial $P$ whose real part is $q$. It uses $U$ exactly $d$ times, one
+signal qubit for the phases, and the phases are found classically.}
+\end{quote}
+The whole content is the eigenplane picture: eq.~\eqref{eq:qsvt}
+restricted to one plane is a product of $2\times2$ matrices,
+$e^{i\phi_0Z}\prod_k R(x)e^{i\phi_kZ}$, whose top-left element is a
+polynomial in $x$ of degree $d$ --- quantum signal processing on one qubit
+--- and the existence of phases for any bounded definite-parity $q$ is a
+statement about such products~\cite{lowchuang2019,gslw2019}. Applying it
+in every eigenplane at once, which is what $U$ does, applies $q$ to every
+eigenvalue at once, without diagonalising anything. The imaginary part of
+$P$ is the price of unitarity and is discarded by the standard real-part
+construction (one more ancilla holding the sequence and its conjugate in
+superposition, section~\ref{sec:qsvt:realisations}); the parity condition
+is real, and is met by splitting a general polynomial into its even and odd
+parts.
 
-The word \emph{walk} deserves an explanation, because nothing in this work has moved yet and the term is imported jargon. A walk operator
-is simply a fixed unitary that one applies over and over, taking one
-``step'' per application, in analogy with a classical random walk
-where one transition matrix is applied repeatedly. The useful property
-is what repetition does. Because $U$ rotates each eigenplane by
-$\arccos x$, applying the walk $k$ times rotates it by $k\arccos x$,
-and the component that ends where it started is
-$\cos(k\arccos x)$, which is precisely the $k$-th Chebyshev
-polynomial $T_k(x)$. One application of the walk knows only $x$;
-$k$ applications know $T_k(x)$. Repetition of a single fixed circuit
-therefore \emph{generates a polynomial family}, one degree per step,
-and that is the entire mechanism by which a quantum computer applies
-polynomials of a matrix without ever diagonalising it. Formally, the
-\emph{qubitization walk} $W=(Z\otimes I)\,U$ (the extra sign
-$Z$ on the dilation qubit turns the reflections of $U$ into clean
-rotations) has the defining property
+Two special phase choices are worth naming because the rest of this work is
+built on them. With every phase zero, the product of reflections is not a
+polynomial one wants; but the \emph{qubitization walk}
+$W=(Z\otimes I)\,U$, which turns each reflection $R(x)$ into a rotation by
+$\arccos x$, has the defining property
 \begin{equation}
 \big\langle 0\big|\,W^{k}\,\big|0\big\rangle_{\rm dil}=T_{k}(X),
 \label{eq:walkcheb}
 \end{equation}
-where $T_k$ is the $k$-th Chebyshev polynomial and the bra-ket
-projects the dilation qubit onto $|0\rangle$.
-Equation~\eqref{eq:walkcheb} is exact, with no Trotterization and no
-error terms, and every operator in it is real, so the entire
-simulation can run in real arithmetic on orthogonal matrices. Walking
-$k$ steps and looking at the undeflected component applies the $k$-th
-Chebyshev polynomial of the Hamiltonian; that is the whole theorem.
+where $T_k(x)=\cos(k\arccos x)$ is the $k$-th Chebyshev polynomial: walking
+$k$ steps and reading the undeflected component applies $T_k$, exactly,
+with no error term and every operator real. A weighted sum of walk powers
+is then any polynomial, and this is the realisation the simulations run.
+And the one-bit filter of section~\ref{sec:onebit} is the degree-one
+member of the same family on a different primitive: the evolution
+$e^{-iAt}$ in place of the block encoding, and one cosine in place of one
+Chebyshev polynomial. Chebyshev polynomials of the block encoding and
+cosines of the evolution are two bases for the same object --- a bounded
+polynomial response on the spectrum --- and the three circuits below are
+three ways of assembling it.
 
-\subsection{Summing the series: LCU}
+\subsection{Three ways to apply it}
+\label{sec:qsvt:realisations}
 
-A degree-$d$ response $p(X)=\sum_{k=0}^{d}c_k T_k(X)$ is then a
-weighted sum of walk powers. Introduce an index register of
-$m=\lceil\log_2(d{+}1)\rceil$ qubits, prepare
-$|{\rm prep}\rangle\propto\sum_k\sqrt{|c_k|}\,|k\rangle$, apply
-$W^{k}$ controlled on the index (in practice: controlled powers
-$W^{2^j}$), undo the preparation, and post-select the index and
-dilation registers on zero. The surviving register state is
-$\propto p(X)|u\rangle$ with success probability
+The response is one thing; the circuit that applies it is a choice, and
+the choice sets the width, the depth and the success probability. Three
+realisations appear in this work, drawn in figure~\ref{fig:circuits}(c)
+and figure~\ref{fig:circuitsqsvt}, and table~\ref{tab:realisations}
+collects what each costs at the production degree $d=40$.
+
+\paragraph{The linear combination of Chebyshev powers (the build).} With
+the walk of eq.~\eqref{eq:walkcheb}, a response $p(X)=\sum_{k=0}^{d}c_kT_k(X)$
+is a weighted sum of walk powers. Introduce an index register of
+$m=\lceil\log_2(d{+}1)\rceil$ qubits, prepare it in
+$\sum_k\sqrt{|c_k|/\lVert c\rVert_1}\,|k\rangle$ with the coefficient signs
+applied as a diagonal, apply $W^{k}$ controlled on the index --- as built,
+controlled powers $W^{2^{j}}$ from index qubit $j$, so the circuit executes
+$2^{m}-1=63$ walk steps at $d=40$ where a unary SELECT would execute $d$ ---
+undo the preparation, and post-select index and dilation on zero. The
+surviving state is $\propto p(X)|u\rangle$ with success probability
 \begin{equation}
 P_{\rm anc}=\frac{\big\lVert p(X)\,|u\rangle\big\rVert^{2}}
 {\big(\sum_k |c_k|\big)^{2}} ,
 \label{eq:psucc}
 \end{equation}
-the usual LCU price: the one-norm of the coefficient vector. The 1BQF
-is recovered, exactly, as the $d=1$ row of this table ($\cos$ is
-$T_1$ of the appropriately rescaled operator), which is the formal
-content of the claim that this work continues rather than replaces
-its predecessors.
+the usual price of a linear combination of unitaries: the one-norm of the
+coefficients. No phases are needed and every operator is real, which is
+why this is the form the exact simulations use. Its cost is width ---
+$1+m=7$ ancillas at $d=40$ --- and controlled walks.
 
-Simulation-side, eq.~\eqref{eq:walkcheb} gives a matrix-free
-evaluator: $p(A)\mathbf{b}$ by the Chebyshev three-term recursion on
-sparse matrix-vector products, $\mathcal{O}(d\cdot{\rm nnz}(A))$
-flops. In a persisted benchmark of the production configuration the
-$d=40$ comb solve runs in $1.2$--$1.7$\,s at $T=1000$
-($n=4\times10^{6}$), and the evaluator agrees with the full qiskit
-circuit and with a gate-streaming evaluation to better than
-$10^{-14}$ at circuit-affordable size (three-way maximum
-discrepancy $8\times10^{-15}$). All large-$T$ results below use this
-exact evaluator; nothing in this work relies on an approximate
-simulation of the quantum readout.
+\paragraph{The phase sequence (QSVT proper).} Equation~\eqref{eq:qsvt}
+directly: $d$ uncontrolled applications of $U$, one signal qubit, and the
+polynomial itself rather than its one-norm in the success probability.
+This work has now built it for the production comb. The comb has no
+definite parity, so it is split, $p=p_{\rm e}+p_{\rm o}$, each part
+rescaled to peak at one, $q_{\rm e}=p_{\rm e}/\alpha_{\rm e}$ and
+$q_{\rm o}=p_{\rm o}/\alpha_{\rm o}$, and given its own sequence: $41$
+phases for the even part and $40$ for the odd, found by the symmetric-phase
+method of ref.~\cite{dong2021} (a quasi-Newton minimisation of the mismatch
+on Chebyshev nodes; $7$\,s and $171$\,s from a cold start) to a scalar
+accuracy of $2\times10^{-7}$ and $8\times10^{-7}$. The circuit was then
+run as dense linear algebra on a $36$-segment event --- the block encoding
+of eq.~\eqref{eq:dilation}, the projector-controlled rotations, $40$
+applications --- and reproduces $q(X)|u\rangle$ on the real part of the
+post-selected branch to $2\times10^{-9}$ (even) and $2\times10^{-7}$ (odd).
+Two honest additions to the textbook count follow. The real part costs one
+ancilla and the sequence together with its conjugate in superposition; the
+parity split costs one more ancilla and both sequences. So a real,
+indefinite-parity polynomial such as the comb runs on $n_{\rm sys}+4$
+qubits with $4d$ block-encoding calls per shot ($2d$ for a polynomial of
+definite parity, which the even-height four-tooth comb of
+section~\ref{sec:toy:modes} would be), and its success probability is
+\begin{equation}
+P_{\rm anc}=\frac{\lVert q(X)|u\rangle\rVert^{2}}{(\alpha_{\rm e}+\alpha_{\rm o})^{2}},
+\qquad q=p/\max|p|,\quad
+(\alpha_{\rm e}+\alpha_{\rm o})^{2}=1.001 .
+\label{eq:psucc_phase}
+\end{equation}
+The comb's even and odd peaks happen to add to almost exactly one, so the
+split costs nothing in probability; and because the polynomial may be
+scaled to $\max|p|=1$ while the one-norm route may not, the phase sequence
+gains a factor $(\lVert c\rVert_1/\max|p|)^{2}=(0.514/0.349)^{2}=2.2$ over
+the build in success probability (figure~\ref{fig:combdeg}c), which is
+precisely the LCU penalty.
 
-\subsection{Resource summary}
+\paragraph{The trigonometric comb over the evolution (QETU).} The one-bit
+filter's primitive is $e^{-iAt}$, synthesised as one two-level rotation per
+compatible pair, and the same primitive can carry the comb: a
+trigonometric polynomial $\sum_{k=0}^{K}c_k\cos(kAt)$ applied by the
+quantum eigenvalue transformation of unitaries~\cite{dong2022} --- $K$
+controlled evolutions interleaved with single-qubit rotations on one
+ancilla, figure~\ref{fig:circuitsqsvt}(b). It runs at exactly the one-bit
+filter's width, $n_{\rm sys}+2$, and is the hardware route of
+section~\ref{sec:limits:resources}. A comb of order $K=40$ in
+$\theta=\lambda t$ with $t=\pi/7.9$ reproduces the production comb's
+segment metrics on the clean events; its rotations are not synthesised in
+this work (the resource numbers do not depend on them), and, being built on
+the per-pair product for $e^{-iAt}$, it inherits the product-formula
+caveat of section~\ref{sec:fork:trotter}.
+
+\begin{table}[tbp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+realisation (primitive) & ancillas & calls per shot & success probability & phases & exact? \\
+\midrule
+HHL, $n_c$-bit clock ($e^{\pm iAt}$) & $n_c{+}1$ & $2(2^{n_c}{-}1)$ & $\sum_j\beta_j^{2}C^{2}/\tilde\lambda_j^{2}$ & none & clock-limited \\
+1BQF ($e^{\pm iAt}$) & $2$ & $2$ & $\sum_j\beta_j^{2}\cos^{2}(\lambda_jt/2)$ & none & product formula \\
+comb, LCU of walk powers (block enc.) & $1{+}m=7$ & $2^{m}{-}1=63$ ($d$ optimal) & $\lVert p(X)u\rVert^{2}/\lVert c\rVert_1^{2}$ & none & exact \\
+comb, phase sequence (block enc.) & $4$ & $4d=160$ ($2d$ def.\ parity) & $\lVert q(X)u\rVert^{2}/(\alpha_{\rm e}{+}\alpha_{\rm o})^{2}$ & $d{+}1$ per part, found & exact \\
+comb over $e^{-iAt}$, QETU ($e^{\pm iAt}$) & $2$ & $K=40$ & $\lVert p_{\rm trig}(A)u\rVert^{2}$ & $K{+}1$, not synthesised & product formula \\
+\bottomrule
+\end{tabular}}
+\caption{The three realisations of the degree-40 comb, with HHL and the
+one-bit filter for reference. Ancillas are beyond the system register
+$n_{\rm sys}=\lceil\log_2 4T^{2}\rceil$; ``calls'' counts uses of the
+primitive per shot before amplification; ``exact'' says whether the circuit
+applies the intended response exactly or through an approximation (the
+finite clock for HHL, the per-pair product for $e^{-iAt}$). The block
+encoding's own price is a separate axis, section~\ref{sec:qsvt:resources}.}
+\label{tab:realisations}
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\captionsetup{width=0.96\textwidth}
+\resizebox{0.98\textwidth}{!}{\input{figures/circuits_qsvt.tex}}
+\caption{The two realisations of the comb not drawn in
+figure~\ref{fig:circuits}. (a) The phase sequence, eq.~\eqref{eq:qsvt}:
+the block encoding $U$ and its inverse alternate with rotations
+$e^{i\phi_kZ}$ on a signal qubit, each conditioned on the dilation qubit
+reading $|0\rangle$; $d$ calls, $d{+}1$ phases, and the polynomial appears
+on the real part of the post-selected branch. (b) The trigonometric comb on
+the one-bit filter's own primitive: $K$ controlled evolutions
+$e^{\mp iAt}$ interleaved with rotations $e^{i\varphi_kX}$ on one ancilla,
+post-selected on zero, at the width of the 1BQF. The states $|\Phi_k\rangle$
+and $|\Theta_k\rangle$ mark the same three stages as in
+figure~\ref{fig:circuits}: prepared, transformed, post-selected.}
+\label{fig:circuitsqsvt}
+\end{figure}
+
+\subsection{Finding the polynomial}
+\label{sec:qsvt:design}
+
+The polynomial is found in three steps and constrained by two rules, and
+figure~\ref{fig:combdeg} shows all of it on the production comb.
+
+\emph{Target.} The response wanted is written down as a function of
+$\lambda$ on the polynomial's domain, here $[0.2,\,7.8]$. For the comb it
+is a Gaussian pass of half-width $h_w=0.18$ at each of the four true-track
+lines $s-2\cos(k\pi/5)$, weighted by $1/\lambda$ so that the passed
+amplitudes reproduce the classical profile inside a track, and zero
+elsewhere; the retired first design was a contiguous band with notches
+(section~\ref{sec:comb}). \emph{Fit.} The target is sampled on a grid of
+$6000$ points and fitted by a Chebyshev series of degree $d$ in least
+squares, which is a linear problem solved in milliseconds. The minimax
+alternative --- the same target fitted in the Chebyshev norm by a linear
+program --- equiripples the error and reaches a smaller worst-case
+deviation at the same degree ($0.16$ against $0.26$ at $d=16$) at the
+price of spreading it everywhere (figure~\ref{fig:combdeg}a); the
+production design is the least-squares one. \emph{Bound.} A response is
+realisable only if $|p|\le1$ on the domain, so the series is rescaled;
+the comb as fitted peaks at $0.349$, which the phase sequence scales up to
+one and the one-norm route cannot. Section~\ref{sec:fit} replaces the first
+step by a measurement --- the response's binned values become the unknowns
+of a quadratic objective on the observed pile-up --- and keeps the other two.
+
+The two rules are what set the degree. The first is the \emph{resolution
+law}: a Chebyshev series of degree $d$ on a domain of half-width $W$ can
+resolve no feature narrower than about $2W/d$. With $W=3.8$ that is $0.19$
+at $d=40$ --- just enough to separate the triple line at $s-\sqrt2$ from
+the nearest true line, $0.20$ away, and to keep a pass of full width $0.36$
+from spilling into its neighbour --- and $0.48$ at $d=16$, where the passes
+have merged into a band that still rejects the isolated line and the
+pairs, which is why the half-resolved comb of section~\ref{sec:comb:resources}
+holds the metrics to $T=700$ at a fraction of the depth
+(figure~\ref{fig:combdeg}d). Between the two, intermediate degrees can land
+on unlucky fits whose false bulk swallows the true tail, the cliffs of
+section~\ref{sec:comb:resources}; degrees are validated, not
+interpolated. The second rule is \emph{parity}: the phase sequence needs
+$q(-x)=\pm q(x)$, the comb has both parts, and the split of
+section~\ref{sec:qsvt:realisations} is the price --- unless the target is
+designed even from the start, which an equal-height comb on the four lines
+would be.
+
+\begin{figure}[tbp]
+\centering
+\captionsetup{width=0.96\textwidth}
+\includegraphics[width=0.98\textwidth]{comb_degrees.pdf}
+\caption{How the polynomial is found. (a) The comb target and its
+least-squares Chebyshev realisation at degrees $8$, $16$, $24$ and $40$
+over the populated spectrum (dotted green: the true lines; dashed: the
+isolated line; dotted red: the pair lines), each normalised to its peak;
+the passes sharpen as the resolvable width $2W/d$ shrinks. The minimax fit
+at degree $16$ has the smaller worst-case error and spreads it over the
+whole domain. (b) The Chebyshev coefficients at degrees $16$ and $40$.
+(c) The one-norm $\sum_k|c_k|$, the peak $\max|p|$, and their squared
+ratio, which is the success-probability penalty the one-norm realisation
+pays relative to the phase sequence: $2.2$ at $d=40$. (d) The resolution
+law $2W/d$ against the widths that matter: the pass, the closest true-line
+spacing, and the gap between the triple line and the nearest true line.}
+\label{fig:combdeg}
+\end{figure}
+
+\subsection{Classical cost}
+\label{sec:qsvt:classical}
+
+Everything above can be run classically, and it is worth being exact about
+what that costs, because the answer is not the one a quantum-advantage
+narrative would like. The design is cheap: the least-squares fit is
+milliseconds, the minimax program seconds, and the phases of the sequence
+are found once per design in minutes. The pre-step that is not cheap is
+the spectral interval: the polynomial's domain must contain the spectrum,
+and estimating $\lambda_{\min}$ and $\lambda_{\max}$ by a Lanczos iteration
+on the event's matrix is the slowest classical step of the pipeline.
+Applying the polynomial is the Chebyshev three-term recursion on sparse
+matrix--vector products, $\mathcal{O}(d\cdot{\rm nnz}(A))$ flops, and the
+evaluator agrees with the full circuit to better than $10^{-14}$ wherever
+the circuit can be simulated.
+
+The comparison that matters is with the classical solver it replaces.
+Table~\ref{tab:classicalcost} measures both on the figure-\ref{fig:clean2x2}
+events. MINRES converges to $10^{-8}$ in four to nine iterations at every
+multiplicity, because $A$ is nearly diagonal --- ${\rm nnz}(A)$ exceeds
+$n_{\rm seg}$ by well under a percent --- so the classical inverse costs
+four to ten times \emph{fewer} matrix--vector products than the degree-40
+polynomial. The polynomial is not a faster classical solver; it is a
+different response, and on a classical machine the whole of this work is
+spectral-filter engineering at a cost of seconds per event. The quantum
+claim is confined to the resource profile of the next subsection.
+
+\begin{table}[tbp]
+\centering
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+$T$ & $n_{\rm seg}$ & ${\rm nnz}(A)$ & MINRES iterations & MINRES time & comb, $d=40$ & ratio of matvecs \\
+\midrule
+100  & 40\,000    & 40\,624    & 4 & 0.01\,s & 0.01\,s & 10 \\
+200  & 160\,000   & 161\,342   & 4 & 0.01\,s & 0.04\,s & 10 \\
+400  & 640\,000   & 643\,722   & 9 & 0.18\,s & 0.28\,s & 4.4 \\
+700  & 1\,960\,000 & 1\,970\,498 & 9 & 0.55\,s & 0.93\,s & 4.4 \\
+1000 & 4\,000\,000 & 4\,026\,178 & 9 & 1.41\,s & 2.09\,s & 4.4 \\
+\bottomrule
+\end{tabular}
+\caption{Classical cost on the clean fixed-acceptance events (one
+event per $T$, one core): MINRES to a relative residual of $10^{-8}$
+against the degree-40 Chebyshev evaluator. The last column is the number
+of matrix--vector products the polynomial needs for each one the inverse
+needs.}
+\label{tab:classicalcost}
+\end{table}
+
+\subsection{Quantum cost}
 \label{sec:qsvt:resources}
 
-For a degree-$d$ filter on an event of $T$ tracks:
-\begin{itemize}[leftmargin=2em]
-\item \textbf{Width}: $n_{\rm sys}=\lceil\log_2 4T^2\rceil$ system
-qubits $+\,1$ dilation $+\,m=\lceil\log_2(d{+}1)\rceil$ index qubits.
-With the production degree $d=40$ this is 21 qubits at $T=50$ rising
-to 29 at $T=1000$. Width is cheap, and grows only logarithmically.
-\item \textbf{Depth}: $d$ controlled walk calls per coherent
-repetition, times $\mathcal{O}(1/\sqrt{P_{\rm anc}})$
-amplitude-amplification rounds.
-\item \textbf{Success}: $P_{\rm anc}\propto 1/T$ (measured constant
-$\approx0.44$ for the comb of section~\ref{sec:comb}), so total walk
-calls scale as $d\sqrt{T}$.
-\end{itemize}
-The quantum content of this work is this resource profile; the
-response functions themselves are classically simulable by the same
-recursion, and I return to what that does and does not concede in
-section~\ref{sec:limits:dequant}.
+The quantum cost model has five factors, and every later resource
+statement in this work is one of them restated: width, calls per shot,
+gates per call, amplification, readout. Figure~\ref{fig:resmodel} draws
+the first four against track count for HHL, the one-bit filter and the
+three realisations of the comb, with fitted power laws, and
+table~\ref{tab:worked} works the whole chain through at $T=400$ and
+$T=1000$.
+
+\emph{Width} is the system register $n_{\rm sys}=\lceil\log_2 4T^{2}\rceil$
+--- $16$ qubits at $T=100$, $20$ at $400$, $22$ at $1000$ --- plus a
+constant that is the whole difference between the algorithms: $+2$ for the
+one-bit filter and for the comb over $e^{-iAt}$, $+4$ for the phase
+sequence, $+7$ for the one-norm build at $d=40$, and $+n_c+1$ for HHL,
+$+9$ at eight clock bits. Every route fits an LHCb-multiplicity event in
+$24$ to $31$ logical qubits; the block-encoding routes can trade width for
+depth by adding the $45$-qubit workspace of the hit-priced encoding below.
+
+\emph{Calls per shot} are independent of $T$: $2$, $40$, $63$, $160$ and
+$510$ for the 1BQF, the trigonometric comb, the one-norm build, the phase
+sequence and eight-bit HHL respectively (table~\ref{tab:realisations}).
+
+\emph{Gates per call} depend on how $A$ enters, and there are two prices.
+The evolution $e^{-iAt}$ as a per-pair product costs one two-level rotation
+per compatible pair, measured at $3.6\times10^{3}$ CX at $T=10$ rising as
+$T^{1.37}$ to $6.2\times10^{5}$ at $T=400$ ($2.0\times10^{6}$ at $T=1000$
+by extrapolation); this is the price of the 1BQF, of HHL and of the
+trigonometric comb. A block encoding of $A$ priced per matrix entry costs
+the same order (the dense dilation of the simulations is not a deployment
+circuit at all: $4^{n_{\rm sys}}$ elements). The block encoding that
+queries \emph{hits} instead of entries (section~\ref{sec:limits:blockencoding})
+is modelled at $103\,T^{0.85}$ CX per call --- $1.6\times10^{4}$ at
+$T=400$, $4.0\times10^{4}$ at $T=1000$ --- for $45$ workspace qubits, and
+is the price used here for the two block-encoding realisations.
+
+\emph{Amplification.} The post-selection succeeds with the probabilities of
+table~\ref{tab:realisations}, all measured or computed on the stored events
+and all $\propto1/T$ for the comb, because the uniform input spreads over
+$4T^{2}$ segments while $\mathcal{O}(T)$ carry surviving amplitude:
+$0.43/T$ for the one-norm build (the store's measurement, reproduced to
+three digits by the matrix-free norm), $0.95/T$ for the phase sequence and
+$0.96/T$ for the trigonometric comb, against $0.09\,T^{-0.79}$ for the
+one-bit filter, whose constant rises at high multiplicity as coupled false
+segments add kept weight, and $1.6\,T^{-0.40}$ for eight-bit HHL, which
+keeps the false bulk and pays for it at readout instead. Amplitude
+amplification turns $1/P$ repetitions into $\pi/(4\sqrt{P})$, so the calls
+per delivered sample are calls per shot times that: at $T=400$, $63$ for the
+1BQF, $641$ for the trigonometric comb, $1504$ for the one-norm build,
+$2585$ for the phase sequence and $1116$ for eight-bit HHL.
+
+\emph{Readout.} A delivered sample is one segment index drawn from the
+filtered distribution; seeing each of the $M\approx4T$ surviving true
+segments needs $M\ln M$ successes, $1.2\times10^{4}$ at $T=400$ and
+$3.3\times10^{4}$ at $T=1000$, and the full-event budget is that times the
+calls per delivered sample: the $d\,T^{1.5}\log T$ walk-call scaling that
+section~\ref{sec:limits:readout} compares with the classical
+$d\,T^{2}$ flop budget --- a square-root-class separation for the readout
+task, and no more.
+
+\begin{table}[tbp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrr}
+\toprule
+ & \multicolumn{3}{c}{$T=400$ ($n_{\rm sys}=20$)} & \multicolumn{3}{c}{$T=1000$ ($n_{\rm sys}=22$)} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+ & qubits & calls per sample & CX per sample & qubits & calls per sample & CX per sample \\
+\midrule
+1BQF (Givens $e^{-iAt}$)            & 22 & 63   & $3.9\times10^{7}$ & 24 & 50   & $1.0\times10^{8}$ \\
+comb over $e^{-iAt}$ (Givens)       & 22 & 641  & $4.0\times10^{8}$ & 24 & 1018 & $2.0\times10^{9}$ \\
+HHL, 8-bit clock (Givens)           & 29 & 1116 & $6.9\times10^{8}$ & 31 & 1499 & $3.0\times10^{9}$ \\
+comb, one-norm build (hit oracle)   & 27{+}45 & 1504 & $2.5\times10^{7}$ & 29{+}45 & 2348 & $9.5\times10^{7}$ \\
+comb, phase sequence (hit oracle)   & 24{+}45 & 2585 & $4.3\times10^{7}$ & 26{+}45 & 4052 & $1.6\times10^{8}$ \\
+\bottomrule
+\end{tabular}}
+\caption{The cost model worked through: logical qubits, operator calls per
+delivered sample after amplitude amplification, and two-qubit gates per
+delivered sample, with the per-call price appropriate to each primitive
+(the measured Givens product for the evolution-based routes, extrapolated
+beyond $T=400$; the hit-oracle model for the block-encoding routes). One
+sample is one filtered segment index; a full event needs $M\ln M\approx
+1.2\times10^{4}$ ($T=400$) and $3.3\times10^{4}$ ($T=1000$) of them.}
+\label{tab:worked}
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\captionsetup{width=0.96\textwidth}
+\includegraphics[width=0.98\textwidth]{resource_model.pdf}
+\caption{The resource model against track count, on the clean
+fixed-acceptance events (one event per $T$). (a) Logical qubits: every
+route is the system register plus a constant; the one-bit filter and the
+trigonometric comb coincide at $n_{\rm sys}+2$; the dashed line adds the
+hit-oracle workspace to the one-norm build. (b) Calls to the primitive per
+shot (left axis, independent of $T$) and two-qubit gates per call (right
+axis): the Givens product for $e^{-iAt}$, measured to $T=400$ and
+extrapolated as $T^{1.37}$, and the hit-priced block encoding model,
+$T^{0.85}$. (c) Post-selection success probability with fitted power laws;
+the hollow circles are the store's direct measurement of the one-norm
+build, which the matrix-free norm reproduces. (d) Calls per delivered
+sample after amplitude amplification.}
+\label{fig:resmodel}
+\end{figure}
+
+Three readings of the table are the ones this work carries forward.
+First, on the evolution primitive the one-bit filter is cheapest by an
+order of magnitude and nothing else comes close, which is why it is the
+member of the family that has run on hardware; the comb on the same
+primitive costs $10$--$20$ times more per delivered sample, the depth
+premium of a degree-40 response, and HHL costs $20$--$30$ times more for a
+response that does no filtering at all. Second, the block-encoding routes
+are competitive only with a block encoding priced by hits: on that price
+the one-norm build delivers a sample for fewer two-qubit gates than the
+one-bit filter on its Givens product, at the cost of $45$ workspace qubits,
+and the phase sequence sits within a factor of two of it while saving three
+of the seven LCU ancillas. Third, and the point to keep in view for the
+rest of the paper: the degree is the only knob that improves the response,
+and every realisation pays for it linearly in calls and, through the
+success probability, in amplification; section~\ref{sec:comb} shows how
+much degree the physics actually needs.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{Fitting the polynomial to the clean events: the line comb}
@@ -3367,6 +3712,17 @@ Quantum \textbf{3} (2019) 163.
 A.~M.~Childs and N.~Wiebe,
 \emph{Hamiltonian simulation using linear combinations of unitary
 operations}, Quantum Inf.\ Comput.\ \textbf{12} (2012) 901.
+
+\bibitem{dong2021}
+Y.~Dong, X.~Meng, K.~B.~Whaley and L.~Lin,
+\emph{Efficient phase-factor evaluation in quantum signal processing},
+Phys.\ Rev.\ A \textbf{103} (2021) 042419; arXiv:2002.11649.
+
+\bibitem{dong2022}
+Y.~Dong, L.~Lin and Y.~Tong,
+\emph{Ground-state preparation and energy estimation on early
+fault-tolerant quantum computers via quantum eigenvalue transformation of
+unitary matrices}, PRX Quantum \textbf{3} (2022) 040305; arXiv:2204.05955.
 
 \bibitem{martyn2021}
 J.~M.~Martyn, Z.~M.~Rossi, A.~K.~Tan and I.~L.~Chuang,

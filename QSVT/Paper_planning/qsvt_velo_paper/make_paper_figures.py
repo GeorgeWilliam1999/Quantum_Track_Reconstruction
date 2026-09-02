@@ -938,6 +938,130 @@ def fig_notch_spectrum():
     axes[1, 0].text(S + 0.08, 4e-6, "$\\lambda=s$", fontsize=8.6, color="#33322e")
     save(fig, "notch_spectrum")
 
+
+
+def fig_comb_degrees():
+    """Section 4.3: how the polynomial is found.  The production comb target and
+    its least-squares Chebyshev realisation at four degrees over the populated
+    spectrum; the Chebyshev coefficients; the one-norm, peak and LCU penalty
+    against degree; and the resolution law."""
+    from numpy.polynomial import chebyshev as Cb
+    from lhcb_velo_toy.solvers.quantum import design_line_comb_inverse, design_minimax_comb
+    lo, hi = 0.2, 7.8
+    lam = np.linspace(lo, hi, 4000)
+    lines = [S - 2 * np.cos(k * np.pi / 5) for k in (1, 2, 3, 4)]
+    target = np.zeros_like(lam)
+    for m in lines: target = np.maximum(target, np.exp(-((lam - m) / 0.18) ** 2))
+    target = target / np.clip(lam, min(lines), None)
+    fig = plt.figure(figsize=(12.8, 7.6))
+    gs = fig.add_gridspec(2, 3, height_ratios=[1.0, 0.9], hspace=0.62, wspace=0.30)
+    ax = fig.add_subplot(gs[0, :])
+    ax.plot(lam, target / target.max(), color="#33322e", lw=1.2, ls="--",
+            label="target: passes of half-width 0.18 at the four true lines, weighted $1/\\lambda$")
+    for d, col in ((8, "#c6dbef"), (16, "#6baed6"), (24, "#2171b5"), (40, "#08306b")):
+        pd_ = design_line_comb_inverse(degree=d, s=S, hw=0.18, domain=(lo, hi)); y = pd_(lam)
+        ax.plot(lam, y / np.max(np.abs(y)), color=col, lw=1.6, label="least-squares Chebyshev fit, degree %d" % d)
+    pm = design_minimax_comb(degree=16, s=S, hw=0.18, domain=(lo, hi)); y = pm(lam)
+    ax.plot(lam, y / np.max(np.abs(y)), color=ORANGE, lw=1.1, ls=":", alpha=0.75,
+            label="minimax (equiripple) fit, degree 16: smaller worst error, spread everywhere")
+    for l in lines: ax.axvline(l, color=GREEN, lw=0.8, ls=":")
+    ax.axvline(S, color=GREY, lw=0.9, ls="--"); ax.axvline(S - 1, color=RED, lw=0.7, ls=":"); ax.axvline(S + 1, color=RED, lw=0.7, ls=":")
+    ax.set_xlim(lo, hi); ax.set_ylim(-0.35, 1.08); ax.set_xlabel("eigenvalue $\\lambda$"); ax.set_ylabel("$p(\\lambda)$, normalised to its peak")
+    ax.set_title("(a) the comb at four degrees: features sharpen as $2W/d$ shrinks (domain half-width $W=3.8$)", loc="left", fontsize=10.5)
+    ax.legend(fontsize=8.2, loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=3, frameon=False)
+    ax = fig.add_subplot(gs[1, 0])
+    for d, col in ((16, "#6baed6"), (40, "#08306b")):
+        c = np.asarray(design_line_comb_inverse(degree=d, s=S, hw=0.18, domain=(lo, hi)).coef)
+        ax.plot(np.arange(len(c)), np.abs(c), "o-", ms=3.2, lw=1.0, color=col, label="degree %d" % d)
+    ax.set_yscale("log"); ax.set_xlabel("Chebyshev index $k$"); ax.set_ylabel("$|c_k|$")
+    ax.set_title("(b) the coefficients", loc="left", fontsize=10.5); ax.legend(fontsize=8.6)
+    ax = fig.add_subplot(gs[1, 1])
+    degs = [6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64]; l1 = []; pk = []
+    x = np.linspace(-1, 1, 20001)
+    for d in degs:
+        c = np.asarray(design_line_comb_inverse(degree=d, s=S, hw=0.18, domain=(lo, hi)).coef)
+        l1.append(np.abs(c).sum()); pk.append(np.max(np.abs(Cb.chebval(x, c))))
+    l1 = np.array(l1); pk = np.array(pk)
+    ax.plot(degs, l1, "s-", color="#6a3d9a", ms=4, label="$\\sum_k|c_k|$")
+    ax.plot(degs, pk, "o-", color="#08306b", ms=4, label="$\\max|p|$")
+    ax.plot(degs, (l1 / pk) ** 2, "^-", color=RED, ms=4, label="$(\\sum_k|c_k|/\\max|p|)^2$: LCU penalty vs the phase sequence")
+    ax.set_xlabel("degree $d$"); ax.set_title("(c) one-norm, peak and the LCU penalty", loc="left", fontsize=10.5)
+    ax.legend(fontsize=7.8, loc="upper center"); ax.set_ylim(0, 3.9)
+    ax = fig.add_subplot(gs[1, 2])
+    dd = np.arange(4, 65); ax.plot(dd, 2 * 3.8 / dd, color="#33322e", lw=1.6, label="narrowest resolvable feature $\\approx 2W/d$")
+    ax.axhline(2 * 0.18, color="#08306b", lw=1.0, ls="--", label="pass full width $2h_w=0.36$")
+    ax.axhline(min(np.diff(sorted(lines))), color=GREEN, lw=1.0, ls=":", label="closest true-line spacing $1.00$")
+    ax.axhline(abs((S - np.sqrt(2)) - lines[0]), color=RED, lw=1.0, ls=":", label="triple line to nearest true line $0.20$")
+    ax.set_yscale("log"); ax.set_xlabel("degree $d$"); ax.set_ylabel("width in $\\lambda$")
+    ax.set_title("(d) the resolution law and the budget", loc="left", fontsize=10.5); ax.legend(fontsize=7.8, loc="upper right")
+    save(fig, "comb_degrees")
+
+
+def fig_resource_model():
+    """Section 4.5: qubits, calls per shot, success probability and calls per
+    delivered sample against track count, for HHL, the 1BQF and the three
+    realisations of the comb, with fitted power laws.  Data:
+    section4_qsvt/02_resource_model.csv."""
+    import pandas as pd, json
+    d = pd.read_csv(HERE.parent / "section4_qsvt" / "outputs" / "02_resource_model.csv")
+    F = json.loads((HERE.parent / "section4_qsvt" / "outputs" / "02_resource_fits.json").read_text())
+    T = d["T"].values
+    # the hit-oracle model is tabulated on a coarser T grid: carry its ancilla
+    # count across and interpolate its per-call cost log-log for the drawn line
+    d["hit_oracle_ancillas"] = d["hit_oracle_ancillas"].ffill().bfill()
+    m = d["hit_cx_per_call"].notna()
+    d["hit_cx_line"] = np.exp(np.interp(np.log(d["T"]), np.log(d["T"][m]), np.log(d["hit_cx_per_call"][m])))
+    fig, axes = plt.subplots(2, 2, figsize=(12.8, 9.0), constrained_layout=True)
+    ax = axes[0, 0]
+    for col, lab, c, mk in (("w_hhl8", "HHL, 8-bit clock", "#08306b", "v"), ("w_hhl6", "HHL, 6-bit clock", "#4292c6", "v"),
+                            ("w_lcu", "comb, LCU realisation ($d=40$)", "#6a3d9a", "D"),
+                            ("w_phase", "comb, phase sequence (real part + parity)", "#9e6ebd", "d"),
+                            ("w_qetu", "comb over $e^{-iAt}$ (QETU)", ORANGE, "s"), ("w_1bqf", "1BQF", "#d6604d", "*")):
+        ax.plot(T, d[col], mk + "-", color=c, ms=7 if mk == "*" else 5, lw=1.3, label=lab, alpha=0.9 if col != "w_qetu" else 0.6)
+    ax.plot(T, d["n_sys"], "-", color=GREY, lw=1.0, label="system register $\\lceil\\log_2 4T^2\\rceil$")
+    ax.plot(T, d["w_lcu"] + d["hit_oracle_ancillas"], "--", color="#6a3d9a", lw=1.0, label="LCU + hit-oracle workspace")
+    ax.set_xscale("log"); ax.set_ylabel("logical qubits"); ax.set_title("(a) width", loc="left", fontsize=11); ax.legend(fontsize=8.0, loc="upper left")
+    ax = axes[0, 1]
+    for col, lab, c, mk in (("calls_hhl8", "HHL, 8-bit clock: $2(2^{8}-1)$", "#08306b", "v"), ("calls_hhl6", "HHL, 6-bit clock: $2(2^{6}-1)$", "#4292c6", "v"),
+                            ("calls_phase", "phase sequence: $4d$", "#9e6ebd", "d"), ("calls_lcu", "LCU: $2^m-1$", "#6a3d9a", "D"),
+                            ("calls_qetu", "QETU: $K$", ORANGE, "s"), ("calls_1bqf", "1BQF: 2", "#d6604d", "*")):
+        ax.plot(T, d[col], mk + "-", color=c, ms=7 if mk == "*" else 5, lw=1.3, label=lab)
+    ax.set_xscale("log"); ax.set_yscale("log"); ax.set_ylabel("calls to the operator per shot")
+    ax.set_title("(b) calls per shot, and two-qubit gates per call", loc="left", fontsize=11); ax.legend(fontsize=8.0, loc="center left")
+    ax2 = ax.twinx()
+    gm = d[d["givens_measured"]]; ge = d[~d["givens_measured"]]
+    ax2.plot(gm["T"], gm["givens_cx_per_call"], "o", color="#33322e", ms=5, label="CX per $e^{-iAt}$ call, Givens product (measured)")
+    ax2.plot(d["T"], d["givens_cx_per_call"], "-", color="#33322e", lw=1.0, alpha=0.6)
+    if len(ge):
+        ax2.plot(ge["T"], ge["givens_cx_per_call"], "o", mfc="white", mec="#33322e", ms=5,
+                 label="extrapolated, $T^{%.2f}$" % F["givens_extrapolation"]["exponent"])
+    ax2.plot(d["T"], d["hit_cx_line"], "-", color=GREEN, lw=1.0, alpha=0.7)
+    ax2.plot(d["T"][m], d["hit_cx_per_call"][m], "^", color=GREEN, ms=5, label="CX per block-encoding call, hit oracle (model), $T^{%.2f}$" % F["hit_cx_per_call"]["exponent"])
+    ax2.set_yscale("log"); ax2.set_ylabel("two-qubit gates per call"); ax2.legend(fontsize=7.8, loc="lower right")
+    ax = axes[1, 0]
+    for col, lab, c, mk in (("P_hhl8", "HHL, 8-bit clock", "#08306b", "v"), ("P_phase", "comb, phase sequence", "#9e6ebd", "d"),
+                            ("P_lcu_from_norm", "comb, LCU", "#6a3d9a", "D"), ("P_qetu", "comb over $e^{-iAt}$", ORANGE, "s"),
+                            ("P_1bqf", "1BQF (measured)", "#d6604d", "*")):
+        ft = F.get(col if col != "P_lcu_from_norm" else "P_lcu_measured")
+        lab2 = lab + ((": $%.2f\\,T^{%.2f}$" % (ft["prefactor"], ft["exponent"])) if ft else "")
+        ax.plot(T, d[col], mk, color=c, ms=7 if mk == "*" else 5, label=lab2)
+        if ft: ax.plot(T, ft["prefactor"] * T ** ft["exponent"], "-", color=c, lw=1.0, alpha=0.7)
+    m = d["P_lcu_measured"].notna()
+    ax.plot(d["T"][m], d["P_lcu_measured"][m], "o", mfc="none", mec="#6a3d9a", ms=9, mew=1.4, label="LCU, measured in the store")
+    ax.set_xscale("log"); ax.set_yscale("log"); ax.set_ylabel("post-selection success probability per shot")
+    ax.set_title("(c) success probability, with fitted power laws", loc="left", fontsize=11); ax.legend(fontsize=8.0, loc="lower left")
+    ax = axes[1, 1]
+    for col, lab, c, mk in (("total_calls_hhl8", "HHL, 8-bit clock", "#08306b", "v"), ("total_calls_phase", "comb, phase sequence", "#9e6ebd", "d"),
+                            ("total_calls_lcu", "comb, LCU", "#6a3d9a", "D"), ("total_calls_qetu", "comb over $e^{-iAt}$", ORANGE, "s"),
+                            ("total_calls_1bqf", "1BQF", "#d6604d", "*")):
+        ax.plot(T, d[col], mk + "-", color=c, ms=7 if mk == "*" else 5, lw=1.3, label=lab)
+    ax.set_xscale("log"); ax.set_yscale("log"); ax.set_ylabel("operator calls per delivered sample (amplified)")
+    ax.set_title("(d) calls per delivered sample: calls $\\times\\ \\pi/(4\\sqrt{P})$", loc="left", fontsize=11); ax.legend(fontsize=8.0, loc="upper left")
+    for ax in axes.ravel():
+        ax.set_xlabel("tracks per event $T$"); ax.set_xticks([10, 20, 50, 100, 200, 400, 700, 1000])
+        ax.set_xticklabels(["10", "20", "50", "100", "200", "400", "700", "1000"])
+    save(fig, "resource_model")
+
 def fig_occfit():
     """§7 correction: the occupancy no-go dissolves under a fitted response."""
     import pandas as pd
@@ -1474,6 +1598,7 @@ if __name__ == "__main__":
         {"motifs": fig_motifs, "twin": fig_twin, "responses": fig_responses,
          "correspondence": fig_correspondence, "trackmodes": fig_track_modes,
          "hhl": fig_hhl_onebit, "notchspec": fig_notch_spectrum,
+         "combdeg": fig_comb_degrees, "resmodel": fig_resource_model,
          "fragmentation": fig_fragmentation, "gershgorin": fig_gershgorin,
          "readout": fig_readout, "erf": fig_erf, "run3crop": fig_run3crop,
          "tangles": fig_tangles, "pileup": fig_pileup,

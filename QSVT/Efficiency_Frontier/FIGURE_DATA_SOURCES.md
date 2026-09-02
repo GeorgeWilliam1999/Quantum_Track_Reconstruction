@@ -70,6 +70,23 @@ or working-point conventions without saying so on the figure itself.
 ## figures/threshold_tradeoff.pdf (fig_threshold) — 2026-09-02 anchor change
 - The quantum curves are placed on the classical scale by norm-matching on the classical solver's own efficiency-first (99%) support; the previous anchor was the classical support at the retired fixed cut 0.35. Quantile metrics unchanged; horizontal placement changed. The 1BQF curve is the stored package circuit (four efficiency steps = the four labelling-order-dependent levels of a track in that circuit).
 
+## figures/circuits_qsvt.tex (fig:circuitsqsvt, section 4.2) — hand-drawn TikZ
+- **New 2026-09-02.** The phase-sequence realisation (QSVT proper) and the trigonometric comb over e^{-iAt} (QETU), same conventions as figures/circuits.tex; styles shared via figures/circuit_styles.tex (loaded in the preamble). No data.
+
+## figures/comb_degrees.pdf + .png (fig_comb_degrees, section 4.3)
+- **New 2026-09-02.** The production comb target and its least-squares Chebyshev fit at degrees 8/16/24/40 (+ the minimax LP fit at 16), the coefficients, the one-norm / peak / LCU-penalty against degree, and the resolution law 2W/d. **Data:** none — analytic, from design_line_comb_inverse / design_minimax_comb (domain 0.2..7.8, h_w = 0.18, s = 4).
+
+## figures/resource_model.pdf + .png (fig_resource_model, section 4.5)
+- **New 2026-09-02.** Width, calls per shot + gates per call, success probability with fitted power laws, and calls per delivered sample vs T for HHL (6/8-bit clock), the 1BQF, and the three realisations of the degree-40 comb.
+- **Data:** QSVT/Paper_planning/section4_qsvt/outputs/02_resource_model.csv + 02_resource_fits.json (02_resource_model.py); phases and parity penalty from 01_phase_factors.json (01_phase_factors.py + 01b_convention_check.py).
+- **Configuration:** the figure-12 events (clean, FIXED eps = 2 mrad, gamma = 3, no drop), T = 10..1000, rep 0. Success probabilities: LCU from degree_sweep.csv (measured) and from the matrix-free norm ||p(X)u||^2/||c||_1^2 (agree to 3 digits); phase sequence ||q(X)u||^2/(alpha_e+alpha_o)^2 with q = p/max|p| (computed); QETU ||p_trig(A)u||^2 (computed, K = 40, t = pi/7.9); 1BQF from the store's P_anc; HHL from section3_onebit/01_hhl_metrics.csv (textbook gain). Gates per call: Givens product from QSVT/DSS/outputs/dss_gates.csv (measured to T = 400, power-law T^1.37 beyond, flagged hollow); hit-oracle model from Block_Encoding/outputs/06_resource_curves.csv (T^0.85).
+- **Per-curve conventions:** amplification rounds pi/(4 sqrt P); calls per shot: 1BQF 2, QETU 40, LCU 2^m-1 = 63 as built (d = 40 optimal SELECT), phase sequence 4d = 160 (real-part trick x parity split), HHL 2(2^n_c - 1).
+- Flags: single event per T; the phase-sequence circuit was validated only at T = 3 (36 segments) — larger sizes are the matrix-free model, by design.
+
+## Section-4 tables (tab:realisations, tab:classicalcost, tab:worked)
+- tab:classicalcost: MINRES (rtol 1e-8, maxiter 5000) iterations and wall time vs the degree-40 Chebyshev evaluator on the figure-12 events, rep 0, one core — measured 2026-09-02 (session log; numbers in the table).
+- tab:worked: rows of 02_resource_model.csv at T = 400 and 1000, CX per sample = calls per sample x CX per call with the primitive-appropriate price.
+
 ## figures/notch_spectrum.pdf + .png (fig_notch_spectrum, section 3.2)
 - **New 2026-09-02.** The kept probability decomposed exactly over eigenmodes, each mode split into its true and false share by squared eigenvector components; the false share histogrammed against lambda before the filter (classical inversion, beta^2/lambda^2) and after (one-bit readout, beta^2 cos^2). Two events: the clean fixed-eps T=400 rep-0 event of figure 12 and the heavy-noise T=200 rep-0 event of figure 18.
 - **Data:** QSVT/Paper_planning/section3_onebit/outputs/02_surviving_false_spectrum.json, produced by 02_surviving_false_spectrum.py (per-component eigh; uniform input over the real segments).
