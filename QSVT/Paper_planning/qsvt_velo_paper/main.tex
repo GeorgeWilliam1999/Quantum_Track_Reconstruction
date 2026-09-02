@@ -1232,17 +1232,6 @@ the rest of this work builds: a degree-40 polynomial with narrow passes at
 the true-track lines and effective zeros everywhere else, the isolated, pair
 and triple lines included.
 
-One statement about the circuit as built belongs here rather than later.
-The package realises $e^{-iAt}$ as a product of one two-level rotation per
-compatible pair (the direct structural synthesis of ref.~\cite{trackhhl}),
-which is exact when the pairs commute and a product-formula approximation
-when they share a segment; section~\ref{sec:fork:trotter} measures the
-agreement with exact evolution at cosine $\approx0.985$ on the uniform-weight
-Hamiltonian of this work. Everything analytic in this section is the exact
-circuit of figure~\ref{fig:circuits}b; every curve read from the solution
-store (figures~\ref{fig:threshold} and~\ref{fig:clean2x2}) is the circuit as
-built, and is labelled so.
-
 \begin{figure}[tbp]
 \centering
 \captionsetup{width=0.90\textwidth}
@@ -1254,6 +1243,59 @@ slopes and pass. (b) The degree-40 line comb: passes at the four true-track
 lines only, with the isolated, pair and triple lines all rejected.}
 \label{fig:responses}
 \end{figure}
+
+Figure~\ref{fig:notchspec} makes the accounting rule quantitative, on two
+real events. The kept probability of eq.~\eqref{eq:onebitreadout}
+decomposes exactly over the eigenmodes of $A$, and each mode's weight splits
+by its eigenvector into a true share and a false share; histogramming the
+false share against $\lambda$ shows where the errors live before and after
+the filter. Before it --- under the classical inversion, whose per-mode
+weight is $\beta_j^{2}/\lambda_j^{2}$ --- the false weight is one spike:
+$99.6\%$ of it sits on the single line $\lambda=s$ on the clean $T=400$
+event, $98.1\%$ on the heavy-noise $T=200$ event, and the false-to-true
+weight ratio is $144$ to $1$ and $61$ to $1$. After it that spike is exactly
+zero ($10^{-33}$, the floating-point residue of $\cos(\pi/2)$), the ratio has
+fallen to $0.36$ and $0.87$ to $1$, and what survives is entirely the coupled
+population the notch cannot reach: on the clean event $94\%$ of the surviving
+false weight is on the pair lines $s\pm1$ and $3\%$ on the triple lines; under
+heavy noise $73\%$ pairs, $15\%$ triples, $1\%$ hubs, $8\%$ spread over the
+continuum between the lines that noise creates, and $2\%$ sitting \emph{on
+the true lines} --- the spectral twins of section~\ref{sec:comb:limits},
+which no function of $\lambda$ will ever separate. One zero removes one
+line; every line that remains needs a zero of its own.
+
+\begin{figure}[tbp]
+\centering
+\captionsetup{width=0.96\textwidth}
+\includegraphics[width=0.98\textwidth]{notch_spectrum.pdf}
+\caption{One zero, and where the surviving errors live. The kept probability
+is decomposed exactly over the eigenmodes of $A$ and each mode's weight is
+split into its true (green) and false (red) share by the squared eigenvector
+components; the histograms show the share of the total kept weight per
+$0.02$ in $\lambda$, on a log scale. Left: before the filter, under the
+classical inversion (per-mode weight $\beta_j^{2}/\lambda_j^{2}$). Right:
+after the one-bit filter (kept weight $\beta_j^{2}\cos^{2}(\lambda_jt/2)$).
+Top row: the clean $T=400$ event of figure~\ref{fig:clean2x2}; bottom row:
+the heavy-noise $T=200$ event of figure~\ref{fig:pileup}. Dashed:
+$\lambda=s$; dotted green: the four true-track lines; dotted red and orange:
+the pair lines $s\pm1$ and triple lines $s\pm\sqrt2$. The spike at
+$\lambda=s$ carries essentially all of the false weight before the filter
+and none after it; the survivors are the coupled false clusters, and under
+noise a small share sits on the true lines themselves.}
+\label{fig:notchspec}
+\end{figure}
+
+One statement about the circuit as built belongs here rather than later.
+The package realises $e^{-iAt}$ as a product of one two-level rotation per
+compatible pair (the direct structural synthesis of ref.~\cite{trackhhl}),
+which is exact when the pairs commute and a product-formula approximation
+when they share a segment; section~\ref{sec:fork:trotter} measures the
+agreement with exact evolution at cosine $\approx0.985$ on the uniform-weight
+Hamiltonian of this work. Everything analytic in this section is the exact
+circuit of figure~\ref{fig:circuits}b; every curve read from the solution
+store (figures~\ref{fig:threshold} and~\ref{fig:clean2x2}) is the circuit as
+built, and is labelled so.
+
 
 \subsection{What the notch does to a track, and what it lets through}
 \label{sec:onebit:track}
@@ -1369,15 +1411,16 @@ stored 1BQF and the QSVT alongside, three events per multiplicity.
 Two things are visible. With a clock of six or eight bits and the textbook
 gain $C=\lambda_{\min}$, HHL reproduces the classical false rate to three
 decimals at every multiplicity --- $1.60\%$ at $T=400$, $4.24\%$ at
-$T=700$ --- because it \emph{is} the classical inverse: an exact clock and
+$T=700$, $10.4\%$ at $T=1000$ --- because it \emph{is} the classical
+inverse: an exact clock and
 a $1/\tilde\lambda$ rotation return $A^{-1}\mathbf{b}$, isolated segments at
 their $0.25$ attractor included. HHL does not null the isolated line. It
 reproduces the haystack faithfully and leaves the threshold to sort it, at
 $2(2^{n_c}-1)=126$ to $510$ evolution calls per shot against the 1BQF's two.
 With four clock bits the resolution is too coarse: the isolated line at $s$
 and the true lines share bins and leak into one another, and the false rate
-rises to $16\%$ at $T=400$ and $27\%$ at $T=700$, between the classical
-solver and the 1BQF. The gain fixed in the package implementation, finally,
+rises to $16\%$ at $T=400$, $27\%$ at $T=700$ and $38\%$ at $T=1000$,
+between the classical solver and the 1BQF. The gain fixed in the package implementation, finally,
 saturates the rotation at every clock value for any system larger than a
 few segments, so that circuit flags everything and its false rate is
 $1-1/T$, the random-ordering value; that is why no HHL segment-level result
@@ -1385,7 +1428,7 @@ existed before this one, and it is left as a to-do.
 
 The success probabilities complete the picture and are the thread into the
 next section. HHL's kept probability is large --- $P_{\rm anc}\approx0.34$
-at $T=100$ and $0.08$ at $T=700$ for the eight-bit clock --- precisely
+at $T=100$ and $0.07$ at $T=1000$ for the eight-bit clock --- precisely
 because it keeps the false bulk: every isolated segment is rotated by $C/s$
 like everything else. The 1BQF's is $\approx0.2/T$ because the bulk has
 already been thrown away before the flag is read. The one-bit filter's small

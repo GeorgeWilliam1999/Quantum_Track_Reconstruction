@@ -890,6 +890,54 @@ def fig_hhl_onebit():
     axes[1].set_title("(b) segment false rate (a measured 0% is drawn at $10^{-3}$)", loc="left", fontsize=11)
     save(fig, "hhl_onebit_headline")
 
+
+def fig_notch_spectrum():
+    """Section 3.2: the one zero, and where the surviving errors live.  The
+    kept probability decomposes exactly over eigenmodes; each mode's weight is
+    split by its eigenvector into a true and a false share.  The FALSE share is
+    histogrammed against lambda before the filter (classical inversion, weight
+    beta^2/lambda^2) and after it (one-bit readout, weight beta^2 cos^2).
+    Data: section3_onebit/02_surviving_false_spectrum.py."""
+    import json
+    D = json.loads((HERE.parent / "section3_onebit" / "outputs" / "02_surviving_false_spectrum.json").read_text())
+    L = D["lines"]
+    fig, axes = plt.subplots(2, 2, figsize=(12.6, 7.0), sharex=True, constrained_layout=True)
+    rows = [("clean_T400", "clean event, $T=400$, fixed $\\varepsilon=2$ mrad"),
+            ("heavy_T200", "heavy-noise event, $T=200$, $\\varepsilon=6.31$ mrad")]
+    for r, (key, title) in enumerate(rows):
+        E = D["events"][key]; edges = np.array(E["edges"]); c = 0.5 * (edges[1:] + edges[:-1]); w = edges[1] - edges[0]
+        for k, (stage, lab) in enumerate((("before", "before the filter: classical inversion, weight $\\beta_j^2/\\lambda_j^2$"),
+                                          ("after", "after the one-bit filter: kept weight $\\beta_j^2\\cos^2(\\lambda_j t/2)$"))):
+            ax = axes[r, k]; H = E[stage]
+            hf = np.array(H["false_hist"]); ht = np.array(H["true_hist"])
+            tot = H["false_total"] + H["true_total"]
+            ax.bar(c, hf / tot, width=w, color=RED, alpha=0.85, label="false segments' share", zorder=3)
+            ax.bar(c, ht / tot, width=w, color=GREEN, alpha=0.55, label="true segments' share", zorder=2)
+            for l in L["true"]: ax.axvline(l, color=GREEN, lw=0.8, ls=":", alpha=0.7)
+            ax.axvline(S, color="#33322e", lw=1.0, ls="--", alpha=0.8)
+            for l in L["pair"]: ax.axvline(l, color=RED, lw=0.7, ls=":", alpha=0.6)
+            for l in L["triple"]: ax.axvline(l, color=ORANGE, lw=0.7, ls=":", alpha=0.6)
+            ax.set_yscale("log"); ax.set_ylim(1e-6, 1.5); ax.set_xlim(0.0, 8.0)
+            ax.set_title(("(%s) " % "abcd"[2 * r + k]) + lab, loc="left", fontsize=10)
+            fam = H["false_by_family"]; ftot = max(H["false_total"], 1e-300)
+            if stage == "before":
+                txt = ("false weight on $\\lambda=s$: %.2f%%\nfalse : true weight  %.0f : 1"
+                       % (100 * H["false_at_s"] / ftot, H["false_total"] / max(H["true_total"], 1e-300)))
+            else:
+                rest = 100 * (1 - (fam["pair"] + fam["triple"] + fam["hub"] + fam["true"]) / ftot)
+                txt = ("false weight on $\\lambda=s$: 0  (%.0e)\nsurvivors: pairs %.0f%%, triples %.0f%%, hubs %.0f%%,\n"
+                       "on the true lines %.1f%%, elsewhere %.0f%%\nfalse : true weight  %.2f : 1"
+                       % (H["false_at_s"], 100 * fam["pair"] / ftot, 100 * fam["triple"] / ftot, 100 * fam["hub"] / ftot,
+                          100 * fam["true"] / ftot, rest, H["false_total"] / max(H["true_total"], 1e-300)))
+            ax.text(0.015, 0.97, txt, transform=ax.transAxes, fontsize=8.6, va="top", ha="left",
+                    bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="#c9c6bf", lw=0.6))
+            if r == 1: ax.set_xlabel("eigenvalue $\\lambda$   ($s=\\gamma+\\delta=4$)")
+            if k == 0: ax.set_ylabel("share of kept weight per 0.02 in $\\lambda$")
+        axes[r, 0].text(-0.02, 1.16, title, transform=axes[r, 0].transAxes, fontsize=10.5, fontweight="bold", va="bottom")
+    axes[0, 1].legend(fontsize=8.6, loc="upper right")
+    axes[1, 0].text(S + 0.08, 4e-6, "$\\lambda=s$", fontsize=8.6, color="#33322e")
+    save(fig, "notch_spectrum")
+
 def fig_occfit():
     """§7 correction: the occupancy no-go dissolves under a fitted response."""
     import pandas as pd
@@ -1425,7 +1473,7 @@ if __name__ == "__main__":
     for c in cmds:
         {"motifs": fig_motifs, "twin": fig_twin, "responses": fig_responses,
          "correspondence": fig_correspondence, "trackmodes": fig_track_modes,
-         "hhl": fig_hhl_onebit,
+         "hhl": fig_hhl_onebit, "notchspec": fig_notch_spectrum,
          "fragmentation": fig_fragmentation, "gershgorin": fig_gershgorin,
          "readout": fig_readout, "erf": fig_erf, "run3crop": fig_run3crop,
          "tangles": fig_tangles, "pileup": fig_pileup,

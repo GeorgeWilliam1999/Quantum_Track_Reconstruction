@@ -70,9 +70,16 @@ or working-point conventions without saying so on the figure itself.
 ## figures/threshold_tradeoff.pdf (fig_threshold) — 2026-09-02 anchor change
 - The quantum curves are placed on the classical scale by norm-matching on the classical solver's own efficiency-first (99%) support; the previous anchor was the classical support at the retired fixed cut 0.35. Quantile metrics unchanged; horizontal placement changed. The 1BQF curve is the stored package circuit (four efficiency steps = the four labelling-order-dependent levels of a track in that circuit).
 
+## figures/notch_spectrum.pdf + .png (fig_notch_spectrum, section 3.2)
+- **New 2026-09-02.** The kept probability decomposed exactly over eigenmodes, each mode split into its true and false share by squared eigenvector components; the false share histogrammed against lambda before the filter (classical inversion, beta^2/lambda^2) and after (one-bit readout, beta^2 cos^2). Two events: the clean fixed-eps T=400 rep-0 event of figure 12 and the heavy-noise T=200 rep-0 event of figure 18.
+- **Data:** QSVT/Paper_planning/section3_onebit/outputs/02_surviving_false_spectrum.json, produced by 02_surviving_false_spectrum.py (per-component eigh; uniform input over the real segments).
+- **Configuration:** MIXED BY ROW, stated on the figure: top row clean (sigma_scatt=1e-4, no resolution, no drop) at FIXED eps=2 mrad; bottom row heavy (20 um, 1% drop) at the formula eps=6.31 mrad. gamma=3, delta=1, kernel=step.
+- **Per-curve conventions:** no thresholds; weights are shares of the total kept weight per 0.02 in lambda. Quoted: 99.63% / 98.06% of false weight on lambda=s before; 0 after (1e-33); survivors 94/3 % pairs/triples (clean), 73/15/1 % pairs/triples/hubs + 2.2% on the true lines (heavy).
+- Flags: none.
+
 ## HHL segment-level comparison (section 3.5, quoted numbers + figure)
 - **Data:** QSVT/Paper_planning/section3_onebit/outputs/01_hhl_metrics.csv (+ 01_hhl_validation.csv), produced by 01_hhl_segment_metrics.py.
-- **Configuration:** the figure-12 events (clean, FIXED eps = 2 mrad, gamma = 3, no drop), T = 10..1000, reps 0-2; HHL emulated spectrally with clocks n_c = 4, 6, 8 and two gains — the package's saturated 0.3 (halved inside arcsin) and the textbook C = lambda_min; classical / 1BQF / QSVT partners read from the store on the same events.
+- **Configuration:** the figure-12 events (clean, FIXED eps = 2 mrad, gamma = 3, no drop), T = 10..1000 (all 13 store values), reps 0-2, complete; HHL emulated spectrally with clocks n_c = 4, 6, 8 and two gains — the package's saturated 0.3 (halved inside arcsin) and the textbook C = lambda_min; classical / 1BQF / QSVT partners read from the store on the same events.
 - **Per-curve conventions:** efficiency-first working point via the package's metrics_at_wp (99%), identical to figure 12. The emulation is validated against a correctly wired exact circuit at T = 3, 5 (cos = 1.00000000, max|diff| 1e-12). The package HHLAlgorithm itself is NOT the comparator (to-do: saturated gain, bit-reversed clock keying, readout offsets).
 - Flags: single-node emulation; no Condor.
 
