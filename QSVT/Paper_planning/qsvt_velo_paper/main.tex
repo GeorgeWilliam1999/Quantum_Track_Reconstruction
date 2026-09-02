@@ -1489,9 +1489,9 @@ $94.0\%$ rather than $97$--$98\%$ at $T=400$ under drop. Extending
 the comb with passes at the fragment lines does not help: it
 re-admits their false spectral twins wholesale (a $P_2$ fragment and
 a false pair are the same matrix, figure~\ref{fig:twins}), so
-fragments are a spectral
-floor \emph{on this Hamiltonian}, the first appearance of the twin
-obstruction that
+fragments are exactly
+degenerate with false pairs \emph{on this Hamiltonian}, the first
+appearance of the twin degeneracy that
 section~\ref{sec:fit} meets at full strength, and that
 section~\ref{sec:fit:occ} shows an operator modification can
 lift. Recovery on the unmodified Hamiltonian must come from
@@ -1539,7 +1539,7 @@ $T$-independent $\approx50$-call budget to $T=700$.}
 \label{fig:resources}
 \end{figure}
 
-\subsection{Spectral twins and the floor theorem}
+\subsection{Spectral twins: a degeneracy no response can lift}
 \label{sec:comb:limits}
 
 The most important structural limit on the whole filter family
@@ -1550,7 +1550,7 @@ of where the segments physically are or whether they belong to a real
 track. Because $A$ acts block-diagonally over connected components,
 each cluster contributes a sub-block of $A$, and twin clusters
 contribute \emph{the same sub-block up to relabelling} (permutation
-similarity). The consequence is the \emph{floor theorem}: for every
+similarity). The consequence is the \emph{twin degeneracy}: for every
 function $f$, $f(A)\mathbf{b}$ assigns twin clusters identical
 amplitudes, because permutation similarity commutes with matrix
 functions and $\mathbf{b}$ is uniform on every cluster. No response,
@@ -1566,9 +1566,9 @@ produce the same $2\times2$ sub-block of $A$, and both therefore sit
 on exactly the eigenvalue lines $s\mp1$ with exactly the same
 amplitudes. On clean events twins are rare (an exhaustive scan of the
 $T\le200$ events finds none; $0.6\%$ of true segments by $T=400$ with
-the acceptance widened to $4$\,mrad), but they are the true ceiling of
-the design, and under noise they return, as a population, in
-section~\ref{sec:fit}.
+the acceptance widened to $4$\,mrad), but the degeneracy they carry is
+what ultimately caps the design, and under noise they return, as a
+population, in section~\ref{sec:fit}.
 
 \begin{figure}[t]
 \centering
@@ -1578,7 +1578,7 @@ section~\ref{sec:fit}.
 an accidental false pair (bottom) have isomorphic compatibility
 graphs, hence identical $2\times2$ sub-blocks of $A$, hence exactly
 the same eigenvalues and amplitudes. Every function of $A$ treats
-them identically; this is the floor theorem, and under noise these
+them identically; this is the twin degeneracy, and under noise these
 twins become a population large enough to cap segment efficiency
 (section~\ref{sec:fit}).}
 \label{fig:twins}
@@ -1762,8 +1762,8 @@ $2\alpha$ coupling and solves to $(\delta+4\alpha)/(s+6\alpha)
 =0.2791$ at $\alpha=0.05$ — \emph{below} the shifted attractor by
 $\approx 2\alpha\delta/s^2$, with its degenerate line split to
 $s+2\alpha$ and $s+6\alpha$. This is the analytic seed of the
-floor-break measured in section~\ref{sec:atscale}: the
-floor theorem's invariant grows from the compatibility graph alone
+degeneracy lifting measured in section~\ref{sec:atscale}: the
+invariant that twins must match grows from the compatibility graph alone
 to the pair $(C, B_{\rm all})$, so two structures are twins only if
 they agree in their chain shape \emph{and} in their hits' same-role
 degrees — and the hit drop that creates a true fragment has just
@@ -2131,7 +2131,7 @@ segments survives, and the false rate of the resulting selection is
 quoted. Heavy noise, $T=200$, three-event means. ``Fitted response''
 is the optimal binned response of eq.~\eqref{eq:fit}, refitted to
 each system. The last row is the efficiency ceiling of
-section~\ref{sec:fit:floor}: at $\eff=0.99$ every solver floods, on
+section~\ref{sec:fit:degeneracy}: at $\eff=0.99$ every solver floods, on
 the base and fork systems alike.}
 \label{tab:fit}
 \end{table}
@@ -2155,7 +2155,7 @@ Hamiltonian without refitting the polynomial is not a half-measure,
 it is worse than doing neither
 (section~\ref{sec:fork:nogo}). The standard-notch 1BQF also benefits
 from the fork
-below the floor ($0.145$ against $0.199$ at $\eff=0.98$): the fork
+below the degeneracy limit ($0.145$ against $0.199$ at $\eff=0.98$): the fork
 pushes coupled-false modes away from the passband even when the
 only zero sits at $s'$.
 
@@ -2175,17 +2175,17 @@ false pairs; their population exceeds the $1\%$ efficiency budget;
 and once the working point must dip below their suppressed
 amplitudes, the entire suppressed false band comes back above
 threshold. This is the \emph{efficiency ceiling set by twin
-fragments}: the noisy-event generalisation of the clean floor
-theorem, no longer a curiosity but the binding constraint. It is a
+fragments}: the noisy-event form of the twin degeneracy,
+no longer a curiosity but the binding constraint. It is a
 ceiling because it caps how far the efficiency can be pushed, and it
 is set by twins because the fragments and the false pairs it confuses
 are, to any function of $A$, the same object. The robust statement is the measured wall
 itself: on the base and fork systems every solver holds
 $\eff=0.98$ and none holds $\eff=0.99$, on all three events. On
 \emph{those} Hamiltonians no function of $\lambda$ can cross it,
-but the floor is a twin degeneracy of the operator, not of the
-event, and the next subsection shows an operator that removes it.
-\label{sec:fit:floor}
+but the degeneracy belongs to the operator and not to the
+event, and the next subsection shows an operator that lifts it.
+\label{sec:fit:degeneracy}
 
 \subsection{The occupancy term, refitted}
 \label{sec:fit:occ}
@@ -2225,14 +2225,14 @@ three events is held at the ceiling on the base system, its fitted
 response cannot do better than $0.654$ at matched efficiency
 $0.985$, because its fragment twins are exactly degenerate with
 false pairs, and on the occupancy system the same event fits to
-$0.062$. The mechanism is the floor theorem read in reverse: the
+$0.062$. The mechanism is the twin degeneracy read in reverse: the
 twin argument requires isomorphic components, and the co-hit
 coupling embeds every motif in its hit-sharing neighbourhood, which
 is different for a fragment of a real track than for an accidental
 false pair. The embedding breaks the isomorphism, the degeneracy
 lifts, and a response fitted to the new spectrum separates what was
 provably inseparable on the base Hamiltonian. The ceiling of
-section~\ref{sec:fit:floor} is therefore a property of the
+section~\ref{sec:fit:degeneracy} is therefore a property of the
 \emph{base} Hamiltonian, not of the problem.
 
 One engineering note: the degree budget
@@ -2455,8 +2455,8 @@ twin population; the response cannot touch it.}
 Every true segment missed at an operating point is assigned to one
 of three named channels: \emph{twin loss} — the segment's
 filtered amplitude agrees with a false segment's under \emph{every}
-member of a set of independent probe responses, which by the floor
-theorem of section~\ref{sec:comb:limits} certifies graph
+member of a set of independent probe responses, which by the twin
+degeneracy of section~\ref{sec:comb:limits} certifies graph
 isomorphism; \emph{ripple loss} — recovered by another degree of
 the same family; \emph{threshold-overlap loss} — the remainder.
 The channels sum to the total loss by construction, and
@@ -2474,7 +2474,7 @@ forces a false rate of $0.633$ at the $99\%$-efficiency point for
 \emph{every} solver, classical included. The no-go knobs earn their
 verdicts in the same currency: shrinking the acceptance
 ($\varepsilon$-scale $1.5$) \emph{creates} twins ($11\%$ of trues)
-by stripping couplings, and moving $\gamma$ moves the floor the
+by stripping couplings, and moving $\gamma$ moves the ceiling the
 wrong way. Section~\ref{sec:occupancy}'s closed forms say why the
 occupancy term is the twin-breaker: the invariant that twins must
 match grew from the compatibility graph to the pair
@@ -2542,7 +2542,7 @@ every operator alike; at the flooded matched-$99\%$-efficiency
 points all five series
 read the same number — the false prevalence — which is the
 solver-independence of a completed twin flood, not a tie. Third,
-the occupancy term's floor-break \emph{does not scale}: its
+the occupancy term's lifting of the degeneracy \emph{does not scale}: its
 spectral span grows linearly with the busiest hit's degree
 (section~\ref{sec:occupancy}; measured $\lambda_{\max}\approx143$
 at $T{=}700$, $202$ at $T{=}1000$), so at fixed degree the
@@ -2617,7 +2617,7 @@ untested escape routes are a multiplicity-dependent coupling
 degree-normalised form of the co-hit term, and any operator that
 distinguishes fragments from false motifs without coupling entire
 co-hit cliques. Separately, the erf-kernel operator leaves the one
-piece of pure response headroom in the study: its twin floor is the
+piece of pure response headroom in the study: its twin loss is the
 smallest measured ($0.25\%$ at moderate noise) but its loss is
 threshold overlap ($1.3\%$), the one channel a better-shaped
 response can still buy back.
@@ -2889,7 +2889,7 @@ breaks too, so the cliff is a property of the acceptance geometry,
 not of the encoding. And the erf-weighted kernel costs nothing
 extra, because the coupling weight is an arithmetic function of
 the kink angle the oracle already computes, where the entry-priced dictionary encoding sees its subnormalization explode
-on continuous values. None of this touches the floor theorem,
+on continuous values. None of this touches the twin degeneracy,
 which is representation-independent; it moves only the hardware
 accounting, and it moves it in the comb's favour.
 
@@ -2937,7 +2937,7 @@ scaling.}
 Every response function in this work can be applied classically by
 the Chebyshev recursion in $\mathcal{O}(d\cdot{\rm nnz}(A))$ flops,
 seconds at $T=1000$. The discrimination physics (combs, roots,
-floors) is solver-independent mathematics of the segment
+degeneracies) is solver-independent mathematics of the segment
 Hamiltonian, and this work's contribution to it stands whether or
 not a quantum computer is ever involved. The quantum claim is
 confined to the resource profile: width logarithmic in problem
@@ -2970,7 +2970,7 @@ statement of scope is that this work's method
 is response engineering on whatever spectral structure the geometry
 provides, demonstrated exhaustively on a geometry that provides a
 lot of it; the measurement loop of section~\ref{sec:fit} (measure
-the pile-up, fit the response, locate the floor) is
+the pile-up, fit the response, locate the degeneracy) is
 geometry-agnostic even where the specific comb is not.
 
 \begin{figure}[t]
@@ -3036,12 +3036,12 @@ operator can change what that is. Spectral twins bound every
 function of $\lambda$ on a fixed Hamiltonian, classical scoring
 included; at heavy noise the true fragments of broken tracks are
 twins of the false pairs, and on the base and fork systems they
-floor every solver at segment efficiency $\approx0.98$: pushing to
+cap every solver at segment efficiency $\approx0.98$: pushing to
 $0.99$ floods the selection back to a $\approx0.65$ false rate for
-everything. But the floor is a degeneracy of the operator, not of
+everything. But the degeneracy belongs to the operator and not to
 the event: the occupancy coupling embeds each motif in its
 hit-sharing neighbourhood, breaks the twin isomorphism, and the one
-event that was floor-bound at $0.654$ on the base system fits to
+event that was degeneracy-limited at $0.654$ on the base system fits to
 $0.062$ on the occupancy system at the same matched efficiency.
 \end{enumerate}
 
@@ -3049,7 +3049,7 @@ The open problems are, I think, unusually crisp for this field: a
 single fixed response for the whole event ensemble, on this toy
 an enumeration over the finite motif structure (roots on the motif
 lines, passes wide enough for the contaminated spread) rather than
-a fitting problem, with the floor-breaking occupancy system folded
+a fitting problem, with the degeneracy-lifting occupancy system folded
 in; per-cluster realization as the structural
 alternative to global filtering; edge-coloured synthesis for
 weighted couplings on hardware; and the transplant of the whole

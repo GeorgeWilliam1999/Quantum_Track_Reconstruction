@@ -19,7 +19,7 @@
 \contentsline {subsection}{\numberline {5.2}Clean-event results}{23}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Hit inefficiency: the first appearance of fragments}{24}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4}Resource scaling and the depth ladder}{24}{subsection.5.4}%
-\contentsline {subsection}{\numberline {5.5}Spectral twins and the floor theorem}{24}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.5}Spectral twins: a degeneracy no response can lift}{24}{subsection.5.5}%
 \contentsline {section}{\numberline {6}The heavy-noise events}{25}{section.6}%
 \contentsline {section}{\numberline {7}The occupancy term}{27}{section.7}%
 \contentsline {subsection}{\numberline {7.1}The term}{27}{subsection.7.1}%
