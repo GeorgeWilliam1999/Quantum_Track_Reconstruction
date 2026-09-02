@@ -201,27 +201,41 @@ have to fit.
 \end{enumerate}
 
 This work is organised as follows. Section~\ref{sec:toy} builds the toy
-model and the segment Hamiltonian from zero, including the exact
-activation levels that make everything else quantitative.
-Section~\ref{sec:onebit} reviews the 1BQF as a spectral filter and
-establishes the working-point conventions used throughout.
+model and the segment Hamiltonian from zero: the event generator and the
+noise triple it takes, the exact activation levels that make everything
+else quantitative, and the conventions every later number obeys --- the
+efficiency-first working point, and the definitions of segment
+efficiency and segment false rate. Section~\ref{sec:onebit} reads the
+1BQF as a spectral filter, deriving what its single zero removes, what
+it leaves behind, and how it reshapes the true band.
 Section~\ref{sec:qsvt} develops the QSVT machinery (block encoding,
 qubitization, and the linear-combination-of-Chebyshev construction) at
 the level of detail needed to count qubits and gates.
-Section~\ref{sec:comb} designs and evaluates the line comb on clean
-events, including its resource scaling and its provable limits.
-Section~\ref{sec:noise} introduces the noise model and shows what it does
-to each solver. Section~\ref{sec:occupancy} dissects the occupancy
-term's collision with the notch. Section~\ref{sec:fork} introduces the
-fork term and the design rule that every operator change demands a
-response refit. Section~\ref{sec:fit} fits the polynomial to the
-measured false pile-up and presents the main comparison, including the
-refitted occupancy result. Section~\ref{sec:limits}
-collects the limitations: realizability, the single-response question,
-Trotterization, the measured hardware-resource comparison of HHL, the
-1BQF and the comb with the error-correction requirements each implies,
-a hardware-native block encoding priced by detector hits rather than
-matrix entries, and what a real detector geometry changes.
+
+Section~\ref{sec:comb} designs and evaluates the comb on clean events,
+including its resource scaling and the twin degeneracy that limits every
+response in the family. Section~\ref{sec:noise} moves to the heavy
+operating point and measures the structure the noise creates: no giant
+tangle, but a population of small false motifs.
+Section~\ref{sec:occupancy} dissects the occupancy term's collision with
+the notch. Section~\ref{sec:fork} introduces the fork term and the
+design rule that every operator change demands a response refit.
+Section~\ref{sec:fit} fits the polynomial to the measured false pile-up
+and presents the main comparison, including the refitted occupancy
+result. Section~\ref{sec:atscale} then crosses the two axes
+systematically --- every Hamiltonian against every polynomial degree,
+with the coefficients refit at each --- and reports the loss budget, the
+density scan that carries every solver to $T=1000$, and the two-axis
+rule the study reduces to. Section~\ref{sec:limits} collects the
+limitations: that the occupancy win does not survive density, the
+realizability of a refitted response, the single-response question,
+Trotterization, the hardware-resource comparison of HHL, the 1BQF and
+the QSVT --- measured for the latter two, a structure-level estimate for
+HHL --- with the error-correction requirements each implies, a
+hardware-native block encoding priced by detector hits rather than
+matrix entries, the success probability and readout cost, what the
+classical simulability of the response family does and does not concede,
+and what a real detector geometry changes.
 Section~\ref{sec:conclusion} concludes.
 
 A remark on style before we begin. This work is deliberately verbose.
