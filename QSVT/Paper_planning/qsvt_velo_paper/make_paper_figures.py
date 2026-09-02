@@ -82,55 +82,6 @@ def draw_motif(ax, segs, hit_colour="#33322e", true_mask=None, lw=2.4):
     ax.axis("off")
 
 
-MOTIFS = [
-    ("isolated segment", [((0, 0), (1, 0.45))], None,
-     [S], "$\\lambda = s$"),
-    ("pair (one continuation)", [((0, -0.35), (1, 0.0)), ((1, 0.0), (2, 0.5))],
-     None, [S - 1, S + 1], "$\\lambda = s \\mp 1$"),
-    ("triple (fork)", [((0, -0.3), (1, 0.05)), ((1, 0.05), (2, 0.6)),
-                       ((1, 0.05), (2, -0.35))],
-     None, [S - np.sqrt(2), S, S + np.sqrt(2)], "$\\lambda = s,\\ s \\mp \\sqrt{2}$"),
-    ("star ($m{=}3$ continuations)",
-     [((0, -0.3), (1, 0.0)), ((1, 0.0), (2, 0.62)),
-      ((1, 0.0), (2, 0.12)), ((1, 0.0), (2, -0.55))],
-     None, [S - np.sqrt(3), S, S, S + np.sqrt(3)], "$\\lambda = s,\\ s,\\ s \\mp \\sqrt{3}$"),
-    ("true track ($P_4$ chain)",
-     [((0, -0.5), (0.5, -0.25)), ((0.5, -0.25), (1.0, 0.0)),
-      ((1.0, 0.0), (1.5, 0.25)), ((1.5, 0.25), (2.0, 0.5))],
-     [1, 1, 1, 1], list(P4), "$\\lambda = s - 2\\cos(k\\pi/5)$"),
-]
-
-
-def fig_motifs():
-    fig = plt.figure(figsize=(12.5, 5.6))
-    gs = fig.add_gridspec(2, 5, height_ratios=[1.0, 1.15], hspace=0.08)
-    for i, (title, segs, tmask, lines, lab) in enumerate(MOTIFS):
-        ax = fig.add_subplot(gs[0, i])
-        draw_motif(ax, segs, true_mask=tmask)
-        ax.set_title(title, fontsize=10.5, pad=2)
-    axl = fig.add_subplot(gs[1, :])
-    y = 0
-    yticklabels = []
-    for title, segs, tmask, lines, lab in MOTIFS:
-        col = GREEN if tmask else RED
-        for lam in lines:
-            axl.plot([lam, lam], [y - 0.30, y + 0.30], "-", color=col, lw=3.0)
-        axl.text(7.62, y, lab, fontsize=10.5, va="center", color="#33322e")
-        yticklabels.append(title.split(" (")[0])
-        y += 1
-    axl.axvline(S, color=GREY, lw=0.8, ls=":")
-    axl.text(S, y - 0.28, "$\\lambda = s$ (isolated line)", fontsize=9.5,
-             color=GREY, ha="center", va="bottom")
-    for lam in P4:
-        axl.axvline(lam, color=GREEN, lw=0.7, ls=":", alpha=0.55)
-    axl.set_yticks(range(len(MOTIFS)), yticklabels, fontsize=10.5)
-    axl.set_ylim(-0.6, len(MOTIFS) - 0.1)
-    axl.set_xlim(1.6, 9.4)
-    axl.set_xlabel("eigenvalue $\\lambda$   ($s = \\gamma + \\delta = 4$)")
-    axl.grid(axis="y", visible=False)
-    save(fig, "motif_gallery")
-
-
 def fig_twin():
     fig = plt.figure(figsize=(12.0, 4.6))
     gs = fig.add_gridspec(2, 3, width_ratios=[1.0, 1.0, 1.35], hspace=0.32,
@@ -938,15 +889,491 @@ def fig_occfit():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# Section-2 graph figures (added 2026-09-02).
+#
+# Section 2 argues in graph theory throughout but never draws a graph: the
+# figures jump from a picture of segments in the detector straight to a list of
+# eigenvalues, with the object that actually HAS the eigenvalues never shown.
+# These four figures supply the missing rungs, and the fifth is the Gershgorin
+# picture behind the positive-definiteness paragraph.
+#
+# Bright vs dark modes: the bias b = delta*1 is invariant under every
+# automorphism of a cluster's graph, so only eigenvectors in the trivial
+# representation get excited.  A cluster's other modes carry an eigenvalue but
+# no amplitude.  Half of every path's spectrum is dark; a star K(1,m) has only
+# two bright lines whatever m.
+# ─────────────────────────────────────────────────────────────────────────────
+
+DELTA = 1.0
+BRIGHT_TOL = 1e-9
+
+
+def cluster_modes(adj):
+    """(lam, V, overlap, bright) for A = s*I - adj driven by b = delta*1."""
+    adj = np.asarray(adj, float)
+    n = adj.shape[0]
+    A = S * np.eye(n) - adj
+    b = DELTA * np.ones(n)
+    lam, V = np.linalg.eigh(A)
+    for k in range(n):                       # sign convention: largest |v| > 0
+        if V[np.argmax(np.abs(V[:, k])), k] < 0:
+            V[:, k] *= -1
+    ov = V.T @ b
+    return lam, V, ov, np.abs(ov) > BRIGHT_TOL
+
+
+def path_adj(m):
+    a = np.zeros((m, m))
+    for j in range(m - 1):
+        a[j, j + 1] = a[j + 1, j] = 1
+    return a
+
+
+def star_adj(m):
+    a = np.zeros((m + 1, m + 1))
+    for j in range(1, m + 1):
+        a[0, j] = a[j, 0] = 1
+    return a
+
+
+def draw_graph(ax, pos, adj, node_col=None, node_sz=340, labels=None,
+               edge_col="#7a7873", lw=1.8, fs=9.5):
+    """Abstract compatibility graph: one node per segment, one edge per
+    compatible head-to-tail pair."""
+    pos = np.asarray(pos, float)
+    n = len(pos)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if adj[i, j]:
+                ax.plot(pos[[i, j], 0], pos[[i, j], 1], "-", color=edge_col,
+                        lw=lw, zorder=1)
+    cols = node_col if node_col is not None else ["#33322e"] * n
+    ax.scatter(pos[:, 0], pos[:, 1], s=node_sz, c=cols, zorder=3,
+               edgecolors="white", linewidths=1.4)
+    if labels is not None:
+        for k, t in enumerate(labels):
+            ax.text(pos[k, 0], pos[k, 1], t, ha="center", va="center",
+                    fontsize=fs, color="white", zorder=4, fontweight="bold")
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+
+def _collapse(lam, bright, tol=1e-9):
+    """Group coincident eigenvalues so a degenerate line is drawn once, with
+    its multiplicity, instead of several markers stacked invisibly."""
+    out = []
+    for l, br in zip(lam, bright):
+        for k, ((l0, br0), m) in enumerate(out):
+            if abs(l - l0) < tol and br == br0:
+                out[k] = ((l0, br0), m + 1)
+                break
+        else:
+            out.append(((float(l), bool(br)), 1))
+    return out
+
+
+def draw_lines(ax, lam, bright, colour, xlim=(1.5, 6.6), show_s=True,
+               p4_guides=True, fs=9):
+    """One motif's eigenvalue lines: bright solid, dark hollow."""
+    if p4_guides:
+        for l in P4:
+            ax.axvline(l, color=GREEN, lw=0.7, ls=":", alpha=0.5)
+    if show_s:
+        ax.axvline(S, color=GREY, lw=0.8, ls=":")
+    for (l, br), mult in _collapse(lam, bright):
+        if br:
+            ax.plot([l, l], [-0.42, 0.42], "-", color=colour, lw=3.0, zorder=3)
+        else:
+            ax.plot([l], [0], "o", mfc="white", mec=colour, mew=1.6, ms=8.5,
+                    zorder=3)
+        if mult > 1:
+            ax.text(l, 0.50, f"$\\times{mult}$", color=colour, fontsize=8.6,
+                    ha="center", va="bottom")
+    ax.set_ylim(-0.95, 0.95)
+    ax.set_xlim(*xlim)
+    ax.set_yticks([])
+    ax.tick_params(labelsize=fs)
+    for sp in ("left", "top", "right"):
+        ax.spines[sp].set_visible(False)
+    ax.grid(False)
+
+
+def draw_block(ax, adj, fs=9.5):
+    """The sub-block of A = s*I - C this cluster contributes."""
+    n = adj.shape[0]
+    M = S * np.eye(n) - adj
+    ax.imshow(np.where(M == S, 0.55, np.where(M == -1, -0.55, 0.0)),
+              cmap="RdBu_r", vmin=-1, vmax=1, interpolation="nearest")
+    ax.add_patch(plt.Rectangle((-0.5, -0.5), n, n, fill=False,
+                               edgecolor="#c9c6bf", lw=1.0, zorder=4))
+    for i in range(n):
+        for j in range(n):
+            v = M[i, j]
+            ax.text(j, i, f"{v:.0f}" if v != 0 else "$\\cdot$",
+                    ha="center", va="center", fontsize=fs,
+                    color="#33322e" if v else "#b6b3ac")
+    ax.set_xticks([]); ax.set_yticks([])
+    ax.grid(False)
+    # pad every block into the same 4-cell window, so the drawn size of a block
+    # is proportional to the number of segments in the cluster
+    pad = (4 - n) / 2.0
+    ax.set_xlim(-0.5 - pad, n - 0.5 + pad)
+    ax.set_ylim(n - 0.5 + pad, -0.5 - pad)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+
+
+# rows: (name, hit-space segments, true mask, node positions, adjacency, colour)
+CORRESPOND = [
+    ("isolated segment $P_1$\n(no compatible continuation)",
+     [((0, 0), (1, 0.45))], None,
+     [(0, 0)], np.zeros((1, 1)), RED),
+    ("true fragment $P_2$\n(3 surviving hits of a broken track)",
+     [((0, -0.35), (1, 0.0)), ((1, 0.0), (2, 0.5))], [1, 1],
+     [(0, 0), (1, 0)], path_adj(2), GREEN),
+    ("true track $P_4$\n(5 hits, 4 segments)",
+     [((0, -0.5), (0.5, -0.25)), ((0.5, -0.25), (1.0, 0.0)),
+      ((1.0, 0.0), (1.5, 0.25)), ((1.5, 0.25), (2.0, 0.5))], [1, 1, 1, 1],
+     [(0, 0), (1, 0), (2, 0), (3, 0)], path_adj(4), GREEN),
+    ("hub $K_{1,3}$\n(one segment, three continuations)",
+     [((0, -0.3), (1, 0.0)), ((1, 0.0), (2, 0.62)),
+      ((1, 0.0), (2, 0.12)), ((1, 0.0), (2, -0.55))], None,
+     [(0.9, 0), (1.9, 0.75), (1.9, 0), (1.9, -0.75)], star_adj(3), RED),
+]
+
+
+def fig_correspondence():
+    """Detector picture -> compatibility graph -> block of A -> eigenvalues."""
+    nrow = len(CORRESPOND)
+    fig = plt.figure(figsize=(12.6, 2.35 * nrow))
+    gs = fig.add_gridspec(nrow, 4, width_ratios=[1.15, 0.95, 0.75, 1.85],
+                          hspace=0.42, wspace=0.28)
+    heads = ["in the detector", "compatibility graph",
+             "its block of $A=sI-C$", "its eigenvalues"]
+    for r, (name, segs, tmask, pos, adj, col) in enumerate(CORRESPOND):
+        ax = fig.add_subplot(gs[r, 0])
+        draw_motif(ax, segs, true_mask=tmask)
+        ax.text(-0.30, 0.5, name, transform=ax.transAxes, fontsize=9.6,
+                ha="right", va="center", color="#33322e")
+
+        ax = fig.add_subplot(gs[r, 1])
+        draw_graph(ax, pos, adj, node_col=[col] * len(pos),
+                   labels=[str(k + 1) for k in range(len(pos))])
+        ax.set_xlim(-0.75, 3.75); ax.set_ylim(-1.15, 1.15)
+
+        ax = fig.add_subplot(gs[r, 2])
+        draw_block(ax, adj)
+
+        ax = fig.add_subplot(gs[r, 3])
+        lam, V, ov, bright = cluster_modes(adj)
+        draw_lines(ax, lam, bright, col)
+        if r == nrow - 1:
+            ax.set_xlabel("eigenvalue $\\lambda$  ($s=\\gamma+\\delta=4$)")
+        else:
+            ax.set_xticklabels([])
+        nb = int(bright.sum())
+        ax.text(0.995, 0.90, f"{nb} bright, {len(lam)-nb} dark",
+                transform=ax.transAxes, ha="right", va="top", fontsize=9,
+                color="#6b6862")
+        if r == 0:
+            for c, h in zip(range(4), heads):
+                fig.axes[c].set_title(h, fontsize=10.5, pad=9)
+    fig.text(0.985, 0.012,
+             "solid line: bright mode (non-zero overlap with the bias "
+             "$\\mathbf{b}=\\delta\\mathbf{1}$)   ·   open circle: dark mode "
+             "(zero overlap, no amplitude)",
+             ha="right", fontsize=9, color="#6b6862")
+    save(fig, "graph_correspondence")
+
+
+def fig_track_modes():
+    """The four modes of a true track, and the two that actually carry it."""
+    adj = path_adj(4)
+    lam, V, ov, bright = cluster_modes(adj)
+    b = DELTA * np.ones(4)
+    x = np.linalg.solve(S * np.eye(4) - adj, b)
+
+    fig = plt.figure(figsize=(12.6, 5.5))
+    gs = fig.add_gridspec(2, 3, hspace=0.52, wspace=0.30)
+
+    ax = fig.add_subplot(gs[0, 0])
+    draw_motif(ax, CORRESPOND[2][1], true_mask=[1, 1, 1, 1])
+    ax.set_title("(a) a true track: 5 hits, 4 segments\n"
+                 "its graph is the chain $P_4$", fontsize=10, pad=4)
+    axi = ax.inset_axes([0.16, 0.02, 0.68, 0.30])
+    draw_graph(axi, [(0, 0), (1, 0), (2, 0), (3, 0)], adj,
+               node_col=[GREEN] * 4, node_sz=150,
+               labels=["1", "2", "3", "4"], fs=7.5)
+    axi.set_xlim(-0.6, 3.6); axi.set_ylim(-0.6, 0.6)
+
+    order = [0, 1, 2, 3]
+    cells = [gs[0, 1], gs[0, 2], gs[1, 0], gs[1, 1]]
+    tags = ["(b)", "(c)", "(d)", "(e)"]
+    for cell, k, tag in zip(cells, order, tags):
+        ax = fig.add_subplot(cell)
+        v = V[:, k]
+        col = GREEN if bright[k] else GREY
+        ax.bar(np.arange(1, 5), v, width=0.55, color=col,
+               alpha=1.0 if bright[k] else 0.40,
+               edgecolor="none")
+        ax.axhline(0, color="#33322e", lw=0.9)
+        ax.set_xticks([1, 2, 3, 4])
+        ax.set_xlabel("segment along the track", fontsize=9.5)
+        ax.set_ylim(-0.85, 0.85)
+        ax.set_ylabel("mode weight", fontsize=9.5)
+        state = "BRIGHT" if bright[k] else "dark"
+        ax.set_title(f"{tag} $\\lambda={lam[k]:.3f}$   —   {state}\n"
+                     f"$\\langle v,\\mathbf{{b}}\\rangle={ov[k]:.3f}$",
+                     fontsize=10, pad=4,
+                     color="#33322e" if bright[k] else "#8f8d86")
+        if not bright[k]:
+            ax.text(0.5, 0.90, "antisymmetric under the chain's reflection:\n"
+                               "the uniform bias cannot excite it",
+                    transform=ax.transAxes, ha="center", va="top",
+                    fontsize=8.6, color="#8f8d86")
+
+    ax = fig.add_subplot(gs[1, 2])
+    j = np.arange(1, 5)
+    c1 = ov[0] / lam[0] * V[:, 0]
+    c3 = ov[2] / lam[2] * V[:, 2]
+    ax.bar(j - 0.19, c1, width=0.34, color=GREEN, alpha=0.85,
+           label=f"$\\lambda={lam[0]:.3f}$  (98.5% of the weight)")
+    ax.bar(j + 0.19, c3, width=0.34, color=BLUE, alpha=0.85,
+           label=f"$\\lambda={lam[2]:.3f}$  (1.5%)")
+    ax.plot(j, x, "o-", color="#33322e", lw=1.6, ms=6.5,
+            label="sum $=\\ 4/11,\\ 5/11,\\ 5/11,\\ 4/11$")
+    ax.set_xticks([1, 2, 3, 4])
+    ax.set_xlabel("segment along the track", fontsize=9.5)
+    ax.set_ylabel("activation", fontsize=9.5)
+    ax.set_title("(f) the solution is the two bright modes,\n"
+                 "and nothing else", fontsize=10, pad=4)
+    ax.legend(fontsize=8.0, loc="upper center", bbox_to_anchor=(0.5, -0.30),
+              frameon=False)
+    ax.set_ylim(-0.10, 0.62)
+    save(fig, "track_modes")
+
+
+# five hits, four segments; dropping a hit deletes the segments that touch it
+FRAGMENTS = [
+    ("no hit lost", [], "$P_4$", (4 / 11, 5 / 11, 5 / 11, 4 / 11)),
+    ("an end hit lost", [0], "$P_3$", (5 / 14, 3 / 7, 5 / 14)),
+    ("the second hit lost", [1], "$P_2$", (1 / 3, 1 / 3)),
+    ("the middle hit lost", [2], "$P_1+P_1$", (0.25, 0.25)),
+]
+
+
+def fig_fragmentation():
+    """How one dropped hit turns a track into the shorter motifs."""
+    fig = plt.figure(figsize=(12.6, 3.5))
+    gs = fig.add_gridspec(2, 4, height_ratios=[1.0, 0.62], hspace=0.05,
+                          wspace=0.22)
+    hits = [(k * 0.5, -0.5 + k * 0.25) for k in range(5)]
+    for c, (title, drop, gname, levels) in enumerate(FRAGMENTS):
+        ax = fig.add_subplot(gs[0, c])
+        keep = [k for k in range(4) if k not in drop and k + 1 not in drop]
+        for k in range(4):
+            p, q = hits[k], hits[k + 1]
+            alive = k in keep
+            ax.plot([p[0], q[0]], [p[1], q[1]],
+                    color=GREEN if alive else "#d9d6cf",
+                    lw=2.6 if alive else 1.6,
+                    ls="-" if alive else (0, (2, 2)), zorder=2)
+        for k, h in enumerate(hits):
+            lost = k in drop
+            ax.plot([h[0]], [h[1]], "o", ms=7.5, zorder=3,
+                    mfc="white" if lost else "#33322e",
+                    mec=RED if lost else "#33322e", mew=1.8 if lost else 1.0)
+        ax.set_xlim(-0.35, 2.35); ax.set_ylim(-1.0, 1.0)
+        ax.axis("off")
+        ax.set_title(title, fontsize=10, pad=3)
+
+        ax = fig.add_subplot(gs[1, c])
+        nk = len(keep)
+        # graph of the surviving segments: adjacent if consecutive and both kept
+        adjf = np.zeros((nk, nk))
+        for a in range(nk):
+            for bq in range(a + 1, nk):
+                if keep[bq] - keep[a] == 1:
+                    adjf[a, bq] = adjf[bq, a] = 1
+        draw_graph(ax, [(i, 0) for i in range(nk)], adjf,
+                   node_col=[GREEN] * nk, node_sz=200,
+                   labels=[str(keep[i] + 1) for i in range(nk)], fs=8)
+        ax.set_xlim(-0.8, 3.8); ax.set_ylim(-0.75, 0.95)
+        ax.text(0.5, -0.02, f"{gname}   ·   $x={', '.join(f'{v:.3f}' for v in levels)}$",
+                transform=ax.transAxes, ha="center", va="top", fontsize=9,
+                color="#33322e")
+    save(fig, "fragmentation")
+
+
+# The motif dictionary.  Eigenvalues are DERIVED from each motif's adjacency
+# rather than written down, so the picture and the numbers cannot drift apart.
+# "triple" is the graph P_3 -- not called a fork here, because the fork term of
+# section 7 is the bifurcation penalty and the two must not share a word.
+MOTIFS2 = [
+    ("isolated segment\n$P_1$", [((0, 0), (1, 0.45))], None,
+     [(1.5, 0)], np.zeros((1, 1)), "$\\lambda = s$"),
+    ("pair\n$P_2$", [((0, -0.35), (1, 0.0)), ((1, 0.0), (2, 0.5))], None,
+     [(1.0, 0), (2.0, 0)], path_adj(2), "$\\lambda = s \\mp 1$"),
+    ("triple\n$P_3$", [((0, -0.3), (1, 0.05)), ((1, 0.05), (2, 0.6)),
+                       ((1, 0.05), (2, -0.35))], None,
+     [(0.5, 0), (1.5, 0), (2.5, 0)], path_adj(3),
+     "$\\lambda = s,\\ s \\mp \\sqrt{2}$"),
+    ("hub\n$K_{1,3}$",
+     [((0, -0.3), (1, 0.0)), ((1, 0.0), (2, 0.62)),
+      ((1, 0.0), (2, 0.12)), ((1, 0.0), (2, -0.55))], None,
+     [(1.0, 0), (2.1, 0.7), (2.1, 0.0), (2.1, -0.7)], star_adj(3),
+     "$\\lambda = s,\\ s,\\ s \\mp \\sqrt{3}$"),
+    ("true track\n$P_4$",
+     [((0, -0.5), (0.5, -0.25)), ((0.5, -0.25), (1.0, 0.0)),
+      ((1.0, 0.0), (1.5, 0.25)), ((1.5, 0.25), (2.0, 0.5))],
+     [1, 1, 1, 1],
+     [(0.4, 0), (1.1, 0), (1.8, 0), (2.5, 0)], path_adj(4),
+     "$\\lambda = s - 2\\cos(k\\pi/5)$"),
+]
+
+
+def fig_motifs():
+    """Motif dictionary: detector picture, graph, and eigenvalue lines."""
+    fig = plt.figure(figsize=(12.8, 6.9))
+    gs = fig.add_gridspec(3, 5, height_ratios=[0.95, 0.62, 1.45], hspace=0.10)
+    for i, (title, segs, tmask, pos, adj, lab) in enumerate(MOTIFS2):
+        col = GREEN if tmask else RED
+        ax = fig.add_subplot(gs[0, i])
+        draw_motif(ax, segs, true_mask=tmask)
+        ax.set_title(title, fontsize=10.5, pad=2)
+        ax = fig.add_subplot(gs[1, i])
+        draw_graph(ax, pos, adj, node_col=[col] * len(pos), node_sz=175,
+                   labels=None)
+        ax.set_xlim(-0.35, 2.95); ax.set_ylim(-1.0, 1.0)
+
+    axl = fig.add_subplot(gs[2, :])
+    y = 0
+    yticklabels = []
+    for title, segs, tmask, pos, adj, lab in MOTIFS2:
+        col = GREEN if tmask else RED
+        lam, V, ov, bright = cluster_modes(adj)
+        for (l, br), mult in _collapse(lam, bright):
+            if br:
+                axl.plot([l, l], [y - 0.30, y + 0.30], "-", color=col, lw=3.0,
+                         zorder=3)
+            else:
+                axl.plot([l], [y], "o", mfc="white", mec=col, mew=1.7, ms=9,
+                         zorder=3)
+            if mult > 1:
+                axl.text(l + 0.13, y + 0.02, f"$\\times{mult}$", color=col,
+                         fontsize=9, ha="left", va="center")
+        axl.text(7.62, y, lab, fontsize=10.5, va="center", color="#33322e")
+        yticklabels.append(title.replace("\n", " "))
+        y += 1
+    axl.axvline(S, color=GREY, lw=0.8, ls=":")
+    axl.text(S, y - 0.30, "$\\lambda = s$ (isolated line)", fontsize=9.5,
+             color=GREY, ha="center", va="bottom")
+    for lam0 in P4:
+        axl.axvline(lam0, color=GREEN, lw=0.7, ls=":", alpha=0.55)
+    axl.set_yticks(range(len(MOTIFS2)), yticklabels, fontsize=10)
+    axl.set_ylim(-0.6, len(MOTIFS2) - 0.1)
+    axl.set_xlim(1.6, 9.4)
+    axl.set_xlabel("eigenvalue $\\lambda$   ($s = \\gamma + \\delta = 4$)")
+    axl.grid(axis="y", visible=False)
+    axl.plot([], [], "-", color="#33322e", lw=3.0, label="bright mode")
+    axl.plot([], [], "o", mfc="white", mec="#33322e", mew=1.7, ms=9,
+             label="dark mode (zero overlap with $\\mathbf{b}=\\delta\\mathbf{1}$)")
+    axl.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=2,
+               fontsize=9.5)
+    save(fig, "motif_gallery")
+
+
+def fig_gershgorin():
+    """The discs behind the positive-definiteness condition, and the knob."""
+    import json
+    src = (HERE.parent / "section2_graphs" / "outputs" / "03_gershgorin.json")
+    D = json.loads(src.read_text())
+
+    fig = plt.figure(figsize=(12.8, 3.9))
+    gs = fig.add_gridspec(1, 3, width_ratios=[1.05, 1.0, 1.0], wspace=0.30)
+
+    # (a) the discs
+    ax = fig.add_subplot(gs[0, 0])
+    for d, col in ((6, RED), (4, ORANGE), (2, BLUE)):
+        ax.add_patch(plt.Circle((S, 0), d, fill=True, facecolor=col,
+                                alpha=0.12, edgecolor=col, lw=1.6, zorder=1))
+        ax.text(S, d - 0.18, f"$d_i={d}$", color=col, fontsize=9.2,
+                ha="center", va="top", zorder=6)
+    ax.axvline(0, color="#33322e", lw=1.4, zorder=4)
+    ax.text(0.18, -6.2, "$\\lambda=0$", fontsize=9.5, color="#33322e")
+    ax.plot([S], [0], "o", color="#33322e", ms=6, zorder=5)
+    ax.text(S + 0.30, 0.10, "$d_i=0$: a point at $s=4$", fontsize=9.0,
+            ha="left", va="bottom", color="#33322e")
+    ax.annotate("", xy=(0, 0), xytext=(S, 0), zorder=6,
+                arrowprops=dict(arrowstyle="<->", color=ORANGE, lw=1.3))
+    ax.text(S / 2, -0.55, "$d_i=s$: the disc\nfirst reaches zero",
+            fontsize=8.8, color=ORANGE, ha="center", va="top", zorder=6)
+    ax.set_xlim(-3.2, 11.2); ax.set_ylim(-6.6, 6.6)
+    ax.set_aspect("equal")
+    ax.set_yticks([])
+    ax.set_xlabel("real axis")
+    ax.set_title("(a) Gershgorin discs of $A=sI-C$\n"
+                 "centre $s$, radius $d_i$ = number of neighbours",
+                 fontsize=10, pad=5)
+    ax.grid(False)
+    for sp in ("left", "top", "right"):
+        ax.spines[sp].set_visible(False)
+
+    # (b) degree distribution -- the tail, not the bulk, sets the bound
+    ax = fig.add_subplot(gs[0, 1])
+    for cfg, col in (("clean", GREEN), ("moderate", BLUE), ("heavy", RED)):
+        h = D["degree_hist"][cfg]
+        c = np.array(h["counts"], float)
+        f = c / c.sum()
+        k = np.arange(len(c))
+        ax.plot(k[f > 0], f[f > 0], "o-", color=col, ms=4.5, lw=1.4,
+                label=f"{cfg} ($d_{{\\max}}={h['d_max']}$)")
+    ax.axvline(S, color=GREY, lw=1.2, ls="--")
+    ax.text(S - 0.12, 2e-5, "$d_i=s$", fontsize=9.0, color="#6b6862",
+            ha="right", va="bottom")
+    ax.set_yscale("log")
+    ax.set_xlabel("number of compatible neighbours $d_i$")
+    ax.set_ylabel("fraction of segments")
+    ax.set_title("(b) the bound is set by a thin tail\n($T=200$, one event each)",
+                 fontsize=10, pad=5)
+    ax.legend(fontsize=8.8)
+
+    # (c) the control knob
+    ax = fig.add_subplot(gs[0, 2])
+    for key, col in (("moderate_T400", BLUE), ("moderate_T700", "#7ea9e0"),
+                     ("heavy_T400", ORANGE), ("heavy_T700", RED)):
+        if key not in D["gamma_scan"]:
+            continue
+        g = D["gamma_scan"][key]
+        gg, ll = np.array(g["gammas"]), np.array(g["lam_min"])
+        ax.plot(gg, ll, "-", color=col, lw=1.8,
+                label=f"{g['config']}, $T={g['T']}$")
+        ax.plot([g["gamma_crit"]], [0.0], "v", color=col, ms=7, zorder=5)
+    ax.axhline(0, color="#33322e", lw=1.0)
+    ax.axvline(3.0, color=GREY, lw=1.0, ls=":")
+    ax.text(3.10, -0.95, "$\\gamma=3$ used here", fontsize=8.6,
+            color="#6b6862", va="bottom", ha="left")
+    ax.set_xlabel("self-penalty $\\gamma$")
+    ax.set_ylabel("$\\lambda_{\\min}(A)=\\gamma+\\delta-\\lambda_{\\max}(C)$")
+    ax.set_title("(c) positive definiteness is a knob:\n"
+                 "raising $\\gamma$ always restores it", fontsize=10, pad=5)
+    ax.legend(fontsize=8.4, loc="upper left")
+    save(fig, "gershgorin_discs")
+
+
 if __name__ == "__main__":
     cmds = sys.argv[1:] or ["all_fast"]
     if "all_fast" in cmds:
-        cmds = ["motifs", "twin", "responses", "readout", "erf", "run3crop"]
+        cmds = ["motifs", "twin", "responses", "readout", "erf", "run3crop",
+                "correspondence", "trackmodes", "fragmentation"]
     if "heavy" in cmds:
         i = cmds.index("heavy")
         cmds[i:i + 1] = ["tangles", "pileup", "threshold", "fitpaper"]
     for c in cmds:
         {"motifs": fig_motifs, "twin": fig_twin, "responses": fig_responses,
+         "correspondence": fig_correspondence, "trackmodes": fig_track_modes,
+         "fragmentation": fig_fragmentation, "gershgorin": fig_gershgorin,
          "readout": fig_readout, "erf": fig_erf, "run3crop": fig_run3crop,
          "tangles": fig_tangles, "pileup": fig_pileup,
          "threshold": fig_threshold, "fitpaper": fig_fitpaper,

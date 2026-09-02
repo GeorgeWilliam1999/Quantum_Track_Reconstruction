@@ -396,6 +396,53 @@ population grows.}
 \label{fig:spectrum}
 \end{figure}
 
+The picture behind that argument is worth drawing, because it makes visible
+exactly where the loose step is (figure~\ref{fig:gershgorin}). Every row of $A$
+has the same diagonal $s$ and $d_i$ off-diagonal entries equal to $-1$, so every
+Gershgorin disc is a circle centred at $s$ of radius $d_i$: a segment with no
+compatible neighbour contributes a disc of radius zero, a point pinned at $s$,
+and each further neighbour grows the disc by one. The condition fails precisely
+when some disc first reaches the origin, which is $d_i\ge s$. The measured
+degree distribution then shows why the failure is so rarely real: at $T=200$,
+$99.5\%$ of segments on clean events and still $98.6\%$ under the heavy
+configuration have no compatible neighbour at all, and at the heavy
+configuration exactly $11$ segments out of $157{,}609$ reach $d_i\ge4=s$. The
+bound is a statement about the worst segment in an event; solvability is a
+statement about the typical one, and at these occupancies the two are very far
+apart.
+
+The knob, by contrast, is exact rather than sufficient. Since
+$\lambda(A)=s-\mu(C)$ and $\mu_{\max}(C)$ does not depend on $\gamma$ at all,
+\begin{equation}
+\lambda_{\min}(A)=\gamma+\delta-\mu_{\max}(C)
+\label{eq:gammaknob}
+\end{equation}
+is a straight line in $\gamma$ of unit slope, crossing zero at
+$\gamma=\mu_{\max}(C)-\delta$. One measures $\mu_{\max}(C)$ once on an event and
+reads off the self-penalty that guarantees positive definiteness; there is
+nothing to hope for. Measured this way the working value $\gamma=3$ has room to
+spare everywhere in this work: the crossing sits at $\gamma=2.24$ for the heavy
+configuration at $T=400$ and at $\gamma=2.58$ at $T=700$, the hardest point
+reached, leaving $\lambda_{\min}=0.76$ and $0.42$ respectively.
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{gershgorin_discs.pdf}
+\caption{The positive-definiteness condition, drawn. (a) Because $A$ has
+constant diagonal $s$ and $0/1$ off-diagonals, every Gershgorin disc is centred
+at $s$ with radius equal to that segment's number of compatible neighbours
+$d_i$; the sufficient condition $\gamma+\delta>d_{\max}$ is exactly the
+statement that no disc reaches the origin. (b) Why the condition is so much
+weaker than the truth: the degree distribution is overwhelmingly concentrated at
+$d_i=0$ --- $98.6\%$ even under heavy noise --- and only eleven segments in
+$157{,}609$ reach $d_i=s$. (c) The control knob. Equation~\eqref{eq:gammaknob}
+makes $\lambda_{\min}(A)$ a unit-slope line in $\gamma$, so the self-penalty
+needed for positive definiteness can be read off exactly (triangles); $\gamma=3$
+clears it at every configuration used here.}
+\label{fig:gershgorin}
+\end{figure}
+
 The same operator is worth writing in the form the predecessor papers
 use, because the two look quite different on the page.
 Refs.~\cite{nicotra2023,trackhhl_epj,trackhhl} build the energy term by
@@ -541,12 +588,152 @@ construction discards $e^{-9}=1.2\times10^{-4}$ of true continuations.}
 \label{fig:epsilon}
 \end{figure}
 
+\subsection{From tracks to graphs}
+\label{sec:toy:graphs}
+
+Every structural argument in this work is an argument about a graph, so it is
+worth fixing once, and explicitly, which graph is meant and how a detector
+object becomes one.
+
+An event is first a layered graph of \emph{hits}: the five planes are the
+layers, each recorded hit is a vertex, and each candidate segment is an edge
+joining a hit on one plane to a hit on the next. The object the Hamiltonian
+acts on is the graph one level up from that. Its vertices are the
+\emph{segments} --- the edges downstairs --- and two of them are joined when
+they share a hit head to tail and their mutual angle lies inside the acceptance
+$\varepsilon$. It is, in other words, the line graph of the hit graph, thinned
+by the angular window, and the compatibility adjacency $C$ of
+eq.~\eqref{eq:energy} is its adjacency matrix. A segment is an edge below and a
+vertex above; that change of level is the one thing to keep straight, because
+everything from here on is stated upstairs. A \emph{cluster} means a connected
+component of the upstairs graph, and since $A=sI-C$ is block diagonal over
+those components, every eigenvalue quoted anywhere in this work is an
+eigenvalue of one cluster. Figure~\ref{fig:correspondence} walks four clusters
+through the entire chain: what each looks like in the detector, the graph it
+becomes, the block of $A$ it contributes, and the eigenvalues that block
+carries.
+
+A perfect track is the simplest case. Five hits give four segments, each
+continuing the next and nothing else, so a true track is a path on four
+vertices --- the graph $P_4$. Tracks do not stay perfect. A dropped hit deletes
+the two segments that touch it, and the path breaks; with five hits there are
+only four outcomes, and between them they generate the whole vocabulary of
+shorter motifs (figure~\ref{fig:fragmentation}):
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{lccl}
+\toprule
+hit lost & segments left & cluster & activation\\
+\midrule
+none                & 4 & $P_4$      & $\tfrac{4}{11},\ \tfrac{5}{11},\ \tfrac{5}{11},\ \tfrac{4}{11}$\\
+an end hit          & 3 & $P_3$      & $\tfrac{5}{14},\ \tfrac{3}{7},\ \tfrac{5}{14}$\\
+the second or fourth& 2 & $P_2$      & $\tfrac13,\ \tfrac13$\\
+the middle hit      & 2 & $P_1+P_1$  & $\tfrac14,\ \tfrac14$\\
+\bottomrule
+\end{tabular}
+\renewcommand{\arraystretch}{1.0}
+\end{center}
+(losing the fourth hit mirrors losing the second, and losing the last mirrors
+losing the first). The activations are those of section~\ref{sec:toy:levels}
+below, and the last row is already the whole difficulty of this work in one
+line: a true track that loses its middle hit leaves two segments sitting at
+exactly the activation of a false isolated segment.
+
+Three graph families cover essentially every cluster that occurs, and each is
+given its name and its graph here, once, so that later sections can carry both:
+\begin{enumerate}[leftmargin=2em]
+\item an \textbf{isolated segment} is the graph $P_1$ (one vertex, no edge): a
+segment with no compatible continuation at all;
+\item a \textbf{chain} is a path graph $P_m$ ($m$ vertices in a line): $m$
+segments each continuing the next. Short chains have the names the figures use
+--- a \emph{pair} is $P_2$, two segments meeting at a shared hit, and a
+\emph{triple} is $P_3$. A triple arises two physically distinct ways that the
+graph cannot tell apart, three segments in a row or one segment continued by
+two others, and this is the first appearance of the degeneracy that
+section~\ref{sec:comb:limits} turns into a theorem;
+\item a \textbf{hub}, or star, is the complete bipartite graph $K_{1,m}$ (a
+centre joined to $m$ leaves, the leaves joined to nothing): one segment
+continued by $m$ others which do not continue one another.
+\end{enumerate}
+A true track is the chain $P_4$; every other member of these families, at the
+sizes that occur, is either a fragment of a broken track or an accident of the
+false population.
+
+That these families suffice is a measurement, not an assumption, and it is
+worth making because nothing forces a cluster to be any of them --- or even to
+be a tree. Two segments that both end on one hit, together with two that both
+start from it, form a four-cycle if all four pairs are compatible, and larger
+tangles are possible in principle. Counting every connected component of the
+compatibility graph over three events at each configuration gives the census of
+table~\ref{tab:census}. Almost every cluster is a single isolated segment, and among the rest the three families account for 99.6\% of components at the heavy configuration at $T=700$: chains dominate, hubs appear once the acceptance is wide enough for one segment to have several continuations, and the residue is a scatter of larger trees. Cycles do occur --- they are not forbidden, only rare --- and reach 0.37\% of multi-segment clusters at their worst (heavy, $T=700$). Read on the true population instead of on components, the same census gives the number that section~\ref{sec:fit} has to live with: at the heavy configuration and $T=700$, only 55.3\% of true segments still sit in a complete four-segment chain, 2.1\% have been broken down into shorter fragments, and 42.3\% have been absorbed into clusters of five segments or more by false neighbours --- tangles whose eigenvalues are not the four true lines at all.
+
+\begin{table}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\caption{Cluster census of the compatibility graph: every connected component of every event, three events per configuration. Almost every cluster is a single isolated segment. Among those that are not, the three named families of section~\ref{sec:toy:graphs} account for essentially all of them, and the components carrying a cycle --- which nothing forbids --- are a fraction of a percent even at the worst corner. Percentages in the right-hand block are of the multi-segment clusters, not of all clusters.}
+\label{tab:census}
+\small
+\begin{tabular}{lrrrrrrr}
+\toprule
+ & & \multicolumn{2}{c}{all clusters} & \multicolumn{4}{c}{of those with $\ge2$ segments} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-8}
+config & $T$ & total & isolated & chain $P_m$ & hub $K_{1,m}$ & other tree & has a cycle \\
+\midrule
+clean & 200 & 159\,392 & 99.87\% & 99.84\% & 0.00\% & 0.16\% & 0.00\% \\
+clean & 700 & 1\,957\,763 & 99.96\% & 99.80\% & 0.00\% & 0.20\% & 0.00\% \\
+\addlinespace[2pt]
+moderate & 200 & 156\,252 & 99.77\% & 97.99\% & 0.00\% & 2.01\% & 0.00\% \\
+moderate & 700 & 1\,915\,832 & 99.57\% & 98.77\% & 0.23\% & 0.95\% & 0.06\% \\
+\addlinespace[2pt]
+heavy & 200 & 155\,784 & 99.44\% & 96.30\% & 0.15\% & 3.27\% & 0.27\% \\
+heavy & 700 & 1\,887\,129 & 98.59\% & 95.72\% & 2.78\% & 1.12\% & 0.37\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{graph_correspondence.pdf}
+\caption{From the detector to the spectrum, for four clusters. Left to right:
+the segments as they lie in the detector (green true, red false); the
+compatibility graph they form, one vertex per segment and one edge per
+compatible head-to-tail pair; the block of $A=sI-C$ that graph contributes,
+drawn at a size proportional to the number of segments; and the eigenvalues of
+that block. A solid line is a \emph{bright} mode, one the uniform bias
+$\mathbf{b}=\delta\mathbf{1}$ actually excites; an open circle is a \emph{dark}
+mode, which carries an eigenvalue but no amplitude
+(section~\ref{sec:toy:modes}), with its multiplicity marked where lines
+coincide. The dotted green verticals are the four true-track lines and the
+dotted grey vertical is $\lambda=s$.}
+\label{fig:correspondence}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{fragmentation.pdf}
+\caption{How one lost hit breaks a track. Top: the five hits of a true track,
+with the lost one drawn as an open red circle and the segments it kills dashed.
+Bottom: the cluster that survives, and its exact activation. Losing an interior
+hit is worse than losing an end one, and losing the middle hit is worst of all:
+it leaves two one-segment stubs at $0.250$, indistinguishable by amplitude from
+an isolated fake.}
+\label{fig:fragmentation}
+\end{figure}
+
 \subsection{Exact activation levels: the atlas}
 \label{sec:toy:levels}
 
-Because $A$ has constant diagonal, its action decomposes over the
-connected components of the compatibility graph, and small components can
-be solved by hand. This is worth doing once in full, because these little
+Because $A$ is a diagonal matrix minus the compatibility adjacency,
+it is block diagonal over the connected components of that graph: it couples
+no segment to anything outside its own cluster, so the whole system splits
+into one independent small problem per cluster, and those problems can be
+solved by hand. (That the diagonal is not merely constant \emph{per cluster}
+but the same constant $s$ everywhere buys something further, used in
+section~\ref{sec:toy:spectrum}: the spectra of $A$ and of the graph are
+related by the rigid shift $\lambda(A)=s-\mu(C)$ rather than cluster by
+cluster.) This is worth doing once in full, because these little
 closed forms are the vocabulary of every result in this work.
 
 An \emph{isolated} segment (no compatible neighbour) has the scalar
@@ -653,7 +840,7 @@ one-segment stub sits on the isolated false segment at $\lambda=s$, so
 the filter's single zero annihilates the two together --- it removes
 every isolated fake, and every one-segment true fragment with them.
 Green: true; pink: false. Cluster names and their graphs are defined in
-section~\ref{sec:toy:spectrum}; a stub is a one-segment true fragment
+section~\ref{sec:toy:graphs}; a stub is a one-segment true fragment
 ($P_1$) and a hub is a star ($K_{1,m}$).}
 \label{fig:atlas}
 \end{figure}
@@ -674,6 +861,107 @@ one-bit filter's reshaped true band (section~\ref{sec:onebit}),
 discarding true segments and understating the false rate at the same
 time. Section~\ref{sec:onebit} shows the full trade-off explicitly in
 figure~\ref{fig:threshold}.
+
+\subsection{Which modes the bias can excite}
+\label{sec:toy:modes}
+
+The atlas gives each cluster's activation and section~\ref{sec:toy:spectrum}
+gives each cluster's eigenvalues, but the two are joined by something the
+eigenvalues alone do not say: how much of each mode the bias actually puts
+there. Every filter in this work acts on eigenvalues, so this is exactly where
+a filter's leverage comes from, and it is worth being exact about it.
+
+Segments are the \emph{coordinates} of the problem, not its modes. The basis
+vector $\mathbf{e}_i$ --- ``segment $i$ active and nothing else'' --- is an
+eigenvector of $A$ only when segment $i$ is isolated, in which case
+$A\mathbf{e}_i=s\,\mathbf{e}_i$ and the identification of a segment with a mode
+is exact. That case covers the overwhelming majority of segments, which is why
+the identification is tempting, and it fails for every cluster that matters. A
+cluster of $m$ mutually compatible segments spans an $m$-dimensional invariant
+subspace on which $A$ acts as $sI_m-C_{\rm cluster}$, and the eigenvectors of
+that block are spread over the whole cluster. A true track therefore does not
+have \emph{an} eigenvalue: it owns a four-dimensional block whose spectrum is
+the four lines of eq.~\eqref{eq:p4lines}, and each of the four modes lives on
+all four segments at once, as the standing waves
+$v_k(j)\propto\sin\!\big(jk\pi/(m{+}1)\big)$ of a particle in a box.
+
+The track's activation is a superposition of those modes,
+\begin{equation}
+\mathbf{x}\big|_{\rm cluster}
+=\sum_{k}\frac{\langle v_k,\mathbf{b}\rangle}{\lambda_k}\,v_k ,
+\label{eq:modesum}
+\end{equation}
+and the overlaps $\langle v_k,\mathbf{b}\rangle$ decide which modes appear at
+all. Here the uniformity of the bias does something strong. Because
+$\mathbf{b}=\delta\mathbf{1}$ is invariant under every automorphism of the
+cluster's graph, it lies entirely in the trivial representation of that
+automorphism group: only modes symmetric under every relabelling that preserves
+the graph can be excited, and every other mode has
+$\langle v_k,\mathbf{b}\rangle=0$ \emph{exactly}. Call a mode \emph{bright}
+when that overlap is non-zero and \emph{dark} when it vanishes. A dark mode
+carries an eigenvalue but no amplitude --- present in the spectrum, absent from
+the solution --- and no choice of filter can change that, since $f(A)\mathbf{b}$
+has the same overlaps as $A^{-1}\mathbf{b}$; the filter reweights modes, it
+cannot create one.
+
+For a chain the consequence is severe. A path $P_m$ has one non-trivial
+automorphism, the reflection $j\mapsto m{+}1-j$, so all its
+reflection-antisymmetric modes are dark and only $\lceil m/2\rceil$ of its $m$
+lines are bright. For the true track this halves the picture: of the four lines
+$\{2.382,\,3.382,\,4.618,\,5.618\}$ only the first and third are bright, and the
+exact solution $(\tfrac{4}{11},\tfrac{5}{11},\tfrac{5}{11},\tfrac{4}{11})$ is
+assembled from those two alone --- $98.5\%$ of its weight on $\lambda=2.382$ and
+the remaining $1.5\%$ on $\lambda=4.618$ (figure~\ref{fig:trackmodes}). A star
+$K_{1,m}$ is more extreme still: its automorphism group permutes all $m$
+leaves, so the trivial component is two-dimensional whatever $m$ is, and a hub
+of any size has exactly two bright lines, $s\pm\sqrt m$, with all $m{-}1$ copies
+of $\lambda=s$ dark.
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{track_modes.pdf}
+\caption{What a true track's four eigenvalues actually carry. (a) The track and
+its graph, the chain $P_4$. (b--e) The four modes of that chain, drawn as their
+weight on each segment: every mode is spread over all four segments, so no mode
+belongs to a segment. (c) and (e) are antisymmetric under the chain's
+reflection, and the uniform bias $\mathbf{b}=\delta\mathbf{1}$ is symmetric, so
+their overlap with it vanishes identically: they are \emph{dark}, carrying an
+eigenvalue but no amplitude. (f) The exact solution is therefore built from the
+two bright modes and nothing else, $98.5\%$ of its weight sitting on
+$\lambda=2.382$, and it reproduces $4/11$ and $5/11$ exactly.}
+\label{fig:trackmodes}
+\end{figure}
+
+Two things follow that the rest of this work leans on. The first repairs what
+would otherwise be a false statement about the spectrum. The triple $P_3$ has a
+line at exactly $\lambda=s$, and a hub $K_{1,m}$ has $m{-}1$ of them, so these
+false motifs do \emph{not} avoid the isolated line --- they sit precisely on it,
+and precisely on the notch that section~\ref{sec:onebit}'s filter puts there.
+What separates them from the isolated population is not position but darkness:
+those coincident modes are unexcited, so nothing is lost when the notch removes
+the line they occupy. The clean statement is that every false family's
+\emph{bright} lines interleave the true lines without touching them, and its
+dark lines may sit wherever they like.
+
+The second is a design consequence. The comb of section~\ref{sec:comb} places a
+pass at each of the four true lines, but two of those lines are dark: on clean
+events, where every true track is an exact $P_4$, no true amplitude exists at
+$\lambda=3.382$ or $\lambda=5.618$ for a tooth to pass, so those two teeth can
+only admit whatever false weight happens to land there. Removing them costs
+nothing and buys separation. Measured on clean events across $T=100$--$400$ at
+the production degree $40$, the false rate is zero for either design --- it
+cannot rank them --- but the separation margin, the ratio of the smallest true
+amplitude to the largest false one, rises from $47$ with four teeth to $108$
+with the two bright teeth alone; and because two teeth sit twice as far apart as
+four, they can be widened from $h_w=0.18$ to $0.24$, which lifts the margin to
+$750$. A control comb placed on the two \emph{dark} lines instead never
+separates at all, at any degree tested (margin below $1$ throughout). The
+advantage is a clean-event result and does not survive noise: once a track
+carries an extra false segment it is no longer a symmetric chain, its dark lines
+acquire overlap, and at the moderate and heavy configurations the two designs
+are indistinguishable. Section~\ref{sec:fit} is where that is dealt with, by
+refitting the coefficients rather than moving the teeth.
 
 \subsection{Metric definitions}
 \label{sec:toy:metrics}
@@ -725,25 +1013,17 @@ adjacency of section~\ref{sec:toy:ham} ($C_{ij}=1$ exactly when
 segments $i$ and $j$ continue one another head-to-tail within the
 angular acceptance $\varepsilon$, and $0$ otherwise). Every spectral
 statement in this work is therefore a statement about the eigenvalues
-of small 0/1 graphs. Each cluster type gets a name and, once and for
-all, the graph that name stands for; later sections carry both, so that
-no name has to be remembered on its own. Three families matter:
+of the small 0/1 graphs catalogued in section~\ref{sec:toy:graphs}, and
+each of those families has a closed form:
 \begin{enumerate}[leftmargin=2em]
-\item \textbf{Isolated segment}, the graph $P_1$ (one vertex, no edge):
-a segment with no compatible continuation. $\lambda=s$ exactly. This
+\item an \textbf{isolated segment}, $P_1$, gives $\lambda=s$ exactly. This
 single line carries $\mathcal{O}(n_{\rm seg})$ modes: at $T=200$ under
 heavy noise, $155{,}371$ of $157{,}609$ segments (rep~0).
-\item \textbf{Chains}, the path graphs $P_m$ ($m$ vertices in a line):
-$m$ segments each continuing the next.
-$\lambda_k=s-2\cos\!\big(k\pi/(m{+}1)\big)$, $k=1,\dots,m$. Short
-chains have their own names, which are the ones the figures use: a
-\emph{pair} is $P_2$, two segments meeting at a shared hit; a
-\emph{triple} is $P_3$. Note that a triple arises two ways that the
-matrix cannot tell apart --- three segments in a row, or one segment
-continued by two others --- because both are the graph $P_3$; this is
-the first appearance of the degeneracy that section~\ref{sec:comb:limits}
-turns into a theorem. A true track ($m=4$) therefore lives on exactly
-four lines,
+\item a \textbf{chain} $P_m$ gives
+$\lambda_k=s-2\cos\!\big(k\pi/(m{+}1)\big)$, $k=1,\dots,m$, so a
+\emph{pair} $P_2$ sits at $s\mp1$ and a \emph{triple} $P_3$ at
+$\{s,\,s\mp\sqrt2\}$. A true track ($m=4$) therefore owns a
+four-dimensional block whose spectrum is exactly four lines,
 \begin{equation}
 \lambda\in\{s-2\cos(k\pi/5)\}_{k=1}^{4}
 =\{2.382,\ 3.382,\ 4.618,\ 5.618\}\quad(s=4),
@@ -753,20 +1033,24 @@ symmetric about $s$ and split by the golden-ratio
 cosines\footnote{The values $2\cos(\pi/5)=\varphi=1.618\dots$ and
 $2\cos(2\pi/5)=1/\varphi$: the five-hit track is secretly a pentagon
 problem.}.
-\item \textbf{Stars}, the complete bipartite graphs $K_{1,m}$ (a centre
-joined to $m$ leaves and the leaves joined to nothing): one segment
-continued by $m$ different others, which do not continue one another.
-$\lambda=s\pm\sqrt m$ plus $m{-}1$ copies of $s$.
+\item a \textbf{hub} $K_{1,m}$ gives $\lambda=s\pm\sqrt m$ plus
+$m{-}1$ copies of $s$ --- and, by section~\ref{sec:toy:modes}, only the two
+outer lines are ever excited, however many continuations the hub has.
 \end{enumerate}
 Figure~\ref{fig:motifs} draws each of these motifs in hit space and
 places its exact eigenvalue lines on a common $\lambda$-axis: this is
 the dictionary between what a cluster of segments \emph{looks like} in
 the detector and where its solution weight \emph{piles up} in the
 spectrum. The pair motif at $\lambda=s\pm1$ and the triple at
-$\{s,\,s\pm\sqrt2\}$ do most of the false-population work under noise,
-and their lines interleave the true lines of eq.~\eqref{eq:p4lines}
-without touching them. That gap, false lines close to but not on the
-true lines, is what this work exploits. When noise is switched on in
+$\{s,\,s\pm\sqrt2\}$ do most of the false-population work under noise.
+It is tempting to say that their lines interleave the true lines of
+eq.~\eqref{eq:p4lines} without touching them, and that is not quite true: the
+triple has a line at exactly $\lambda=s$, and a hub $K_{1,m}$ has $m-1$ of
+them, sitting squarely on the isolated line. What is true, and is what this
+work exploits, is the statement of section~\ref{sec:toy:modes}: every false
+family's \emph{bright} lines --- the ones the uniform bias can actually put
+amplitude into --- lie close to but never on the true lines, while the lines
+that do coincide are dark and carry nothing. When noise is switched on in
 section~\ref{sec:noise}, the \emph{measured} spectral pile-up of a
 heavy-noise event (figure~\ref{fig:pileup}) lands exactly on the lines
 catalogued here. Motifs whose spectrum coincides
@@ -777,13 +1061,17 @@ sections~\ref{sec:comb:limits} and~\ref{sec:fit} as the limiting factor.
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{motif_gallery.pdf}
-\caption{The motif dictionary. Top: the canonical segment clusters
-drawn in hit space (dots are hits, lines are segments; green true, red
-false). Bottom: the exact eigenvalue lines each motif contributes,
-from the closed forms of section~\ref{sec:toy:spectrum}, at
-$s=\gamma+\delta=4$. Every false family sits close to, but never on,
-the four true-track lines (green dotted), except for the spectral
-twins of section~\ref{sec:comb:limits}.}
+\caption{The motif dictionary. Top: the canonical segment clusters drawn
+in hit space (dots are hits, lines are segments; green true, red false).
+Middle: the compatibility graph each one forms, which is the object that
+carries the eigenvalues. Bottom: the exact eigenvalue lines each motif
+contributes, from the closed forms of section~\ref{sec:toy:spectrum}, at
+$s=\gamma+\delta=4$; a solid line is a bright mode and an open circle a dark
+one (section~\ref{sec:toy:modes}), with multiplicity marked where lines
+coincide. Every false family's \emph{bright} lines sit close to, but never on,
+the four true-track lines (green dotted), except for the spectral twins of
+section~\ref{sec:comb:limits}; the lines that do fall on $\lambda=s$, from the
+triple and the hub, are dark and carry no amplitude.}
 \label{fig:motifs}
 \end{figure}
 

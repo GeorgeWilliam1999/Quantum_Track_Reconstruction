@@ -2,50 +2,52 @@
 \contentsline {section}{\numberline {2}The toy model and the segment Hamiltonian}{5}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Events}{5}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}The Hamiltonian}{5}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Exact activation levels: the atlas}{9}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Metric definitions}{11}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}The spectrum}{11}{subsection.2.5}%
-\contentsline {section}{\numberline {3}The one-bit quantum filter, read as a spectral filter}{12}{section.3}%
-\contentsline {subsection}{\numberline {3.1}The circuit and its response function}{12}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}What the notch cannot do}{13}{subsection.3.2}%
-\contentsline {section}{\numberline {4}From one bit to any polynomial: the QSVT construction}{15}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Block encoding and the qubitization walk}{15}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Summing the series: LCU}{16}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Resource summary}{16}{subsection.4.3}%
-\contentsline {section}{\numberline {5}Fitting the polynomial to the clean events: the line comb}{17}{section.5}%
-\contentsline {subsection}{\numberline {5.1}The design insight: the true spectrum is discrete}{17}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Clean-event results}{17}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Hit inefficiency: the first appearance of fragments}{18}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Resource scaling and the depth ladder}{19}{subsection.5.4}%
-\contentsline {subsection}{\numberline {5.5}Spectral twins and the floor theorem}{20}{subsection.5.5}%
-\contentsline {section}{\numberline {6}The heavy-noise events}{21}{section.6}%
-\contentsline {section}{\numberline {7}The occupancy term}{21}{section.7}%
-\contentsline {subsection}{\numberline {7.1}The term}{21}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Classically it works; the notch it destroys}{23}{subsection.7.2}%
-\contentsline {section}{\numberline {8}The fork term and the moving spectrum}{24}{section.8}%
-\contentsline {subsection}{\numberline {8.1}The term and its validity envelope}{24}{subsection.8.1}%
-\contentsline {subsection}{\numberline {8.2}The operator and the response are one design}{25}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3}A Trotter aside that will matter on hardware}{25}{subsection.8.3}%
-\contentsline {section}{\numberline {9}Fitting the polynomial to noisy events: roots at the measured pile-up}{26}{section.9}%
-\contentsline {subsection}{\numberline {9.1}Measuring the false pile-up}{26}{subsection.9.1}%
-\contentsline {subsection}{\numberline {9.2}Fitting the response}{27}{subsection.9.2}%
-\contentsline {subsection}{\numberline {9.3}Results}{27}{subsection.9.3}%
-\contentsline {subsection}{\numberline {9.4}The occupancy term, refitted}{29}{subsection.9.4}%
-\contentsline {subsection}{\numberline {9.5}Why the 1BQF specifically cannot follow}{30}{subsection.9.5}%
-\contentsline {section}{\numberline {10}The operator axis at scale: degree, density, and the loss budget}{30}{section.10}%
-\contentsline {subsection}{\numberline {10.1}The degree axis: what the polynomial can and cannot buy}{31}{subsection.10.1}%
-\contentsline {subsection}{\numberline {10.2}The refitted responses, seen against the moved lines}{32}{subsection.10.2}%
-\contentsline {subsection}{\numberline {10.3}The loss budget: where the missing efficiency lives}{32}{subsection.10.3}%
-\contentsline {subsection}{\numberline {10.4}Density: every solver to $T=1000$}{33}{subsection.10.4}%
-\contentsline {subsection}{\numberline {10.5}The two-axis rule}{33}{subsection.10.5}%
-\contentsline {section}{\numberline {11}Limitations}{34}{section.11}%
-\contentsline {subsection}{\numberline {11.1}The occupancy win does not survive density}{34}{subsection.11.1}%
-\contentsline {subsection}{\numberline {11.2}Realizability of the fitted response}{35}{subsection.11.2}%
-\contentsline {subsection}{\numberline {11.3}One response for all events}{36}{subsection.11.3}%
-\contentsline {subsection}{\numberline {11.4}Trotterization on hardware}{36}{subsection.11.4}%
-\contentsline {subsection}{\numberline {11.5}Hardware resources: HHL, the 1BQF, and the QSVT side by side}{36}{subsection.11.5}%
-\contentsline {subsection}{\numberline {11.6}A block encoding priced by hits, not matrix entries}{38}{subsection.11.6}%
-\contentsline {subsection}{\numberline {11.7}Success probability and readout}{39}{subsection.11.7}%
-\contentsline {subsection}{\numberline {11.8}Classical simulability of the response family}{39}{subsection.11.8}%
-\contentsline {subsection}{\numberline {11.9}The toy's geometry, and what a real detector changes}{40}{subsection.11.9}%
-\contentsline {section}{\numberline {12}Conclusion}{40}{section.12}%
+\contentsline {subsection}{\numberline {2.3}From tracks to graphs}{9}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Exact activation levels: the atlas}{11}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Which modes the bias can excite}{13}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Metric definitions}{16}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}The spectrum}{16}{subsection.2.7}%
+\contentsline {section}{\numberline {3}The one-bit quantum filter, read as a spectral filter}{17}{section.3}%
+\contentsline {subsection}{\numberline {3.1}The circuit and its response function}{18}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}What the notch cannot do}{18}{subsection.3.2}%
+\contentsline {section}{\numberline {4}From one bit to any polynomial: the QSVT construction}{19}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Block encoding and the qubitization walk}{20}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Summing the series: LCU}{21}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Resource summary}{22}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Fitting the polynomial to the clean events: the line comb}{22}{section.5}%
+\contentsline {subsection}{\numberline {5.1}The design insight: the true spectrum is discrete}{22}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Clean-event results}{23}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Hit inefficiency: the first appearance of fragments}{24}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Resource scaling and the depth ladder}{24}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Spectral twins and the floor theorem}{24}{subsection.5.5}%
+\contentsline {section}{\numberline {6}The heavy-noise events}{25}{section.6}%
+\contentsline {section}{\numberline {7}The occupancy term}{27}{section.7}%
+\contentsline {subsection}{\numberline {7.1}The term}{27}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Classically it works; the notch it destroys}{29}{subsection.7.2}%
+\contentsline {section}{\numberline {8}The fork term and the moving spectrum}{30}{section.8}%
+\contentsline {subsection}{\numberline {8.1}The term and its validity envelope}{30}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}The operator and the response are one design}{30}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}A Trotter aside that will matter on hardware}{31}{subsection.8.3}%
+\contentsline {section}{\numberline {9}Fitting the polynomial to noisy events: roots at the measured pile-up}{32}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Measuring the false pile-up}{32}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Fitting the response}{32}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Results}{33}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}The occupancy term, refitted}{35}{subsection.9.4}%
+\contentsline {subsection}{\numberline {9.5}Why the 1BQF specifically cannot follow}{35}{subsection.9.5}%
+\contentsline {section}{\numberline {10}The operator axis at scale: degree, density, and the loss budget}{36}{section.10}%
+\contentsline {subsection}{\numberline {10.1}The degree axis: what the polynomial can and cannot buy}{36}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}The refitted responses, seen against the moved lines}{37}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}The loss budget: where the missing efficiency lives}{37}{subsection.10.3}%
+\contentsline {subsection}{\numberline {10.4}Density: every solver to $T=1000$}{38}{subsection.10.4}%
+\contentsline {subsection}{\numberline {10.5}The two-axis rule}{38}{subsection.10.5}%
+\contentsline {section}{\numberline {11}Limitations}{39}{section.11}%
+\contentsline {subsection}{\numberline {11.1}The occupancy win does not survive density}{39}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}Realizability of the fitted response}{40}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.3}One response for all events}{41}{subsection.11.3}%
+\contentsline {subsection}{\numberline {11.4}Trotterization on hardware}{41}{subsection.11.4}%
+\contentsline {subsection}{\numberline {11.5}Hardware resources: HHL, the 1BQF, and the QSVT side by side}{42}{subsection.11.5}%
+\contentsline {subsection}{\numberline {11.6}A block encoding priced by hits, not matrix entries}{43}{subsection.11.6}%
+\contentsline {subsection}{\numberline {11.7}Success probability and readout}{44}{subsection.11.7}%
+\contentsline {subsection}{\numberline {11.8}Classical simulability of the response family}{44}{subsection.11.8}%
+\contentsline {subsection}{\numberline {11.9}The toy's geometry, and what a real detector changes}{45}{subsection.11.9}%
+\contentsline {section}{\numberline {12}Conclusion}{45}{section.12}%

@@ -15,11 +15,51 @@ or working-point conventions without saying so on the figure itself.
 
 ---
 ## figures/motif_gallery.pdf + .png (fig_motifs)
-- **Data:** None. Fully analytic cartoon: the hardcoded MOTIFS list and eigenvalues computed in-script in /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/make_paper_figures.py (module constants S=4.0, P4=S-2cos(k*pi/5), k=1..4). No file, store, or CSV is read.
+- **2026-09-02 (rebuild):** three rows now, not two — hit space, the abstract compatibility graph, and the eigenvalue axis. Eigenvalues are DERIVED from each motif's adjacency via cluster_modes(), no longer written down by hand, so picture and numbers cannot drift apart. Lines are split bright (solid, non-zero overlap with b = delta*1) vs dark (open circle, zero overlap), with multiplicity marked. The P_3 motif is labelled "triple P_3", not "triple (fork)": "fork" is reserved for the section-7 bifurcation term.
+- **Data:** None. Fully analytic: the MOTIFS2 list of adjacencies in /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Paper_planning/qsvt_velo_paper/make_paper_figures.py, eigen-decomposed in-script (module constant S=4.0). No file, store, or CSV is read.
 - **Configuration:** No events. Only the operator constant s = gamma+delta = 4.0 (consistent with the paper's gamma=3, delta=1 working point). Noise triple, acceptance, kernel, T, reps: N/A (nothing simulated).
 - **Per-curve conventions:** No solvers or thresholds. Eigenvalue lines are closed-form motif spectra: isolated segment lambda=s; pair s-+1; triple s, s-+sqrt(2); star (m=3) s, s, s-+sqrt(3); true P4 chain s-2cos(k*pi/5). Green = true motifs, red = false motifs.
 - **Aggregation:** None — analytic diagram, no data aggregation.
 - Flags: none.
+
+## figures/graph_correspondence.pdf + .png (fig_correspondence)
+- **New 2026-09-02** (paper section 2.3). Four clusters walked through detector picture -> compatibility graph -> block of A -> eigenvalues, with bright/dark modes marked.
+- **Data:** None. Analytic: adjacencies in the CORRESPOND list of make_paper_figures.py; blocks and spectra computed in-script from A = s*I - adj with b = delta*1.
+- **Configuration:** No events. s = gamma+delta = 4.0, delta = 1.0. Noise/acceptance/T: N/A.
+- **Per-curve conventions:** No solvers or thresholds. Bright = |<v_k, b>| > 1e-9.
+- Flags: none.
+
+## figures/track_modes.pdf + .png (fig_track_modes)
+- **New 2026-09-02** (paper section 2.5, "Which modes the bias can excite"). The four eigenvectors of P_4, the two that are dark under a uniform bias, and the two-mode reconstruction of 4/11 and 5/11.
+- **Data:** None. Analytic: numpy.linalg.eigh of 4*I - P_4 in-script.
+- **Configuration:** No events. s = 4.0, delta = 1.0.
+- **Per-curve conventions:** None. The 98.5% / 1.5% weight split is (<v,b>/lambda)^2 normalised over the two bright modes.
+- Flags: none.
+
+## figures/fragmentation.pdf + .png (fig_fragmentation)
+- **New 2026-09-02** (paper section 2.3). The four ways a five-hit track breaks when one hit is dropped, and the cluster each leaves.
+- **Data:** None. Analytic; activations are the exact solutions of (4I - P_m) x = 1.
+- **Configuration:** No events. s = 4.0.
+- Flags: none.
+
+## figures/gershgorin_discs.pdf + .png (fig_gershgorin)
+- **New 2026-09-02** (paper section 2.2). (a) the discs; (b) the measured degree distribution; (c) lambda_min vs gamma.
+- **Data:** QSVT/Paper_planning/section2_graphs/outputs/03_gershgorin.json, produced by 03_gershgorin_data.py from qtrk_store events via qp.ensure_event + qp.build_hamiltonian.
+- **Configuration:** MIXED BY PANEL, stated on the figure. (b) all three configurations at T=200, rep 0, formula acceptance (0.42 / 3.18 / 6.31 mrad), gamma=3, delta=1, kernel=step. (c) moderate and heavy at T=400 and 700, rep 0, same acceptances.
+- **Per-curve conventions:** No thresholds. Panel (c) uses the exact identity lambda_min(A) = gamma + delta - lambda_max(C), lambda_max(C) measured once per event by per-component eigh.
+- Flags: single rep per point in (b) and (c) — the degree tail and lambda_max(C) are both worst-case-over-event quantities, so rep spread is real; see the note below on the Epsilon_study_2 T=200 heavy disagreement.
+
+## Cluster census (paper section 2.3, table)
+- **Data:** QSVT/Paper_planning/section2_graphs/outputs/01_cluster_census.csv (+ 01_cluster_summary.csv, 01_bright_dark.csv), produced by 01_cluster_census.py.
+- **Configuration:** all three configurations, T = 100/200/400/700/1000, reps 0-2, formula acceptance, gamma=3, delta=1, kernel=step.
+- **Per-curve conventions:** none — a count of connected components, not a solve. Bright/dark counts computed for components of at most 16 segments.
+- Flags: none.
+
+## Two-tooth comb test (paper section 2.5, quoted numbers)
+- **Data:** QSVT/Paper_planning/section2_graphs/outputs/02_two_tooth.csv (+ 02_min_degree.csv), produced by 02_two_tooth_comb.py.
+- **Configuration:** all three configurations, T = 100/200/400, reps 0-2, formula acceptance, gamma=3, delta=1. Comb domain and the pointwise |p(lambda)| follow the production recipe of Efficiency_Frontier/01_degree_response_frontier.py lines 306-329 exactly.
+- **Per-curve conventions:** matched-efficiency thresholds at 0.90/0.95/0.99/0.995 (tau at the k-th largest true amplitude), i.e. the efficiency-first convention. The quoted "margin" is min(true amplitude)/max(false amplitude), used because the false rate saturates at zero on clean events and cannot rank the designs.
+- Flags: the noisy configurations are degenerate at 99% efficiency for every tooth pattern (fragment/tangle ceiling); the two-tooth advantage is a clean-event result only.
 
 ## figures/spectral_twins.pdf + .png (fig_twin)
 - **Data:** None. Fully analytic diagram drawn in fig_twin of make_paper_figures.py: two motif cartoons, a hand-typeset 2x2 block matrix [[s,-1],[-1,s]], and the shared eigenvalues s-+1 plotted as superimposed green/red lines. No file, store, or CSV is read.
