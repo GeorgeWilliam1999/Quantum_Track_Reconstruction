@@ -665,7 +665,7 @@ be a tree. Two segments that both end on one hit, together with two that both
 start from it, form a four-cycle if all four pairs are compatible, and larger
 tangles are possible in principle. Counting every connected component of the
 compatibility graph over three events at each configuration gives the census of
-table~\ref{tab:census}. Almost every cluster is a single isolated segment, and among the rest the three families account for 99.6\% of components at the heavy configuration at $T=700$: chains dominate, hubs appear once the acceptance is wide enough for one segment to have several continuations, and the residue is a scatter of larger trees. Cycles do occur --- they are not forbidden, only rare --- and reach 0.37\% of multi-segment clusters at their worst (heavy, $T=700$). Read on the true population instead of on components, the same census gives the number that section~\ref{sec:fit} has to live with: at the heavy configuration and $T=700$, only 55.3\% of true segments still sit in a complete four-segment chain, 2.1\% have been broken down into shorter fragments, and 42.3\% have been absorbed into clusters of five segments or more by false neighbours --- tangles whose eigenvalues are not the four true lines at all.
+table~\ref{tab:census}. Almost every cluster is a single isolated segment, and among the rest the three families account for 99.4\% of components at the heavy configuration at $T=1000$: chains dominate, hubs appear once the acceptance is wide enough for one segment to have several continuations, and the residue is a scatter of larger trees. Cycles do occur --- they are not forbidden, only rare --- and reach 0.61\% of multi-segment clusters at their worst (heavy, $T=1000$). Read on the true population instead of on components, the same census gives the number that section~\ref{sec:fit} has to live with: at the heavy configuration and $T=1000$, only 46.1\% of true segments still sit in a complete four-segment chain, 1.7\% have been broken down into shorter fragments, and 52.0\% have been absorbed into clusters of five segments or more by false neighbours --- tangles whose eigenvalues are not the four true lines at all.
 
 \begin{table}[t]
 \centering
@@ -680,13 +680,13 @@ table~\ref{tab:census}. Almost every cluster is a single isolated segment, and a
 config & $T$ & total & isolated & chain $P_m$ & hub $K_{1,m}$ & other tree & has a cycle \\
 \midrule
 clean & 200 & 159\,392 & 99.87\% & 99.84\% & 0.00\% & 0.16\% & 0.00\% \\
-clean & 700 & 1\,957\,763 & 99.96\% & 99.80\% & 0.00\% & 0.20\% & 0.00\% \\
+clean & 1000 & 3\,996\,554 & 99.96\% & 99.75\% & 0.00\% & 0.25\% & 0.00\% \\
 \addlinespace[2pt]
 moderate & 200 & 156\,252 & 99.77\% & 97.99\% & 0.00\% & 2.01\% & 0.00\% \\
-moderate & 700 & 1\,915\,832 & 99.57\% & 98.77\% & 0.23\% & 0.95\% & 0.06\% \\
+moderate & 1000 & 3\,896\,344 & 99.43\% & 98.79\% & 0.42\% & 0.72\% & 0.07\% \\
 \addlinespace[2pt]
 heavy & 200 & 155\,784 & 99.44\% & 96.30\% & 0.15\% & 3.27\% & 0.27\% \\
-heavy & 700 & 1\,887\,129 & 98.59\% & 95.72\% & 2.78\% & 1.12\% & 0.37\% \\
+heavy & 1000 & 3\,836\,200 & 98.20\% & 93.92\% & 4.37\% & 1.11\% & 0.61\% \\
 \bottomrule
 \end{tabular}
 \end{table}
