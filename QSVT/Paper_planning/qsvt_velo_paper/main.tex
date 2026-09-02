@@ -16,6 +16,8 @@
 \usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=green!50!black,
             urlcolor=blue!70!black]{hyperref}
 \usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing,calc}
 \usepackage{parskip}
 \usepackage{enumitem}
 \usepackage{fancyhdr}
@@ -824,11 +826,12 @@ cluster type (rows), classical (top) and after the 1BQF (bottom). This
 figure is analytic: it is the exact solution of $A\mathbf{x}=\delta
 \mathbf{1}$ on each cluster in isolation at $\gamma=3$, $\delta=1$,
 $s=4$, with no events, no noise and no acceptance; the filtered
-amplitudes are the response $f(A)\mathbf{b}$ of eq.~\eqref{eq:notch}
-placed on the classical scale by one global factor, so the two panels
-are directly comparable. The dashed line is the threshold that would
-keep every segment of a \emph{complete} five-hit track, $4/11$
-classically and $0.246$ after the filter: on clean events, where every
+amplitudes are the exact readout of the one-bit filter circuit,
+eq.~\eqref{eq:onebitreadout} of section~\ref{sec:onebit}, placed on the
+classical scale by one global factor, so the two panels are directly
+comparable. The dashed line is the threshold that would keep every segment
+of a \emph{complete} five-hit track, $4/11$ classically and $0.266$ after
+the filter: on clean events, where every
 true segment belongs to such a track, it is the efficiency-first
 threshold of the analytic picture. Two things are then visible that the
 rest of this work spends its time on. The true fragments of broken
@@ -1079,160 +1082,366 @@ triple and the hub, are dark and carry no amplitude.}
 \section{The one-bit quantum filter, read as a spectral filter}
 \label{sec:onebit}
 
-\subsection{The circuit and its response function}
+\subsection{The circuit, block by block}
+\label{sec:onebit:circuit}
 
-The 1BQF of ref.~\cite{trackhhl} is a one-ancilla interference
-experiment. Prepare the uniform superposition $|u\rangle$ over the
-(zero-padded) segment register, put the ancilla in
-$(|0\rangle+|1\rangle)/\sqrt2$, apply $e^{iAt}$ to the register
-controlled on the ancilla, close the interferometer with a second
-Hadamard, and keep the runs in which the ancilla reports the
-interference branch. The kept state is
+The three quantum algorithms of this lineage --- HHL, the one-bit quantum
+filter of ref.~\cite{trackhhl}, and the QSVT developed from
+section~\ref{sec:qsvt} onward --- are one family, and the cleanest way to
+introduce the 1BQF precisely is to draw all three to the same conventions and
+write down the state after every block (figure~\ref{fig:circuits}). Each acts
+on a \emph{system} register of $n=\lceil\log_2 n_{\rm seg}\rceil$ qubits
+holding one amplitude per segment, and each is read by post-selecting a flag.
+What distinguishes them is what they do to an eigencomponent of $A$ between
+preparation and readout.
+
+\paragraph{HHL, in four blocks.} Write the input in the eigenbasis of $A$,
+$|b\rangle=\sum_j\beta_j|u_j\rangle$ with $A|u_j\rangle=\lambda_j|u_j\rangle$.
+Phase estimation with an $n_c$-qubit clock, driven by controlled powers of
+$e^{iAt}$, writes an estimate $\tilde\lambda_j$ of each eigenvalue into the
+clock, $|\Psi_2\rangle=\sum_j\beta_j|\tilde\lambda_j\rangle_T|u_j\rangle_S$;
+a rotation of the flag conditioned on the clock value multiplies each
+component by $C/\tilde\lambda_j$ on the flag's $|1\rangle$ branch,
+$|\Psi_3\rangle=\sum_j\beta_j\big(\sqrt{1-C^2/\tilde\lambda_j^{2}}\,|0\rangle
++\tfrac{C}{\tilde\lambda_j}|1\rangle\big)_A|\tilde\lambda_j\rangle_T|u_j\rangle_S$;
+the phase estimation is run backwards to return the clock to $|0\rangle$; and
+post-selecting the flag leaves $|\Psi_4\rangle\propto\sum_j\beta_j
+(C/\tilde\lambda_j)|u_j\rangle_S$, which is $C\,A^{-1}|b\rangle$ whenever the
+clock resolves every eigenvalue exactly. Two costs follow from this
+structure: $\approx2(2^{n_c}-1)$ calls to the controlled evolution for an
+$n_c$-bit clock, and a success probability $\sum_j\beta_j^{2}C^{2}/
+\tilde\lambda_j^{2}$ set by the smallest eigenvalue the rotation must
+accommodate.
+
+\paragraph{The 1BQF, in five blocks.} The one-bit filter is HHL with a
+one-qubit clock and the rotation replaced by a flag. Its input is not
+$|b\rangle$ but the uniform superposition, $|u\rangle=H^{\otimes n}|0\rangle$,
+which is what $\mathbf{b}=\delta\mathbf{1}$ becomes once the register is padded
+to a power of two with \emph{ones} (the padded rows of $A$ carry only the
+diagonal $s$, so the padding modes sit at $\lambda=s$ and are dealt with
+below). Writing $\beta_j=\langle u_j|u\rangle$ and abbreviating
+$c_j=\cos(\lambda_jt/2)$, $s_j=\sin(\lambda_jt/2)$, the five states are
+\begin{align}
+|\Psi_1\rangle&=|0\rangle_A\,|{+}\rangle_T\sum_j\beta_j|u_j\rangle_S ,
+\label{eq:psi1}\\
+|\Psi_2\rangle&=|0\rangle_A\sum_j\beta_j\,e^{-i\lambda_jt/2}
+\big(c_j|0\rangle_T+i\,s_j|1\rangle_T\big)|u_j\rangle_S ,
+\label{eq:psi2}\\
+|\Psi_3\rangle&=\sum_j\beta_j\,e^{-i\lambda_jt/2}
+\big(c_j|1\rangle_A|0\rangle_T+i\,s_j|0\rangle_A|1\rangle_T\big)|u_j\rangle_S ,
+\label{eq:psi3}\\
+|\Psi_4\rangle&=\sum_j\beta_j\Big\{|1\rangle_A\big(c_j^{2}|0\rangle_T-i\,c_js_j|1\rangle_T\big)
++|0\rangle_A\big(s_j^{2}|0\rangle_T+i\,s_jc_j|1\rangle_T\big)\Big\}|u_j\rangle_S .
+\label{eq:psi4}
+\end{align}
+Equation~\eqref{eq:psi2} is the whole trick: the single controlled
+$e^{-iAt}$ kicks the phase $e^{-i\lambda_jt}$ back onto the clock, and the
+second Hadamard --- which is the one-qubit inverse Fourier transform ---
+turns that phase into the amplitudes $\cos$ and $\sin$ of half of it. A
+one-bit clock cannot \emph{estimate} an eigenvalue; it can only weigh each
+eigencomponent by $\cos(\lambda_jt/2)$. The flag (eq.~\ref{eq:psi3}) is a
+NOT on the ancilla conditioned on the clock reading $|0\rangle$, so it marks
+the cosine branch. The uncompute (eq.~\ref{eq:psi4}) runs the one-bit phase
+estimation backwards --- second Hadamard, the inverse evolution $e^{+iAt}$,
+first Hadamard --- and the mode-dependent phases $e^{\mp i\lambda_jt/2}$
+cancel exactly. What it does \emph{not} do is return the clock to
+$|0\rangle$: because the flag acted in between, the clock stays entangled
+with the flag, and the predecessors' statement that uncomputation
+``restores the time register'' holds only in the binary idealisation in
+which every $c_j$ is $0$ or $1$. Post-selecting the flag on $|1\rangle$
+and tracing out the clock, the probability of reading segment $i$ is
+therefore a sum of two squares,
 \begin{equation}
-|\psi\rangle \;\propto\; \tfrac12\big(I+e^{iAt}\big)|u\rangle
-\;=\;\sum_i e^{i\lambda_i t/2}\cos\!\Big(\frac{\lambda_i t}{2}\Big)\,
-\langle v_i|u\rangle\,|v_i\rangle ,
-\label{eq:onebitresponse}
+p_i=\Big[\cos^{2}\!\big(\tfrac{At}{2}\big)\,\mathbf{u}\Big]_i^{2}
++\Big[\tfrac12\sin(At)\,\mathbf{u}\Big]_i^{2},
+\qquad
+P_{\rm anc}=\sum_i p_i=\sum_j\beta_j^{2}\cos^{2}\!\big(\tfrac{\lambda_jt}{2}\big),
+\label{eq:onebitreadout}
 \end{equation}
-where $\{\lambda_i,|v_i\rangle\}$ are the eigenpairs of $A$. Reading
-out $|\langle j|\psi\rangle|$ segment by segment gives amplitudes
-$x^{Q}_j$, and the whole device is summarised by a single real
-response function applied to the spectrum:
+and the device's amplitude for segment $i$ is $x^{Q}_i=\sqrt{p_i}$, with the
+sign of the underlying amplitude not recovered. The kept weight per
+eigenmode is $c_j^{4}+c_j^{2}s_j^{2}=c_j^{2}$, so the success probability is
+exactly the one the predecessors quote; but the \emph{pattern} of amplitude
+over the segments is not $|\cos(At/2)\mathbf{u}|$, because the two clock
+branches of eq.~\eqref{eq:psi4} add in probability rather than in amplitude.
+Every filtered level quoted in this work is eq.~\eqref{eq:onebitreadout}
+evaluated exactly; the difference from the single-cosine idealisation is a
+few percent on a five-hit track and zero on anything the notch annihilates.
+(The sign convention is immaterial: the circuit as built applies
+$e^{-iAt}$, the predecessors write $e^{+iAt}$, and the cosine is even.)
+
+\paragraph{The QSVT, in three blocks.} Its circuit is drawn in the same
+figure for comparison and constructed in section~\ref{sec:qsvt}: prepare an
+index register in $\sum_k\sqrt{|c_k|}\,|k\rangle$, apply the qubitization
+walk $W$ a number of times controlled on the index, unprepare, and
+post-select index and dilation qubit on zero, which leaves
+$p(X)|u\rangle$ for the Chebyshev series $p=\sum_kc_kT_k$. Where the 1BQF's
+clock can weigh a mode by one cosine, the walk's $k$-th power weighs it by
+$T_k(x)=\cos(k\arccos x)$, and the index register sums those weights with
+chosen coefficients. The one-bit filter is the $k=1$ term of that sum, and
+the accounting of this whole work rests on the difference between owning one
+term and owning $d$ of them.
+
+\begin{figure}[p]
+\centering
+\captionsetup{width=0.96\textwidth}
+\resizebox{0.98\textwidth}{!}{\input{figures/circuits.tex}}
+\caption{The three filters of one lineage, drawn to the same conventions.
+(a) HHL: prepare $|b\rangle$, estimate each eigenvalue into an $n_c$-qubit
+clock, rotate the flag by $2\arcsin(C/\tilde\lambda)$ conditioned on the clock
+value, uncompute, post-select the flag. (b) The one-bit quantum filter: the
+same structure with a one-qubit clock, the rotation replaced by a NOT on the
+flag conditioned on the clock reading $|0\rangle$, and the uniform state as
+input; the states $|\Psi_1\rangle$--$|\Psi_4\rangle$ are
+eqs.~\eqref{eq:psi1}--\eqref{eq:psi4}. (c) The QSVT of section~\ref{sec:qsvt}:
+an index register prepared in the coefficient amplitudes controls powers of
+the qubitization walk $W$ on the dilation and system registers; unpreparing
+and post-selecting both ancillary registers on zero applies the Chebyshev
+series $p(X)$. Wires carrying several qubits are marked with their count. The
+1BQF as drawn is the correct one-bit filter; the circuit as built in the
+package realises the evolution as a per-pair product (section~\ref{sec:fork:trotter}).}
+\label{fig:circuits}
+\end{figure}
+
+\subsection{The response function}
+\label{sec:onebit:response}
+
+Reading eq.~\eqref{eq:onebitreadout} mode by mode, the whole device is
+summarised by one real function of the eigenvalue, the kept amplitude
 \begin{equation}
-f(\lambda)=\cos\!\Big(\frac{\lambda t}{2}\Big),
-\qquad t=\frac{\pi}{s} .
+f(\lambda)=\cos\!\Big(\frac{\lambda t}{2}\Big),\qquad t=\frac{\pi}{s},
 \label{eq:notch}
 \end{equation}
-The choice $t=\pi/s$ places the zero of the cosine exactly at
-$\lambda=s$, the isolated-segment line. Every isolated false segment,
-all $\mathcal{O}(n_{\rm seg})$ of them, is annihilated exactly: not
-suppressed, killed. This is the entire content of the 1BQF, and the
-form in which we will need it later is a simple accounting rule: each
-application of the filter buys exactly one zero of the response, and
-the 1BQF spends its one zero on the largest false population in the
-problem. The padding modes introduced to reach a power-of-two
-dimension are diagonal-only, sit at $\lambda=s$ too, and are removed
-by the same zero, a small but pleasing piece of engineering hygiene.
+and the choice $t=\pi/s$ places its zero exactly at $\lambda=s$, the
+isolated-segment line. On that line $c_j=0$, so both terms of
+eq.~\eqref{eq:onebitreadout} vanish: every isolated false segment, all
+$\mathcal{O}(n_{\rm seg})$ of them, is annihilated --- not suppressed,
+killed --- and the padding modes, which sit on the same line, go with them.
+This is the entire content of the 1BQF, and the form in which it will be
+needed later is an accounting rule: a degree-one response owns exactly one
+zero, and the 1BQF spends it on the largest false population in the problem.
+Figure~\ref{fig:responses} draws the geometry. The single zero sits on the
+isolated line, and every other bright line of the false families of
+section~\ref{sec:toy:graphs} --- the pair at $s\pm1$, the triple at
+$s\pm\sqrt2$, the hub at $s\pm\sqrt m$ --- lands on the slopes of the cosine
+and passes with large weight: $f(3)=0.38$ for a pair, $f(2.59)=0.53$ for a
+triple, against $f(2.38)=0.59$ for a true track's dominant mode. The filter
+attacks the isolated segments and nothing else; whatever false weight is
+\emph{coupled} sails through. The lower panel shows the alternative that
+the rest of this work builds: a degree-40 polynomial with narrow passes at
+the true-track lines and effective zeros everywhere else, the isolated, pair
+and triple lines included.
 
-Figure~\ref{fig:responses} makes the geometry of this choice, and of
-everything that follows, visible. The top panel is the 1BQF response
-of eq.~\eqref{eq:notch} drawn over the populated spectrum: its single
-zero sits exactly on the isolated-false line, and every other
-population, the pair and triple motif lines included, lands on the
-slopes of the cosine and passes with large weight. The filter attacks
-the isolated segments and nothing else; whatever false weight is
-\emph{coupled} sails through. The bottom panel shows the QSVT
-alternative developed from section~\ref{sec:qsvt} onward: a degree-40
-polynomial with narrow passes at the four true-track lines and
-effective zeros everywhere else, including the isolated, pair and
-triple lines simultaneously. The one-sentence summary of this work
-is the difference between those two panels: a degree-one response owns
-one zero, a degree-$d$ response owns $d$, and the noisy-event false
-spectrum demands more than one.
+One statement about the circuit as built belongs here rather than later.
+The package realises $e^{-iAt}$ as a product of one two-level rotation per
+compatible pair (the direct structural synthesis of ref.~\cite{trackhhl}),
+which is exact when the pairs commute and a product-formula approximation
+when they share a segment; section~\ref{sec:fork:trotter} measures the
+agreement with exact evolution at cosine $\approx0.985$ on the uniform-weight
+Hamiltonian of this work. Everything analytic in this section is the exact
+circuit of figure~\ref{fig:circuits}b; every curve read from the solution
+store (figures~\ref{fig:threshold} and~\ref{fig:clean2x2}) is the circuit as
+built, and is labelled so.
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \captionsetup{width=0.90\textwidth}
 \includegraphics[width=0.92\textwidth]{response_functions.pdf}
 \caption{The two response functions against the populated spectrum
 ($s=4$). (a) The 1BQF cosine: one zero, placed on the isolated-false
-line; the coupled false motifs (pair, triple) sit on the slopes and
-pass. (b) The degree-40 line comb: passes at the four true-track
+line; the bright lines of the coupled false motifs (pair, triple) sit on the
+slopes and pass. (b) The degree-40 line comb: passes at the four true-track
 lines only, with the isolated, pair and triple lines all rejected.}
 \label{fig:responses}
 \end{figure}
 
-\subsection{What the notch cannot do}
+\subsection{What the notch does to a track, and what it lets through}
+\label{sec:onebit:track}
 
-Away from its zero the cosine is not flat, and this has two
-consequences that define the 1BQF's operating envelope.
+Away from its zero the cosine is not flat, and the first consequence is
+that true amplitudes are reshaped. Section~\ref{sec:toy:modes} showed that
+a true track's solution lives on two bright modes, at $\lambda=2.382$ and
+$4.618$, and the notch at $s=4$ sits \emph{between} them: the response is
+$+0.593$ on the first and $-0.240$ on the second. The filter therefore
+flips the sign of the smaller mode. On the two end segments, where the two
+modes had reinforced one another, they now partly cancel; on the two middle
+segments, where they had opposed, they now add. Evaluated with
+eq.~\eqref{eq:onebitreadout} and placed on the classical scale by the atlas'
+single global factor, the endpoints of a clean track fall from $4/11=0.364$
+to $0.266$ while the middles rise from $5/11=0.455$ to $0.492$
+(figures~\ref{fig:atlas} and~\ref{fig:ladder}). The endpoint amplitudes
+remain perfectly well ordered above the false levels of a clean event, so
+the efficiency-first threshold, which sits just below $0.266$, keeps every
+segment of every complete track.
 
-The first is that true amplitudes are reshaped. A true track's four
-modes (eq.~\eqref{eq:p4lines}) sit symmetrically about $s$, where
-$|f(\lambda)|$ is small; the filtered chain no longer reproduces the
-classical $\{4/11,5/11\}$ profile. The effect has a closed form: the
-outer (endpoint) segments of a clean track drop from $0.364$ to
-$0.246$ while the inner pair rises slightly, from $0.455$ to $0.498$
-(figure~\ref{fig:atlas}, on the common scale defined there). This is why the fixed
-cut of the earlier convention ($0.35$) was wrong for the filter: it
-sat above the endpoint band and reported a segment efficiency plateau
-of $\approx0.73$--$0.75$, finding the middles of tracks and losing the
-ends. The endpoint loss was a property of that cut, not of the
-physics; the endpoint amplitudes remain perfectly well ordered above
-the false ones, so the efficiency-first threshold, which sits below
-the endpoint band, recovers them all.
+The second consequence is the one that decides this work, and it can be
+written out on three clusters. A false pair --- two fake segments that
+happen to continue one another inside the acceptance --- has its bright
+line at $\lambda=s-1$, where $f=0.383$, and comes out of the filter at
+$0.261$: five thousandths below the true endpoints, separable on a clean
+event by the thinnest of margins and not at all once noise smears either
+population. A false triple, bright at $s\pm\sqrt2$, comes out at $0.287$ on
+its ends and $0.472$ at its centre, \emph{above} the true endpoints and
+level with the true middles. A three-way hub $K_{1,3}$ comes out at $0.637$
+at its centre, above every true segment in the event. The efficiency-first
+threshold, pinned at $0.266$ by the true endpoints, must admit all of them.
+Nothing here is a matter of tuning: the notch has one zero and it is already
+spent, so a coupled false cluster is filtered by whatever value the cosine
+happens to take at its bright lines, and those values are of the same order
+as the true track's. This is, cluster by cluster, the false-rate curve of
+figure~\ref{fig:clean2x2}: as density or acceptance grows, the coupled-false
+population grows, and the 1BQF's false rate grows with it. The 1BQF is,
+precisely, the statement that unconnected fakes are exactly removable;
+everything in this work beyond section~\ref{sec:qsvt} is about the
+connected ones.
 
-Figure~\ref{fig:threshold} shows the whole trade explicitly, on a
-stored $T=400$ clean event, by sweeping the threshold for all three
-solvers of this work. The efficiency panel shows the plateau
-structure just described: the 1BQF efficiency steps down at the
-endpoint band around $\tau\approx0.28$, so any cut above it reads
-$75\%$, not because the filter lost the physics but because the cut
-sits above a reshaped true band. The false-rate panel shows what
-moving the threshold costs. Every solver is read at its own
-\emph{efficiency-first working point} (dashed verticals): the
-threshold just below the 1\% quantile of that solver's true
-amplitudes, so that $99\%$ of true segments survive by construction,
-with the false rate quoted as the price. For the 1BQF that threshold
-is small, because the filter has already sent the isolated false
-segments to zero. On clean fixed-acceptance events at $\gamma=3$ the
-price is steep at high multiplicity: the 1BQF false rate climbs to
-several tens of percent by $T=400$ and beyond, and
-section~\ref{sec:comb} quantifies this against the comb.
+\begin{figure}[tbp]
+\centering
+\captionsetup{width=0.70\textwidth}
+\includegraphics[width=0.75\textwidth]{chain_amplitude_ladder.pdf}
+\caption{The chain ladder, on the same analytic footing as
+figure~\ref{fig:atlas} ($\gamma=3$, $\delta=1$, $s=4$, no noise; the 1BQF
+levels are the readout of eq.~\eqref{eq:onebitreadout} on the classical scale
+by the atlas' single global factor). Classical outer activation climbs
+eq.~\eqref{eq:ladder} toward $0.366$; the 1BQF pushes the outer level of a
+five-hit track down to $0.266$ and the middles up to $0.492$, and annihilates
+the one-segment stub outright, since a lone segment sits exactly on the
+notch. The marked levels are what a threshold has to clear to keep every
+segment of a complete track.}
+\label{fig:ladder}
+\end{figure}
 
-\begin{figure}[t]
+\subsection{The threshold trade-off}
+\label{sec:onebit:threshold}
+
+Figure~\ref{fig:threshold} shows the whole trade explicitly, on a stored
+$T=400$ clean event of the benchmark campaign, by sweeping the threshold for
+all three solvers of this work with the quantum amplitudes norm-matched to
+the classical solver on its own working-point support. The efficiency panel
+is a staircase for every solver, because on a clean event the true segments
+sit at a few exact levels; the false-rate panel shows what each step costs.
+Every solver is read at its own \emph{efficiency-first working point} (dashed
+verticals): the threshold just below the $1\%$ quantile of that solver's
+true amplitudes, so that $99\%$ of true segments survive by construction,
+with the false rate quoted as the price. For the 1BQF that threshold is
+small, because the filter has already sent the isolated false segments to
+zero, and its price on clean fixed-acceptance events at $\gamma=3$ is steep
+at high multiplicity: the 1BQF false rate climbs to several tens of percent
+by $T=400$ and beyond, and section~\ref{sec:comb} quantifies this against
+the comb. The stored 1BQF curve descends in four steps rather than the two of
+the exact circuit; that is a property of the package circuit's uncompute
+step, which leaves the four segments of a track at four distinct levels
+depending on their labelling order, and it is left as it is here.
+
+\begin{figure}[tbp]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{threshold_tradeoff.pdf}
 \caption{The threshold trade-off, on the stored $T=400$ clean event of
 the canonical campaign: (a) segment efficiency and (b) segment false
 rate as the threshold $\tau$ sweeps, for the classical solver, the
-1BQF and the QSVT (degree 40, base $A$; quantum amplitudes on the
-classical signal scale). The dashed verticals are each solver's
-efficiency-first working point (the lowest threshold keeping 99\% of
-its true segments). The 1BQF's efficiency steps down at its reshaped
-endpoint band near $\tau\approx0.28$, so its working point sits
-below that band, while the QSVT holds both high efficiency and a
+1BQF (package circuit, as stored) and the QSVT (degree 40, base $A$).
+The quantum amplitudes are placed on the classical scale by norm-matching on
+the classical solver's own efficiency-first support. The dashed verticals are
+each solver's efficiency-first working point (the lowest threshold keeping
+99\% of its true segments); the QSVT holds both high efficiency and a
 $\sim10^{-2}$ false rate over the whole usable range.}
 \label{fig:threshold}
 \end{figure}
 
-\begin{figure}[t]
+\subsection{HHL and the one-bit filter, side by side}
+\label{sec:onebit:hhl}
+
+Nothing in this programme had measured HHL at the segment level, and the
+comparison is worth having because the three algorithms of
+figure~\ref{fig:circuits} sit on one axis: what each does to an
+eigencomponent. HHL's action is a response like the others', $C/\tilde\lambda$
+with $\tilde\lambda$ the clock's estimate of $\lambda$, so it can be
+emulated exactly through the same per-cluster eigendecomposition as every
+other curve in this work: the standard finite-clock phase-estimation kernel
+with its leakage, the rotation keyed on the estimated clock value, the true
+inverse of the phase estimation, and the clock traced out. The emulation
+agrees with an exact circuit to $10^{-12}$ at small $T$.
+Figure~\ref{fig:hhl1bqf} reads it on the events of figure~\ref{fig:clean2x2}
+at the same efficiency-first working point, with the classical solver, the
+stored 1BQF and the QSVT alongside, three events per multiplicity.
+
+Two things are visible. With a clock of six or eight bits and the textbook
+gain $C=\lambda_{\min}$, HHL reproduces the classical false rate to three
+decimals at every multiplicity --- $1.60\%$ at $T=400$, $4.24\%$ at
+$T=700$ --- because it \emph{is} the classical inverse: an exact clock and
+a $1/\tilde\lambda$ rotation return $A^{-1}\mathbf{b}$, isolated segments at
+their $0.25$ attractor included. HHL does not null the isolated line. It
+reproduces the haystack faithfully and leaves the threshold to sort it, at
+$2(2^{n_c}-1)=126$ to $510$ evolution calls per shot against the 1BQF's two.
+With four clock bits the resolution is too coarse: the isolated line at $s$
+and the true lines share bins and leak into one another, and the false rate
+rises to $16\%$ at $T=400$ and $27\%$ at $T=700$, between the classical
+solver and the 1BQF. The gain fixed in the package implementation, finally,
+saturates the rotation at every clock value for any system larger than a
+few segments, so that circuit flags everything and its false rate is
+$1-1/T$, the random-ordering value; that is why no HHL segment-level result
+existed before this one, and it is left as a to-do.
+
+The success probabilities complete the picture and are the thread into the
+next section. HHL's kept probability is large --- $P_{\rm anc}\approx0.34$
+at $T=100$ and $0.08$ at $T=700$ for the eight-bit clock --- precisely
+because it keeps the false bulk: every isolated segment is rotated by $C/s$
+like everything else. The 1BQF's is $\approx0.2/T$ because the bulk has
+already been thrown away before the flag is read. The one-bit filter's small
+success probability is the price of doing the selection inside the circuit
+rather than in the readout, and the QSVT pays a price of the same kind,
+measured in section~\ref{sec:comb:resources}.
+
+\begin{figure}[tbp]
 \centering
-\captionsetup{width=0.70\textwidth}
-\includegraphics[width=0.75\textwidth]{chain_amplitude_ladder.pdf}
-\caption{The chain ladder, on the same analytic footing as
-figure~\ref{fig:atlas} ($\gamma=3$, $\delta=1$, $s=4$, no noise, the
-filtered amplitudes on the classical scale by the same global factor).
-Classical outer activation climbs eq.~\eqref{eq:ladder} toward
-$0.366$; the 1BQF pushes the outer level of a five-hit track down to
-$0.246$ and the middles up to $0.498$, and annihilates the
-one-segment stub outright, since a lone segment sits exactly on the
-notch. The marked levels are what a threshold has to clear to keep
-every segment of a complete track, and the reason the earlier fixed cut
-at $0.35$ lost the filtered chain's endpoints.}
-\label{fig:ladder}
+\captionsetup{width=0.95\textwidth}
+\includegraphics[width=0.98\textwidth]{hhl_onebit_headline.pdf}
+\caption{HHL against the one-bit filter, on the events and axes of
+figure~\ref{fig:clean2x2} ($\gamma=3$, fixed $\varepsilon=2$\,mrad, no hit
+drop; three events per multiplicity; every solver at its efficiency-first
+working point). HHL is the exact finite-clock emulation described in the
+text, with the textbook gain $C=\lambda_{\min}$ for clocks of 4, 6 and 8
+bits and, for the record, the package implementation's saturated gain. The
+six- and eight-bit curves coincide with the classical solver's (drawn hollow
+so that they show through): with enough clock, HHL is the classical inverse.
+The 1BQF and QSVT curves are the same store rows as figure~\ref{fig:clean2x2}.}
+\label{fig:hhl1bqf}
 \end{figure}
 
-The second consequence is that coupled false segments pass. A false
-segment that accidentally couples to the graph moves off the
-$\lambda=s$ line, out of the zero, and into the passband. The notch
-has no second zero to spend on it. As density or acceptance width
-grows, the coupled-false population grows, and the 1BQF's false rate
-grows with it. The 1BQF is, precisely, the statement that unconnected
-fakes are exactly removable; everything in this work beyond
-section~\ref{sec:qsvt} is about the connected ones.
+\subsection{Why one zero is not enough}
+\label{sec:onebit:motivation}
 
-On success probability: the kept-branch probability scales as
-$P_{\rm anc}\approx 0.25/T$ on this problem, since the uniform input
-spreads over $4T^2$ segments of which order $T$ carry surviving
-amplitude, so shot budgets grow linearly in $T$ and amplitude
-amplification buys the usual quadratic discount.\footnote{The $0.25$
-constant is the analytic estimate for the uniform input; the comb's
-analogous constant, $\approx0.44$, is directly measured
-(section~\ref{sec:comb:resources}).} These costs carry over
-essentially unchanged to the polynomial filters below, which is why I
-defer resource accounting to section~\ref{sec:comb:resources}.
+On success probability first, because it is the currency in which the
+next section's construction is paid. The kept-branch probability is
+eq.~\eqref{eq:onebitreadout}: for an exact five-hit track the two bright
+modes contribute $\cos^{2}$ weights of $0.352$ and $0.058$ to a per-track
+total of $0.337$, spread over the $4T^{2}$ segments of the register, so on
+clean events $P_{\rm anc}\approx0.34\,T/n_{\rm pad}$ with $n_{\rm pad}$ the
+padded dimension --- $0.21/T$ where the padding ratio is $0.61$ and $0.32/T$
+where it is $0.95$. Measured on the stored solutions the constant is $0.18$
+to $0.25$ from $T=10$ to $550$ and then rises, to $0.60$ at $T=700$ and
+$0.98$ at $T=1000$: the coupled false population that the notch lets
+through adds kept weight of its own, so $P_{\rm anc}$ is itself a diagnostic
+of the false pile-up. Shot budgets grow linearly in $T$, and amplitude
+amplification buys the usual quadratic discount; these costs carry over
+essentially unchanged to the polynomial filters below, which is why the
+resource accounting is deferred to section~\ref{sec:comb:resources}.
+
+The motivation for everything that follows is now a single sentence with
+numbers behind it. A response of degree one owns one zero, and this
+problem's false population has more than one line: the isolated line at
+$s$, which the 1BQF kills; the pair lines at $s\pm1$, the triple lines at
+$s\pm\sqrt2$, the hub lines at $s\pm\sqrt m$, which it passes at
+$0.38$--$0.53$ of their weight; and under noise the tangles that
+section~\ref{sec:noise} measures, spread across the whole band. Each of
+those lines needs a zero of its own, and the true lines between them need
+to be passed. A polynomial of degree $d$ owns $d$ zeros and can be shaped
+between them, and section~\ref{sec:qsvt} shows that a quantum computer
+applies such a polynomial to $A$ with the same primitive the 1BQF already
+uses --- the controlled evolution, called $d$ times instead of two ---
+without diagonalising anything. That is the QSVT, and the one-bit filter is
+its first term.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{From one bit to any polynomial: the QSVT construction}

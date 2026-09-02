@@ -629,13 +629,21 @@ def fig_threshold():
         raise RuntimeError(f"no stored {solver} solution")
 
     x_cls = stored("classical")
-    x_1b = rescale_to_signal(stored("quantum"), x_cls, 0.35)
-    x_comb = rescale_to_signal(stored("qsvt"), x_cls, 0.35)
+    # Put the quantum amplitudes on the classical scale by norm-matching on the
+    # classical solver's OWN efficiency-first support (the segments it keeps at
+    # its 99% working point).  The earlier anchor was the classical support at
+    # the fixed cut 0.35 -- the retired convention leaking into a plotting scale.
+    # Quantile metrics are unchanged by any rescale; only the horizontal
+    # placement of the curves depends on it.
+    from lhcb_velo_toy.analysis.working_points import working_point_threshold
+    tau_cls_wp = working_point_threshold(x_cls, truth, 0.99)
+    x_1b = rescale_to_signal(stored("quantum"), x_cls, tau_cls_wp)
+    x_comb = rescale_to_signal(stored("qsvt"), x_cls, tau_cls_wp)
     taus = np.linspace(0.02, 0.55, 240)
     fig, axes = plt.subplots(1, 2, figsize=(12.0, 4.6),
                              constrained_layout=True)
     for x, col, lab in [(x_cls, "#33322e", "classical"),
-                        (x_1b, RED, "1BQF"),
+                        (x_1b, RED, "1BQF (package circuit, stored)"),
                         (x_comb, BLUE, "QSVT ($d=40$)")]:
         eff = [(x[truth] > t).mean() for t in taus]
         far = [((x > t) & ~truth).sum() / max(int((x > t).sum()), 1)
@@ -658,8 +666,9 @@ def fig_threshold():
     axes[1].text(0.02, 0.02,
                  "dashed verticals: each solver's efficiency-first\n"
                  "working point (the lowest threshold keeping 99%\n"
-                 "of its true segments)", fontsize=9,
-                 transform=axes[1].transAxes)
+                 "of its true segments); quantum amplitudes norm-matched\n"
+                 "to the classical solver on its own working-point support",
+                 fontsize=8.6, transform=axes[1].transAxes)
     save(fig, "threshold_tradeoff")
 
 
@@ -837,6 +846,49 @@ def fig_clean2x2():
                       "$10^{-3}$)", loc="left", fontsize=11)
     save(fig, "clean_headline")
 
+
+
+def fig_hhl_onebit():
+    """Section 3.5: HHL, the 1BQF, the classical solver and the QSVT on the
+    figure-12 events and axes, every solver at its efficiency-first working
+    point.  HHL is the exact finite-clock emulation of
+    QSVT/Paper_planning/section3_onebit/01_hhl_segment_metrics.py (validated
+    against a correctly wired circuit to 1e-12); the package's own HHL circuit
+    is not the comparator (to-do)."""
+    import pandas as pd
+    src = (HERE.parent / "section3_onebit" / "outputs" / "01_hhl_metrics.csv")
+    d = pd.read_csv(src)
+    d["far"] = d["far"].astype(float); d["eff"] = d["eff"].astype(float)
+    fig, axes = plt.subplots(1, 2, figsize=(12.2, 4.8), constrained_layout=True)
+
+    def series(sub, label, col, mk, ls="-", ms=6, z=3, hollow=False):
+        g = sub.groupby("T").agg(eff=("eff", "mean"), effe=("eff", lambda v: v.std(ddof=1) / np.sqrt(len(v)) if len(v) > 1 else 0.0),
+                                 far=("far", "mean"), fare=("far", lambda v: v.std(ddof=1) / np.sqrt(len(v)) if len(v) > 1 else 0.0)).reset_index()
+        kw = dict(mfc="white", mec=col, mew=1.6) if hollow else dict(mec="k", mew=0.5)
+        axes[0].errorbar(g["T"], 100 * g["eff"], yerr=100 * g["effe"], fmt=mk + ls, color=col, capsize=3,
+                         ms=ms, label=label, zorder=z, **kw)
+        axes[1].errorbar(g["T"], 100 * np.maximum(g["far"], 1e-5), yerr=100 * g["fare"], fmt=mk + ls, color=col,
+                         capsize=3, ms=ms, label=label, zorder=z, **kw)
+
+    series(d[d.solver == "classical"], "classical", "#1b7837", "o", ms=11, z=4, hollow=True)
+    series(d[d.solver == "qsvt"], "QSVT ($d=40$, base $A$)", "#6a3d9a", "D")
+    series(d[d.solver == "quantum"], "1BQF (package circuit, stored)", "#d6604d", "*", ms=9)
+    hh = d[d.solver == "hhl"]
+    for n_c, col, ls in ((4, "#9ecae1", ":"), (6, "#4292c6", "--"), (8, "#08306b", "-")):
+        series(hh[(hh.n_c == n_c) & (hh.gain == "textbook")], f"HHL, {n_c}-bit clock, $C=\\lambda_{{\\min}}$", col, "s", ls=ls, ms=5, z=2)
+    series(hh[(hh.n_c == 8) & (hh.gain == "package")], "HHL, 8-bit clock, package gain (saturated)", "#bdbdbd", "v", ls="-", ms=5, z=1)
+
+    axes[0].set_ylabel("segment efficiency  [%]")
+    axes[0].axhline(100, color=GREY, lw=0.7, ls="--"); axes[0].axhline(99, color=GREY, lw=0.7, ls=":")
+    axes[0].set_ylim(90, 100.6)
+    axes[1].set_ylabel("segment false rate  [%]"); axes[1].set_yscale("log"); axes[1].set_ylim(7e-4, 130)
+    for ax in axes:
+        ax.set_xlabel("tracks per event $T$"); ax.set_xscale("log")
+        ax.set_xticks([10, 20, 50, 100, 200, 400, 700, 1000]); ax.set_xticklabels(["10", "20", "50", "100", "200", "400", "700", "1000"])
+    axes[0].legend(fontsize=8.6, loc="lower left")
+    axes[0].set_title("(a) segment efficiency", loc="left", fontsize=11)
+    axes[1].set_title("(b) segment false rate (a measured 0% is drawn at $10^{-3}$)", loc="left", fontsize=11)
+    save(fig, "hhl_onebit_headline")
 
 def fig_occfit():
     """§7 correction: the occupancy no-go dissolves under a fitted response."""
@@ -1373,6 +1425,7 @@ if __name__ == "__main__":
     for c in cmds:
         {"motifs": fig_motifs, "twin": fig_twin, "responses": fig_responses,
          "correspondence": fig_correspondence, "trackmodes": fig_track_modes,
+         "hhl": fig_hhl_onebit,
          "fragmentation": fig_fragmentation, "gershgorin": fig_gershgorin,
          "readout": fig_readout, "erf": fig_erf, "run3crop": fig_run3crop,
          "tangles": fig_tangles, "pileup": fig_pileup,

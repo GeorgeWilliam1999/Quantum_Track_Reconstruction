@@ -61,6 +61,21 @@ or working-point conventions without saying so on the figure itself.
 - **Per-curve conventions:** matched-efficiency thresholds at 0.90/0.95/0.99/0.995 (tau at the k-th largest true amplitude), i.e. the efficiency-first convention. The quoted "margin" is min(true amplitude)/max(false amplitude), used because the false rate saturates at zero on clean events and cannot rank the designs.
 - Flags: the noisy configurations are degenerate at 99% efficiency for every tooth pattern (fragment/tangle ceiling); the two-tooth advantage is a clean-event result only.
 
+## figures/circuits.tex (fig:circuits, section 3.1) — hand-drawn TikZ
+- **New 2026-09-02.** HHL, the one-bit quantum filter, and the QSVT to one set of conventions, with the state labels of section 3's equations. No data. The 1BQF is drawn as the CORRECT one-bit filter (true-inverse uncompute); the package circuit applies its inverse pair gates in forward order (Notion to-do, 2026-09-02).
+
+## figures/amplitude_atlas.pdf + chain_amplitude_ladder.pdf (fig:atlas, fig:ladder) — 2026-09-02 readout change
+- The 1BQF panel/levels are now the EXACT ONE-BIT FILTER READOUT with the clock traced out, sqrt([cos^2(At/2) b]^2 + [1/2 sin(At) b]^2) (paper eq. onebitreadout), verified against a gate-level simulation to 1e-15 — no longer the real-cosine idealisation |cos(At/2) b|. Complete-track threshold 0.266 (was 0.246); false pair 0.261, false triple 0.287/0.472, hub K(1,3) centre 0.637. Global factor onto the classical scale 0.6818 (notebook 07_segment_amplitude_atlas.ipynb, cell 1). NOT the package circuit: that one is order-dependent on chains (to-do).
+
+## figures/threshold_tradeoff.pdf (fig_threshold) — 2026-09-02 anchor change
+- The quantum curves are placed on the classical scale by norm-matching on the classical solver's own efficiency-first (99%) support; the previous anchor was the classical support at the retired fixed cut 0.35. Quantile metrics unchanged; horizontal placement changed. The 1BQF curve is the stored package circuit (four efficiency steps = the four labelling-order-dependent levels of a track in that circuit).
+
+## HHL segment-level comparison (section 3.5, quoted numbers + figure)
+- **Data:** QSVT/Paper_planning/section3_onebit/outputs/01_hhl_metrics.csv (+ 01_hhl_validation.csv), produced by 01_hhl_segment_metrics.py.
+- **Configuration:** the figure-12 events (clean, FIXED eps = 2 mrad, gamma = 3, no drop), T = 10..1000, reps 0-2; HHL emulated spectrally with clocks n_c = 4, 6, 8 and two gains — the package's saturated 0.3 (halved inside arcsin) and the textbook C = lambda_min; classical / 1BQF / QSVT partners read from the store on the same events.
+- **Per-curve conventions:** efficiency-first working point via the package's metrics_at_wp (99%), identical to figure 12. The emulation is validated against a correctly wired exact circuit at T = 3, 5 (cos = 1.00000000, max|diff| 1e-12). The package HHLAlgorithm itself is NOT the comparator (to-do: saturated gain, bit-reversed clock keying, readout offsets).
+- Flags: single-node emulation; no Condor.
+
 ## figures/spectral_twins.pdf + .png (fig_twin)
 - **Data:** None. Fully analytic diagram drawn in fig_twin of make_paper_figures.py: two motif cartoons, a hand-typeset 2x2 block matrix [[s,-1],[-1,s]], and the shared eigenvalues s-+1 plotted as superimposed green/red lines. No file, store, or CSV is read.
 - **Configuration:** No events. s = gamma+delta = 4.0 only. Everything else N/A.
