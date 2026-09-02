@@ -78,20 +78,28 @@ events the answer must be measured: the false weight piles up on the
 eigenvalue lines of specific two- and three-segment motifs, and a
 polynomial fitted with roots at the measured pile-up beats the classical
 baseline at every attainable efficiency below a sharply defined
-\emph{fragment floor}, the small population of true fragments that are
-spectral twins of the false motifs and that, on that Hamiltonian, no
-function of $\lambda$ can separate. I also show that the two natural Hamiltonian modifications
+ceiling. That ceiling has a structural cause: a broken track's
+two-segment fragment and an accidental false pair are the same object
+as far as $A$ is concerned --- two segments sharing one hit, hence the
+same sub-block, hence the same eigenvalues and the same amplitudes ---
+so on that Hamiltonian no function of $\lambda$ can separate them, and
+their population is what caps segment efficiency near $0.98$. I also show that the two natural Hamiltonian modifications
 inherited from the classical literature can only be judged together with
 the response applied to them. The Denby--Peterson occupancy term destroys
 the one-bit filter, whose single zero cannot follow the spectrum it
 creates; but paired with a response refitted to that spectrum it becomes
 the strongest configuration in the study: at the matched $99\%$-efficiency
 point ($T{=}200$) it cuts the false rate thirtyfold at moderate noise
-($0.31$ to $0.010$) and roughly halves it at heavy noise, and, at small coupling, it breaks
-the spectral-twin degeneracy behind the fragment floor: the floor is a
-property of the base Hamiltonian, not of the problem. The bifurcation
-(fork) term behaves the same way, a regression under the clean-event comb
-and a net win under the refitted response. The result is a two-part
+($0.31$ to $0.010$), and at heavy noise by a fifth to a half --- both
+figures depend on the polynomial degree, the moderate one reading
+seventeenfold at degree $40$ against thirtyfold at degree $80$ --- and,
+at small coupling, it breaks the twin degeneracy that sets the ceiling,
+which is therefore a property of the base Hamiltonian and not of the
+problem. The bifurcation (fork) term is likewise a regression under the
+clean-event comb applied without refitting, and likewise a win once the
+response is refit to the spectrum it creates, but lower on the
+efficiency axis: below the ceiling it wins, and at the strict $99\%$
+point both systems flood alike. The result is a two-part
 design rule: the operator shapes the spectrum, and the fitted response
 separates it; neither knob can be evaluated without the other.
 \end{abstract}
@@ -122,8 +130,9 @@ weights, so a single-ancilla circuit, the one-bit quantum filter (1BQF),
 suffices. The 1BQF applies one cosine function of the Hamiltonian, placed
 so that its zero lands exactly on the eigenvalue shared by every isolated
 fake segment, and reads out the survivors. It is cheap, it suits near-term
-hardware, and it was demonstrated on trapped-ion and superconducting
-devices.
+hardware, and it was validated against device-calibrated noise models
+of trapped-ion and superconducting processors; running it on the
+devices themselves remains to be done.
 
 This work asks the question that follows naturally from the 1BQF. A
 cosine with one zero is a polynomial filter of degree
@@ -159,18 +168,25 @@ eigenvalue lines of specific small \emph{motifs} (hit-sharing pairs and
 triples), which sit off the true lines but inside any naive pass window.
 The correct response cannot be written down a priori; it must be fitted
 to the measured pile-up. Once it is, the quantum false rate drops below
-the classical one at every efficiency below a floor that I can identify,
-count, and explain segment by segment.
+the classical one at every efficiency below a ceiling that I can
+identify, count, and explain segment by segment.
 \item Hamiltonian engineering and response engineering are coupled, and
 neither knob can be evaluated without the other. Both Denby--Peterson
-penalties destroy the one-bit filter and read as regressions under the
-fixed clean-event comb; both become net wins once the polynomial is
-refitted to the spectrum they produce. The occupancy term is the
-sharpest case: it breaks the notch outright, yet with a refitted
-response it cuts the false rate at the matched $99\%$-efficiency point
-thirtyfold at moderate noise and roughly in half at heavy noise
-($T{=}200$), and at small coupling it lifts the fragment floor by breaking the
-spectral-twin degeneracy that causes it. Changing the operator moves
+penalties read as regressions under the clean-event comb applied
+without refitting its coefficients, and both are rehabilitated once
+those coefficients are refit to the spectrum they produce --- but not
+equally, and not at the same place on the efficiency axis. On the
+one-bit filter the two act in opposite directions: the fork term helps
+it, while the occupancy term destroys it outright, its single zero
+having no way to follow the co-hit coupling the term creates. The
+occupancy term is the sharpest case in the study: with the polynomial's
+coefficients refit it cuts the false rate at the matched
+$99\%$-efficiency point thirtyfold at moderate noise and by a fifth to
+a half at heavy noise ($T{=}200$), both of them degree-dependent --- at
+degree $40$ the moderate figure is seventeenfold, at degree $80$
+thirtyfold --- and at small coupling it breaks the twin degeneracy that
+caps segment efficiency near $0.98$ on the base Hamiltonian. The fork
+term wins too, but only below that cap. Changing the operator moves
 the activations, and moving the activations changes the polynomial we
 have to fit.
 \end{enumerate}
@@ -382,7 +398,8 @@ working two rungs by hand. A two-hit fragment ($m{=}1$) sits at exactly
 the isolated-false attractor $0.250$, and a three-hit fragment ($m{=}2$)
 sits at $1/3$, only $0.083$ above it. Fragments are barely
 distinguishable from noise by amplitude alone; this innocent-looking
-fact returns as the fragment floor in section~\ref{sec:fit}.
+fact returns in section~\ref{sec:fit} as the ceiling on segment
+efficiency.
 
 \begin{figure}[t]
 \centering
@@ -1013,8 +1030,9 @@ section~\ref{sec:fit}.
 an accidental false pair (bottom) have isomorphic compatibility
 graphs, hence identical $2\times2$ sub-blocks of $A$, hence exactly
 the same eigenvalues and amplitudes. Every function of $A$ treats
-them identically; this is the floor theorem, and under noise it
-becomes the fragment floor of section~\ref{sec:fit}.}
+them identically; this is the floor theorem, and under noise these
+twins become a population large enough to cap segment efficiency
+(section~\ref{sec:fit}).}
 \label{fig:twins}
 \end{figure}
 
@@ -1536,7 +1554,7 @@ numbers are means over three events, heavy noise, $T=200$.
 $T=200$): (a) exact per-mode false (red) and true (green) formation
 weight against $\lambda$, with the fitted response overlaid; the
 fitted roots land on the pair and triple lines. (b) The resulting
-efficiency/false-rate frontier, with the fragment floor biting
+efficiency/false-rate frontier, with the twin fragments biting
 only above $\eff\approx0.99$. (c) False rate at matched efficiency
 $0.985$ for the base and fork systems (three-event means). (d) The
 same quantity for responses fitted directly at fixed polynomial
@@ -1564,7 +1582,7 @@ each solver's threshold is set so the stated fraction of true
 segments survives, and the false rate of the resulting selection is
 quoted. Heavy noise, $T=200$, three-event means. ``Fitted response''
 is the optimal binned response of eq.~\eqref{eq:fit}, refitted to
-each system. The last row is the fragment floor of
+each system. The last row is the efficiency ceiling of
 section~\ref{sec:fit:floor}: at $\eff=0.99$ every solver floods, on
 the base and fork systems alike.}
 \label{tab:fit}
@@ -1608,9 +1626,12 @@ chains. Any response with a root at $s-1$ kills them alongside the
 false pairs; their population exceeds the $1\%$ efficiency budget;
 and once the working point must dip below their suppressed
 amplitudes, the entire suppressed false band comes back above
-threshold. This is the \emph{fragment floor}: the noisy-event
-generalisation of the clean floor theorem, no longer a curiosity but
-the binding constraint. The robust statement is the measured wall
+threshold. This is the \emph{efficiency ceiling set by twin
+fragments}: the noisy-event generalisation of the clean floor
+theorem, no longer a curiosity but the binding constraint. It is a
+ceiling because it caps how far the efficiency can be pushed, and it
+is set by twins because the fragments and the false pairs it confuses
+are, to any function of $A$, the same object. The robust statement is the measured wall
 itself: on the base and fork systems every solver holds
 $\eff=0.98$ and none holds $\eff=0.99$, on all three events. On
 \emph{those} Hamiltonians no function of $\lambda$ can cross it,
@@ -1651,8 +1672,8 @@ occupancy term stretches the spectral span ($6.7\to43\to242$ for
 $\alpha=0\to0.05\to0.3$) and a fixed degree budget loses resolution
 proportionally; the spectral benefit saturates long before the
 classical amplitude benefit does. Second, and most strikingly,
-\emph{the occupancy coupling breaks the fragment floor}. One of the
-three events is floor-bound on the base system, its fitted
+\emph{the occupancy coupling breaks that ceiling}. One of the
+three events is held at the ceiling on the base system, its fitted
 response cannot do better than $0.654$ at matched efficiency
 $0.985$, because its fragment twins are exactly degenerate with
 false pairs, and on the occupancy system the same event fits to
@@ -1662,7 +1683,7 @@ coupling embeds every motif in its hit-sharing neighbourhood, which
 is different for a fragment of a real track than for an accidental
 false pair. The embedding breaks the isomorphism, the degeneracy
 lifts, and a response fitted to the new spectrum separates what was
-provably inseparable on the base Hamiltonian. The fragment floor of
+provably inseparable on the base Hamiltonian. The ceiling of
 section~\ref{sec:fit:floor} is therefore a property of the
 \emph{base} Hamiltonian, not of the problem.
 
@@ -1687,8 +1708,8 @@ on every system). (a) False rate at matched efficiency $0.985$,
 three-event means: the fitted response on the occupancy system at
 $\alpha=0.05$ beats both the classical solver and the fitted
 response on the base system. (b) Per event: the event that is
-fragment-floor-bound on the base system (event 1) escapes the floor
-on the occupancy system, the co-hit coupling breaks the
+held at the efficiency ceiling on the base system (event 1) escapes
+it on the occupancy system: the co-hit coupling breaks the
 fragment/false-pair twin degeneracy.}
 \label{fig:occfit}
 \end{figure}
@@ -2386,7 +2407,7 @@ because this toy pins every true track to five hits. Real VELO
 tracks have variable length, and a companion study on real Run-3
 event geometry found the true spectrum smeared into a band, the
 $P_4$ comb keeping only $40\%$ of true segments, and a
-short-fragment floor ($m\le2$ tracks indistinguishable from noise
+short fragments ($m\le2$ tracks indistinguishable from noise
 at the segment level) capping all segment-level solvers, while the
 fork transfer and the band-plus-notch redesign behaved as the toy
 predicts. Figure~\ref{fig:run3} shows the measured amplitude
@@ -2416,7 +2437,7 @@ fragments ($m\le2$); green: findable true segments ($m\ge3$); the
 dotted line is each solver's efficiency-first threshold, set so that $99\%$ of the \emph{findable} true segments (tracks with three or more true segments) survive, with the per-event range shaded; over all true segments the same rule is degenerate, because the $13\%$ of true segments in fragments of one or two segments sit at the isolated level inside the false bulk. The QSVT here is the degree-40 band-limited design on the base Hamiltonian, not the line comb: real tracks have variable length, so the five-hit lines do not apply. Variable track length smears
 the discrete toy levels into bands, and the fragment population
 sits inside the false bulk for every solver, the real-geometry
-form of the fragment floor.}
+form of the same efficiency ceiling.}
 \label{fig:run3}
 \end{figure}
 
@@ -2452,7 +2473,7 @@ refitted to that measurement reads a false rate of $0.061$ at
 matched segment efficiency $0.97$ where the classical solver on the
 same events reads $0.124$, half the fakes at identical
 efficiency, on every event tested, at every efficiency below the
-fragment floor.
+twin-fragment ceiling.
 \item Judge every Hamiltonian modification together with the
 response fitted to it, never separately. Both Denby--Peterson terms
 destroy the degree-one filter, and both help the refitted
