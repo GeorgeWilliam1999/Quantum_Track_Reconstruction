@@ -14,7 +14,9 @@ the SAME fixed epsilon=0.002:
     families:  fitted_moment d=40 (refit per operator per rep),
                comb_prod d=40 (production line comb on the operator's
                domain), matched 1BQF cosine (degree-60 Chebyshev),
-               classical MINRES reference (fixed tau + frontier columns)
+               classical MINRES reference (efficiency-first columns; the
+               eff_fixed_tau/far_fixed_tau columns are legacy — George 2026-09-02:
+               the fixed threshold was a bug — and are read by nothing)
 so every series can be drawn at ONE stated working point (the matched
 99%-efficiency point) alongside figure 6's own store curves.  The base
 comb_prod row doubles as the anchor against the store campaign's qsvt

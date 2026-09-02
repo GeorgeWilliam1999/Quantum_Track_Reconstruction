@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Paper figures for 'From one bit to a fitted polynomial' (review pass, 2026-07-19).
+"""Paper figures for 'From one bit to a fitted polynomial' (review pass, 2026-07-19;
+convention pass 2026-09-02).
+
+Conventions (George 2026-09-02): every solver, the classical inversion included,
+is read at its efficiency-first working point — the lowest threshold that keeps
+99% of the true segments.  The fixed absolute threshold tau = 0.35 was a bug and
+is drawn nowhere.  The QSVT is one solver; its series are labelled by polynomial
+degree and by the Hamiltonian the problem is set up on.
 
 Each subcommand produces one figure into figures/.  Run `all_fast` for the
 figures that need no event data, `heavy` for the ones built from the heavy
@@ -218,7 +225,7 @@ def fig_responses():
 
     ax = axes[1]
     ax.plot(lam, f_comb, color=BLUE, lw=2.2,
-            label="line comb $|p(\\lambda)|$ (degree 40, half-width 0.18)")
+            label="QSVT polynomial $|p(\\lambda)|$, degree 40 (line comb, half-width 0.18)")
     for lv, col, lab in pops:
         ax.axvline(lv, color=col, lw=1.4 if col is GREY else 1.1,
                    ls="-" if col is GREY else "--", alpha=0.85)
@@ -232,7 +239,7 @@ def fig_responses():
     ax.set_ylabel("$|p(\\lambda)|$")
     ax.set_ylim(-0.02, 1.06)
     ax.legend(loc="upper left", fontsize=9.2)
-    ax.set_title("(b) the QSVT line comb: a zero (or a pass) wherever the spectrum needs one",
+    ax.set_title("(b) the QSVT polynomial: a zero (or a pass) wherever the spectrum needs one",
                  loc="left", fontsize=11)
     save(fig, "response_functions")
 
@@ -247,7 +254,7 @@ def fig_readout():
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.3))
     ax = axes[0]
     ax.loglog(d40["T"], d40["P"], "o", color=BLUE, ms=7,
-              label="measured, line comb ($d=40$)")
+              label="measured, QSVT ($d=40$)")
     ax.loglog(Ts, 0.44 / Ts, "-", color=BLUE, lw=1.4, alpha=0.7,
               label="$P_{\\rm anc} = 0.44/T$")
     ax.loglog(Ts, 0.25 / Ts, "--", color=RED, lw=1.4, alpha=0.7,
@@ -260,7 +267,7 @@ def fig_readout():
 
     ax = axes[1]
     ax.loglog(d40["T"], d40["total_depth"], "s", color=BLUE, ms=7,
-              label="measured amplified walk calls ($d=40$)")
+              label="measured amplified walk calls (QSVT, $d=40$)")
     scale = float(d40["total_depth"].iloc[0] / np.sqrt(d40["T"].iloc[0]))
     ax.loglog(Ts, scale * np.sqrt(Ts), "-", color=BLUE, lw=1.4, alpha=0.7,
               label="$\\propto d\\sqrt{T}$")
@@ -326,7 +333,7 @@ def fig_run3crop():
 
 def fig_resources_compare():
     """Table-2 companion: measured resource scaling vs track count for
-    HHL (structure-level estimate band), the 1BQF, and the DSS-QETU comb."""
+    HHL (structure-level estimate band), the 1BQF, and the QSVT (DSS-QETU)."""
     import pandas as pd
     base = "/data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/DSS/outputs/"
     gw = pd.read_csv(base + "dss_width.csv")
@@ -341,11 +348,11 @@ def fig_resources_compare():
     ax.fill_between(gw["T"], gw["n_s"] + NC_LO + 1, gw["n_s"] + NC_HI + 1,
                     color=RED, alpha=0.25, label="HHL (clock $n_c=6$--$8$)")
     ax.plot(gw["T"], gw["QSVT_LCU"], ":", color=GREY, lw=1.6,
-            label="comb, dense-dilation LCU (simulation only)")
+            label="QSVT, dense-dilation LCU (simulation only)")
     ax.plot(gw["T"], gw["BQF_1"], "o-", color=RED, lw=1.8, ms=6,
             label="1BQF")
     ax.plot(gw["T"], gw["DSS_QETU"], "s--", color=BLUE, lw=1.8, ms=6,
-            label="comb (DSS--QETU)")
+            label="QSVT (DSS--QETU)")
     ax.set_xscale("log")
     ax.set_xlabel("tracks per event $T$")
     ax.set_ylabel("logical qubits")
@@ -360,9 +367,9 @@ def fig_resources_compare():
     ax.loglog(gg["T"], gg["bqf_total"], "o-", color=RED, lw=1.8, ms=6,
               label="1BQF (2 calls)")
     ax.loglog(gg["T"], gg["comb_global"], "s--", color=BLUE, lw=1.8, ms=6,
-              label="comb, global ($d=40$ calls)")
+              label="QSVT, global ($d=40$ calls)")
     ax.loglog(gg["T"], gg["comb_percluster_max_instance"], "D", color=GREEN,
-              ms=7, ls="none", label="comb, largest single cluster")
+              ms=7, ls="none", label="QSVT, largest single cluster")
     ax.set_xlabel("tracks per event $T$")
     ax.set_ylabel("two-qubit (CX) gates per shot")
     ax.legend(fontsize=9, loc="upper left")
@@ -567,7 +574,7 @@ def fig_threshold():
                              constrained_layout=True)
     for x, col, lab in [(x_cls, "#33322e", "classical"),
                         (x_1b, RED, "1BQF"),
-                        (x_comb, BLUE, "line comb")]:
+                        (x_comb, BLUE, "QSVT ($d=40$)")]:
         eff = [(x[truth] > t).mean() for t in taus]
         far = [((x > t) & ~truth).sum() / max(int((x > t).sum()), 1)
                for t in taus]
@@ -581,10 +588,6 @@ def fig_threshold():
              "(a) efficiency against the threshold"),
             (axes[1], "segment false rate",
              "(b) false rate against the threshold")]:
-        ax.axvline(0.35, color=GREY, lw=1.6)
-        ax.text(0.353, 0.60, "fixed $\\tau=0.35$", rotation=90, fontsize=9.5,
-                color=GREY, va="center",
-                transform=ax.get_xaxis_transform())
         ax.set_xlabel("threshold $\\tau$")
         ax.set_ylabel(ylab)
         ax.set_title(ttl, loc="left", fontsize=11)
@@ -592,13 +595,14 @@ def fig_threshold():
     axes[0].legend(loc="center left", fontsize=9.5)
     axes[1].text(0.02, 0.02,
                  "dashed verticals: each solver's efficiency-first\n"
-                 "threshold (99% of true segments kept)", fontsize=9,
+                 "working point (the lowest threshold keeping 99%\n"
+                 "of its true segments)", fontsize=9,
                  transform=axes[1].transAxes)
     save(fig, "threshold_tradeoff")
 
 
 def fig_fitpaper():
-    """Paper version of the fit figure: no footer, no unfitted-comb series."""
+    """Paper version of the fit figure: no footer; QSVT series only (no line-comb-coefficient series)."""
     import pandas as pd
     m4 = _load_04()
     sysd, eps, nz = _heavy_system(m4)
@@ -656,21 +660,21 @@ def fig_fitpaper():
     ax2 = ax.twinx()
     lg = np.linspace(edges[0], edges[-1], 1500)
     ax2.plot(lg, np.abs(m4.binned_response(p_opt, edges)(lg)),
-             color=BLUE, lw=1.8, label="fitted response")
+             color=BLUE, lw=1.8, label="QSVT polynomial (fitted)")
     ax2.set_ylim(0, 1.12)
     ax2.grid(False)
-    ax2.set_ylabel("|fitted response| (normalised)")
+    ax2.set_ylabel("|QSVT polynomial| (normalised)")
     h1, l1 = ax.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()
     ax.legend(h1 + h2, l1 + l2, fontsize=9, loc="upper right")
     ax.set_title("(a) the measurement: false weight piles up on the motif "
-                 "lines;\nthe fitted response puts its roots there",
+                 "lines;\nthe fitted QSVT polynomial puts its roots there",
                  loc="left", fontsize=11)
 
     ax = axes[0, 1]
     for xv, cc, lab, lw in [(x_cls, "#33322e", "classical", 1.8),
                             (x_1b, RED, "1BQF", 1.4),
-                            (x_opt, BLUE, "fitted response", 2.2)]:
+                            (x_opt, BLUE, "QSVT (fitted polynomial)", 2.2)]:
         e_, f_ = m4.roc(xv, truth)
         ax.plot(np.maximum(f_, 2e-3), e_, "-", color=cc, lw=lw, label=lab)
     for tgt, ls in [(0.99, ":"), (0.985, "--")]:
@@ -691,7 +695,7 @@ def fig_fitpaper():
     agg = df.groupby("config").mean(numeric_only=True).reindex(order)
     series = [("far_cls_e985", "#33322e", "classical"),
               ("far_1b_e985", RED, "1BQF"),
-              ("far_opt_e985", BLUE, "fitted response")]
+              ("far_opt_e985", BLUE, "QSVT (fitted polynomial)")]
     width = 0.24
     for k, (col, cc, lab) in enumerate(series):
         ax.bar(np.arange(len(order)) + (k - 1.0) * width, agg[col],
@@ -707,9 +711,9 @@ def fig_fitpaper():
     base = dfo[dfo.system == "base"]
     degs = [40, 80, 160, 240, 480, 960]
     ax.semilogy(degs, [base[f"far_fit{d}_e985"].mean() for d in degs], "o-",
-                color=BLUE, label="directly fitted degree-$d$ response")
+                color=BLUE, label="QSVT, degree $d$ (coefficients fit directly)")
     ax.axhline(d0.far_opt_e985.mean(), color=GREEN, ls="--",
-               label="binned (unlimited-degree) response")
+               label="QSVT, unlimited degree (binned fit)")
     ax.axhline(d0.far_cls_e985.mean(), color="#33322e", ls=":",
                label="classical")
     gen = d0[d0.rep > 0]
@@ -726,46 +730,49 @@ def fig_fitpaper():
 
 
 def fig_clean2x2():
-    """One readable headline figure replacing the two side-by-side 2x2 grids."""
+    """The headline figure: every solver at its efficiency-first working point
+    (George 2026-09-02: the fixed threshold was a bug; nothing is drawn at it)."""
     sys.path.insert(0, "/data/bfys/gscriven/Quantum_Track_Reconstruction/"
                     "Toy_Characterisation/Segment_level_studies")
     import seg_store as Sst
     M = Sst.fixed_eps_metrics()
     M = M[M["n_trk"] <= 1000]
-    solvers = [("classical", "#1b7837", "o", "classical (fixed $\\tau=0.35$)"),
-               ("qsvt", "#6a3d9a", "D", "line comb (fixed $\\tau=0.35$)"),
-               ("quantum", "#d6604d", "*",
-                "1BQF (efficiency-first threshold)")]
+    solvers = [("classical", "#1b7837", "o", "classical"),
+               ("qsvt", "#6a3d9a", "D", "QSVT ($d=40$, base $A$)"),
+               ("quantum", "#d6604d", "*", "1BQF")]
     fig, axes = plt.subplots(1, 2, figsize=(12.2, 4.8),
                              constrained_layout=True)
     for k, col, mk, lab in solvers:
         d = Sst.agg_by_ntrk(M, k, 3.0, 0.0)
-        if not d:
+        if not d or "se_wp_m" not in d:
             continue
-        if k == "quantum" and "se_wp_m" in d:
-            se, see, fr, fre = (d["se_wp_m"], d["se_wp_e"],
-                                d["fr_wp_m"], d["fr_wp_e"])
-            axes[0].plot(d["tc"], d["se_m"], mk + "--", color=col, alpha=0.30,
-                         ms=5, label="1BQF (fixed $\\tau$: endpoint cut)")
-            axes[1].plot(d["tc"], d["fr_m"], mk + "--", color=col, alpha=0.30,
-                         ms=5)
-        else:
-            se, see, fr, fre = d["se_m"], d["se_e"], d["fr_m"], d["fr_e"]
+        se, see, fr, fre = (d["se_wp_m"], d["se_wp_e"],
+                            d["fr_wp_m"], d["fr_wp_e"])
         axes[0].errorbar(d["tc"], se, yerr=see, fmt=mk + "-", color=col,
                          capsize=3, mec="k", mew=0.5, label=lab,
                          ms=9 if mk == "*" else 6)
-        axes[1].errorbar(d["tc"], fr, yerr=fre, fmt=mk + "-", color=col,
-                         capsize=3, mec="k", mew=0.5, label=lab,
-                         ms=9 if mk == "*" else 6)
+        axes[1].errorbar(d["tc"], np.maximum(fr, 1e-3), yerr=fre,
+                         fmt=mk + "-", color=col, capsize=3, mec="k", mew=0.5,
+                         label=lab, ms=9 if mk == "*" else 6)
     axes[0].set_ylabel("segment efficiency  [%]")
-    axes[0].set_ylim(60, 102)
+    axes[0].set_ylim(90, 100.6)
     axes[0].axhline(100, color=GREY, lw=0.7, ls="--")
+    axes[0].axhline(99, color=GREY, lw=0.7, ls=":")
+    axes[0].text(10.5, 99.08, "99% of true segments kept", fontsize=8.5,
+                 color="#55534d")
     axes[1].set_ylabel("segment false rate  [%]")
+    axes[1].set_yscale("log")
+    axes[1].set_ylim(7e-4, 130)
     for ax in axes:
         ax.set_xlabel("tracks per event $T$")
+        ax.set_xscale("log")
+        ax.set_xticks([10, 20, 50, 100, 200, 400, 700, 1000])
+        ax.set_xticklabels(["10", "20", "50", "100", "200", "400", "700",
+                            "1000"])
     axes[0].legend(fontsize=9.5, loc="lower left")
     axes[0].set_title("(a) segment efficiency", loc="left", fontsize=11)
-    axes[1].set_title("(b) segment false rate", loc="left", fontsize=11)
+    axes[1].set_title("(b) segment false rate (a measured 0% is drawn at "
+                      "$10^{-3}$)", loc="left", fontsize=11)
     save(fig, "clean_headline")
 
 
@@ -790,13 +797,13 @@ def fig_occfit():
     ax.bar(xs - w, agg.far_cls_e985, w * 0.9, color="#33322e",
            label="classical")
     ax.bar(xs, agg.far_fit40_e985, w * 0.9, color="#7fb0e0",
-           label="fitted response, degree 40")
+           label="QSVT, degree 40")
     ax.bar(xs + w, agg.far_fitbest_e985, w * 0.9, color=BLUE,
-           label="fitted response, best degree $\\leq 960$")
+           label="QSVT, best degree $\\leq 960$")
     ax.set_xticks(xs, names)
     ax.set_ylabel("false rate at matched efficiency 0.985")
     ax.legend(fontsize=9.5)
-    ax.set_title("(a) the occupancy term helps a fitted response\n"
+    ax.set_title("(a) the occupancy term helps the QSVT\n"
                  "(mean over three events, heavy noise, $T=200$)",
                  loc="left", fontsize=11)
 
@@ -809,7 +816,7 @@ def fig_occfit():
         d = dfo[dfo.system == sysname].set_index("rep")
         ax.bar(np.array(reps) + (k - 0.5) * w,
                d.loc[reps, "far_fitbest_e985"], w * 0.92, color=col,
-               label=f"fitted, {lab}")
+               label=f"QSVT, {lab}")
     ax.set_xticks(reps, [f"event {r}" for r in reps])
     ax.set_ylabel("false rate at matched efficiency 0.985")
     ax.legend(fontsize=9.5)

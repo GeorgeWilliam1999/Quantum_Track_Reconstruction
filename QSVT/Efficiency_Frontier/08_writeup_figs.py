@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 """QSVT XIV write-up figures — the LaTeX paper's segment-metrics style.
 
-Conventions (locked, George 2026-08-26):
-  * classical = its fixed absolute tau (attractor + 0.10; 0.35 at gamma=3) —
-    the eff_fixed_tau / far_fixed_tau columns where present, else the
-    Stage-1 eff_fixed/far_fixed columns;
-  * every quantum solver = its wp99 high-efficiency working point
-    (eff_e990 / far_e990) — per-solver taus, as always;
-  * polynomial degree HELD at the production d=40; the Hamiltonian set-out is
-    the variable.
+Conventions (George 2026-09-02; this supersedes the 2026-08-26 note that read
+the classical solver at a fixed absolute threshold — that threshold was a bug):
+  * EVERY solver, the classical inversion included, is read at its
+    efficiency-first working point: the lowest threshold that keeps 99% of
+    the true segments (eff_e990 / far_e990 columns).  No curve anywhere is
+    read at a fixed threshold.
+  * The QSVT is one solver.  Its variants are labelled by polynomial degree
+    (held at 40 here) and by the Hamiltonian the problem is set up on
+    (base A, A + occupancy term, A + bifurcation term, both).
 
 Figures (paper rc style, make_paper_figures palette):
   F1 figures/xiv_metrics_vs_T_{clean,moderate,heavy}.png
-     (a) segment efficiency vs T, (b) segment false rate vs T — classical
-     fixed-tau reference + quantum wp99 per set-out, T = 200..1000.
-  F2 figures/xiv_setout_T200.png — the T=200 set-out comparison (both panels).
-  F3 figures/xiv_loss_budget.png — stacked L1-L3 + twin fraction (mechanism).
+     (a) segment efficiency vs T, (b) segment false rate vs T — classical,
+     1BQF, and the degree-40 QSVT on each Hamiltonian, T = 200..1000.
+  F2 figures/xiv_metrics_composite.png — the three regimes stacked.
+  F3 figures/xiv_loss_budget.png — stacked loss channels + twin fraction.
 Numbers: outputs/08_writeup_numbers.csv
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import matplotlib
@@ -42,15 +42,22 @@ plt.rcParams.update({
     "figure.facecolor": "white", "savefig.facecolor": "white",
 })
 
-SETOUT_STYLE = {          # colour follows the OPERATOR
-    "base":            (BLUE,   "-",  "o", "base $A$"),
-    "occ_a0.05":       (GREEN,  "-",  "s", "occupancy $\\alpha{=}0.05$"),
-    "occ_a0.10":       ("#2f6b3e", "--", "s", "occupancy $\\alpha{=}0.10$"),
-    "fork_b0.5":       (ORANGE, "-",  "D", "bifurcation $\\beta{=}0.5$"),
-    "occ0.05_fork0.5": (PURPLE, "-",  "^", "occ.+bifur. $\\alpha{=}.05,\\beta{=}.5$"),
-    "erf":             ("#b0762a", ":",  "v", "erf kernel"),
-}
 D_HEAD = 40.0
+# colour follows the Hamiltonian; every QSVT legend entry names degree + Hamiltonian
+HAM_STYLE = {
+    "base":            (BLUE,   "-",  "o", "base $A$"),
+    "occ_a0.05":       (GREEN,  "-",  "s", "$A$ + occupancy $\\alpha{=}0.05$"),
+    "occ_a0.10":       ("#2f6b3e", "--", "s", "$A$ + occupancy $\\alpha{=}0.10$"),
+    "fork_b0.5":       (ORANGE, "-",  "D", "$A$ + bifurcation $\\beta{=}0.5$"),
+    "occ0.05_fork0.5": (PURPLE, "-",  "^", "$A$ + occupancy + bifurcation"),
+    "erf":             ("#b0762a", ":",  "v", "erf-kernel $A$"),
+}
+HAM_PLAIN = {k: v[3].replace("$", "").replace("\\alpha{=}", "alpha=")
+             .replace("\\beta{=}", "beta=") for k, v in HAM_STYLE.items()}
+
+
+def qsvt_label(ham):
+    return f"QSVT $d{{=}}{int(D_HEAD)}$, {HAM_STYLE[ham][3]}"
 
 
 def load_frames():
@@ -59,12 +66,9 @@ def load_frames():
                "02_fork_frontier.csv", "04_heavy_frontier.csv",
                "04_heavy_fork.csv", "04_heavy_base_ref.csv",
                "03_highT_frontier.csv",
-               # Stage 5 (2026-09-01): full degree scan at T=200 (all regimes,
-               # all set-outs, matched onebqf_cos included) + the high-T
-               # matched 1BQF reference — same events, same machinery
-               "06_degree_scan.csv", "06b_highT_onebqf.csv",
-               # classical fixed-tau at T=200 recomputed from the 06 caches
-               "06c_classical_fixed_tau.csv"]:
+               # full degree scan at T=200 (all regimes, all Hamiltonians,
+               # matched 1BQF included) + the high-T matched 1BQF reference
+               "06_degree_scan.csv", "06b_highT_onebqf.csv"]:
         p = OUT / fn
         if not p.exists():
             continue
@@ -75,7 +79,6 @@ def load_frames():
             d["T"] = 200
         d["src"] = fn
         frames.append(d)
-    # the 1BQF store reference (base A, wp99 columns already in shape)
     p1b = OUT / "03_1bqf_reference.csv"
     if p1b.exists():
         b = pd.read_csv(p1b)
@@ -83,19 +86,6 @@ def load_frames():
         b["src"] = "03_1bqf_reference.csv"
         frames.append(b)
     df = pd.concat(frames, ignore_index=True)
-    # older runners recorded the classical fixed-tau point in the notes text
-    # ("fixed-tau 0.350: eff 0.9838 far 0.0226") — recover it into columns
-    if "eff_fixed_tau" not in df.columns:
-        df["eff_fixed_tau"] = np.nan
-        df["far_fixed_tau"] = np.nan
-    m = (df.family == "classical_invA") & df["eff_fixed_tau"].isna() \
-        & df["notes"].astype(str).str.contains("fixed-tau")
-    pat = re.compile(r"eff ([0-9.]+) far ([0-9.]+)")
-    for i in df.index[m]:
-        g = pat.search(str(df.at[i, "notes"]))
-        if g:
-            df.at[i, "eff_fixed_tau"] = float(g.group(1))
-            df.at[i, "far_fixed_tau"] = float(g.group(2))
     df["family"] = df["family"].replace({"fitted_ridge": "fitted_moment"})
     return df
 
@@ -109,6 +99,8 @@ NOISE_TXT = {
     "moderate": "$\\sigma_{\\rm scatt}{=}10^{-4}$, $\\sigma_{\\rm res}{=}10\\,\\mu$m, drop 1%",
     "heavy":    "$\\sigma_{\\rm scatt}{=}10^{-4}$, $\\sigma_{\\rm res}{=}20\\,\\mu$m, drop 1%",
 }
+WP_TXT = ("every solver at its efficiency-first working point: the lowest "
+          "threshold keeping 99% of the true segments")
 
 
 def param_box(fig, regime, sub, extra=""):
@@ -118,11 +110,73 @@ def param_box(fig, regime, sub, extra=""):
         if len(eps) else "formula $\\varepsilon$"
     txt = (f"{NOISE_TXT.get(regime, regime)} · {eps_txt} · "
            "$\\gamma{=}3$, $\\delta{=}1$, step kernel · "
-           "occupancy $\\alpha{=}0.05$ · fork $\\beta{=}0.5$, "
-           "$\\varepsilon_B{=}\\varepsilon$ · fitted = moment-space ridge, "
-           "$\\mu$ by eff@far$\\leq$1%" + (" · " + extra if extra else ""))
+           "occupancy $\\alpha{=}0.05$ · bifurcation $\\beta{=}0.5$, "
+           "$\\varepsilon_B{=}\\varepsilon$ · QSVT polynomial: degree 40, "
+           "coefficients least-squares fit per Hamiltonian in Chebyshev-moment "
+           "space (ridge weight chosen for best efficiency at false rate "
+           "$\\leq$ 1%) · " + WP_TXT + (" · " + extra if extra else ""))
     fig.text(0.5, -0.035, txt, ha="center", va="top", fontsize=8.2,
-             color="#55534d")
+             color="#55534d", wrap=True)
+
+
+def series_classical(sub, Ts):
+    T_, e_, f_ = [], [], []
+    for T in Ts:
+        g = sub[(sub.setout == "base") & (sub["T"] == T)
+                & (sub.family == "classical_invA")]
+        if len(g):
+            T_.append(T); e_.append(med(g, "eff_e990")); f_.append(med(g, "far_e990"))
+    return T_, e_, f_
+
+
+def series_onebqf(sub, Ts):
+    T_, e_, f_ = [], [], []
+    for T in Ts:
+        g = sub[(sub.setout == "base") & (sub["T"] == T)
+                & (sub.family.isin(["1bqf_cos", "onebqf_cos"]))]
+        if len(g):
+            T_.append(T); e_.append(med(g, "eff_e990")); f_.append(med(g, "far_e990"))
+    return T_, e_, f_
+
+
+def series_qsvt(sub, Ts, ham):
+    T_, e_, f_ = [], [], []
+    for T in Ts:
+        g = sub[(sub.setout == ham) & (sub["T"] == T)
+                & (sub.family == "fitted_moment") & (sub.degree == D_HEAD)]
+        if len(g):
+            T_.append(T); e_.append(med(g, "eff_e990")); f_.append(med(g, "far_e990"))
+    return T_, e_, f_
+
+
+def draw_regime(axE, axF, sub, Ts, hams, rows, regime, lw=2.0):
+    cT, ce, cf = series_classical(sub, Ts)
+    axE.plot(cT, ce, "--", color=INK, lw=lw, marker="x", ms=6, label="classical")
+    axF.plot(cT, np.maximum(cf, 2e-4), "--", color=INK, lw=lw, marker="x",
+             ms=6, label="classical")
+    for T, e, f in zip(cT, ce, cf):
+        rows.append(dict(regime=regime, T=T, hamiltonian="base",
+                         series="classical", eff=e, far=f))
+    bT, be, bf = series_onebqf(sub, Ts)
+    if bT:
+        axE.plot(bT, be, "-.", color=RED, lw=lw - 0.2, marker="+", ms=7,
+                 label="1BQF")
+        axF.plot(bT, np.maximum(bf, 2e-4), "-.", color=RED, lw=lw - 0.2,
+                 marker="+", ms=7, label="1BQF")
+        for T, e, f in zip(bT, be, bf):
+            rows.append(dict(regime=regime, T=T, hamiltonian="base",
+                             series="1BQF", eff=e, far=f))
+    for ham in hams:
+        col, ls, mk, _ = HAM_STYLE[ham]
+        xT, xe, xf = series_qsvt(sub, Ts, ham)
+        if xT:
+            axE.plot(xT, xe, ls, color=col, lw=lw, marker=mk, ms=5,
+                     label=qsvt_label(ham))
+            axF.plot(xT, np.maximum(xf, 2e-4), ls, color=col, lw=lw,
+                     marker=mk, ms=5, label=qsvt_label(ham))
+            for T, e, f in zip(xT, xe, xf):
+                rows.append(dict(regime=regime, T=T, hamiltonian=HAM_PLAIN[ham],
+                                 series=f"QSVT degree {int(D_HEAD)}", eff=e, far=f))
 
 
 def fig_metrics_vs_T(df):
@@ -134,58 +188,10 @@ def fig_metrics_vs_T(df):
             continue
         fig, axes = plt.subplots(1, 2, figsize=(12.0, 4.6),
                                  constrained_layout=True)
-        # classical fixed-tau reference (base A)
-        ce, cf, cT = [], [], []
-        for T in Ts:
-            g = sub[(sub.setout == "base") & (sub["T"] == T)
-                    & (sub.family == "classical_invA")]
-            e = med(g, "eff_fixed_tau") if "eff_fixed_tau" in g and \
-                g["eff_fixed_tau"].notna().any() else med(g, "eff_fixed")
-            f = med(g, "far_fixed_tau") if "far_fixed_tau" in g and \
-                g["far_fixed_tau"].notna().any() else med(g, "far_fixed")
-            if np.isfinite(e):
-                cT.append(T); ce.append(e); cf.append(f)
-            rows.append(dict(regime=regime, T=T, setout="base",
-                             series="classical_fixed_tau", eff=e, far=f))
-        axes[0].plot(cT, ce, "--", color=INK, lw=2.0, marker="x", ms=6,
-                     label="classical (fixed $\\tau$)")
-        axes[1].plot(cT, np.maximum(cf, 2e-4), "--", color=INK, lw=2.0,
-                     marker="x", ms=6, label="classical (fixed $\\tau$)")
-        # 1BQF wp99 reference where it exists (Stage-1 T=200 + heavy base ref)
-        be, bf, bT = [], [], []
-        for T in Ts:
-            g = sub[(sub.setout == "base") & (sub["T"] == T)
-                    & (sub.family.isin(["1bqf_cos", "onebqf_cos"]))]
-            if len(g):
-                bT.append(T); be.append(med(g, "eff_e990"))
-                bf.append(med(g, "far_e990"))
-                rows.append(dict(regime=regime, T=T, setout="base",
-                                 series="1bqf_wp99", eff=be[-1], far=bf[-1]))
-        if bT:
-            axes[0].plot(bT, be, "-.", color=RED, lw=1.8, marker="+", ms=7,
-                         label="1BQF (matched 99% eff.)")
-            axes[1].plot(bT, np.maximum(bf, 2e-4), "-.", color=RED, lw=1.8,
-                         marker="+", ms=7, label="1BQF (matched 99% eff.)")
-        # fitted d=40 per set-out at wp99
-        for so, (col, ls, mk, lab) in SETOUT_STYLE.items():
-            xe, xf, xT = [], [], []
-            for T in Ts:
-                g = sub[(sub.setout == so) & (sub["T"] == T)
-                        & (sub.family == "fitted_moment")
-                        & (sub.degree == D_HEAD)]
-                if len(g):
-                    xT.append(T); xe.append(med(g, "eff_e990"))
-                    xf.append(med(g, "far_e990"))
-                    rows.append(dict(regime=regime, T=T, setout=so,
-                                     series="fitted_d40_wp99",
-                                     eff=xe[-1], far=xf[-1]))
-            if xT:
-                axes[0].plot(xT, xe, ls, color=col, lw=2.0, marker=mk, ms=5,
-                             label=lab)
-                axes[1].plot(xT, np.maximum(xf, 2e-4), ls, color=col, lw=2.0,
-                             marker=mk, ms=5, label=lab)
+        draw_regime(axes[0], axes[1], sub, Ts, list(HAM_STYLE), rows, regime)
         axes[0].set_ylabel("segment efficiency")
         axes[0].set_ylim(0.90, 1.005)
+        axes[0].axhline(0.99, color=GREY, lw=0.7, ls=":")
         axes[0].set_title("(a) segment efficiency", loc="left")
         axes[1].set_yscale("log")
         axes[1].set_ylim(2e-4, 1.2)
@@ -199,8 +205,8 @@ def fig_metrics_vs_T(df):
             ax.grid(alpha=0.25, lw=0.5)
         axes[1].legend(loc="lower right", ncol=2)
         fig.suptitle(f"Segment metrics against track density — {regime} noise "
-                     "(fitted response, $d{=}40$; quantum at its matched "
-                     "99%-efficiency point, classical at fixed $\\tau$)", fontsize=12)
+                     "(every solver at its efficiency-first working point; "
+                     "QSVT at degree 40)", fontsize=12)
         param_box(fig, regime, sub,
                   extra="$T$ reps: 10 (200) / 5 (400) / 3 (700, 1000) · "
                         "1BQF = matched cosine $|\\cos(\\pi\\lambda/2s')|$ "
@@ -209,9 +215,44 @@ def fig_metrics_vs_T(df):
             fig.savefig(FIG / f"xiv_metrics_vs_T_{regime}.{ext}", dpi=150,
                         bbox_inches="tight")
         plt.close(fig)
-        print(f"[saved] figures/xiv_metrics_vs_T_{regime}.png "
-              f"(T = {Ts})")
+        print(f"[saved] figures/xiv_metrics_vs_T_{regime}.png (T = {Ts})")
     pd.DataFrame(rows).to_csv(OUT / "08_writeup_numbers.csv", index=False)
+    print("[saved] outputs/08_writeup_numbers.csv")
+
+
+def fig_metrics_composite(df):
+    """Paper composite: 3 regimes x (eff, far) in one fig-6-style block."""
+    hams = ["base", "occ_a0.05", "fork_b0.5", "occ0.05_fork0.5"]
+    fig, axes = plt.subplots(3, 2, figsize=(12.0, 12.2),
+                             constrained_layout=True)
+    for row, regime in enumerate(("clean", "moderate", "heavy")):
+        sub = df[df.regime == regime]
+        Ts = sorted(sub["T"].unique())
+        axE, axF = axes[row]
+        draw_regime(axE, axF, sub, Ts, hams, [], regime, lw=1.9)
+        axE.set_ylim(0.985, 1.001)
+        axE.set_ylabel(f"{regime}\nsegment efficiency")
+        axF.set_yscale("log")
+        axF.set_ylim(2e-4, 1.4)
+        axF.set_ylabel("segment false rate")
+        for ax in (axE, axF):
+            ax.set_xscale("log")
+            ax.set_xticks(Ts)
+            ax.set_xticklabels([str(t) for t in Ts])
+            ax.grid(alpha=0.25, lw=0.5)
+        if row == 0:
+            axE.set_title("(a) segment efficiency (every solver at its "
+                          "efficiency-first working point)", loc="left")
+            axF.set_title("(b) segment false rate", loc="left")
+            axF.legend(loc="lower right", fontsize=7.8, ncol=2)
+        if row == 2:
+            for ax in (axE, axF):
+                ax.set_xlabel("tracks per event $T$")
+    for ext in ("png", "pdf"):
+        fig.savefig(FIG / f"xiv_metrics_composite.{ext}", dpi=150,
+                    bbox_inches="tight")
+    plt.close(fig)
+    print("[saved] figures/xiv_metrics_composite.png")
 
 
 def fig_loss_budget():
@@ -224,10 +265,13 @@ def fig_loss_budget():
     g = (f4[f4.family == "fitted_moment"]
          .groupby(["regime", "setout", "degree"])[["eff", "L1", "L2", "L3"]]
          .median().reset_index())
+    # one bar per (regime, Hamiltonian): the degree with the highest
+    # efficiency at false rate <= 1% (median over events)
     best = g.loc[g.groupby(["regime", "setout"]).eff.idxmax()]
     best = best[best.regime.isin(["moderate", "heavy"])]
     best = best.sort_values(["regime", "eff"])
-    lab = [f"{r.regime[:3]} · {r.setout}" for _, r in best.iterrows()]
+    lab = [f"{r.regime} · {HAM_PLAIN.get(r.setout, r.setout)} · $d{{=}}{int(r.degree)}$"
+           for _, r in best.iterrows()]
     y = np.arange(len(best))
     left = np.zeros(len(best))
     for ch, col, name in [("L1", INK, "twin loss (irreducible)"),
@@ -236,21 +280,27 @@ def fig_loss_budget():
         axes[0].barh(y, best[ch], left=left, color=col, height=0.7, label=name)
         left += best[ch].values
     axes[0].set_yticks(y); axes[0].set_yticklabels(lab, fontsize=8.5)
-    axes[0].set_xlabel("efficiency loss at far $\\leq$ 1 %")
-    axes[0].set_title("(a) where the lost efficiency lives (fitted response)",
-                      loc="left")
+    axes[0].set_xlabel("efficiency loss at false rate $\\leq$ 1 %")
+    axes[0].set_title("(a) where the lost efficiency lives (QSVT, best degree "
+                      "per Hamiltonian)", loc="left")
     axes[0].legend(loc="lower right", fontsize=8)
     tw = (f4.groupby(["regime", "setout"]).twin_frac.median().reset_index())
     tw = tw[tw.regime.isin(["moderate", "heavy"])].sort_values("twin_frac")
     axes[1].barh(np.arange(len(tw)), tw.twin_frac, color=GREY, height=0.65)
     axes[1].set_yticks(np.arange(len(tw)))
-    axes[1].set_yticklabels([f"{r.regime[:3]} · {r.setout}"
+    axes[1].set_yticklabels([f"{r.regime} · {HAM_PLAIN.get(r.setout, r.setout)}"
                              for _, r in tw.iterrows()], fontsize=8.5)
     axes[1].set_xscale("log")
     axes[1].set_xlabel("twin fraction of true segments")
-    axes[1].set_title("(b) the operator sets the twin population", loc="left")
+    axes[1].set_title("(b) the Hamiltonian sets the twin population", loc="left")
     for ax in axes:
         ax.grid(alpha=0.25, lw=0.5, axis="x")
+    fig.text(0.5, -0.035,
+             "$T{=}200$ · moderate + heavy noise as in the degree scan · "
+             "QSVT coefficients refit per Hamiltonian and degree · bar = the "
+             "degree with the highest median efficiency at false rate "
+             "$\\leq$ 1% for that Hamiltonian",
+             ha="center", va="top", fontsize=8.2, color="#55534d", wrap=True)
     for ext in ("png", "pdf"):
         fig.savefig(FIG / f"xiv_loss_budget.{ext}", dpi=150,
                     bbox_inches="tight")
@@ -261,79 +311,5 @@ def fig_loss_budget():
 if __name__ == "__main__":
     df = load_frames()
     fig_metrics_vs_T(df)
+    fig_metrics_composite(df)
     fig_loss_budget()
-
-
-def fig_metrics_composite(df):
-    """Paper composite: 3 regimes x (eff, far) in one fig-6-style block."""
-    fig, axes = plt.subplots(3, 2, figsize=(12.0, 12.2),
-                             constrained_layout=True)
-    for row, regime in enumerate(("clean", "moderate", "heavy")):
-        sub = df[df.regime == regime]
-        Ts = sorted(sub["T"].unique())
-        axE, axF = axes[row]
-        ce, cf, cT = [], [], []
-        for T in Ts:
-            g = sub[(sub.setout == "base") & (sub["T"] == T)
-                    & (sub.family == "classical_invA")]
-            e = med(g, "eff_fixed_tau") if "eff_fixed_tau" in g and \
-                g["eff_fixed_tau"].notna().any() else med(g, "eff_fixed")
-            f = med(g, "far_fixed_tau") if "far_fixed_tau" in g and \
-                g["far_fixed_tau"].notna().any() else med(g, "far_fixed")
-            if np.isfinite(e):
-                cT.append(T); ce.append(e); cf.append(f)
-        axE.plot(cT, ce, "--", color=INK, lw=1.9, marker="x", ms=6,
-                 label="classical (fixed $\\tau$)")
-        axF.plot(cT, np.maximum(cf, 2e-4), "--", color=INK, lw=1.9,
-                 marker="x", ms=6, label="classical (fixed $\\tau$)")
-        be, bf, bT = [], [], []
-        for T in Ts:
-            g = sub[(sub.setout == "base") & (sub["T"] == T)
-                    & (sub.family.isin(["1bqf_cos", "onebqf_cos"]))]
-            if len(g):
-                bT.append(T); be.append(med(g, "eff_e990"))
-                bf.append(med(g, "far_e990"))
-        if bT:
-            axE.plot(bT, be, "-.", color=RED, lw=1.7, marker="+", ms=7,
-                     label="1BQF (matched 99% eff.)")
-            axF.plot(bT, np.maximum(bf, 2e-4), "-.", color=RED, lw=1.7,
-                     marker="+", ms=7, label="1BQF (matched 99% eff.)")
-        for so, (col, ls, mk, lab) in SETOUT_STYLE.items():
-            if so in ("occ_a0.10", "erf"):
-                continue      # the paper carries the four headline operators
-            xe, xf, xT = [], [], []
-            for T in Ts:
-                g = sub[(sub.setout == so) & (sub["T"] == T)
-                        & (sub.family == "fitted_moment")
-                        & (sub.degree == D_HEAD)]
-                if len(g):
-                    xT.append(T); xe.append(med(g, "eff_e990"))
-                    xf.append(med(g, "far_e990"))
-            if xT:
-                axE.plot(xT, xe, ls, color=col, lw=2.0, marker=mk, ms=5,
-                         label=lab)
-                axF.plot(xT, np.maximum(xf, 2e-4), ls, color=col, lw=2.0,
-                         marker=mk, ms=5, label=lab)
-        axE.set_ylim(0.985, 1.001)
-        axE.set_ylabel(f"{regime}\nsegment efficiency")
-        axF.set_yscale("log")
-        axF.set_ylim(2e-4, 1.4)
-        axF.set_ylabel("segment false rate")
-        for ax in (axE, axF):
-            ax.set_xscale("log")
-            ax.set_xticks(Ts)
-            ax.set_xticklabels([str(t) for t in Ts])
-            ax.grid(alpha=0.25, lw=0.5)
-        if row == 0:
-            axE.set_title("(a) segment efficiency (quantum at wp99)",
-                          loc="left")
-            axF.set_title("(b) segment false rate", loc="left")
-            axF.legend(loc="lower right", fontsize=7.8, ncol=2)
-        if row == 2:
-            for ax in (axE, axF):
-                ax.set_xlabel("tracks per event $T$")
-    for ext in ("png", "pdf"):
-        fig.savefig(FIG / f"xiv_metrics_composite.{ext}", dpi=150,
-                    bbox_inches="tight")
-    plt.close(fig)
-    print("[saved] figures/xiv_metrics_composite.png")

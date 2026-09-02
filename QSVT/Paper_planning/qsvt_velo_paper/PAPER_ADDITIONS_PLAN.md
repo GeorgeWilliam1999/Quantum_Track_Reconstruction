@@ -1,231 +1,207 @@
-# Paper additions plan — the two figure-6 companions (for George's check, 2026-09-02)
+# Paper additions and the working-point correction — plan (2026-09-02, revised)
 
-Nothing in `main.tex` has been changed yet. This file is the complete plan; each item is
-either an unconditional edit (E) or a decision George has to make (D). After the OK the
-edits are applied in one pass, the paper recompiled, and the ledger updated.
+Repo: Quantum_Track_Reconstruction. Paper: `QSVT/Paper_planning/qsvt_velo_paper/main.tex`
+(39 pp at commit 04b731a4). Nothing in `main.tex` has been edited; this file lists what
+should change, why, and the exact numbers, for George to approve section by section.
 
-## 0. What the two figures are
+## 1. The three rules this revision follows
 
-Both come from `QSVT/Efficiency_Frontier/13_fig6_overlay_fig.py`, numbers in
-`outputs/13_fig6_companion_numbers.csv`. One configuration throughout, identical to
-figure 6's: fixed ε = 2 mrad, σ_scatt = 1e-4, σ_res = 0, no hit drop, φ_max = 0.2, γ = 3,
-δ = 1, step kernel, T = 10…1000, the stored `Verify_new_results` events. Efficiency axis
-zoomed to 90–100 %, false-rate axis log with a measured 0 % drawn at the 10⁻³ floor.
-Every curve on a figure is read at ONE threshold convention, named in the title and footer.
+1. **One working point.** Every solver, the classical inversion included, is read at its
+   efficiency-first working point: the lowest threshold that admits the true solutions,
+   implemented as the threshold just below the 1 % quantile of the solver's own true-segment
+   amplitudes (99 % of true segments kept). The fixed absolute threshold
+   τ = δ/(γ+δ) + 0.10 = 0.35 was a bug: it sits inside the one-bit filter's reshaped true band
+   (chain endpoints at 0.258), so it lowered the efficiency and flattered the false rate.
+   No figure, table, or number is read at it any more.
+2. **One solver name.** The comb is the QSVT. Its results are labelled by polynomial degree
+   and by the Hamiltonian the problem is set up on (base A; A + occupancy term; A +
+   bifurcation term; both). "Fitted response", "production comb", "line comb" are not solver
+   names.
+3. **Plain technical English** in every plan, label, to-do and message.
 
-**Figure A — `xiv_fig6_fixed_tau.pdf`** (label `fig:fig6fixed`). Figure 6's three solvers,
-all at the fixed absolute threshold τ = 0.35 (1BQF and comb amplitudes rescaled to the
-classical signal-support norm first, as in the store). Store mean ± sem over reps
-(classical 5–20, comb 5–10, 1BQF 3–10 per T). The 1BQF sits at ≈75 % — below the zoom —
-and is annotated with an arrow ("1BQF ≈ 75 % at every T: the endpoint cut, off this
-scale"). No fitted-response series: the fitted polynomial has no absolute activation
-scale, so it cannot be read at a fixed τ (stated in the footer).
+## 2. What was regenerated today (figures and data — done)
 
-| T | classical eff / far | comb eff / far | 1BQF eff / far |
-|---|---|---|---|
-| 200 | 100 / 0.76 % | 98.9 / 0.00 % | 75.0 / 0.33 % |
-| 400 | 100 / 2.25 % | 97.2 / 0.02 % | 74.7 / 1.73 % |
-| 700 | 100 / 9.64 % | 94.3 / 0.17 % | 74.5 / 8.05 % |
-| 1000 | 100 / 20.5 % | 92.1 / 0.93 % | 74.3 / 18.8 % |
-
-**Figure B — `xiv_fig6_matched.pdf`** (label `fig:fig6matched`). Every solver at the
-matched 99 %-efficiency working point: the store's three (classical, production comb,
-1BQF; threshold just below the 1 % quantile of true amplitudes, so efficiency reads
-≥ 99 %) plus the four refitted d = 40 responses (base A, +occupancy α = 0.05,
-+bifurcation β = 0.5, both; threshold at exactly the 99 % rank; same stored events,
-reps 0–2; driver `12_fig6_overlay.py`). The driver's classical solve reproduces the store
-rep-for-rep at both conventions (worst difference 0.0000 pp), so the two families are on
-the same footing.
-
-| T | classical | comb | 1BQF | fitted base | +occ | +fork | both |
-|---|---|---|---|---|---|---|---|
-| 200 | 0.65 % | 0.31 % | 15.7 % | 0.00 | 0.00 | 0.00 | 0.00 |
-| 400 | 1.49 % | 1.44 % | 43.9 % | 0.27 | 0.83 | 0.06 | 0.50 |
-| 700 | 4.92 % | 9.06 % | 69.5 % | 1.04 | 3.84 | 1.13 | 1.60 |
-| 1000 | 10.0 % | 20.7 % | 82.6 % | 2.80 | 5.72 | 2.55 | 3.54 |
-
-(false rate at the matched point; the store curves at T = 300/550 have no fitted
-counterpart because the driver ran T = 10, 50, 100, 200, 400, 700, 1000.)
-
-## 1. Placement (D1 — George decides; recommendation given)
-
-- **Figure A → §5.2 "Clean-event results"**, directly after `fig:clean2x2` (after line 868,
-  before the crossover paragraph). It is pure §5 content: the same three solvers, one
-  convention, and it makes the fixed-τ bullet numbers (lines 832–853) visible on a scale
-  where the comb's 100 → 92.1 % sag and the classical 0 → 20.5 % false-rate rise are both
-  legible (figure 6 squeezes them into a 0–100 axis).
-- **Figure B → §10.4 "Density: the five solvers to T = 1000"**, directly after
-  `fig:density5` (after line 1904). *Recommended over §5.2* because (i) the four refitted
-  operators are only defined in §7, §8 and §10, so in §5 they would be unexplained
-  curves; (ii) beside `fig:density5` (formula ε, same five series, same T range) it is
-  the direct acceptance comparison the paper keeps promising in words ("at the formula
-  acceptance the same T = 1000 multiplicity is solved outright"); (iii) it carries the
-  §10 finding that at 2 mrad none of the operator terms beats base A (occupancy is the
-  worst of the four at T ≥ 400), which belongs with §10.4's "does not scale" argument.
-  §5.2 gets a one-line forward reference.
-- Alternative: both in §5.2 as a pair. Reads well as "figure 6 split by convention" but
-  forward-references three sections from a §5 figure. Not recommended.
-
-## 2. Captions (E — drafted; wording open to edits)
-
-**Figure A**
-> The figure~\ref{fig:clean2x2} campaign read at one threshold convention: every solver at
-> the fixed absolute cut $\tau=0.35$ (1BQF and comb amplitudes rescaled to the classical
-> signal-support norm before the cut). (a) Segment efficiency on a 90–100\% axis, (b)
-> segment false rate (log; a measured 0\% is drawn at $10^{-3}$). Same configuration as
-> figure~\ref{fig:clean2x2}: fixed $\varepsilon=2$\,mrad, $\gamma=3$, no hit drop, mean $\pm$
-> standard error over stored event repetitions (5–20 classical, 5–10 comb, 3–10 1BQF per
-> $T$). The 1BQF's $\approx75\%$ plateau is the endpoint cut of section~\ref{sec:onebit}
-> and lies below this axis (arrow). No fitted response appears: a fitted polynomial has no
-> absolute activation scale and is read only at a matched working point
-> (figure~\ref{fig:fig6matched}).
-
-**Figure B**
-> The same campaign at the matched $99\%$-efficiency working point, every series alike:
-> the three stored solvers of figure~\ref{fig:clean2x2} (threshold just below the 1\%
-> quantile of each solve's true amplitudes, so efficiency reads $\ge99\%$) and the four
-> refitted $d{=}40$ responses of section~\ref{sec:atscale} on base $A$, $+$occupancy
-> ($\alpha=0.05$), $+$bifurcation ($\beta=0.5$) and both (threshold at exactly the 99\%
-> rank; the same stored events, repetitions 0–2, refit per operator). Fixed
-> $\varepsilon=2$\,mrad throughout — compare figure~\ref{fig:density5}, the identical five
-> series at the formula acceptance. At this acceptance the production comb ties the
-> classical solver at $T=400$ ($1.44\%$ vs $1.49\%$) and is behind it from $T=550$
-> ($20.7\%$ vs $10.0\%$ at $T=1000$); the refitted base-$A$ response stays at $2.8\%$, and
-> no operator term improves on it (occupancy is the worst of the four beyond $T=400$).
-
-## 3. Text edits (E unless marked D)
-
-**T1 — §5.2 opening (lines 825–830).** After "…the 1BQF at its efficiency-first point),
-the picture is:" insert the clause "— figures~\ref{fig:fig6fixed} and~\ref{fig:fig6matched}
-repeat the campaign one convention at a time —". (Pure cross-reference.)
-
-**T2 — §5.2 crossover paragraph (lines 870–880) — D2.** The current numbers ("$1.3\%$
-vs classical $3.1\%$ on matched fresh solves" at $T=400$; "$\approx21\%$ comb vs $17.5\%$
-classical, crossover near $T=700$"; footnote "as low as $10\%$") have no locatable
-source: not the store (20-rep or reps 0–2), not the new driver, no file in the repo. The
-store (the same aggregation as figure 6 and every bullet above it) reads: comb ahead
-through $T=300$ (0.31 vs 0.65 at 200, 0.76 vs 1.02 at 300), tie at $T=400$ (1.44 vs
-1.49), behind from $T=550$ (5.2 vs 2.9; 9.1 vs 4.9 at 700; 20.7 vs 10.0 at 1000). The
-2026-06-14 working-point refresh (`Toy_Characterisation/WP99_REFRESH_LOG.md`, "§7.3
-crossover honesty") already adjudicated exactly these store numbers for the Notion draft;
-`main.tex` inherited the older ones from `main_v1_backup.tex`. **Recommendation: replace
-with the store numbers and delete the footnote.** Draft:
-
-> At the matched $99\%$-efficiency point (figure~\ref{fig:fig6matched}) the comb is ahead
-> of the classical solver through $T=300$ ($0.31\%$ vs $0.65\%$ at $T=200$), ties it at
-> $T=400$ ($1.44\%$ vs $1.49\%$) and is behind it from $T=550$ on ($9.1\%$ vs $4.9\%$ at
-> $T=700$, $20.7\%$ vs $10.0\%$ at $T=1000$): at extreme density the composition effect
-> dominates everyone — the false-to-true ratio $n_F/n_T=T-1$ converts even excellent
-> per-segment separation into a growing impurity, and the comb's four narrow passes,
-> tuned to the isolated-chain lines, admit the tangle eigenvalues that appear at this
-> acceptance from $T\approx400$ on (section~\ref{sec:comb:limits}). One qualifier matters enough
-> to state here rather than in a caption: the wall is set by the \emph{acceptance}, …
-
-(the rest of the paragraph, from "the wall is set by the acceptance", unchanged; the
-sentence "the two regimes … bracket the operational truth" stays as is — at fixed τ the
-comb is still 22× below classical at $T=1000$.) If George prefers to keep the old
-numbers, they need a source and the footnote must say which aggregation each is.
-
-**T3 — §7.1 "The term" (lines 1140–1141 and 1160–1162) — D4.** Two sentences are wrong on
-events and must go: "and the threshold tracks it" and "The whole true-track atlas moves as
-one block: nothing about the term touches the structures we want to keep". The closed
-form (eq.~\ref{eq:laddocc}) is exact for an isolated chain; on an event every hit carries
-$T-1$ false candidates per role, so the same-role sums $o_h^{\,r}$ are hit-independent
-to $\approx0.2\%$ and the term acts as a uniform rescale of the whole solution. Measured
-on the stored $T=200$ events at $\alpha=0.05$: $x_{\rm occ}=0.1087\,x_{\rm base}$ for every
-segment (p5–p95 0.1087–0.1088 clean; 0.1093–0.1099 moderate; 0.1082–0.1098 heavy); the
-isolated-false level is $(\delta+4\alpha)/(s+4\alpha+4\alpha(T-1))=0.0273$ (measured
-0.0272), not the chain-only $0.2857$; the fixed threshold $\tau=0.386$ activates nothing
-at any $T$. The ranking is preserved exactly at clean (false rate at $99\%$ efficiency
-0.0029 both operators) and improved at moderate (0.345 vs 0.444) and heavy (0.299 vs
-0.648) through the per-hit non-uniformities — which is why every occupancy result in
-§9.4 and §10 is read at a matched working point and none of them changes. Draft
-replacement for lines 1140–1141: "The isolated attractor of a lone chain moves to
-$(\delta+4\alpha)/(\gamma+\delta+4\alpha)$; on an event it does not — see below." Draft
-new paragraph after line 1162 (replacing its last sentence):
-
-> On an isolated chain, that is; an event is not a collection of isolated chains. Every
-> hit carries $T-1$ false candidates in each role, so the same-role sums $o_h^{\,r}$
-> that the term penalises are, to within $\approx0.2\%$, the same number at every hit,
-> and the term acts on the whole solution as one uniform rescale: on the stored $T=200$
-> events at $\alpha=0.05$, $x_{\rm occ}=0.109\,x_{\rm base}$ segment by segment, the
-> isolated-false level is $(\delta+4\alpha)/(s+4\alpha+4\alpha(T-1))=0.027$ rather than
-> the chain-only $0.286$, and the fixed threshold activates nothing. The atlas does not
-> move as a block — it shrinks by a $T$-dependent factor — so an occupancy operator is
-> read only at a matched working point. What survives the rescale is the ranking, and
-> that is where the term earns its keep: at clean noise the false rate at $99\%$
-> efficiency is unchanged (0.0029 on both operators); at moderate and heavy noise it
-> falls from 0.444 to 0.345 and from 0.648 to 0.299, through the per-hit departures from
-> the mean field, which are exactly the co-hit structures the base Hamiltonian cannot
-> see.
-
-Numbers: `QSVT/Efficiency_Frontier/outputs/cache/06_coef_{regime}_*_rep{r}.npz` (sol_C,
-truth) at formula ε, T = 200, reps 0–2, computed 2026-09-02 (worklog in the Notion
-to-do). The §7.2 heavy T = 200 α = 0.3 number ($0.650\to0.210$) is a matched-point number
-and stands.
-
-**T4 — §10.4 new paragraph after `fig:density5` and Figure B (after line 1929).**
-
-> Figure~\ref{fig:fig6matched} repeats the five series on the benchmark acceptance,
-> fixed $\varepsilon=2$\,mrad, where figure~\ref{fig:density5}'s clean row is no longer
-> solved outright: the refitted base-$A$ response reads $2.8\%$ false at the matched
-> $99\%$ point at $T=1000$ (against $0\%$ at the formula acceptance on the same
-> multiplicity), the classical solver $10.0\%$, the production comb $20.7\%$ and the
-> 1BQF $82.6\%$. The operator terms do not help here: the bifurcation term is neutral
-> ($2.55\%$), both terms together cost ($3.54\%$), and occupancy is the worst of the
-> four from $T=400$ on ($5.7\%$ at $T=1000$) — the same span-growth mechanism as under
-> noise, now driven by the $4T^2$ false candidates the wide window admits rather than by
-> fragments. The two figures together are the measurement behind the two-axis rule
-> below: the acceptance sets the false population the response has to separate, and no
-> response or operator recovers what a five-times-too-wide window lets in.
-
-**T5 — `fig:density5` caption (lines 1893–1902).** Make the mixed convention explicit:
-replace "classical (fixed $\tau$), the matched 1BQF at its $99\%$-efficiency working
-point, and the fitted $d{=}40$ response" with "the classical solver at the fixed cut
-$\tau=0.35$ (the production baseline; its matched-$99\%$ curve is in
-figure~\ref{fig:fig6matched}), and — all at the matched $99\%$-efficiency working point —
-the 1BQF and the fitted $d{=}40$ response". (Audit question A-15 below asks whether the
-classical curve in this figure should instead be re-read at the matched point so the
-whole figure is one convention; that is a data change and is for the audit, not for
-this pass.)
-
-**T6 — §11.1 Limitations (after line 1994 "…entire co-hit cliques.").** Add:
-
-> The mean-field collapse of section~\ref{sec:occupancy} sharpens the first of these:
-> at fixed $\alpha$ the same-role sums grow as $(T-1)\alpha$, so the whole solution
-> scale shrinks $\propto1/T$ along with the span; $\alpha\propto1/T$ would pin both.
-
-**T7 — §5.2 1BQF bullet (line 843–847)** already says the fixed-τ plateau is an artefact;
-add "(figure~\ref{fig:fig6fixed})" after "faded curve in figure~\ref{fig:clean2x2}".
-
-**T8 — §2.4 metrics (lines 414–452).** No change needed; the three conventions are
-defined there. Check only that "matched-efficiency" and "efficiency-first (99 %)" are
-both named, since Figure B's footer uses "matched 99 %" for the store's efficiency-first
-point and the driver's exact-rank point.
-
-**T9 — abstract / conclusion.** No echo of the crossover numbers found (the abstract quotes
-the fixed-τ 20.5 % → 0.9 % pair, which is store-exact). No edit.
-
-## 4. Mechanics (E, after the OK)
-
-1. Copy `QSVT/Efficiency_Frontier/figures/xiv_fig6_fixed_tau.pdf` and `xiv_fig6_matched.pdf`
-   into `QSVT/Paper_planning/qsvt_velo_paper/figures/`.
-2. Apply T1–T7; add the two `figure` environments (`[t]`, `width=0.95\textwidth`,
-   `captionsetup{width=0.92\textwidth}`) at the placements of §1.
-3. Recompile (`pdflatex` ×2 + bibtex if needed); confirm the page count and that no
-   `??` references remain (`grep -c '??' main.log`).
-4. Update `QSVT/Efficiency_Frontier/FIGURE_DATA_SOURCES.md`: the `xiv_fig6_overlay` entry
-   is already replaced by the two companion entries; add the paper labels.
-5. Commit; append the worklog to the Notion to-do; patch the two Notion write-ups'
-   occupancy sentences (theory addendum `3ce5d544-b9d9-8105…`, XIV `3ce5d544-b9d9-8164…`)
-   with the T3 paragraph.
-
-## 5. Decisions for George
-
-| # | Question | Recommendation |
+| Figure | File | What changed |
 |---|---|---|
-| D1 | Where does Figure B go — §10.4 beside `fig:density5`, or §5.2 beside Figure A? | §10.4 |
-| D2 | Replace the untraceable crossover numbers (1.3 vs 3.1; 21 vs 17.5, crossover ≈700) with the store's (tie at 400; behind from 550; 20.7 vs 10.0 at 1000) and drop the footnote? | Yes |
-| D3 | Add the classical +bifurcation series at fixed τ to Figure A (98.3 % / 13.5 % at T = 1000 vs base 100 % / 20.5 %)? It is a real fixed-τ reading (the fork term keeps the activation scale) but it is not one of figure 6's solvers. | No — keep Figure A as figure 6's three solvers |
-| D4 | §7.1: replace the two "moves as one block / threshold tracks it" sentences and add the mean-field paragraph (T3) in this pass, or leave §7 for the audit? | Do it now — the sentences are wrong as written |
-| D5 | Figure 6 itself: unchanged (as "additional figures" implies), or drop its faded 1BQF fixed-τ curve now that Figure A shows it? | Unchanged |
+| Paper fig. 6, the clean-benchmark headline | `qsvt_velo_paper/figures/clean_headline.pdf` | All three solvers now at the efficiency-first point; the faded fixed-threshold 1BQF curve removed; efficiency axis 90–100 %; labels "classical", "QSVT (d = 40, base A)", "1BQF" |
+| Paper fig. 4, the threshold sweep | `figures/threshold_tradeoff.pdf` | The grey "fixed τ = 0.35" line removed; each solver's efficiency-first point stays; "line comb" → "QSVT (d = 40)" |
+| Paper figs. 3, 7, 13, 14, 22 | `response_functions`, `resource_comparison`, `fit_comb_paper`, `occupancy_fitted`, `readout_probability` | Labels only: "comb" / "fitted response" → "QSVT, degree d" |
+| Paper fig. 20, the formula-acceptance composite | `Efficiency_Frontier/figures/xiv_metrics_composite.pdf` | The classical curve is now read at the efficiency-first point (it was the only fixed-threshold curve on the figure); QSVT labels carry degree and Hamiltonian |
+| Efficiency-Frontier figures 15–19 | `xiv_degree_scan_*`, `xiv_degree_marginal`, `xiv_degree_comb_*`, `xiv_responses_modified`, `xiv_loss_budget` | Labels only |
+| The new companion figure | `Efficiency_Frontier/figures/xiv_fig6_efficiency_first.pdf` | Replaces the two convention-split companions: every solver at the efficiency-first point, benchmark campaign plus the four degree-40 refits on the same events, 90–100 % efficiency axis |
+
+Removed: the fixed-threshold companion figure and its numbers file, and the fixed-threshold
+classical data file `06c_classical_fixed_tau.csv` (it served only the bug).
+
+Consistency anchor: the new classical solves reproduce the benchmark campaign rep-for-rep at
+the efficiency-first point (worst difference 0.0000 percentage points, reps 0–2, every T).
+
+## 3. The numbers the paper should now carry (clean benchmark, fixed ε = 2 mrad, γ = 3)
+
+Segment false rate in % at the efficiency-first working point; every series keeps ≥ 99 % of
+true segments (classical 100 %, benchmark QSVT 99.1–100 %, 1BQF 99.5–100 %, refits 99.0–100 %).
+
+| T | classical | QSVT d = 40, base A, benchmark line-comb coefficients | 1BQF | QSVT d = 40, base A, coefficients refit | + occupancy α = 0.05 | + bifurcation β = 0.5 | + both |
+|---|---|---|---|---|---|---|---|
+| 200 | 0.65 | 0.31 | 15.7 | 0.00 | 0.00 | 0.00 | 0.00 |
+| 400 | 1.49 | 1.44 | 43.9 | 0.27 | 0.83 | 0.06 | 0.50 |
+| 700 | 4.92 | 9.06 | 69.5 | 1.04 | 3.84 | 1.13 | 1.60 |
+| 1000 | 10.02 | 20.67 | 82.6 | 2.80 | 5.72 | 2.55 | 3.54 |
+
+Benchmark series: mean over all valid campaign repetitions (classical 5–20, QSVT 5–10, 1BQF
+3–10 per T). Refit series: repetitions 0–2 on the same stored events. Source:
+`Efficiency_Frontier/outputs/13_fig6_efficiency_first_numbers.csv`.
+
+Reading: with the benchmark line-comb coefficients the QSVT is ahead of the classical solver
+through T = 300, ties at T = 400, and is behind from T = 550 (the clean-event design was made
+for a tangle-free spectrum; at T ≥ 400 the 2 mrad events develop tangles, section 5.4). With
+the coefficients refit to the events the same degree-40 QSVT reads 2.8 % at T = 1000 against
+the classical 10.0 %, on every Hamiltonian between 2.5 % and 5.7 %.
+
+Formula acceptance (paper fig. 20), classical at the efficiency-first point, false rate in %:
+moderate noise 31.4 (T = 200) → 65.8 → 84.6 → 92.0 (T = 1000); heavy noise 63.3 → 87.6 →
+95.5 → 93.7. Clean 0.00 → 0.12 → 0.07 → 0.07. The QSVT refits on the modified Hamiltonians
+were already read at this point; those curves are unchanged.
+
+## 4. Passages in `main.tex` that read at the fixed threshold (to be rewritten)
+
+Line numbers refer to commit 04b731a4. Each item gives the current wording and the proposed
+replacement in plain terms; exact LaTeX is drafted once George approves the direction.
+
+1. **Abstract, lines 67–71.** "at the wide fixed 2 mrad acceptance it drives the segment false
+   rate from 20.5 % (classical, T = 1000) to 0.9 % at 92 % efficiency". Both numbers are
+   fixed-threshold readings. Proposed: "at the wide fixed 2 mrad acceptance, keeping 99 % of
+   true segments, a degree-40 polynomial refit to the events reads a 2.8 % segment false rate at
+   T = 1000 tracks where the classical solver reads 10.0 %". The formula-acceptance clause
+   ("solved outright") is unaffected.
+2. **Introduction, lines 148–149.** "the classical solver's false rate has climbed to 20.5 %"
+   → 10.0 %.
+3. **Section 2.3, lines 392–412 (equation for τ).** Presents the fixed threshold as "the
+   classical convention, kept for comparability" and efficiency-first as the convention for
+   filtered solvers only. Proposed: one working point for every solver, defined once; the fixed
+   cut mentioned only as an earlier convention that was found to sit inside the filtered true
+   band and is not used. Whether the equation stays as history or goes: George's call.
+4. **Section 2.4, lines 426–436 (metric definitions).** Remove "the fixed threshold of
+   eq. (tau)" from the list of working points. One definition: the lowest threshold that keeps
+   the wanted fraction of true segments — 99 % unless stated; sections 8–9 use the same rule at
+   other fractions (the "matched-efficiency" wording can stay as the name for that variant).
+5. **Fig. 1 caption, line 386** ("with the fixed threshold τ = 0.35 marked") and the figure
+   file itself (a hand-copied notebook figure with the τ line drawn). Proposed: regenerate the
+   atlas with the lowest true level marked instead (4/11 classical; 0.258 filtered) — that line
+   is the efficiency-first threshold of the analytic picture. Same for fig. 5 (chain ladder,
+   caption lines 637–642).
+6. **Section 3.2, lines 583–609.** The "≈ 0.73–0.75 plateau" is the bug described as a
+   property of the filter. Keep the endpoint-halving physics (real, closed form); rewrite the
+   plateau as the reason the fixed cut was wrong, and state that at the efficiency-first point
+   the 1BQF keeps 99.5–100 % at every T. Drop "the fixed τ = 0.35 of eq. (tau) is retained only
+   where the classical baseline is quoted on its own established operating point".
+7. **Fig. 4 caption, lines 620–630.** Drop "The grey vertical is the inherited fixed τ = 0.35"
+   and "The fixed cut sits above the 1BQF's reshaped endpoint band, the origin of its 75 %
+   plateau" (the line is no longer on the figure).
+8. **Section 5.1, line 803.** "At fixed threshold its false rate reached tens of percent by
+   T = 400" (the band design) → re-read at the efficiency-first point or drop the number.
+9. **Section 5.2, lines 826–853 and the fig. 6 caption, lines 855–868.** Every number is a
+   fixed-threshold reading (classical 2.25 % / 20.5 %; QSVT 0.02 % / 0.17 % / 0.9 % at 92.1 %;
+   1BQF plateau). Replace with the table in section 3 above. The 1BQF bullet's parenthesis
+   about the plateau goes.
+10. **Section 5.2, lines 870–893 (crossover paragraph and footnote).** The quoted
+    "1.3 % vs 3.1 %" and "≈ 21 % vs 17.5 %, crossover near T = 700" have no locatable source;
+    the benchmark campaign reads: ahead through T = 300, tie at 400 (1.44 vs 1.49 %), behind
+    from 550 (9.1 vs 4.9 at 700; 20.7 vs 10.0 at 1000). The sentence "The two regimes,
+    fixed-τ where the comb wins by an order of magnitude ... bracket the operational truth"
+    must go: there is no fixed-τ regime. The paragraph's real content becomes: the clean-event
+    coefficients stop being right when tangles appear; refitting the same degree-40 polynomial
+    to the events restores the win (2.8 % vs 10.0 % at T = 1000), which is the subject of
+    section 9 and the companion figure.
+11. **Fig. 20 caption, lines 1893–1903.** "classical (fixed τ)" → "classical" (now at the
+    efficiency-first point); "the fitted d = 40 response on base A, +occupancy, +fork, and
+    both" → "the degree-40 QSVT on base A, A + occupancy, A + bifurcation, and both";
+    "all five series" → "the classical solver, the 1BQF, and the QSVT on four Hamiltonians".
+12. **Fig. 23 caption, line 2360** ("dotted line is the fixed threshold"): the Run-3 figure is
+    an imported PNG drawn at the fixed threshold only. Regenerate at the efficiency-first point
+    (source script under `QSVT/Run3/`; cost to be checked in the figure audit).
+13. **Conclusion, lines 2380–2389.** "from a 20.5 % false rate (the classical solver at its
+    fixed threshold) to 0.9 % (the comb at the same threshold, at 92 % segment efficiency): a
+    factor twenty fewer fakes" → the efficiency-first statement of item 1 (a factor 3.6 at
+    T = 1000 with the refit; the benchmark coefficients alone do not win at that density).
+14. **Section 7.1, lines 1140–1141 and 1160–1162 (unchanged from the earlier plan).** "the
+    threshold tracks it" and "the whole true-track atlas moves as one block" are wrong on
+    events: the occupancy term is a uniform rescale (x = 0.1087 · x_base at α = 0.05, T = 200,
+    to 0.2 %), the ranking is what changes (false rate at 99 % efficiency: clean 0.29 % both;
+    moderate 34.5 % vs 44.4 %; heavy 29.9 % vs 64.8 %). Proposed paragraph drafted in the
+    previous version of this plan; every matched-point result in sections 9–10 stands.
+
+## 5. How the paper describes the QSVT (naming check)
+
+Counts in `main.tex`: "the comb" 31, "line comb" 8, "fitted response" 16, "refitted" 20,
+"QSVT" 26. The structure is already right — section 5 is "Fitting the polynomial to the clean
+events: the line comb", section 9 is "Fitting the polynomial to noisy events" — but the
+results text treats "the comb" and "the fitted response" as different solvers (section 10.4
+"the five solvers"; the table rows; the resource section title "HHL, the 1BQF, and the comb
+side by side"). Proposed:
+
+- One naming sentence at the start of section 5: the QSVT solver — the comb, so called because
+  it combs the false tracks out of the spectrum — is one solver: a bounded polynomial p of
+  degree d applied to the Hamiltonian A. Every QSVT result is labelled by d and by A. How the
+  coefficients of p are chosen (the closed-form line design of section 5 for clean events, the
+  least-squares fit of section 9 for measured events) is a method step, stated where it
+  matters, not a solver name.
+- Replace "the fitted response" / "the refitted response" in results text by "the QSVT, degree
+  d, coefficients fit to the events" (or just "the QSVT" once the section has said so);
+  "the comb" may stay as the solver's name.
+- Section 10.4: "the five solvers" → "three solvers, the QSVT on four Hamiltonians".
+- Section 12.5 title: "HHL, the 1BQF, and the QSVT side by side".
+
+## 6. The new figure in the paper
+
+`xiv_fig6_efficiency_first.pdf` (every solver at the efficiency-first point, benchmark campaign
+plus the four refits). Recommended place: section 10.4, directly after fig. 20 — the four
+Hamiltonians are only defined by then, and its point is the acceptance contrast with fig. 20
+(same solvers, same working point, 2 mrad vs the formula acceptance). Fig. 6 stays in
+section 5.2 with its three benchmark solvers, now at the same working point. Caption drafted:
+
+> The clean benchmark of fig. 6 (fixed ε = 2 mrad, γ = 3, no hit drop) with every solver at
+> its efficiency-first working point (99 % of true segments kept; panel (a) shows the
+> convention holding): the classical solver, the 1BQF, and the degree-40 QSVT with the
+> clean-event line-comb coefficients (benchmark campaign, mean ± s.e.m. over 3–20
+> repetitions) together with the same degree-40 QSVT refit on base A, A + occupancy
+> (α = 0.05), A + bifurcation (β = 0.5) and both (repetitions 0–2 of the same events). The
+> line-comb coefficients stop winning once the 2 mrad events develop tangles (T ≥ 400); the
+> refit restores the margin, 2.8 % against the classical 10.0 % at T = 1000, on every
+> Hamiltonian. A measured 0 % false rate is drawn at the 10⁻³ floor.
+
+Mechanics once approved: copy the PDF into the paper's figures directory; add the figure
+environment after fig. 20 and a cross-reference sentence in section 10.4; apply the passage
+edits of section 4; recompile (expect 39 pp, no unresolved references); update the figure
+ledger; commit; append the worklog to the Notion to-do; patch the occupancy statements in the
+two write-ups (theory addendum, QSVT XIV).
+
+## 7. Questions for George (each changes what gets written)
+
+1. **Where the new figure goes.** Section 10.4 beside fig. 20 (recommended), or section 5.2
+   next to fig. 6, or in place of fig. 6.
+2. **The headline claim.** Replace "20.5 % → 0.9 % at 92 % efficiency" in the abstract,
+   introduction and conclusion with the efficiency-first statement (classical 10.0 %, QSVT
+   refit 2.8 %, at T = 1000, 99 % of true segments kept)? Recommended yes — the old headline
+   was a fixed-threshold artefact, and the benchmark coefficients alone read 20.7 % at that
+   density.
+3. **Which degree-40 base-A series is "the QSVT" in the paper.** Two series share degree and
+   Hamiltonian and differ only in how the coefficients were chosen: the clean-event line-comb
+   design (20.7 % at T = 1000) and the least-squares refit (2.8 %). Recommended: the refit is
+   the QSVT everywhere results are compared; the line-comb design is shown in section 5 as the
+   clean-event closed form with the statement that its coefficients must be refit once tangles
+   appear. If George prefers, the label can carry a third attribute ("coefficients: line design
+   / fit").
+4. **The 1BQF's threshold.** Keep the same rule as every other solver (lowest threshold keeping
+   99 % of true segments; in classical units ≈ 0.26 for the 1BQF), or read the 1BQF at a
+   threshold just above zero (every non-zero segment counts, so all coupled false segments
+   count)? The second raises the 1BQF false rates. Recommended: the same rule for every solver.
+5. **99 % or 100 %.** "Admits all of the solutions" read literally is 100 % of true segments;
+   under hit drop a true segment whose chain is broken can read exactly zero, so 100 % is not
+   always attainable and the 99 % quantile has been the headline rule since 2026-06-14.
+   Recommended: 99 % unless stated.
+6. **Section 7.1 rewrite** (the mean-field correction): yes / later.
+7. **The analytic figures 1 and 5**: regenerate with the lowest true level marked instead of
+   the fixed cut: yes / drop the line entirely.
+8. **The Run-3 figure 23**: regenerate at the efficiency-first point (cost to be checked), or
+   drop it until then.

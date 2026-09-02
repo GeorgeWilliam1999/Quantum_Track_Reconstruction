@@ -58,13 +58,13 @@ S, DELTA, GAMMA_D = 4.0, 1.0, 3.0
 T, REP, REGIME = 200, 0, "moderate"
 NOISE = dict(sigma_scatt=1e-4, sigma_res=0.01, phi_max=0.2, hit_ineff=0.01)
 OPS = [("base", 0.0, 0.0, 40,
-        "base $A$  (fitted $d{=}40$)"),
+        "base $A$  (QSVT $d{=}40$)"),
        ("fork_b0.5", 0.0, 0.5, 40,
-        "full system $A+\\beta B_{\\rm fork}$, $\\beta{=}0.5$  (fitted $d{=}40$)"),
+        "full system $A+\\beta B_{\\rm fork}$, $\\beta{=}0.5$  (QSVT $d{=}40$)"),
        ("occ_a0.05", 0.05, 0.0, 80,
-        "full system $A+4\\alpha I+2\\alpha B_{\\rm all}$, $\\alpha{=}0.05$  (fitted $d{=}80$)"),
+        "full system $A+4\\alpha I+2\\alpha B_{\\rm all}$, $\\alpha{=}0.05$  (QSVT $d{=}80$)"),
        ("occ0.05_fork0.5", 0.05, 0.5, 80,
-        "full system, both terms  ($\\alpha{=}0.05$, $\\beta{=}0.5$; fitted $d{=}80$)")]
+        "full system, both terms  ($\\alpha{=}0.05$, $\\beta{=}0.5$; QSVT $d{=}80$)")]
 
 
 def chain_lines(m, a):
@@ -218,7 +218,7 @@ def fig_responses():
         ax.plot(lam, np.abs(np.cos(np.pi * lam / (2 * s_prime))), color=GREY,
                 lw=1.3, ls="-.", label="1BQF cosine $|\\cos(\\pi\\lambda/2s')|$")
         ax.plot(lam, p, color=INK, lw=1.8, zorder=3,
-                label=f"fitted $|p(\\lambda)|$, $d{{=}}{deg}$")
+                label=f"QSVT $|p(\\lambda)|$, $d{{=}}{deg}$")
         ax.set_title(title, loc="left", fontsize=10)
         ax.set_xlim(1.6, 6.9)
         ax.set_ylim(-0.34, 1.06)
@@ -242,7 +242,7 @@ def fig_responses():
         ax.set_xlabel("$\\lambda$")
     for ax in axes[:, 0]:
         ax.set_ylabel("$|p(\\lambda)|$ / scaled class support")
-    fig.suptitle("The fitted response against each operator's MEASURED "
+    fig.suptitle("The QSVT polynomial (refit per Hamiltonian) against each Hamiltonian's MEASURED "
                  "class spectral support (moderate configuration, "
                  "$T{=}200$, rep 0)", fontsize=12.2)
     fig.text(0.5, -0.025,

@@ -16,8 +16,8 @@ matched 1BQF cosine + classical references on the same events):
      the MARGINAL efficiency gain from one degree step to the next
      (moderate + heavy panels) — the derivative of the sigmoid.
   F3 figures/xiv_degree_comb.png
-     the same scan for the UNFITTED production line comb — what happens
-     when the response is not refitted to the modified operator.
+     the same scan with the clean-event line-comb coefficients kept — what
+     happens when the QSVT polynomial is not refit to the modified Hamiltonian.
 
 Numbers: outputs/10_degree_numbers.csv
 """
@@ -44,10 +44,10 @@ plt.rcParams.update({
 })
 
 OPS = {
-    "base":            (BLUE,   "o", "base $A$"),
-    "occ_a0.05":       (GREEN,  "s", "occupancy $\\alpha{=}0.05$"),
-    "fork_b0.5":       (ORANGE, "D", "bifurcation $\\beta{=}0.5$"),
-    "occ0.05_fork0.5": (PURPLE, "^", "occ.+bifur."),
+    "base":            (BLUE,   "o", "QSVT, base $A$"),
+    "occ_a0.05":       (GREEN,  "s", "QSVT, $A$ + occupancy $\\alpha{=}0.05$"),
+    "fork_b0.5":       (ORANGE, "D", "QSVT, $A$ + bifurcation $\\beta{=}0.5$"),
+    "occ0.05_fork0.5": (PURPLE, "^", "QSVT, $A$ + occupancy + bifurcation"),
 }
 NOISE_TXT = {
     "moderate": "$\\sigma_{\\rm scatt}{=}10^{-4}$, $\\sigma_{\\rm res}{=}10\\,\\mu$m, drop 1%",
@@ -64,9 +64,10 @@ def box_txt(regime, sub):
     eps = sub["eps"].dropna().median() * 1e3
     return (f"$T{{=}}200$, 10 reps · {NOISE_TXT[regime]} · formula "
             f"$\\varepsilon{{=}}{eps:.2f}$ mrad · $\\gamma{{=}}3$, "
-            "$\\delta{=}1$, step kernel · fitted = moment-space ridge, "
-            "$\\mu$ by eff@far$\\leq$1% · clean regime omitted: every "
-            "operator reads 1.000 (median of 10 reps) at every degree $\\geq$ 4")
+            "$\\delta{=}1$, step kernel · QSVT coefficients: least-squares fit per Hamiltonian in Chebyshev-moment space, "
+            "$\\mu$ by eff@far$\\leq$1% · every solver at its efficiency-first "
+            "working point · clean regime omitted: every Hamiltonian reads "
+            "1.000 (median of 10 reps) at every degree $\\geq$ 4")
 
 
 def degree_panels(df, family, fname, title_extra=""):
@@ -79,7 +80,7 @@ def degree_panels(df, family, fname, title_extra=""):
         for ax, col in ((axes[0], "eff_f010"), (axes[1], "far_e990")):
             v = gcls[col].median()
             ax.axhline(v, color=INK, ls="--", lw=1.6,
-                       label=f"classical (base $A$): {v:.3f}")
+                       label=f"classical, base $A$: {v:.3f}")
         for so, (c, mk, lab) in OPS.items():
             g = sub[(sub.setout == so) & (sub.family == family)]
             if not len(g):
@@ -118,7 +119,7 @@ def degree_panels(df, family, fname, title_extra=""):
             ax.set_xlabel("polynomial degree $d$")
             ax.grid(alpha=0.25, lw=0.5)
         axes[0].legend(loc="lower right", fontsize=8.2)
-        fig.suptitle(f"Polynomial degree against segment metrics — {regime} "
+        fig.suptitle(f"QSVT polynomial degree against segment metrics — {regime} "
                      f"noise{title_extra}", fontsize=12)
         param_box(fig, box_txt(regime, sub))
         for ext in ("png", "pdf"):
@@ -158,8 +159,8 @@ def fig_marginal(df):
     axes[0].set_ylabel("marginal efficiency gain per degree step\n"
                        "$\\Delta$ eff @ far $\\leq$ 1%")
     axes[0].legend(fontsize=8.2)
-    fig.suptitle("The marginal value of one more degree step (fitted "
-                 "response, $T{=}200$)", fontsize=12)
+    fig.suptitle("The marginal value of one more degree step (QSVT, "
+                 "coefficients refit at every degree, $T{=}200$)", fontsize=12)
     param_box(fig, "moderate + heavy noise as in the degree scan · marginal "
                    "gain between CONSECUTIVE degrees of the (non-uniformly "
                    "spaced) scan grid {4, 8, ..., 48, 56, 64, 80, 84, 96, 120, 160} "
@@ -174,10 +175,10 @@ def fig_marginal(df):
 if __name__ == "__main__":
     df = pd.read_csv(OUT / "06_degree_scan.csv")
     degree_panels(df, "fitted_moment", "xiv_degree_scan",
-                  " (response refit at every degree)")
+                  " (coefficients refit at every degree)")
     fig_marginal(df)
     degree_panels(df, "comb_prod", "xiv_degree_comb",
-                  " (UNFITTED production comb — no refit)")
+                  " (clean-event line-comb coefficients, not refit)")
     med = (df.groupby(["regime", "setout", "family", "degree"], dropna=False)
              [["eff_f010", "far_e990", "eff_e990"]].median().reset_index())
     med.to_csv(OUT / "10_degree_numbers.csv", index=False)
