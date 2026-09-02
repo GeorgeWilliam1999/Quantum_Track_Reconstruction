@@ -133,12 +133,23 @@ or working-point conventions without saying so on the figure itself.
 - **Aggregation:** median per (T, series); pooled across source CSVs where cells coincide.
 - **⚠ Flags:** Pooling across source CSVs means a cell's median can mix 10-rep (06) and 3-rep (02/04) samples of the SAME configuration — consistent machinery, but rep provenance per point is not recorded in 08_writeup_numbers.csv.
 
-## figures/xiv_fig6_overlay.{png,pdf} (13_fig6_overlay_fig.py)
-- **Data:** Store curves: seg_store.fixed_eps_metrics (fixed 2 mrad campaign) via agg_by_ntrk. New series: outputs/12_fig6_overlay.csv (writer 12_fig6_overlay.py, header carries config).
-- **Configuration:** ONE configuration throughout: fixed epsilon=2 mrad, clean noise (sigma_scatt=1e-4, sigma_res=0, no drop), gamma=3, delta=1, step kernel, T=10..1000, 3 reps, same stored events for both curve families.
-- **Per-curve conventions:** Named per legend entry: classical fixed tau 0.35; comb at BOTH fixed tau (fig-6 historical) and matched 99% eff. (store wp columns); 1BQF matched 99% eff. (store); four operator series = fitted d=40 refit per operator at matched 99% eff. (driver). Driver base classical anchors the chain against the store (T=1000: 21.3% vs 20.5%).
-- **Aggregation:** 3-rep mean +- sem, both families.
-- **⚠ Flags:** The driver's own comb row is deliberately NOT plotted: at T>=400 the 2 mrad events develop tangle structure (lam_min < 2) and a comb rebuilt on the measured per-rep domain is a different realization from the store's production comb.
+## figures/xiv_fig6_fixed_tau.{png,pdf} (13_fig6_overlay_fig.py, fig_fixed_tau) — companion A to paper fig 6
+- **Data:** Store only: seg_store.fixed_eps_metrics (fixed 2 mrad benchmark campaign, study Verify_new_results, validity gate applied) via agg_by_ntrk for solver in {classical, qsvt, quantum} at gamma=3, hit_ineff=0. Numbers written to outputs/13_fig6_companion_numbers.csv (convention='fixed_tau'). No driver rows are drawn on this figure.
+- **Configuration:** ONE configuration: fixed epsilon=2 mrad, clean noise (sigma_scatt=1e-4, sigma_res=0, no drop), gamma=3, delta=1, step kernel, phi_max=0.2, T in {10,20,30,50,75,100,150,200,300,400,550,700,1000}, stored events.
+- **Per-curve conventions:** ONE convention: fixed absolute tau = delta/(delta+gamma)+0.10 = 0.35 for all three solvers (the fig-6 comb/classical convention). Efficiency axis zoomed to 90-100%; the 1BQF's ~75% plateau (74.3-75.1% at T>=200) sits below the zoom and is annotated with an arrow. No fitted series: a fitted polynomial has no absolute activation scale and is never read at a fixed tau.
+- **Aggregation:** Mean +- SEM over ALL valid store reps per T: classical 20 at T in {10,20,50,100,200,400,700,1000}, 10 at {30,75,150,300}, 5 at 550; comb (qsvt) 5-10; 1BQF (quantum) 3-10. Footer states these counts.
+- **⚠ Flags:** Rep counts are heterogeneous across T (inherited from the store); SEM bars honest but narrow where reps are few. The earlier overlay footer's '3 reps' claim for the store curves was wrong and is corrected here.
+
+## figures/xiv_fig6_matched.{png,pdf} (13_fig6_overlay_fig.py, fig_matched) — companion B to paper fig 6
+- **Data:** Store wp columns (se_wp_m / fr_wp_m via agg_by_ntrk, same slice as above) for classical, comb, 1BQF; plus the four refitted operators from outputs/12_fig6_overlay.csv (writer 12_fig6_overlay.py, header carries config; far_e990/eff_e990 columns, family fitted_moment, degree 40, setout in {base, occ_a0.05, fork_b0.5, occ0.05_fork0.5}). Numbers in outputs/13_fig6_companion_numbers.csv (convention='matched99').
+- **Configuration:** Same single configuration as companion A (fixed epsilon=2 mrad, clean, gamma=3, delta=1, step); driver series at T in {10,50,100,200,400,700,1000} on the SAME stored events (ensure_event keys identical to the store's).
+- **Per-curve conventions:** ONE convention: matched 99% segment efficiency for every series. Store wp columns set tau just below the 1% quantile of true amplitudes (efficiency reads >= 99%, classical reads 100% at clean); the driver's far_e990 sets tau at exactly the 99% rank (efficiency reads exactly 99.00). Both are the same working-point definition up to the quantile rounding; the footer says so. Anchor: the driver's classical base-A row reproduces the store classical wp values rep-for-rep at both conventions (worst |diff| 0.0000 pp; the earlier '0.8 pp anchor gap' was 3 driver reps vs 20 store reps).
+- **Aggregation:** Store series: mean +- SEM over all valid reps (counts as in companion A). Driver series: mean +- SEM over reps 0-2 (3 reps); T=300 and T=550 exist only in the store series.
+- **⚠ Flags:** (1) The driver's own comb row is deliberately NOT plotted: at T>=400 the 2 mrad events develop tangle structure (lam_min < 2, see paper sec:comb:limits) and a comb rebuilt on the measured per-rep domain is a different realization from the store's production comb. (2) Fitted series are 3-rep against 5-20-rep store curves — extending to 5 reps and adding T=300/550 is a cheap T2 item in the figure audit. (3) This figure contradicts paper sec 5.2's crossover numbers (see PAPER_ADDITIONS_PLAN.md D2): the store reads comb ahead of classical through T=300, tie at 400 (1.44 vs 1.49%), behind from 550 (9.06 vs 4.92 at 700; 20.67 vs 10.02 at 1000).
+
+## NOT YET IN THIS LEDGER (paper figures without an entry — audit to-do)
+- **fig:resources** (paper figs 7 and 22 share `degree_sweep.csv`): `qsvt_width_and_P.pdf`, `qsvt_total_depth.pdf` — hand-copied into the paper figures dir 2026-07-18 from notebook 05; no ledger entry, no factory regeneration.
+- **fig:budget** (`xiv_loss_budget.pdf`): produced by 08_writeup_figs.py fig_loss_budget from outputs/05_loss_budget.csv (writer 05_loss_budget.py); selects the best degree per (regime, setout) by max efficiency — the selection rule is not stated on the figure. Entry to be written during the audit.
 
 ## figures/xiv_degree_scan_moderate.{png,pdf}, figures/xiv_degree_scan_heavy.{png,pdf} (degree_panels, family='fitted_moment')
 - **Data:** Single input: /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Efficiency_Frontier/outputs/06_degree_scan.csv (git-tracked, commit ab95dca8), written by /data/bfys/gscriven/Quantum_Track_Reconstruction/QSVT/Efficiency_Frontier/06_degree_scan.py (same commit). That writer transitively reads: (1) the qtrk_pipeline event store at QTRK_STORE=/data/bfys/gscriven/qtrk_store via qp.ensure_event (deterministic key-seeded events, gzip JSON cache; code at /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/_shared/qtrk_pipeline/events.py); (2) qp.build_hamiltonian (Toy_Characterisation/_shared/qtrk_pipeline/hamiltonian.py); (3) dp_terms.dp_system at /data/bfys/gscriven/Quantum_Track_Reconstruction/Toy_Characterisation/Bifurification/dp_terms.py (occupancy/fork modifications A = A0 + beta*B_fork + 4*alpha*I + 2*alpha*B_all, b = (delta+4*alpha)*1); (4) compute_epsilon from /data/bfys/gscriven/LHCb_VeLo_Toy_Model/src/lhcb_velo_toy/analysis/segment_metrics.py and design_line_comb_inverse from .../lhcb_velo_toy/solvers/quantum/QSVT.py. The writer also caches per-system coefficients in outputs/cache/06_coef_{regime}_{setout}_rep{r}.npz (not read by 10_degree_figs.py).
@@ -186,8 +197,15 @@ or working-point conventions without saying so on the figure itself.
 ## Action items distilled (feed the number-specification to-do)
 1. **Paper fig 6 compares the comb (fixed tau) against the 1BQF (efficiency-first)** even though
    the store carries comb wp columns and the 2026-06-14 ruling makes efficiency-first the headline
-   for both filtered solvers — the new overlay figure (xiv_fig6_overlay) is the matched-convention
-   version; consider it for the paper alongside or in place of fig 6's current form.
+   for both filtered solvers — the two companion figures split this cleanly: xiv_fig6_fixed_tau
+   (every solver at the fixed tau, 90-100% zoom) and xiv_fig6_matched (every solver, including the
+   four refitted operators, at matched 99% efficiency). Both are planned as additional paper
+   figures (qsvt_velo_paper/PAPER_ADDITIONS_PLAN.md, awaiting George's D1-D5); fig 6 itself stays
+   as is pending the figure audit (qsvt_velo_paper/FIGURE_AUDIT_PLAN.md).
+1b. **Paper sec 5.2 crossover numbers have no locatable source** (1.3 vs 3.1% at T=400; ~21 vs
+   17.5% with crossover near T=700; footnote 'as low as 10%') — not the store at any rep subset,
+   not the driver; WP99_REFRESH_LOG.md (2026-06-14) already adopted the store numbers for the
+   Notion draft. Replace with the store numbers (plan D2).
 2. ERF figures run at sigma_scatt 3e-4/5e-4 (not the frontier's 1e-4) — any cross-quoted number
    must say so.
 3. readout/resources figures: single-rep points at T=700/1000 plotted like 3-rep points; the
