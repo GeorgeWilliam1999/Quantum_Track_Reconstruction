@@ -331,13 +331,104 @@ eq.~\eqref{eq:energy} gives the linear system
 A\,\mathbf{x}=\delta\,\mathbf{1},
 \label{eq:linsys}
 \end{equation}
-which I solve classically with MINRES ($A$ is symmetric, sparse, and at
-$\gamma=3$ comfortably positive definite). A useful picture is a voting
+which I solve classically with MINRES. A useful picture is a voting
 market: each segment starts with the same bias-funded credit $\delta$,
 and the off-diagonal couplings let aligned neighbours reinforce one
 another. A segment embedded in a long, straight chain of compatible
 neighbours accumulates support; a segment with no compatible continuation
 is left with only its own bias against its own penalty.
+
+Whether that system is well posed at all is something the two constants
+buy, and it is worth being exact about how. Since $A$'s diagonal is the
+constant $s$ and $C$ is a zero-diagonal $0/1$ adjacency, the two spectra
+are related not by a bound but by an identity,
+$\lambda(A)=s-\lambda(C)$, so
+\begin{equation}
+\lambda_{\min}(A)=(\gamma+\delta)-\lambda_{\max}(C),
+\label{eq:lammin}
+\end{equation}
+and $A$ is positive definite exactly when $\lambda_{\max}(C)<\gamma+\delta$.
+Gershgorin applied to $C$ turns that into something checkable without
+solving anything: $\lambda_{\max}(C)\le d_{\max}$, the largest number of
+compatible neighbours any segment has, so $\gamma+\delta>d_{\max}$ is
+sufficient. Positive definiteness is therefore not a property one hopes
+for but one the regularisation controls: on any event, raising $\gamma$
+past $\lambda_{\max}(C)-\delta$ restores it.
+
+The sufficient condition is loose, and the honest statement is that
+sparsity, not the bound, is what keeps the benchmark solvable. At
+$\varepsilon=2$\,mrad and $\gamma=3$ some segment already reaches degree
+$4=s$ by $T\approx400$, so the Gershgorin floor $s-d_{\max}$ collapses to
+zero there, while the measured $\lambda_{\min}(A)$ is still $0.8$--$2.4$
+out to $T=1000$. Where it does bite is the wide-acceptance corner. At the
+heavy configuration, evaluated exactly on each connected component,
+$\lambda_{\min}(A)$ falls from $1.91$ at $T=100$ through $0.71$ at
+$T=400$ to $0.10\pm0.26$ at $T=700$ and $0.009$ at $T=1000$: marginal,
+with the occasional negative mode already appearing at $T=700$. Push the
+resolution to $\sigma_{\rm res}=50\,\mu$m, where
+eq.~\eqref{eq:epsilon} returns $\varepsilon=15.8$\,mrad, and
+$\lambda_{\max}(C)$ crosses $\gamma+\delta$ near $T\approx290$: beyond
+that $A$ is genuinely indefinite, and the classical solution begins to
+diverge on the offending cluster rather than merely being ill-conditioned.
+This is why the linear system is solved with MINRES rather than the
+conjugate gradient that a positive-definite matrix would invite: the same
+code path has to serve those corners and the $\gamma=1$ operating point,
+where $2I-C$ is indefinite outright and conjugate gradient has no
+convergence guarantee at all.
+
+The same operator is worth writing in the form the predecessor papers
+use, because the two look quite different on the page.
+Refs.~\cite{nicotra2023,trackhhl_epj,trackhhl} build the energy term by
+term in the Denby--Peterson manner, over activations $S_i$ that begin
+binary and are then relaxed to the reals:
+\begin{equation}
+\mathcal{H}(S)=\mathcal{H}_{\rm ang}(S,\varepsilon)
++\gamma\,\mathcal{H}_{\rm spec}(S)+\delta\,\mathcal{H}_{\rm gap}(S),
+\label{eq:dpform}
+\end{equation}
+an angular term that rewards compatible continuations,
+\[
+\mathcal{H}_{\rm ang}=-\tfrac12\sum_{i,j}f(\theta_{ij},\varepsilon)\,S_iS_j,
+\qquad
+f(\theta,\varepsilon)=
+\begin{cases}1,&\cos\theta\ge1-\varepsilon,\\[2pt] 0,&\text{otherwise,}\end{cases}
+\]
+plus a spectral term $\mathcal{H}_{\rm spec}=\tfrac12\sum_iS_i^{2}$ that
+penalises activation and a gap term
+$\mathcal{H}_{\rm gap}=\tfrac12\sum_i(1-S_i)^{2}$ that rewards it. In
+refs.~\cite{trackhhl_epj,trackhhl} the two multipliers are called $\alpha$
+and $\beta$; they are the $\gamma$ and $\delta$ used here, as the
+reference implementation of ref.~\cite{trackhhl} makes explicit.
+Expanding the squares,
+\[
+\mathcal{H}(\mathbf{x})
+=\tfrac12\,\mathbf{x}^{\!\top}\!\big[(\gamma+\delta)I-C\big]\mathbf{x}
+-\delta\,\mathbf{1}^{\!\top}\mathbf{x}+\tfrac{\delta}{2}\,n_{\rm seg}
+=E(\mathbf{x})+\tfrac{\delta}{2}\,n_{\rm seg},
+\]
+so eq.~\eqref{eq:energy} is that energy up to a constant independent of
+$\mathbf{x}$: the same Hessian, the same gradient, the same minimiser,
+and $\nabla\mathcal{H}=0$ is eq.~\eqref{eq:linsys}. What differs between
+the papers is not the operator but three conventions, and they matter
+whenever numbers are carried across. First, ref.~\cite{nicotra2023}
+writes the Ising template
+$\mathcal{H}=-\tfrac12\mathbf{x}^{\!\top}\!A\mathbf{x}
++\mathbf{b}^{\!\top}\mathbf{x}$, which for a positive-definite $A$ is
+$-E(\mathbf{x})$ and hence concave; ref.~\cite{trackhhl} already uses the
+convex sign adopted here. Second, their acceptance is a cosine tolerance,
+$\cos\theta\ge1-\varepsilon$, where mine is an angle in radians; the two
+are related by $\varepsilon_{\cos}=1-\cos\varepsilon\simeq\varepsilon^2/2$,
+so the $10^{-5}$ of ref.~\cite{nicotra2023} is $4.5$\,mrad, and the
+$6.3$\,mrad of the heavy configuration here is $2.0\times10^{-5}$ in
+their variable. Third, and most consequential for every closed form
+below, they take $\gamma=2$ where this work takes $\gamma=3$, so their
+$s=3$: the isolated attractor sits at $\tfrac13$ rather than $\tfrac14$,
+a five-hit track at $(\tfrac35,\tfrac45)$ rather than
+$(\tfrac{4}{11},\tfrac{5}{11})$, and a long chain spans $[1,5]$ rather
+than $[2,6]$ --- which is why refs.~\cite{trackhhl_epj,trackhhl} quote a
+spectrum bounded by $\lambda_{\min}\approx1$, $\lambda_{\max}\approx5$
+and a filter notch at $\lambda=\gamma+\delta=3$. Every level in this work
+is stated at $s=4$.
 
 The acceptance $\varepsilon$ deserves its own derivation, because it is
 the single most consequential experimental knob and because the formula
