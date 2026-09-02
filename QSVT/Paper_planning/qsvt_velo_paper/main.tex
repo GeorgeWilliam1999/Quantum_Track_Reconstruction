@@ -2413,7 +2413,7 @@ pile-up: activation-amplitude spectra on real Run-3 VELO event
 geometry, for the classical solver, the 1BQF, and the redesigned
 band-plus-notch response. Pink: false segments; orange: true
 fragments ($m\le2$); green: findable true segments ($m\ge3$); the
-dotted line is the fixed threshold. Variable track length smears
+dotted line is each solver's efficiency-first threshold, set so that $99\%$ of the \emph{findable} true segments (tracks with three or more true segments) survive, with the per-event range shaded; over all true segments the same rule is degenerate, because the $13\%$ of true segments in fragments of one or two segments sit at the isolated level inside the false bulk. The QSVT here is the degree-40 band-limited design on the base Hamiltonian, not the line comb: real tracks have variable length, so the five-hit lines do not apply. Variable track length smears
 the discrete toy levels into bands, and the fragment population
 sits inside the false bulk for every solver, the real-geometry
 form of the fragment floor.}
