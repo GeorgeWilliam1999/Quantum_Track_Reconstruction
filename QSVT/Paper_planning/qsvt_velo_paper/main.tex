@@ -360,7 +360,7 @@ sparsity, not the bound, is what keeps the benchmark solvable. At
 $\varepsilon=2$\,mrad and $\gamma=3$ some segment already reaches degree
 $4=s$ by $T\approx400$, so the Gershgorin floor $s-d_{\max}$ collapses to
 zero there, while the measured $\lambda_{\min}(A)$ is still $0.8$--$2.4$
-out to $T=1000$. Where it does bite is the wide-acceptance corner. At the
+out to $T=1000$ (figure~\ref{fig:spectrum}). Where it does bite is the wide-acceptance corner. At the
 heavy configuration, evaluated exactly on each connected component,
 $\lambda_{\min}(A)$ falls from $1.91$ at $T=100$ through $0.71$ at
 $T=400$ to $0.10\pm0.26$ at $T=700$ and $0.009$ at $T=1000$: marginal,
@@ -375,6 +375,26 @@ conjugate gradient that a positive-definite matrix would invite: the same
 code path has to serve those corners and the $\gamma=1$ operating point,
 where $2I-C$ is indefinite outright and conjugate gradient has no
 convergence guarantee at all.
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.92\textwidth}
+\includegraphics[width=0.97\textwidth]{hamiltonian_spectrum.pdf}
+\caption{What keeps the system solvable, on the benchmark configuration
+($\varepsilon=2$\,mrad, $\gamma=3$, $\delta=1$, clean events, three
+repetitions per point). (a) The measured extremes of the spectrum of $A$
+against the sufficient condition: the Gershgorin floor
+$\min_i(A_{ii}-R_i)=s-d_{\max}$ (grey) reaches zero once some segment
+first acquires four compatible neighbours, near $T=400$, while the true
+$\lambda_{\min}$ (green) stays between $0.8$ and $2.4$ all the way to
+$T=1000$ and four million segments. The guarantee lapses; the matrix
+stays positive definite anyway, because it is overwhelmingly sparse.
+(b) The condition number that follows. (c) The mechanism: the largest
+off-diagonal row sum saturates at $4=s$, which is what makes the bound
+vacuous, while the mean row sum falls towards zero as the isolated
+population grows.}
+\label{fig:spectrum}
+\end{figure}
 
 The same operator is worth writing in the form the predecessor papers
 use, because the two look quite different on the page.
