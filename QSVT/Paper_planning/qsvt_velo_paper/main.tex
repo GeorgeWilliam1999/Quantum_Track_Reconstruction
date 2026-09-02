@@ -633,17 +633,27 @@ efficiency.
 \captionsetup{width=0.85\textwidth}
 \includegraphics[width=0.9\textwidth]{amplitude_atlas.pdf}
 \caption{The amplitude atlas: exact activation level of every canonical
-cluster type (rows), classical (top) and 1BQF-filtered (bottom). The
-dashed line is the lowest level of a \emph{complete} five-hit track ---
-its outer segment, $4/11$ classically and $0.258$ after the filter --- so
-on clean events, where every true segment belongs to such a track, it is
-the efficiency-first threshold of the analytic picture. The true
-fragments of broken tracks fall below it, on top of the false levels;
-that is the whole difficulty of section~\ref{sec:fit}, seen here in
-closed form. Green: true; pink: false. Everything quantitative in this
-work is a statement about where these levels sit relative to a
-threshold. Cluster names and their graphs are defined in
-section~\ref{sec:toy:spectrum}; the stub is a one-segment true fragment
+cluster type (rows), classical (top) and after the 1BQF (bottom). This
+figure is analytic: it is the exact solution of $A\mathbf{x}=\delta
+\mathbf{1}$ on each cluster in isolation at $\gamma=3$, $\delta=1$,
+$s=4$, with no events, no noise and no acceptance; the filtered
+amplitudes are the response $f(A)\mathbf{b}$ of eq.~\eqref{eq:notch}
+placed on the classical scale by one global factor, so the two panels
+are directly comparable. The dashed line is the threshold that would
+keep every segment of a \emph{complete} five-hit track, $4/11$
+classically and $0.246$ after the filter: on clean events, where every
+true segment belongs to such a track, it is the efficiency-first
+threshold of the analytic picture. Two things are then visible that the
+rest of this work spends its time on. The true fragments of broken
+tracks fall \emph{below} that line, on top of the false levels. And
+every cluster pair with the same graph carries exactly the same
+amplitudes in both panels: a true two-segment fragment sits on the
+false pair, a true three-segment fragment on the false bridge, and the
+one-segment stub sits on the isolated false segment at $\lambda=s$, so
+the filter's single zero annihilates the two together --- it removes
+every isolated fake, and every one-segment true fragment with them.
+Green: true; pink: false. Cluster names and their graphs are defined in
+section~\ref{sec:toy:spectrum}; a stub is a one-segment true fragment
 ($P_1$) and a hub is a star ($K_{1,m}$).}
 \label{fig:atlas}
 \end{figure}
@@ -854,7 +864,8 @@ modes (eq.~\eqref{eq:p4lines}) sit symmetrically about $s$, where
 $|f(\lambda)|$ is small; the filtered chain no longer reproduces the
 classical $\{4/11,5/11\}$ profile. The effect has a closed form: the
 outer (endpoint) segments of a clean track drop from $0.364$ to
-$0.258$ while the inner pair stays near $0.45$. This is why the fixed
+$0.246$ while the inner pair rises slightly, from $0.455$ to $0.498$
+(figure~\ref{fig:atlas}, on the common scale defined there). This is why the fixed
 cut of the earlier convention ($0.35$) was wrong for the filter: it
 sat above the endpoint band and reported a segment efficiency plateau
 of $\approx0.73$--$0.75$, finding the middles of tracks and losing the
@@ -902,12 +913,16 @@ $\sim10^{-2}$ false rate over the whole usable range.}
 \centering
 \captionsetup{width=0.70\textwidth}
 \includegraphics[width=0.75\textwidth]{chain_amplitude_ladder.pdf}
-\caption{The chain ladder and the endpoint halving. Classical outer
-activation climbs eq.~\eqref{eq:ladder} toward $0.366$; the 1BQF
-response drops the $P_4$ outer level to $0.258$. The lowest true level
-of each family is marked: it is the efficiency-first threshold of the
-analytic picture, and the reason the earlier fixed cut at $0.35$ lost
-the filtered chain's endpoints.}
+\caption{The chain ladder, on the same analytic footing as
+figure~\ref{fig:atlas} ($\gamma=3$, $\delta=1$, $s=4$, no noise, the
+filtered amplitudes on the classical scale by the same global factor).
+Classical outer activation climbs eq.~\eqref{eq:ladder} toward
+$0.366$; the 1BQF pushes the outer level of a five-hit track down to
+$0.246$ and the middles up to $0.498$, and annihilates the
+one-segment stub outright, since a lone segment sits exactly on the
+notch. The marked levels are what a threshold has to clear to keep
+every segment of a complete track, and the reason the earlier fixed cut
+at $0.35$ lost the filtered chain's endpoints.}
 \label{fig:ladder}
 \end{figure}
 
