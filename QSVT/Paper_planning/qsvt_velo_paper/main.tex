@@ -65,10 +65,15 @@ transformation (QSVT), and once the problem is viewed this way the design
 question changes: it is no longer a question of which algorithm inverts
 $A$, but of which function of $\lambda$ separates true from false segments.
 On clean events the answer is a four-line comb pinned to the eigenvalues of
-a five-hit track: at the wide fixed $2$\,mrad acceptance it drives the
-segment false rate from $20.5\%$ (classical, $T{=}1000$ tracks) to $0.9\%$
-at $92\%$ efficiency, and at the formula acceptance the same multiplicity
-is solved outright ($99.98\%$ efficiency at a false rate below $0.1\%$). On noisy
+a five-hit track. Read, as every solver in this work is, at the
+efficiency-first working point (the lowest threshold that keeps $99\%$ of
+the true segments), it holds the segment false rate below the classical
+solver's up to $T\approx400$ tracks at the wide fixed $2$\,mrad acceptance;
+at $T{=}1000$, where tangles of false segments have entered the clean-event
+design's passes, the same degree-40 polynomial with its coefficients refit
+to the events reads a $2.8\%$ false rate where the classical solver reads
+$10.0\%$, and at the formula acceptance the same multiplicity is solved
+outright ($99.98\%$ efficiency at a false rate below $0.1\%$). On noisy
 events the answer must be measured: the false weight piles up on the
 eigenvalue lines of specific two- and three-segment motifs, and a
 polynomial fitted with roots at the measured pile-up beats the classical
@@ -144,9 +149,11 @@ the spectrum:
 geometry pins every true track to the same five-hit chain, whose four
 eigenvalues are known in closed form. A comb of narrow passes at those
 four lines, and nothing else, separates true from false essentially
-perfectly up to the densities I can simulate ($T=1000$ tracks, four
-million segments), where at the wide fixed $2$\,mrad acceptance the
-classical solver's false rate has climbed to $20.5\%$.
+perfectly at low and moderate multiplicity; at the densities I can
+simulate ($T=1000$ tracks, four million segments) and the wide fixed
+$2$\,mrad acceptance, where the classical solver's false rate at
+$99\%$ efficiency has climbed to $10.0\%$, the comb's coefficients must
+be refit to the events, and then read $2.8\%$.
 \item On noisy events the false population moves: it concentrates on the
 eigenvalue lines of specific small \emph{motifs} (hit-sharing pairs and
 triples), which sit off the true lines but inside any naive pass window.
@@ -383,33 +390,30 @@ fact returns as the fragment floor in section~\ref{sec:fit}.
 \includegraphics[width=0.9\textwidth]{amplitude_atlas.pdf}
 \caption{The amplitude atlas: exact activation level of every canonical
 cluster type (rows), classical (top) and 1BQF-filtered (bottom), with the
-fixed threshold $\tau=0.35$ marked. Green: true; pink: false. Everything
-quantitative in this work is a statement about where these levels sit
-relative to a threshold.}
+lowest true level marked in each: the five-hit track's outer segment,
+$4/11$ classically and $0.258$ after the filter. That level is the
+efficiency-first threshold of the analytic picture. Green: true; pink:
+false. Everything quantitative in this work is a statement about where
+these levels sit relative to that threshold.}
 \label{fig:atlas}
 \end{figure}
 
-The classical decision rule is a threshold: segment $i$ is \emph{active}
-iff $x_i>\tau$. The \emph{classical} convention, inherited from
-ref.~\cite{trackhhl} and kept for comparability, fixes
-\begin{equation}
-\tau(\gamma,\delta)=\frac{\delta}{\gamma+\delta}+0.10 ,
-\label{eq:tau}
-\end{equation}
-i.e.\ $\tau=0.35$ at $\gamma=3$: a fixed margin above the false
-attractor, below the lowest clean-track level $4/11$. It is important
-to say at the outset what this convention is and is not. For the
-classical solver it is a natural operating point, because the classical
-amplitude atlas happens to leave a gap there. For a \emph{filtered}
-solver it is in general the wrong place to read the device: a filter
-reshapes the amplitude atlas, and a threshold inherited from the
-unfiltered atlas can land in the middle of a reshaped true band.
-Every threshold choice trades efficiency against false rate, and the
-convention this work actually uses for filtered solvers is
-\emph{efficiency-first}: put the threshold where the wanted fraction of
-true segments survives, and quote the false rate that results.
-Section~\ref{sec:onebit} makes this concrete, with the trade-off shown
-explicitly in figure~\ref{fig:threshold}.
+The decision rule is a threshold: segment $i$ is \emph{active} iff
+$x_i>\tau$. Every threshold choice trades efficiency against false
+rate, and this work reads every solver, the classical inversion
+included, at one working point, the \emph{efficiency-first} one: the
+threshold is the lowest value that admits the true solutions, placed
+just below the $1\%$ quantile of that solver's own true-segment
+amplitudes so that $99\%$ of true segments survive by construction,
+and the false rate at that threshold is the price quoted. An earlier
+convention, inherited from ref.~\cite{trackhhl}, fixed an absolute
+threshold $\tau=\delta/(\gamma+\delta)+0.10$ ($0.35$ at $\gamma=3$)
+as a margin above the false attractor. It is not used here: a filter
+reshapes the amplitude atlas, and that fixed cut lands inside the
+one-bit filter's reshaped true band (section~\ref{sec:onebit}),
+discarding true segments and understating the false rate at the same
+time. Section~\ref{sec:onebit} shows the full trade-off explicitly in
+figure~\ref{fig:threshold}.
 
 \subsection{Metric definitions}
 \label{sec:toy:metrics}
@@ -423,16 +427,18 @@ the fraction of true segments that survive selection;
 $\far=n_{\rm false\,active}/n_{\rm active}$: the fraction of the
 \emph{selected} sample that is fake (note the denominator: this is an
 impurity, not a false-positive rate over all fakes);
-\item \textbf{working points}: either the \emph{fixed threshold} of
-eq.~\eqref{eq:tau}; or the \emph{efficiency-first working point}
-(the threshold placed just below the 1\% quantile of the true-segment
-amplitudes, so $\eff\ge0.99$ by construction, whenever this work
-says ``efficiency-first'' without qualification, this 99\% point is
-meant); or, in
-sections~\ref{sec:fork}--\ref{sec:fit}, the \emph{matched-efficiency}
-convention: $\tau$ just below the $k$-th largest true amplitude with
-$k=\lceil\mathrm{eff}\cdot n_{\rm true}\rceil$, which lets solvers be
-compared at identical efficiency without quantile-grid artefacts.
+\item \textbf{working point}: the \emph{efficiency-first working
+point}, the lowest threshold that admits the true solutions: $\tau$
+placed just below the 1\% quantile of the solver's own true-segment
+amplitudes, so $\eff\ge0.99$ by construction. Whenever this work
+quotes a false rate without qualification, this 99\% point is meant,
+for every solver. Sections~\ref{sec:fork}--\ref{sec:fit} use the same
+rule at other target efficiencies, there called
+\emph{matched-efficiency}: $\tau$ just below the $k$-th largest true
+amplitude with $k=\lceil\mathrm{eff}\cdot n_{\rm true}\rceil$, which
+lets solvers be compared at identical efficiency without quantile-grid
+artefacts. Because the threshold is a quantile of the solver's own
+amplitudes, these metrics do not depend on the amplitude scale.
 \item \textbf{AUC}, the threshold-free separation metric: sweeping
 $\tau$ from high to low traces out a curve of efficiency against false
 rate for each solver, and the \emph{area under that curve} summarises
@@ -586,33 +592,32 @@ modes (eq.~\eqref{eq:p4lines}) sit symmetrically about $s$, where
 $|f(\lambda)|$ is small; the filtered chain no longer reproduces the
 classical $\{4/11,5/11\}$ profile. The effect has a closed form: the
 outer (endpoint) segments of a clean track drop from $0.364$ to
-$0.258$, below the fixed threshold $\tau=0.35$, while the inner pair
-survives above it. At the fixed threshold the 1BQF therefore reports a
-segment efficiency plateau of $\approx0.73$--$0.75$: it finds the
-middles of tracks and loses the ends. This endpoint loss is a
-property of the cut, not of the physics; the endpoint amplitudes
-remain perfectly well ordered above the false ones, so a threshold
-placed below the endpoint band recovers them all.
+$0.258$ while the inner pair stays near $0.45$. This is why the fixed
+cut of the earlier convention ($0.35$) was wrong for the filter: it
+sat above the endpoint band and reported a segment efficiency plateau
+of $\approx0.73$--$0.75$, finding the middles of tracks and losing the
+ends. The endpoint loss was a property of that cut, not of the
+physics; the endpoint amplitudes remain perfectly well ordered above
+the false ones, so the efficiency-first threshold, which sits below
+the endpoint band, recovers them all.
 
 Figure~\ref{fig:threshold} shows the whole trade explicitly, on a
 stored $T=400$ clean event, by sweeping the threshold for all three
 solvers of this work. The efficiency panel shows the plateau
 structure just described: the 1BQF efficiency steps down at the
-endpoint band around $\tau\approx0.28$, so the inherited $\tau=0.35$
-reads $75\%$, not because the filter lost the physics but because
-the cut sits above a reshaped true band. The false-rate panel shows
-what moving the threshold costs. Every solver is therefore read at
-its own \emph{efficiency-first working point} (dashed verticals):
-the threshold just below the 1\% quantile of that solver's true
+endpoint band around $\tau\approx0.28$, so any cut above it reads
+$75\%$, not because the filter lost the physics but because the cut
+sits above a reshaped true band. The false-rate panel shows what
+moving the threshold costs. Every solver is read at its own
+\emph{efficiency-first working point} (dashed verticals): the
+threshold just below the 1\% quantile of that solver's true
 amplitudes, so that $99\%$ of true segments survive by construction,
-with the false rate quoted as the price. This is the convention for
-all 1BQF headlines in this work; the fixed $\tau=0.35$ of
-eq.~\eqref{eq:tau} is retained only where the classical baseline is
-quoted on its own established operating point. On clean
-fixed-acceptance events at $\gamma=3$ the efficiency-first price is
-steep at high multiplicity: the 1BQF false rate climbs to several
-tens of percent by $T=400$ and beyond, and section~\ref{sec:comb}
-quantifies this against the comb.
+with the false rate quoted as the price. For the 1BQF that threshold
+is small, because the filter has already sent the isolated false
+segments to zero. On clean fixed-acceptance events at $\gamma=3$ the
+price is steep at high multiplicity: the 1BQF false rate climbs to
+several tens of percent by $T=400$ and beyond, and
+section~\ref{sec:comb} quantifies this against the comb.
 
 \begin{figure}[t]
 \centering
@@ -621,13 +626,13 @@ quantifies this against the comb.
 \caption{The threshold trade-off, on the stored $T=400$ clean event of
 the canonical campaign: (a) segment efficiency and (b) segment false
 rate as the threshold $\tau$ sweeps, for the classical solver, the
-1BQF and the line comb (quantum amplitudes on the classical signal
-scale). The grey vertical is the inherited fixed $\tau=0.35$; the
-dashed verticals are each solver's efficiency-first working point
-(99\% of its true segments kept). The fixed cut sits above the 1BQF's
-reshaped endpoint band, the origin of its $75\%$ plateau, while
-the comb holds both high efficiency and a $\sim10^{-2}$ false rate
-over the whole usable range.}
+1BQF and the QSVT (degree 40, base $A$; quantum amplitudes on the
+classical signal scale). The dashed verticals are each solver's
+efficiency-first working point (the lowest threshold keeping 99\% of
+its true segments). The 1BQF's efficiency steps down at its reshaped
+endpoint band near $\tau\approx0.28$, so its working point sits
+below that band, while the QSVT holds both high efficiency and a
+$\sim10^{-2}$ false rate over the whole usable range.}
 \label{fig:threshold}
 \end{figure}
 
@@ -636,11 +641,11 @@ over the whole usable range.}
 \captionsetup{width=0.70\textwidth}
 \includegraphics[width=0.75\textwidth]{chain_amplitude_ladder.pdf}
 \caption{The chain ladder and the endpoint halving. Classical outer
-activation climbs eq.~\eqref{eq:ladder} toward $0.366$ (above $\tau$);
-the 1BQF response drops the $P_4$ outer level to $0.258$, below the
-fixed threshold. This is the origin of the fixed-$\tau$ efficiency
-plateau, and the reason 1BQF headlines use the efficiency-first
-working point.}
+activation climbs eq.~\eqref{eq:ladder} toward $0.366$; the 1BQF
+response drops the $P_4$ outer level to $0.258$. The lowest true level
+of each family is marked: it is the efficiency-first threshold of the
+analytic picture, and the reason the earlier fixed cut at $0.35$ lost
+the filtered chain's endpoints.}
 \label{fig:ladder}
 \end{figure}
 
@@ -800,8 +805,8 @@ inverse ($\approx1/\lambda$ across a contiguous band containing the
 true lines, zero outside) works beautifully at low multiplicity and
 then fails exactly where it matters: as $T$ grows, accidental tangles
 of false segments produce eigenvalues throughout the band, and a band
-design passes them all. At fixed threshold its false rate reached tens
-of percent by $T=400$, worse than classical.\footnote{A useful
+design passes them all. Its false rate reached tens of percent by
+$T=400$, worse than classical.\footnote{A useful
 failure: it taught us that the exploitable structure is the
 discreteness of the geometry-pinned true spectrum, not its location.}
 The production design is therefore a \emph{line comb}: narrow Gaussian
@@ -809,6 +814,14 @@ passes of half-width $h_w$, weighted $\propto1/\lambda$, centred at
 the four lines $s-2\cos(k\pi/5)$ only, fitted as a bounded Chebyshev
 series of degree $d$. The defaults, fixed once by a two-dimensional
 $(d,h_w)$ scan and never tuned per event, are $d=40$, $h_w=0.18$.
+This degree-40 line comb on the base Hamiltonian $A$ is \emph{the
+QSVT} of this work, the comb, so called because it combs the false
+tracks out of the spectrum: wherever the text says ``the QSVT'' or
+``the comb'' without qualification, this polynomial on $A$ is meant.
+Every other QSVT result is labelled by its polynomial degree and by
+the Hamiltonian it is set up on, and where a polynomial of the same
+degree has its coefficients refit to the events
+(section~\ref{sec:fit}) the text says so.
 
 Why does a width of $0.18$ work? The nearest systematically-populated
 false lines, the $P_3$ bridge modes at $\{s-\sqrt2,\,s,\,s+\sqrt2\}$,
@@ -825,31 +838,28 @@ noisy events of section~\ref{sec:fit} will re-open.
 On the fixed-acceptance ($\varepsilon=2$\,mrad), $\gamma=3$ study, the
 canonical benchmark of the programme, with events and solutions shared
 segment-for-segment across all three solvers through a common data
-pipeline, each solver read at the working point fixed in
-section~\ref{sec:toy:metrics} (the classical solver and the comb at
-the fixed cut $\tau=0.35$, the 1BQF at its efficiency-first point), the picture is:
+pipeline, every solver read at the efficiency-first working point of
+section~\ref{sec:toy:metrics} ($99\%$ of its true segments kept),
+the picture is:
 \begin{itemize}[leftmargin=2em]
-\item \textbf{Classical}: efficiency $100\%$ throughout (the minimum
-true amplitude $4/11$ clears $\tau$ at every $T$); false rate grows
-from $\approx0$ at low $T$ to $2.25\%$ at $T=400$ and $20.5\%$ at
-$T=1000$ as the $\mathcal{O}(T^2)$ false pairing feeds the active
-set.
-\item \textbf{1BQF}: at its efficiency-first working point the notch
-recovers essentially every true segment (efficiency
-$99.5$--$100\%$ at every $T$), and the false rate blows up to pay
-for it: $5.1\%$ at $T=100$, $43.9\%$ at $T=400$, $82.6\%$ at
-$T=1000$, far above the classical solver, because the single zero
-removes only the isolated-false bulk while every coupled fake sits
-off the notch and survives. (At the fixed threshold $\tau=0.35$ the
-same solver instead reads an $\approx75\%$ efficiency plateau at
-$T=400$, the endpoint cut of section~\ref{sec:onebit}, an
-artefact of that threshold and not a working point, kept only as the
-faded curve in figure~\ref{fig:clean2x2}.)
-\item \textbf{Comb}: efficiency $97$--$100\%$ with false rate
-$\le0.02\%$ through $T=400$ (zero to a few false actives per event
-where the classical solver admits tens), rising to $0.17\%$ at
-$T=700$ and $0.9\%$ at $T=1000$ against the classical $20.5\%$, at
-efficiency $92.1\%$.
+\item \textbf{Classical}: efficiency $100\%$ throughout (the true
+amplitudes are tightly clustered, so the threshold that keeps $99\%$
+keeps them all); false rate grows from $\approx0$ at low $T$ to
+$0.65\%$ at $T=200$, $1.49\%$ at $T=400$, $4.9\%$ at $T=700$ and
+$10.0\%$ at $T=1000$ as the $\mathcal{O}(T^2)$ false pairing feeds
+the active set.
+\item \textbf{1BQF}: the notch recovers essentially every true
+segment (efficiency $99.5$--$100\%$ at every $T$), and the false rate
+blows up to pay for it: $5.1\%$ at $T=100$, $43.9\%$ at $T=400$,
+$82.6\%$ at $T=1000$, far above the classical solver, because the
+single zero removes only the isolated-false bulk while every coupled
+fake sits off the notch and survives.
+\item \textbf{QSVT}: efficiency $99.1$--$100\%$ with a false rate of
+$0.31\%$ at $T=200$ against the classical $0.65\%$ (zero to a few
+false actives per event where the classical solver admits tens), a
+tie at $T=400$ ($1.44\%$ against $1.49\%$), and then behind:
+$9.1\%$ at $T=700$ and $20.7\%$ at $T=1000$ against the classical
+$4.9\%$ and $10.0\%$.
 \end{itemize}
 
 \begin{figure}[t]
@@ -858,39 +868,39 @@ efficiency $92.1\%$.
 \includegraphics[width=0.95\textwidth]{clean_headline.pdf}
 \caption{The clean-toy headline ($\gamma=3$, fixed
 $\varepsilon=2$\,mrad, no hit drop): (a) segment efficiency and (b)
-segment false rate against multiplicity, for the classical solver and
-the line comb at the fixed threshold and the 1BQF at its
-efficiency-first working point (its fixed-$\tau$ curve is kept faded:
-the $\approx75\%$ plateau is the endpoint cut of
-section~\ref{sec:onebit}, not lost physics). Error bars are standard
-errors over event repetitions.}
+segment false rate against multiplicity, for the classical solver,
+the QSVT (degree 40, base $A$) and the 1BQF, every solver at its
+efficiency-first working point ($99\%$ of its true segments kept; the
+efficiency axis shows the convention holding). Error bars are standard
+errors over event repetitions (classical 5--20, QSVT 5--10, 1BQF
+3--10 per $T$); a measured $0\%$ false rate is drawn at $10^{-3}$.}
 \label{fig:clean2x2}
 \end{figure}
 
-At the efficiency-first working point the comb wins clearly through
-$T=400$ ($1.3\%$ vs classical $3.1\%$ on matched fresh solves), but
-at extreme density the composition effect dominates everyone: the
-false-to-true ratio $n_F/n_T\approx T-1$ converts even excellent
-per-segment separation into a growing impurity, and by $T=1000$ the
-efficiency-first false rates cross ($\approx21\%$ comb vs $17.5\%$
-classical, crossover near $T=700$).\footnote{The crossover is robust;
-its size is aggregation-dependent. A whole-store aggregate reads the
-classical efficiency-first false rate at $T=1000$ as low as $10\%$.
-Both sources agree the comb no longer wins at the efficiency-first
-point beyond $T\approx700$, which is the operative statement.} One
-qualifier matters enough to state here rather than in a caption: the
-wall is set by the \emph{acceptance}, not by multiplicity alone.
-This whole section runs at the wide fixed $\varepsilon=2$\,mrad of
-the benchmark configuration, whose window admits several times more
-false candidates than the formula acceptance of
-eq.~\eqref{eq:epsilon}; at the formula acceptance the same $T=1000$
-multiplicity is solved outright ($99.98\%$ efficiency at a false rate
-below $0.1\%$, section~\ref{sec:atscale}) — a direct measurement of
+The comb wins clearly through $T=300$ and ties at $T=400$; beyond
+that, at this acceptance, it loses. Two things happen at once. The
+composition effect dominates everyone: the false-to-true ratio
+$n_F/n_T\approx T-1$ converts even excellent per-segment separation
+into a growing impurity. And the clean-event design itself stops
+being right: from $T\approx400$ the $2$\,mrad events develop tangles
+of false segments whose eigenvalues enter the comb's passes
+(section~\ref{sec:comb:limits}), so a polynomial pinned to the
+isolated-chain lines no longer separates. The remedy is not a
+different solver but the same degree-40 polynomial with its
+coefficients refit to the events, the subject of
+section~\ref{sec:fit} and, on these very events, of
+figure~\ref{fig:fig6first}: refit, it reads $2.8\%$ at $T=1000$
+against the classical $10.0\%$. One qualifier matters enough to
+state here rather than in a caption: the wall is set by the
+\emph{acceptance}, not by multiplicity alone. This whole section runs
+at the wide fixed $\varepsilon=2$\,mrad of the benchmark
+configuration, whose window admits several times more false
+candidates than the formula acceptance of eq.~\eqref{eq:epsilon}; at
+the formula acceptance the same $T=1000$ multiplicity is solved
+outright ($99.98\%$ efficiency at a false rate below $0.1\%$,
+section~\ref{sec:atscale}) — a direct measurement of
 section~\ref{sec:toy:ham}'s claim that $\varepsilon$ is the most
-consequential experimental knob. The two regimes, fixed-$\tau$ where
-the comb wins by an order of magnitude and more, and the strict
-efficiency-first point at extreme density where, at this acceptance,
-composition flattens everyone, bracket the operational truth.
+consequential experimental knob.
 
 The comb's amplitude picture explains the numbers. Under the comb
 response the false population collapses to $\lesssim10^{-2}$ of the
@@ -1136,9 +1146,9 @@ A_{\rm occ}=A+4\alpha I+2\alpha B_{\rm all},\qquad
 where $B_{\rm all}$ couples every pair of segments sharing a hit in
 the same role: two segments departing the same hit, or two arriving
 at it. Consecutive segments of one track share their interior hit in
-opposite roles and are not coupled. The isolated attractor moves to
-$(\delta+4\alpha)/(\gamma+\delta+4\alpha)$ and the threshold tracks
-it.
+opposite roles and are not coupled. On an isolated chain the attractor moves to
+$(\delta+4\alpha)/(\gamma+\delta+4\alpha)$; on an event, as shown
+below, it does not.
 
 That role structure has an exact consequence worth deriving before
 any experiment: \emph{on every pure chain the occupancy term is
@@ -1157,9 +1167,27 @@ x_j=\bar x'\left[1-\frac{r'^{\,j}+r'^{\,m+1-j}}{1+r'^{\,m+1}}\right],
 so at $\alpha=0.05$ the attractor sits at
 $1.2/4.2=0.2857$, the $P_4$ outer and inner levels rise from
 $4/11,\,5/11$ to $0.4052,\,0.5017$, and every chain eigenvalue line
-of figure~\ref{fig:motifs} shifts rigidly by $+4\alpha$. The whole
-true-track atlas moves as one block: nothing about the term touches
-the structures we want to keep.
+of figure~\ref{fig:motifs} shifts rigidly by $+4\alpha$. On an
+isolated chain, that is. An event is not a collection of isolated
+chains: every hit carries $T-1$ false candidate segments per role, so
+the same-role sums the term penalises are, to within $0.2\%$,
+independent of which hit one looks at, and the term's effect on the
+solution collapses to a mean field. Measured at $T=200$ and
+$\alpha=0.05$, every segment amplitude, true or false, is the base
+amplitude multiplied by one number, $0.1087$ (its 5th--95th
+percentile range across segments is $0.1087$--$0.1088$ on clean
+events and $0.108$--$0.110$ under noise), and the isolated-false level
+sits at $(\delta+4\alpha)/(s+4\alpha+4\alpha(T-1))=0.027$, not at
+the chain-only $0.286$. The atlas does not move as a block; it
+shrinks as a block. What the term changes is the \emph{ranking}
+inside the shrunken atlas, through the small per-hit departures from
+the mean field, and that is what the efficiency-first working point
+reads: the false rate at $99\%$ efficiency is unchanged on clean
+events ($0.29\%$ both ways) and falls from $44\%$ to $35\%$ at
+moderate and from $65\%$ to $30\%$ at heavy noise. Every occupancy
+result below is read at that working point and stands; only the
+closed-form ladder, exact for an isolated chain, must not be read as
+a prediction of event amplitudes.
 
 What it does touch is exactly the structures the base Hamiltonian
 cannot see. A same-role pair with no continuation edge, invisible to
@@ -1883,33 +1911,61 @@ occupancy term is the twin-breaker: the invariant that twins must
 match grew from the compatibility graph to the pair
 $(C,B_{\rm all})$.
 
-\subsection{Density: the five solvers to $T=1000$}
+\subsection{Density: every solver to $T=1000$}
 \label{sec:atscale:density}
 
 \begin{figure}[t]
 \centering
 \captionsetup{width=0.80\textwidth}
 \includegraphics[width=0.84\textwidth]{xiv_metrics_composite.pdf}
-\caption{The figure~\ref{fig:clean2x2} pair for all five series —
-classical (fixed $\tau$), the matched 1BQF at its
-$99\%$-efficiency working point, and the fitted
-$d{=}40$ response on base $A$, $+$occupancy, $+$fork, and both — at
-clean, moderate and heavy noise (rows), formula $\varepsilon$,
-$T=200$--$1000$. Clean is solved at every multiplicity by every
-QSVT operator. Under noise, every matched-efficiency curve
-converges to the false
-prevalence as the twin flood completes: past the wall the matched
-$99\%$-efficiency point stops being a working point at all.}
+\caption{The figure~\ref{fig:clean2x2} pair at the formula acceptance
+for every series — the classical solver, the 1BQF, and the degree-40
+QSVT with coefficients refit on base $A$, $A+$occupancy,
+$A+$bifurcation, and both — at clean, moderate and heavy noise (rows),
+$T=200$--$1000$, every solver at its efficiency-first working point.
+Clean is solved at every multiplicity on every Hamiltonian. Under
+noise, every curve converges to the false prevalence as the twin
+flood completes: past the wall the $99\%$-efficiency point stops being
+a working point at all. The classical solver, read at the same
+working point, sits at $31\%$--$92\%$ (moderate) and $63\%$--$94\%$
+(heavy) false rate over this range.}
 \label{fig:density5}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\captionsetup{width=0.92\textwidth}
+\includegraphics[width=0.95\textwidth]{xiv_fig6_efficiency_first.pdf}
+\caption{The clean benchmark of figure~\ref{fig:clean2x2} (fixed
+$\varepsilon=2$\,mrad, $\gamma=3$, no hit drop) with every solver at
+its efficiency-first working point ($99\%$ of true segments kept;
+panel (a) shows the convention holding): the classical solver, the
+1BQF, and the QSVT (degree 40, base $A$, the clean-event line-comb
+coefficients; benchmark campaign, mean $\pm$ s.e.m.\ over 3--20
+repetitions), together with the same degree-40 QSVT with coefficients
+refit on base $A$, $A+$occupancy ($\alpha=0.05$), $A+$bifurcation
+($\beta=0.5$) and both (repetitions 0--2 of the same events). The
+line-comb coefficients stop winning once the $2$\,mrad events develop
+tangles ($T\ge400$); the refit restores the margin, $2.8\%$ against
+the classical $10.0\%$ at $T=1000$, on every Hamiltonian. A measured
+$0\%$ false rate is drawn at the $10^{-3}$ floor.}
+\label{fig:fig6first}
 \end{figure}
 
 Figure~\ref{fig:density5} carries the campaign to $T=1000$ at the
 formula acceptance. Three structural statements survive to that
 scale. First, \emph{clean events are solved at every multiplicity}:
-the fitted $d{=}40$ response holds $99.85$--$100\%$ efficiency at
-zero measured false rate to four million segments, on every
-operator — while the matched 1BQF's false rate climbs through
+the degree-40 QSVT, coefficients refit, holds $99.85$--$100\%$
+efficiency at zero measured false rate to four million segments, on
+every Hamiltonian — while the 1BQF's false rate climbs through
 $0.10$ ($T{=}400$) to $0.68$ ($T{=}1000$) on the same events.
+Figure~\ref{fig:fig6first} puts the same solvers, at the same working
+point, back on the wide $2$\,mrad benchmark events of
+section~\ref{sec:comb}: there the clean-event line-comb coefficients
+lose to the classical solver from $T\approx550$, and the refit on
+each Hamiltonian reads $2.5$--$5.7\%$ at $T=1000$ against the
+classical $10.0\%$. The acceptance, not the solver, is what separates
+``solved outright'' from a factor of three or four.
 Second, under noise there is a \emph{composition wall}: the
 false-to-true ratio grows $\propto T$, and between $T{=}700$ and
 $T{=}1000$ the moderate-noise $1\%$-budget frontier closes for
@@ -2074,7 +2130,7 @@ QSP over $e^{-iAt}$) restores exactness at matched cost and is, on
 present evidence, mandatory for any weighted Hamiltonian on
 hardware.
 
-\subsection{Hardware resources: HHL, the 1BQF, and the comb side by
+\subsection{Hardware resources: HHL, the 1BQF, and the QSVT side by
 side}
 \label{sec:limits:resources}
 
@@ -2378,15 +2434,16 @@ and response design turns out to be a measurement-driven loop:
 
 \begin{enumerate}[leftmargin=2em]
 \item Read the spectrum the problem gives you. On clean events the
-detector geometry hands you four exact eigenvalue lines, and a fixed
-forty-degree comb pinned to them converts the segment selection at
-$T=1000$ tracks and the wide $2$\,mrad benchmark acceptance from a
-$20.5\%$ false rate (the classical solver at its fixed threshold) to
-$0.9\%$ (the comb at the same threshold, at $92\%$ segment
-efficiency): a factor twenty fewer fakes in the selected sample. At
-the formula acceptance the same multiplicity is solved outright —
-$99.85\%$ efficiency at zero measured false rate
-(section~\ref{sec:atscale}).
+detector geometry hands you four exact eigenvalue lines, and a
+forty-degree comb pinned to them beats the classical solver at the
+wide $2$\,mrad benchmark acceptance up to $T\approx400$ tracks, every
+solver read at the threshold that keeps $99\%$ of its true segments.
+Beyond that the clean-event coefficients must be refit to the events,
+and then the same polynomial converts the segment selection at
+$T=1000$ from a $10.0\%$ false rate (classical) to $2.8\%$: a factor
+of $3.6$ fewer fakes in the selected sample. At the formula
+acceptance the same multiplicity is solved outright — $99.85\%$
+efficiency at zero measured false rate (section~\ref{sec:atscale}).
 \item When the problem changes, measure where the false weight went,
 and put roots there. At the heavy-noise operating point
 ($\sigma_{\rm res}=20\,\mu$m, $1\%$ hit drop, $T=200$) the false
