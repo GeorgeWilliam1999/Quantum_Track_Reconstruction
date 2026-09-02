@@ -35,6 +35,10 @@
 \cfoot{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 
+% Floats are pinned in place with [H]; let the slack collect at the foot of
+% the page rather than being stretched through the text.
+\raggedbottom
+
 \newtheorem{theorem}{Theorem}
 \newcommand{\eff}{\ensuremath{\varepsilon_{\rm seg}}}
 \newcommand{\far}{\ensuremath{f_{\rm seg}}}
@@ -379,7 +383,7 @@ code path has to serve those corners and the $\gamma=1$ operating point,
 where $2I-C$ is indefinite outright and conjugate gradient has no
 convergence guarantee at all.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.97\textwidth]{hamiltonian_spectrum.pdf}
@@ -428,7 +432,7 @@ spare everywhere in this work: the crossing sits at $\gamma=2.24$ for the heavy
 configuration at $T=400$ and at $\gamma=2.58$ at $T=700$, the hardest point
 reached, leaving $\lambda_{\min}=0.76$ and $0.42$ respectively.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{gershgorin_discs.pdf}
@@ -571,7 +575,7 @@ benchmark is therefore a deliberate stress test of the false
 population, not a physics-derived operating point, and it is labelled as
 fixed wherever it is used.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.97\textwidth]{epsilon_derivation.pdf}
@@ -670,7 +674,7 @@ tangles are possible in principle. Counting every connected component of the
 compatibility graph over three events at each configuration gives the census of
 table~\ref{tab:census}. Almost every cluster is a single isolated segment, and among the rest the three families account for 99.4\% of components at the heavy configuration at $T=1000$: chains dominate, hubs appear once the acceptance is wide enough for one segment to have several continuations, and the residue is a scatter of larger trees. Cycles do occur --- they are not forbidden, only rare --- and reach 0.61\% of multi-segment clusters at their worst (heavy, $T=1000$). Read on the true population instead of on components, the same census gives the number that section~\ref{sec:fit} has to live with: at the heavy configuration and $T=1000$, only 46.1\% of true segments still sit in a complete four-segment chain, 1.7\% have been broken down into shorter fragments, and 52.0\% have been absorbed into clusters of five segments or more by false neighbours --- tangles whose eigenvalues are not the four true lines at all.
 
-\begin{table}[t]
+\begin{table}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \caption{Cluster census of the compatibility graph: every connected component of every event, three events per configuration. Almost every cluster is a single isolated segment. Among those that are not, the three named families of section~\ref{sec:toy:graphs} account for essentially all of them, and the components carrying a cycle --- which nothing forbids --- are a fraction of a percent even at the worst corner. Percentages in the right-hand block are of the multi-segment clusters, not of all clusters.}
@@ -694,7 +698,7 @@ heavy & 1000 & 3\,836\,200 & 98.20\% & 93.92\% & 4.37\% & 1.11\% & 0.61\% \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{graph_correspondence.pdf}
@@ -712,7 +716,7 @@ dotted grey vertical is $\lambda=s$.}
 \label{fig:correspondence}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{fragmentation.pdf}
@@ -818,7 +822,7 @@ distinguishable from noise by amplitude alone; this innocent-looking
 fact returns in section~\ref{sec:fit} as the ceiling on segment
 efficiency.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.85\textwidth}
 \includegraphics[width=0.9\textwidth]{amplitude_atlas.pdf}
@@ -921,7 +925,7 @@ leaves, so the trivial component is two-dimensional whatever $m$ is, and a hub
 of any size has exactly two bright lines, $s\pm\sqrt m$, with all $m{-}1$ copies
 of $\lambda=s$ dark.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{track_modes.pdf}
@@ -1061,7 +1065,7 @@ catalogued here. Motifs whose spectrum coincides
 with a true motif's are the exception, and they return in
 sections~\ref{sec:comb:limits} and~\ref{sec:fit} as the limiting factor.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{motif_gallery.pdf}
@@ -1183,7 +1187,7 @@ chosen coefficients. The one-bit filter is the $k=1$ term of that sum, and
 the accounting of this whole work rests on the difference between owning one
 term and owning $d$ of them.
 
-\begin{figure}[p]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.96\textwidth}
 \resizebox{0.98\textwidth}{!}{\input{figures/circuits.tex}}
@@ -1202,6 +1206,90 @@ series $p(X)$. Wires carrying several qubits are marked with their count. The
 1BQF as drawn is the correct one-bit filter; the circuit as built in the
 package realises the evolution as a per-pair product (section~\ref{sec:fork:trotter}).}
 \label{fig:circuits}
+\end{figure}
+
+\paragraph{Inside the two preparations.} The three circuits contain exactly
+two state preparations between them, and figure~\ref{fig:prep} draws both.
+The system register's is trivial and exact: $\mathbf{b}=\delta\mathbf{1}$ is
+uniform, so $|u\rangle=H^{\otimes n}|0\rangle$ is one layer of $n$ Hadamards.
+The input-loading problem that shadows quantum linear solvers in general never
+arises on the register that carries the segments; it is displaced entirely
+onto the index register, and that displacement is worth pricing, because it is
+where the QSVT's extra freedom is bought. PREP must load the $d+1=41$
+Chebyshev coefficients of the response onto $m=\lceil\log_2 41\rceil=6$
+qubits,
+\begin{equation}
+\mathrm{PREP}\,|0\rangle^{\otimes m}=\sum_{k=0}^{2^{m}-1}
+\sqrt{\frac{|c_k|}{\lVert c\rVert_1}}\,|k\rangle ,
+\qquad
+\lVert c\rVert_1=0.5144,\quad \max_k|c_k|=0.0466 ,
+\label{eq:prep}
+\end{equation}
+and it does so as a binary cascade: one uniformly controlled $R_y$ per qubit,
+the rotation acting on qubit $j$ selected by the $j$ bits already written.
+Write $A(v)$ for the norm of the coefficients lying under node $v$ of that
+binary tree, so that $A(v)=\sqrt{A(v_{\rm L})^{2}+A(v_{\rm R})^{2}}$ with the
+leaves carrying $\pm\sqrt{|c_k|/\lVert c\rVert_1}$. Then the state after
+level $j$ is the $(j{+}1)$-th row of the tree, and the angle that splits a
+node is the angle between its two children:
+\begin{equation}
+|\Phi^{(j)}\rangle=\sum_{x\in\{0,1\}^{j+1}}A(x)\,|x\rangle\,
+|0\rangle^{\otimes(m-j-1)} ,
+\qquad
+\theta_v=2\arctan\frac{A(v_{\rm R})}{A(v_{\rm L})} ,
+\label{eq:preptree}
+\end{equation}
+the arctangent taken in the full circle. Three things follow, and each is a
+check on the cost of the build.
+
+First, the signs are free. The tree has $2^{m}-1=63$ angles against $2^{m}=64$
+amplitudes --- exactly the count that fixes a real vector up to normalisation,
+signs and all --- so the same cascade with angles allowed outside $[0,\pi]$
+loads the coefficients with their signs at identical cost. The $15$ negative
+$c_k$ of the comb therefore need no diagonal of their own: the first
+preparation loads the signed vector and the second the magnitudes, and
+$\langle0|\mathrm{PREP}^{\dagger}\,\mathrm{SELECT}\,\mathrm{PREP}'|0\rangle=
+\sum_kc_kT_k(X)/\lVert c\rVert_1$ as required. This is the only sense in which
+the two boxes of figure~\ref{fig:circuits}(c) are not each other's inverse:
+same cascade, different angles. The alternative, a $\pm1$ diagonal on the
+index register, is far worse --- the comb's sign pattern has $36$ terms in its
+algebraic normal form, up to a six-controlled $Z$.
+
+Second, the register is mostly empty. Only $41$ of the $64$ index states carry
+a coefficient, so $19$ of the $63$ angles sit under a branch of zero weight
+and are dropped, leaving $44$. The states $|41\rangle$--$|63\rangle$ are never
+populated, which is why the binary \textsc{select} may be allowed to execute
+walk powers all the way to $W^{63}$: those branches carry no amplitude, so the
+$23$ surplus powers cost depth and nothing else.
+
+Third, and the reason for pricing it at all: the preparation does not scale
+with the event. A dense loader on $m$ qubits costs at most $2^{m}-1=63$
+rotations and $2^{m}-2=62$ CNOTs, and a compiler pass on the comb's actual
+coefficient vector returns $57$ CX at depth $214$ ($188$ with the signs). One
+call to the block encoding costs $1.65\times10^{4}$ two-qubit gates at
+$T=400$ and the circuit makes $63$ of them, so the whole preparation is
+$0.4\%$ of a single call and $6\times10^{-5}$ of the shot --- and it stays
+$63$ rotations at $T=1000$, where a call costs $4.0\times10^{4}$. The index
+register is where the polynomial lives, and loading it is not what the
+polynomial costs.
+
+\begin{figure}[H]
+\centering
+\captionsetup{width=0.96\textwidth}
+\resizebox{\textwidth}{!}{\input{figures/prep.tex}}
+\caption{The two preparations of figure~\ref{fig:circuits}, drawn out.
+(a) PREP on the index register: one uniformly controlled $R_y$ per qubit ---
+a filled square marks a uniform control, meaning one angle for each value of
+the qubits above, so level $j$ carries $2^{j}$ angles and the cascade
+$2^{m}-1=63$. The states $|\Phi^{(j)}\rangle$ are eq.~\eqref{eq:preptree}.
+(b) The angles are read off the binary tree of subtree norms; the numbers are
+those of the production comb ($d=40$, $m=6$), and the grey branch is the
+$23$ index states above $k=40$, which carry no coefficient and are dropped.
+(c) The system register needs no loader at all: $\mathbf{b}$ is uniform.
+PREP$^{\dagger}$ in figure~\ref{fig:circuits}(c) is the same cascade run
+backwards with the unsigned angles. The cascade was validated against the
+coefficient vector to $10^{-16}$, with and without the signs.}
+\label{fig:prep}
 \end{figure}
 
 \subsection{The response function}
@@ -1233,7 +1321,7 @@ the rest of this work builds: a degree-40 polynomial with narrow passes at
 the true-track lines and effective zeros everywhere else, the isolated, pair
 and triple lines included.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.90\textwidth}
 \includegraphics[width=0.92\textwidth]{response_functions.pdf}
@@ -1265,7 +1353,7 @@ the true lines} --- the spectral twins of section~\ref{sec:comb:limits},
 which no function of $\lambda$ will ever separate. One zero removes one
 line; every line that remains needs a zero of its own.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.96\textwidth}
 \includegraphics[width=0.98\textwidth]{notch_spectrum.pdf}
@@ -1338,7 +1426,7 @@ precisely, the statement that unconnected fakes are exactly removable;
 everything in this work beyond section~\ref{sec:qsvt} is about the
 connected ones.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.70\textwidth}
 \includegraphics[width=0.75\textwidth]{chain_amplitude_ladder.pdf}
@@ -1376,7 +1464,7 @@ the exact circuit; that is a property of the package circuit's uncompute
 step, which leaves the four segments of a track at four distinct levels
 depending on their labelling order, and it is left as it is here.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{threshold_tradeoff.pdf}
@@ -1437,7 +1525,7 @@ success probability is the price of doing the selection inside the circuit
 rather than in the readout, and the QSVT pays a price of the same kind,
 measured in section~\ref{sec:comb:resources}.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{hhl_onebit_headline.pdf}
@@ -1601,10 +1689,12 @@ the walk of eq.~\eqref{eq:walkcheb}, a response $p(X)=\sum_{k=0}^{d}c_kT_k(X)$
 is a weighted sum of walk powers. Introduce an index register of
 $m=\lceil\log_2(d{+}1)\rceil$ qubits, prepare it in
 $\sum_k\sqrt{|c_k|/\lVert c\rVert_1}\,|k\rangle$ with the coefficient signs
-applied as a diagonal, apply $W^{k}$ controlled on the index --- as built,
+carried by the cascade itself (figure~\ref{fig:prep}), apply $W^{k}$
+controlled on the index --- as built,
 controlled powers $W^{2^{j}}$ from index qubit $j$, so the circuit executes
 $2^{m}-1=63$ walk steps at $d=40$ where a unary SELECT would execute $d$ ---
-undo the preparation, and post-select index and dilation on zero. The
+undo the preparation with the unsigned angles, and post-select index and
+dilation on zero. The
 surviving state is $\propto p(X)|u\rangle$ with success probability
 \begin{equation}
 P_{\rm anc}=\frac{\big\lVert p(X)\,|u\rangle\big\rVert^{2}}
@@ -1666,7 +1756,7 @@ this work (the resource numbers do not depend on them), and, being built on
 the per-pair product for $e^{-iAt}$, it inherits the product-formula
 caveat of section~\ref{sec:fork:trotter}.
 
-\begin{table}[tbp]
+\begin{table}[H]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -1692,7 +1782,7 @@ encoding's own price is a separate axis, section~\ref{sec:qsvt:resources}.}
 \label{tab:realisations}
 \end{table}
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.96\textwidth}
 \resizebox{0.98\textwidth}{!}{\input{figures/circuits_qsvt.tex}}
@@ -1754,7 +1844,7 @@ section~\ref{sec:qsvt:realisations} is the price --- unless the target is
 designed even from the start, which an equal-height comb on the four lines
 would be.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.96\textwidth}
 \includegraphics[width=0.98\textwidth]{comb_degrees.pdf}
@@ -1800,7 +1890,7 @@ different response, and on a classical machine the whole of this work is
 spectral-filter engineering at a cost of seconds per event. The quantum
 claim is confined to the resource profile of the next subsection.
 
-\begin{table}[tbp]
+\begin{table}[H]
 \centering
 \small
 \begin{tabular}{rrrrrrr}
@@ -1854,7 +1944,7 @@ encoding is priced by hits. Panel (b) is the depth: two-qubit gates per
 shot, which is the calls of table~\ref{tab:realisations} times the two
 per-call prices.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.97\textwidth}
 \includegraphics[width=0.99\textwidth]{qubit_scaling.pdf}
@@ -1914,7 +2004,7 @@ section~\ref{sec:limits:readout} compares with the classical
 $d\,T^{2}$ flop budget --- a square-root-class separation for the readout
 task, and no more.
 
-\begin{table}[tbp]
+\begin{table}[H]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4.5pt}
@@ -1942,7 +2032,7 @@ sample is one filtered segment index; a full event needs $M\ln M\approx
 \label{tab:worked}
 \end{table}
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.96\textwidth}
 \includegraphics[width=0.98\textwidth]{resource_model.pdf}
@@ -2055,7 +2145,7 @@ $9.1\%$ at $T=700$ and $20.7\%$ at $T=1000$ against the classical
 $4.9\%$ and $10.0\%$.
 \end{itemize}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{clean_headline.pdf}
@@ -2148,7 +2238,7 @@ intermediate degrees ($d\approx20$--$32$) can cliff at the
 efficiency-first working point through Chebyshev fit pathologies, so
 every production degree must be validated, not interpolated.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.80\textwidth}
 \begin{subfigure}[t]{0.80\textwidth}
@@ -2198,7 +2288,7 @@ the acceptance widened to $4$\,mrad), but the degeneracy they carry is
 what ultimately caps the design, and under noise they return, as a
 population, in section~\ref{sec:fit}.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{spectral_twins.pdf}
@@ -2272,7 +2362,7 @@ the pair line $s-1$ and the triple lines $s\pm\sqrt2$, interleaving
 but not touching the four true lines.
 \end{enumerate}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{tangle_gallery.pdf}
@@ -2286,7 +2376,7 @@ segments, 8 true). Green segments are true, red false.}
 \label{fig:tangles}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.90\textwidth}
 \includegraphics[width=0.92\textwidth]{measured_pileup.pdf}
@@ -2432,7 +2522,7 @@ occupancy system is strictly worse. Post-selection tells the same
 story: the occupancy term diverts the ancilla-conditioned
 probability mass almost entirely onto false segments.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.90\textwidth}
 \includegraphics[width=0.95\textwidth]{dp_occupancy_proof.png}
@@ -2589,7 +2679,7 @@ that filter physics and circuit error are never conflated;
 section~\ref{sec:limits:trotter} returns to what this means for
 deployment.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{erf_exact_evolution_paper.pdf}
@@ -2722,7 +2812,7 @@ same row are compared at identical efficiency by construction, so
 the false rate is the \emph{entire} difference between them. All
 numbers are means over three events, heavy noise, $T=200$.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.93\textwidth}
 \includegraphics[width=0.98\textwidth]{fit_comb_paper.pdf}
@@ -2874,7 +2964,7 @@ the single fixed response of
 section~\ref{sec:limits:generalization} is part of that
 enumeration.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{occupancy_fitted.pdf}
@@ -2935,7 +3025,7 @@ applied to it.}
 \subsection{The degree axis: what the polynomial can and cannot buy}
 \label{sec:atscale:degree}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{xiv_degree_scan_moderate.pdf}
@@ -2954,7 +3044,7 @@ polynomial.}
 \label{fig:degmod}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{xiv_degree_scan_heavy.pdf}
@@ -2969,7 +3059,7 @@ every operator here.}
 \label{fig:degheavy}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.90\textwidth}
 \includegraphics[width=0.92\textwidth]{xiv_degree_marginal.pdf}
@@ -3018,7 +3108,7 @@ response are one design.
 \subsection{The refitted responses, seen against the moved lines}
 \label{sec:atscale:lines}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{xiv_motif_lines_modified.pdf}
@@ -3034,7 +3124,7 @@ and sets the spectral span.}
 \label{fig:linesmod}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{xiv_responses_modified.pdf}
@@ -3066,7 +3156,7 @@ figure~\ref{fig:degheavy} as the ordering of the sigmoid onsets.
 \subsection{The loss budget: where the missing efficiency lives}
 \label{sec:atscale:budget}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{xiv_loss_budget.pdf}
@@ -3111,7 +3201,7 @@ $(C,B_{\rm all})$.
 \subsection{Density: every solver to $T=1000$}
 \label{sec:atscale:density}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.80\textwidth}
 \includegraphics[width=0.84\textwidth]{xiv_metrics_composite.pdf}
@@ -3129,7 +3219,7 @@ working point, sits at $31\%$--$92\%$ (moderate) and $63\%$--$94\%$
 \label{fig:density5}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{xiv_fig6_efficiency_first.pdf}
@@ -3184,7 +3274,7 @@ recipe that survives density.
 \subsection{The two-axis rule}
 \label{sec:atscale:rule}
 
-\begin{table}[t]
+\begin{table}[H]
 \centering
 \captionsetup{width=0.9\textwidth}
 \caption{The two axes separated (moderate noise, $T{=}200$, medians
@@ -3408,7 +3498,7 @@ order and are omitted.}
 \label{tab:resources}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{resource_comparison.pdf}
@@ -3546,7 +3636,7 @@ budget against the classical $d\cdot T^{2}$ flop budget: a
 square-root-class separation for that readout task, and no more
 than that.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.92\textwidth}
 \includegraphics[width=0.95\textwidth]{readout_probability.pdf}
@@ -3601,7 +3691,7 @@ lot of it; the measurement loop of section~\ref{sec:fit} (measure
 the pile-up, fit the response, locate the degeneracy) is
 geometry-agnostic even where the specific comb is not.
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
 \captionsetup{width=0.95\textwidth}
 \includegraphics[width=0.98\textwidth]{run3_activation_spectra.png}

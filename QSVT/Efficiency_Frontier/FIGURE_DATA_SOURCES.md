@@ -283,6 +283,41 @@ The fixed absolute threshold tau = delta/(gamma+delta) + 0.10 (0.35 at gamma=3) 
 - **Aggregation:** Per-n_trk mean +/- SEM (std ddof=1 / sqrt(n)) over valid reps, per (solver, gamma, hit_ineff) slice; n_reps reported as the MINIMUM group size across the n_trk grid. _sem returns 0.0 for single-rep cells, so error bars silently vanish where the gamma=1 gate leaves 1 rep.
 - **⚠ Flags:** No cross-campaign mixing: the exact eps_provenance=='set' & epsilon==0.002 filter cleanly isolates the fixed-2 mrad benchmark from the Efficiency Frontier formula-epsilon campaign, and the module docstring labels this. Residual cautions: (1) agg_by_ntrk returns fixed-tau and wp99 arrays in one dict, so any figure drawn from it must state which convention each curve uses — the convention choice lives in the (unaudited-here) notebook, not the data layer; (2) rep counts are heterogeneous across the n_trk grid (5-20 classical, 0-10 quantum/qsvt; several quantum gamma in {1,2}, hit_ineff=0.01 cells are empty at n_trk in {30,75,150,300,550}), and the single n_reps=min value understates most points while SEM=0 masks 1-rep gamma=1 cells after the ~19% validity drop; (3) the raw-vector path (solves_index/load_vectors) applies NO validity gate — exploded lambda_min->0 solves pass through to amplitude/spectrum notebooks unless the caller gates them; (4) at gamma=1 hit_ineff cells the post-gate survivors are a biased subset (up to ~100% of high-T cells explode per the docstring), so gamma=1 curves at high n_trk rest on very few events.
 
+## qsvt_velo_paper figure 10 — figures/prep.tex (the PREP operator, hand-drawn TikZ)
+- **Data:** No event data. Panels (a) and (c) are schematics. Panel (b)'s numbers and every
+  number in the surrounding text come from
+  `QSVT/Paper_planning/section4_qsvt/03_prep_operator.py` ->
+  `outputs/03_prep_operator.json`, which builds the production comb with
+  `lhcb_velo_toy.solvers.quantum.design_line_comb_inverse(degree=40, s=4.0, hw=0.18,
+  domain=(0.2, 7.8))` — the same call as `02_resource_model.py`, so the coefficients are the
+  ones the resource table and figure 18 price.
+- **Configuration:** No noise triple, acceptance, T or reps — the coefficient vector is a
+  property of the response, not of an event. m = ceil(log2(41)) = 6, 2^m = 64 index states,
+  41 coefficients, 23 padding zeros. ||c||_1 = 0.514392, max|c_k| = 0.046642 (at k = 2).
+- **Per-number provenance:** Subtree norms 1 / (0.946, 0.324) / (0.673, 0.665, 0.324, 0) and
+  angles 37.8 / (89.3, 0) / (71.8, 73.6, 79.8, 0) degrees are the level-0..2 rows of
+  `subtree_weight` and `angles_deg` in the JSON. 63 = 2^m - 1 angles, 62 = 2^m - 2 CNOTs are
+  the dense Moettoenen worst case; 44 is the count of angles on a branch of non-zero weight
+  (`live_nodes_per_level` summed); 15 negative c_k and the 36-monomial algebraic normal form
+  of the sign pattern are `n_negative` and `sign_anf_monomials`. The 57 CX / depth 214 (188
+  signed) are a Qiskit 2.4.1 `StatePreparation` transpiled to {cx, ry, rz, x, h} at
+  optimisation level 3 on the actual amplitude vector.
+- **Validation:** The cascade is simulated densely in-script and compared with the target
+  amplitudes: max |dA| = 1.1e-16 unsigned, 1.4e-16 signed; the Qiskit statevector agrees to
+  1.3e-14. The claim that the 63 angles carry the signs at no extra cost is therefore
+  constructive for this coefficient vector, not asserted.
+- **Cost comparison in the text:** 1.65e4 and 4.0e4 two-qubit gates per block-encoding call at
+  T = 400 and T = 1000 are `hit_cx_per_call` from
+  `section4_qsvt/outputs/02_resource_model.csv` (the hit-oracle model, the primitive the LCU
+  route actually uses); 63 calls is `calls_lcu` in the same file. 62 / 1.65e4 = 0.4% of one
+  call; 62 / (63 x 1.65e4) = 6e-5 of the shot.
+- **Flags:** (1) The figure is a schematic: the drawn cascade shows levels 0, 1, 2 and 5, with
+  levels 3 and 4 elided behind an ellipsis. (2) The 57-CX compiler number is one compiler at one
+  optimisation level, quoted as an existence result against the 62-CNOT bound, not as an
+  optimum. (3) Section 4.2's earlier wording, "the coefficient signs applied as a diagonal", was
+  corrected in this pass to the signed cascade, which is cheaper; the diagonal's 36-monomial
+  cost is now quoted as the rejected alternative.
+
 ---
 ## Action items distilled (feed the number-specification to-do)
 1. **The fixed threshold tau=0.35 was a bug (George 2026-09-02).** Every figure now reads every
