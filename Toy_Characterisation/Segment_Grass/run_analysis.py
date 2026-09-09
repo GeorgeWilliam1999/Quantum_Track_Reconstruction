@@ -25,6 +25,9 @@ from scipy.stats import norm
 # ── package import ──────────────────────────────────────────────
 from lhcb_velo_toy.generation import PlaneGeometry, StateEventGenerator
 from lhcb_velo_toy.solvers import SimpleHamiltonianFast
+from lhcb_velo_toy.analysis.segment_metrics import (
+    compute_epsilon as _pkg_compute_epsilon,
+)
 
 # ── output dirs ────────────────────────────────────────────────
 OUTDIR = Path(__file__).parent
@@ -65,9 +68,15 @@ def make_geometry():
     )
 
 def compute_epsilon():
-    theta_s = SCALE * SIGMA_SCATT
-    theta_r = np.arctan((SCALE * SIGMA_RES) / DZ) if DZ != 0 else 0.0
-    return float(np.sqrt(2 * theta_s**2 + 12 * theta_r**2 + 2 * (1.5e-5)**2))
+    """This study's epsilon, at its own baked constants.
+
+    The formula lives in lhcb_velo_toy.analysis.segment_metrics
+    (migrated 2026-09-09; verified bit-exact against the local copy it
+    replaced).  The constants stay pinned here so a change to the
+    package defaults cannot silently move this study's numbers.
+    """
+    return _pkg_compute_epsilon(sigma_res=SIGMA_RES, sigma_scatt=SIGMA_SCATT,
+                               dz=DZ, scale=SCALE, theta_min=1.5e-5)
 
 EPSILON = compute_epsilon()
 

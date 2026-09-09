@@ -26,6 +26,9 @@ import numpy as np
 from lhcb_velo_toy.generation import PlaneGeometry, StateEventGenerator
 from lhcb_velo_toy.solvers import SimpleHamiltonianFast, get_tracks
 from lhcb_velo_toy.analysis import EventValidator
+from lhcb_velo_toy.analysis.segment_metrics import (
+    compute_epsilon as _pkg_compute_epsilon,
+)
 
 # ── Physics constants (match the main pipeline) ──────────────────
 SIGMA_RES    = 0.0
@@ -44,9 +47,15 @@ THRESHOLD = (1 + BASELINE) / 2
 
 
 def compute_epsilon():
-    theta_s = SCALE * SIGMA_SCATT
-    theta_r = np.arctan((SCALE * SIGMA_RES) / DZ_MM) if DZ_MM != 0 else 0.0
-    return float(np.sqrt(2 * theta_s**2 + 12 * theta_r**2 + 2 * (1.5e-5)**2))
+    """This study's epsilon, at its own baked constants.
+
+    The formula lives in lhcb_velo_toy.analysis.segment_metrics
+    (migrated 2026-09-09; verified bit-exact against the local copy it
+    replaced).  The constants stay pinned here so a change to the
+    package defaults cannot silently move this study's numbers.
+    """
+    return _pkg_compute_epsilon(sigma_res=SIGMA_RES, sigma_scatt=SIGMA_SCATT,
+                               dz=DZ_MM, scale=SCALE, theta_min=1.5e-5)
 
 EPSILON = compute_epsilon()
 

@@ -29,6 +29,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from lhcb_velo_toy.generation import PlaneGeometry, StateEventGenerator
 from lhcb_velo_toy.analysis import EventValidator
+from lhcb_velo_toy.analysis.segment_metrics import (
+    compute_epsilon as _pkg_compute_epsilon,
+)
 from accelerated_hamiltonian import AcceleratedHamiltonian, get_tracks_accel
 
 
@@ -64,9 +67,18 @@ def make_geometry():
 
 
 def compute_epsilon(sigma_res, sigma_scatt):
-    theta_s = SCALE * sigma_scatt
-    theta_r = np.arctan((SCALE * sigma_res) / DZ_MM) if DZ_MM != 0 else 0.0
-    return float(np.sqrt(2 * theta_s**2 + 12 * theta_r**2 + 2 * THETA_MIN**2))
+    """This study's epsilon: the package formula at this module's constants.
+
+    The formula lives in lhcb_velo_toy.analysis.segment_metrics (migrated
+    2026-09-09; verified bit-exact against the local copy it replaced).  The
+    constants stay pinned here on purpose, so a change to the package
+    defaults cannot silently move this study's numbers.
+
+    Keyword arguments are deliberate: the package signature is
+    (sigma_res, sigma_scatt, ...) and a positional swap is silent.
+    """
+    return _pkg_compute_epsilon(sigma_res=sigma_res, sigma_scatt=sigma_scatt,
+                                dz=DZ_MM, scale=SCALE, theta_min=THETA_MIN)
 
 
 def compute_threshold(gamma, delta):

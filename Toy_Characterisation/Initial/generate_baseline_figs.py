@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from lhcb_velo_toy.generation import PlaneGeometry, StateEventGenerator
 from lhcb_velo_toy.solvers import SimpleHamiltonianFast, get_tracks
 from lhcb_velo_toy.analysis import EventValidator
+from lhcb_velo_toy.analysis.segment_metrics import compute_epsilon
 from lhcb_velo_toy.analysis.plotting.event_display import (
     plot_event_3d,
     plot_reco_vs_truth,
@@ -43,10 +44,10 @@ def generate_event(geo, n_tracks, phi_max=0.2, theta_max=0.2):
     gen.generate_particles([[{"type": "pion", "mass": 139.6, "q": 1}] * n_tracks])
     return gen, gen.generate_complete_events()
 
-def compute_epsilon(sigma_res, sigma_scatt, dz, scale=1.0, theta_min=1.5e-5):
-    theta_s = scale * sigma_scatt
-    theta_r = np.arctan((scale * sigma_res) / dz) if dz != 0 else 0.0
-    return float(np.sqrt(2*theta_s**2 + 12*theta_r**2 + 2*theta_min**2))
+# compute_epsilon now comes from the package (migrated 2026-09-09; verified
+# bit-exact against the local copy it replaced).  The package default is
+# scale=3.0 where the local copy defaulted to scale=1.0 -- the call below
+# passes scale=SCALE explicitly, so nothing changes.
 
 # ── parameters ──────────────────────────────────────────────────
 SIGMA_SCATT = 1e-3

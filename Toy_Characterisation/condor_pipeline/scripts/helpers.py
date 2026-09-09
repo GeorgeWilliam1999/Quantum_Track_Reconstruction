@@ -12,6 +12,22 @@ from lhcb_velo_toy.generation import PlaneGeometry, StateEventGenerator
 from lhcb_velo_toy.solvers import SimpleHamiltonianFast, get_tracks
 from lhcb_velo_toy.analysis import EventValidator
 
+# ── Package re-exports ──────────────────────────────────────────────
+# compute_epsilon / pairwise_angle / collect_segment_pair_angles used to be
+# defined here.  They now live in lhcb_velo_toy.analysis.segment_metrics, so
+# this study picks up package fixes instead of drifting away from them.
+# Verified identical before removal (2026-09-09): bit-exact at this study's
+# operating point, 1 ulp worst case over a synthetic parameter sweep.
+#
+# NOTE the package default is scale=3.0 where the local copy defaulted to
+# scale=1.0.  Every call site here passes scale=SCALE explicitly, so nothing
+# changes -- but pass it explicitly in new code too.
+from lhcb_velo_toy.analysis.segment_metrics import (  # noqa: F401
+    compute_epsilon,
+    pairwise_angle,
+    collect_segment_pair_angles,
+)
+
 # ═══════════════════════════════════════════════════════════════════
 #  Physics constants (shared across both notebooks)
 # ═══════════════════════════════════════════════════════════════════
@@ -75,76 +91,6 @@ def safe_generate(geo, n_tracks, collision_noise=1e-8,
         if min(len(t.hit_ids) for t in event.tracks) >= 3:
             return event
     return event  # best effort
-
-
-# ═══════════════════════════════════════════════════════════════════
-#  Epsilon computation
-# ═══════════════════════════════════════════════════════════════════
-def compute_epsilon(sigma_res, sigma_scatt, dz, scale=1.0, theta_min=1.5e-5):
-    """Compute angular acceptance threshold epsilon.
-
-    Uses the paper formula:
-        epsilon = sqrt(2*theta_s^2 + 12*theta_r^2 + 2*theta_min^2)
-    """
-    theta_s = scale * sigma_scatt
-    theta_r = np.arctan((scale * sigma_res) / dz) if dz != 0 else 0.0
-    return float(np.sqrt(2 * theta_s**2 + 12 * theta_r**2 + 2 * theta_min**2))
-
-
-# ═══════════════════════════════════════════════════════════════════
-#  Angle analysis
-# ═══════════════════════════════════════════════════════════════════
-def pairwise_angle(h_prev, h_mid, h_next):
-    """Angle between segment (prev->mid) and segment (mid->next)."""
-    v1 = np.array([h_mid.x - h_prev.x, h_mid.y - h_prev.y, h_mid.z - h_prev.z])
-    v2 = np.array([h_next.x - h_mid.x, h_next.y - h_mid.y, h_next.z - h_mid.z])
-    n1, n2 = np.linalg.norm(v1), np.linalg.norm(v2)
-    if n1 == 0 or n2 == 0:
-        return 0.0
-    cos_a = np.clip(np.dot(v1, v2) / (n1 * n2), -1.0, 1.0)
-    return float(np.arccos(cos_a))
-
-
-def collect_segment_pair_angles(event):
-    """Collect pairwise angles for ALL segment pairs sharing a middle hit.
-
-    Returns (true_angles, false_angles) as lists.
-    """
-    hits_dict = {h.hit_id: h for h in event.hits}
-
-    true_seg_set = set()
-    for trk in event.tracks:
-        hids = trk.hit_ids
-        for k in range(len(hids) - 1):
-            true_seg_set.add((hids[k], hids[k + 1]))
-
-    hits_by_module = {}
-    for h in event.hits:
-        hits_by_module.setdefault(h.module_id, []).append(h)
-    sorted_mod_ids = sorted(hits_by_module.keys())
-
-    true_angles = []
-    false_angles = []
-
-    for mi in range(1, len(sorted_mod_ids) - 1):
-        mod_prev = sorted_mod_ids[mi - 1]
-        mod_mid  = sorted_mod_ids[mi]
-        mod_next = sorted_mod_ids[mi + 1]
-
-        for h_mid in hits_by_module[mod_mid]:
-            for h_prev in hits_by_module[mod_prev]:
-                seg_in_true = (h_prev.hit_id, h_mid.hit_id) in true_seg_set
-                for h_next in hits_by_module[mod_next]:
-                    seg_out_true = (h_mid.hit_id, h_next.hit_id) in true_seg_set
-                    angle = pairwise_angle(h_prev, h_mid, h_next)
-                    if (seg_in_true and seg_out_true and
-                            h_prev.track_id is not None and
-                            h_prev.track_id == h_mid.track_id == h_next.track_id):
-                        true_angles.append(angle)
-                    else:
-                        false_angles.append(angle)
-
-    return true_angles, false_angles
 
 
 # ═══════════════════════════════════════════════════════════════════
