@@ -63,6 +63,9 @@ import bif  # noqa: E402
 from dp_matrix_characterisation import NOISES  # noqa: E402
 from lhcb_velo_toy.analysis import compute_epsilon  # noqa: E402
 from lhcb_velo_toy.solvers.quantum import design_line_comb_inverse  # noqa: E402
+from lhcb_velo_toy.solvers.quantum.spectral_filter import (   # noqa: E402
+    binned_response as _pkg_binned_response,
+)
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "outputs" / "fork_noisy"
@@ -187,12 +190,10 @@ def amplitudes(sysd, p_of_lam):
     return x
 
 
-def binned_response(p_bins, edges):
-    def f(lam):
-        bi = np.clip(np.searchsorted(edges, np.asarray(lam)) - 1,
-                     0, len(p_bins) - 1)
-        return p_bins[bi]
-    return f
+# binned_response is the package's (migrated 2026-09-09; verified bit-exact
+# against the local copy over 6 random bin layouts, evaluated on and either
+# side of every bin edge).
+binned_response = _pkg_binned_response
 
 
 def mode_table(sysd):

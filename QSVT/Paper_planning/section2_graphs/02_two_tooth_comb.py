@@ -51,6 +51,10 @@ os.environ.setdefault("QTRK_STORE", "/data/bfys/gscriven/qtrk_store")
 import qtrk_pipeline as qp                                      # noqa: E402
 from lhcb_velo_toy.analysis import compute_epsilon              # noqa: E402
 from lhcb_velo_toy.solvers.quantum import design_line_comb_inverse  # noqa: E402
+from lhcb_velo_toy.solvers.quantum.spectral_filter import (      # noqa: E402
+    mode_system as _pkg_mode_system,
+    apply_response as _pkg_apply_response,
+)
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "outputs"; OUT.mkdir(exist_ok=True)
@@ -91,38 +95,25 @@ def say(*a):
 
 
 def mode_system(M, b, iso_lambda):
-    """Per-component eigh -> sparse mode basis U, eigenvalues lam, overlaps w."""
-    n = M.shape[0]
-    Off = M.copy().tolil(); Off.setdiag(0); Off = Off.tocsr(); Off.eliminate_zeros()
-    ncomp, lab = connected_components(Off, directed=False)
-    sizes = np.bincount(lab)
-    if sizes.max() > MAX_COMP:
-        raise RuntimeError(f"component of size {sizes.max()} > {MAX_COMP}")
-    order = np.argsort(lab, kind="stable")
-    bounds = np.searchsorted(lab[order], np.arange(ncomp + 1))
-    rows, cols, vals, lams, ws = [], [], [], [], []
-    m0 = 0
-    for c in np.flatnonzero(sizes > 1):
-        idx = order[bounds[c]:bounds[c + 1]]
-        lam, V = eigh(M[np.ix_(idx, idx)].toarray())
-        k = len(idx)
-        rows.append(np.repeat(idx, k))
-        cols.append(np.tile(np.arange(m0, m0 + k), k))
-        vals.append(V.ravel())
-        lams.append(lam); ws.append(V.T @ b[idx])
-        m0 += k
-    U = sp.csr_matrix((np.concatenate(vals),
-                       (np.concatenate(rows), np.concatenate(cols))), shape=(n, m0))
-    return dict(U=U, lam=np.concatenate(lams), w=np.concatenate(ws),
-                iso=sizes[lab] == 1, b=b, iso_lambda=iso_lambda)
+    """Per-component eigendecomposition -> sparse mode basis U, eigenvalues
+    lam, overlaps w.
+
+    The implementation is the package's (migrated 2026-09-09; verified
+    bit-exact against the local copy it replaced, over 3 event sizes and the
+    inverse / degree-40 comb / one-bit cosine responses).  This wrapper keeps
+    the study's own MAX_COMP guard, which is tighter than the package default.
+
+    NOTE the package returns the isolated-segment eigenvalues under the key
+    ``iso_lam`` (an array), where the local version returned the scalar
+    ``iso_lambda``.  Anything reading that key must be updated.
+    """
+    return _pkg_mode_system(M, b, iso_lambda=iso_lambda, max_comp=MAX_COMP)
 
 
 def amplitudes(sysd, f):
-    x = np.zeros(sysd["U"].shape[0])
-    x[sysd["iso"]] = abs(float(np.asarray(f(np.array([sysd["iso_lambda"]]))).ravel()[0])) \
-        * sysd["b"][sysd["iso"]]
-    x += np.abs(sysd["U"] @ (np.asarray(f(sysd["lam"])) * sysd["w"])) * (~sysd["iso"])
-    return x
+    """Amplitudes |f(M) b| for a decomposed system -- the package's
+    ``apply_response`` (verified bit-exact against the local copy)."""
+    return _pkg_apply_response(sysd, f)
 
 
 def matched_metrics(x, truth):

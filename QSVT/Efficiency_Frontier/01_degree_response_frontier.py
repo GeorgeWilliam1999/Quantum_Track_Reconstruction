@@ -54,6 +54,12 @@ import qtrk_pipeline as qp                                   # noqa: E402
 from lhcb_velo_toy.analysis import compute_epsilon           # noqa: E402
 from lhcb_velo_toy.solvers.quantum import (                  # noqa: E402
     design_band_limited_inverse, design_line_comb_inverse)
+from lhcb_velo_toy.solvers.quantum.spectral_filter import (      # noqa: E402
+    mode_system as _pkg_mode_system,
+    binned_response as _pkg_binned_response,
+    chebyshev_realize as _pkg_chebyshev_realize,
+    apply_response as _pkg_apply_response,
+)
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "outputs"
@@ -99,56 +105,25 @@ def say(*a):
 
 # ── spectral systems ─────────────────────────────────────────────────────────
 def mode_system(M, b, iso_lambda):
-    """Per-component eigh of sparse symmetric M -> (U, lam, w, iso_mask).
+    """Per-component eigendecomposition -> sparse mode basis U, eigenvalues
+    lam, overlaps w.
 
-    U is (n x n_modes) sparse; amplitudes for response f are
-    |U (f(lam) * w)| with x[iso] = |f(iso_lambda)| * b[iso].
+    The implementation is the package's (migrated 2026-09-09; verified
+    bit-exact against the local copy it replaced, over 3 event sizes and the
+    inverse / degree-40 comb / one-bit cosine responses).  This wrapper keeps
+    the study's own MAX_COMP guard, which is tighter than the package default.
+
+    NOTE the package returns the isolated-segment eigenvalues under the key
+    ``iso_lam`` (an array), where the local version returned the scalar
+    ``iso_lambda``.  Anything reading that key must be updated.
     """
-    n = M.shape[0]
-    Off = M.copy().tolil()
-    Off.setdiag(0)
-    Off = Off.tocsr()
-    Off.eliminate_zeros()
-    ncomp, lab = connected_components(Off, directed=False)
-    sizes = np.bincount(lab)
-    if sizes.max() > MAX_COMP:
-        raise RuntimeError(f"component of size {sizes.max()} > {MAX_COMP}: "
-                           "dense per-component eigh not viable here")
-    order = np.argsort(lab, kind="stable")
-    bounds = np.searchsorted(lab[order], np.arange(ncomp + 1))
-    rows, cols, vals = [], [], []
-    lams, ws = [], []
-    m0 = 0
-    for c in np.flatnonzero(sizes > 1):
-        idx = order[bounds[c]:bounds[c + 1]]
-        lam, V = eigh(M[np.ix_(idx, idx)].toarray())
-        wb = V.T @ b[idx]
-        k = len(idx)
-        rows.append(np.repeat(idx, k))
-        cols.append(np.tile(np.arange(m0, m0 + k), k))
-        vals.append(V.ravel())
-        lams.append(lam)
-        ws.append(wb)
-        m0 += k
-    U = sp.csr_matrix((np.concatenate(vals),
-                       (np.concatenate(rows), np.concatenate(cols))),
-                      shape=(n, m0))
-    lam = np.concatenate(lams)
-    w = np.concatenate(ws)
-    iso = sizes[lab] == 1
-    return dict(U=U, lam=lam, w=w, iso=iso, b=b, iso_lambda=iso_lambda,
-                lam_min=float(lam.min()), lam_max=float(lam.max()),
-                max_comp=int(sizes.max()),
-                n_comp=int(np.count_nonzero(sizes > 1)))
+    return _pkg_mode_system(M, b, iso_lambda=iso_lambda, max_comp=MAX_COMP)
 
 
 def amplitudes(sysd, f):
-    x = np.zeros(sysd["U"].shape[0])
-    x[sysd["iso"]] = abs(float(np.asarray(f(np.array([sysd["iso_lambda"]])))
-                         .ravel()[0])) * sysd["b"][sysd["iso"]]
-    x += np.abs(sysd["U"] @ (np.asarray(f(sysd["lam"])) * sysd["w"])) \
-        * (~sysd["iso"])
-    return x
+    """Amplitudes |f(M) b| for a decomposed system -- the package's
+    ``apply_response`` (verified bit-exact against the local copy)."""
+    return _pkg_apply_response(sysd, f)
 
 
 # ── frontier metrics (matched-eff tau at the k-th true amplitude) ────────────
@@ -232,26 +207,18 @@ def fit_binned(sysd, truth, x_cls):
     return p_opt, edges, float(mu_b)
 
 
-def binned_fn(p_bins, edges):
-    def f(lam):
-        bi = np.clip(np.searchsorted(edges, np.asarray(lam)) - 1,
-                     0, len(p_bins) - 1)
-        return p_bins[bi]
-    return f
+# binned_fn / cheb_realize are the package's binned_response /
+# chebyshev_realize (migrated 2026-09-09; verified bit-exact against the local
+# copies over 6 random bin layouts, evaluated on and either side of every bin
+# edge, at degrees 20/40/60).  The package generalises cheb_realize from a
+# binned target to any callable, so the wrapper supplies the binned one.
+binned_fn = _pkg_binned_response
 
 
 def cheb_realize(p_bins, edges, degree):
-    grid = np.linspace(edges[0], edges[-1], 4000)
-    targ = binned_fn(p_bins, edges)(grid)
-    dom = (edges[0], edges[-1])
-    u = (2 * grid - (dom[0] + dom[1])) / (dom[1] - dom[0])
-    cf = npcheb.chebfit(u, targ, degree)
-    sc = max(float(np.max(np.abs(npcheb.chebval(u, cf)))), 1e-12)
-
-    def f(lam, cf=cf, dom=dom, sc=sc):
-        uu = (2 * np.asarray(lam) - (dom[0] + dom[1])) / (dom[1] - dom[0])
-        return npcheb.chebval(uu, cf) / sc
-    return f
+    """Degree-d Chebyshev realisation of a binned response (package impl)."""
+    return _pkg_chebyshev_realize(_pkg_binned_response(p_bins, edges),
+                                  (edges[0], edges[-1]), degree)
 
 
 # ── normalized comb design (BE-03) ───────────────────────────────────────────
