@@ -13,6 +13,18 @@ Can a QSVT polynomial $p(A)$ map the segment-solver failure modes to ~0 where th
 > - **A-build is ~25× faster at T=1000** (exact cKDTree step path, `max|ΔA|=0`, vs the §A.1-measured ~100 s original O(T³) build). The matrix-free QSVT
 >   `solve_statevector` and the comb designs are unchanged; only the underlying A regeneration is faster.
 
+> **Package status (2026-09-07)** — every QSVT capability of this folder is now an
+> importable model in `lhcb_velo_toy` (branch `centralise-2.1`, v2.2.0):
+> `QSVT(A, b, filter_design="comb"|"band"|"minimax"|"cosine")` / `QSVT.comb(A, b)`,
+> the response families in `solvers/quantum/responses.py` (normalized ±½ comb, the
+> one-bit cosine as a series, the trigonometric QETU comb), the phase-sequence
+> realisation in `qsp_phases.py` (`find_phase_factors`, `QSVT.solve_phase_sequence`),
+> `QSVT.resources(realisation)`, the exact evaluator `spectral_filter.py`, the
+> coefficient refit `refit.py` (supervised, under audit). `QSVT(A, b)` builds the comb by
+> default (George's ruling, 2026-09-07). Each is tested against the originating script here
+> (`tests/test_qsvt_models.py`); new work should import from the package rather than
+> copy the helpers. Executed example: `notebooks/quantum_qsvt_end_to_end.ipynb`.
+
 ## `Initial/` — the feasibility study + first circuit build
 Steps A–E (spectral census, polynomial design, classical efficacy, quantum cost,
 noise robustness) and the first circuit-level build

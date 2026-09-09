@@ -1,6 +1,43 @@
 # Project Status & TODO — Quantum Track Reconstruction
 
-_Last updated: 2026-07-19_
+_Last updated: 2026-09-09_
+
+### 🆕 2026-09-09 — the toy-model package becomes the single producer: QSVT lane in-package, 1BQF uncompute fixed, qiskit 2.x
+`LHCb_VeLo_Toy_Model` v2.2.0 on branch `centralise-2.1` (6 commits, `741236d`…`717fbfa`; 76 tests
+green on Q_env with qiskit 2.4.1 / aer 0.17.2). Every QSVT capability that lived only in `QSVT/`
+working scripts is now an importable model, tested against the originating script verbatim.
+- **QSVT lane**: `QSVT(A, b, filter_design="comb"|"band"|"minimax"|"cosine")` — **the default is now
+  the comb** (George, 2026-09-07); `s = γ+δ` read off a constant diagonal. New modules
+  `responses.py` (normalized ±½ comb, the one-bit cosine as a series, the trigonometric/QETU comb),
+  `qsp_phases.py` (the phase-sequence realisation — symmetric phase factors, wx→reflection
+  conversion, `QSVT.solve_phase_sequence`), `refit.py` (supervised coefficient/binned refit, a
+  diagnostic under audit). `resources(realisation)` prices LCU / phase sequence / QETU.
+  The quantum subpackage imports HHL and OneBQF **lazily**, so the QSVT solver and the matrix-free
+  1BQF now work without qiskit installed.
+- **1BQF uncompute FIXED** (the long-standing to-do): the inverse controlled evolution applied the
+  per-pair Givens rotations in forward order; the exact inverse of a product is the reversed product
+  of inverses. Inverse now exact to 1e-17 (was 5e-2); the package readout matches the paper's
+  exact-evolution formula to cosine 0.99999 (clean) / 0.9996 (moderate). The residual ~1e-2
+  label-order dependence that remains is the forward per-pair product formula, not the uncompute.
+  ⚠️ **The 6,008 stored 1BQF solutions and the paper's store-derived 1BQF curves (figs 10, 12)
+  predate this fix** — re-run tracked as its own to-do.
+- **Two defects the new tests exposed**: `SimpleHamiltonian`'s hard threshold compared
+  `1−cos θ` with ε — an effective acceptance of `√(2ε)`, 141 mrad at ε=0.01 — so the reference
+  builder coupled pairs far outside the window (every study result used the *fast* builder and is
+  unaffected); and `OneBQF.get_success_probability()` was documented and used by the 1BQF example
+  but did not exist, so that example could not run.
+- **qiskit 2.x**: `QFT`→`QFTGate`, `annotated=False` controlled gates, Aer statevector method,
+  runtime imported only on demand; extras now `qiskit>=2.1` / `aer>=0.17` / `ibm-runtime>=0.40`,
+  and pytest fails on any deprecation attributed to the package.
+- **Examples**: new `notebooks/quantum_qsvt_end_to_end.ipynb` (responses, three backends, three
+  realisations, per-solver working points, scaling, other families, refit + transfer); all four
+  existing notebooks re-executed against the release, figure counts unchanged.
+- Docs rebuilt around the lanes that actually exist (README lane table, API reference for QSVT /
+  extended Hamiltonians / Hough / post-selection / working points / Run-3 adapter, flow diagrams,
+  dependency matrix, workflow overview).
+- **Not merged to `main`**: the Phase 6 gate (repointing live consumers, supersede banners, hygiene
+  deletions) is still open, so the branch is pushed for review only.
+
 
 ### 🆕 2026-07-19 — paper review pass (25 points) · occupancy REVERSAL: refit wins + breaks the fragment floor
 George's 25-point review of the paper executed in full (`qsvt_velo_paper/main.tex`, 20→27 pp,
