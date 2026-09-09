@@ -1,7 +1,7 @@
 # OneBitHHL / OneBQF algorithm — full mathematical description
 
 <!-- STATUS: final -->
-<!-- SOURCES: LHCb_VeLo_Toy_Model/src/lhcb_velo_toy/solvers/quantum/OneBQF.py; OneBQF_parameter_audit.tex -->
+<!-- SOURCES: LHCb_VeLo_Toy_Model/src/lhcb_velo_toy/solvers/quantum/one_bqf.py; OneBQF_parameter_audit.tex -->
 
 ## Inputs & padding
 Given the SPD pair $(A, b)$ with $A \in \mathbb{R}^{N_s \times N_s}$ and constant diagonal $c \equiv A_{00} = \gamma + \delta$:

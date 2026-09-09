@@ -459,7 +459,9 @@ valid and nothing recomputes.
 | file · function | change | status | risk |
 |---|---|---|---|
 | `src/lhcb_velo_toy/solvers/hamiltonians/fast.py` · `construct_hamiltonian` (step branch, the per-middle-hit `cos_mat = vᵢ@vⱼ.T` loop) | replace the full `(in_deg×out_deg)` dot with a **cKDTree fixed-radius query** on the segment direction vectors, then the *same* `cos > cos(ε)` test (prototype: `_shared/_validate_fastbuild.py::fast_build`). No signature change; output identical. | **validated exact** `max\|ΔA\|=0`, 8.5× @T=1000 [M] | medium — library matrix code; run `api-impact` + the equality test on stored events first. ERF/`convolution=True` branch can get the same query but keep its `1+erf` value test (separate, optional). |
-| `src/lhcb_velo_toy/solvers/quantum/OneBQF.py` | **leave unchanged** (it is the byte-identical verified reference). The matrix-free engine reuses its `build_circuit()` op list from the *pipeline* layer (6b), so the library stays frozen. | — | none |
+| `src/lhcb_velo_toy/solvers/quantum/one_bqf.py` (was `OneBQF.py`) | **leave unchanged** (it is the byte-identical verified reference). The matrix-free engine reuses its `build_circuit()` op list from the *pipeline* layer (6b), so the library stays frozen. | — | none |
+
+> **Superseded 2026-09-09** — the row above no longer holds. The file was renamed to `one_bqf.py` (a module/class name collision broke the package's own `from ... import OneBQF`) and is no longer byte-identical to the reference: the uncompute now applies the inverse pair rotations in reverse order (George reopened that defect on 2026-09-07), it tracks the qiskit 2.x API, and `get_success_probability()` was restored. The matrix-free engine carries the same uncompute fix. Stored 1BQF solutions produced before that date predate the fix.
 
 ### 6b. Condor data pipeline (`Toy_Characterisation/_shared`)
 

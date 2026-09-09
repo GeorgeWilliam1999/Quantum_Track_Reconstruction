@@ -27,7 +27,7 @@ Submission file: `condor_obqf/submit_gpu.sub` — 1 GPU/job, memory tiers 16/32/
 
 ## Underlying library (HEAD `13ef495`, `lhcb_velo_toy v2.0.0`)
 - Hamiltonian: `LHCb_VeLo_Toy_Model/src/lhcb_velo_toy/solvers/hamiltonians/fast.py` → `SimpleHamiltonianFast`.
-- Quantum solver: `LHCb_VeLo_Toy_Model/src/lhcb_velo_toy/solvers/quantum/OneBQF.py` (re-exported as `OneBitHHL`).
+- Quantum solver: `LHCb_VeLo_Toy_Model/src/lhcb_velo_toy/solvers/quantum/one_bqf.py` (re-exported as `OneBitHHL`).
 - Track finders: `LHCb_VeLo_Toy_Model/src/lhcb_velo_toy/solvers/reconstruction/track_finder.py` → `get_tracks` (connected components, threshold 0.0), `get_tracks_layered` (greedy, threshold 0.45 default, here passed 0.35 + `min_hits=3`).
 - Validator: `lhcb_velo_toy.analysis.validation.validator.EventValidator.match_tracks` — purity ≥ 0.70, `hit_efficiency_min = 0.0`, `min_rec_hits = 3`.
 

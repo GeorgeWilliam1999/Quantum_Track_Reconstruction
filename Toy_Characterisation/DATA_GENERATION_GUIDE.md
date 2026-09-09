@@ -45,7 +45,7 @@ Store root: `$QTRK_STORE` (default `/data/bfys/gscriven/qtrk_store`). Library:
 | **Hit inefficiency** | `_shared/helpers.py::apply_hit_inefficiency()` | random p_drop dropout, prunes track & module hit-id lists. |
 | **Segments + matrix A** | `LHCb_VeLo_Toy_Model/.../hamiltonians/fast.py::SimpleHamiltonianFast` | `construct_segments(materialize_segments=False)` then `construct_hamiltonian(convolution=False|True)`. **A = sI − C**, symmetric, constant diagonal s = γ+δ, off-diagonal −1 (step) where two segments share a middle hit and the kink angle < ε. `n_seg = 4T²`. |
 | **Pipeline A wrapper + guard** | `qtrk_pipeline/hamiltonian.py::build_hamiltonian()` | string `kernel` API + the **sparse invariant guard** (`nnz < 5·n_seg` for step). |
-| **1BQF circuit schematic** | `LHCb_VeLo_Toy_Model/.../quantum/OneBQF.py` | 1-bit HHL: H|b⟩ → 1-bit QPE (controlled-U = Givens product) → ancilla notch → uncompute. `n_qubits = ⌈log₂4T²⌉ + 2`. |
+| **1BQF circuit schematic** | `LHCb_VeLo_Toy_Model/.../quantum/one_bqf.py` | 1-bit HHL: H|b⟩ → 1-bit QPE (controlled-U = Givens product) → ancilla notch → uncompute. `n_qubits = ⌈log₂4T²⌉ + 2`. |
 | **QSVT circuit schematic** | `LHCb_VeLo_Toy_Model/.../quantum/QSVT.py` | LCU-of-Chebyshev over the qubitization walk; the 1BQF cosine is its degree-1 member. |
 
 **Reference A figures / spectra** (geometry-pinned eigenvalues, P4 band, hubs, bridges) live in
