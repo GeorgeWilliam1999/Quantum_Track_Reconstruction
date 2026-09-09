@@ -66,7 +66,7 @@ def fig_hhl_why_one_bit():
     meas_T, meas_g = [], []
     try:
         from qiskit import transpile
-        from lhcb_velo_toy.solvers.quantum.OneBQF import OneBQF
+        from lhcb_velo_toy.solvers.quantum import OneBQF
         eps = compute_epsilon(0.0, 1e-4)
         for Tm in (10, 20, 50):
             ev, _ = qp.ensure_event(n_trk=Tm, rep=0, sigma_scatt=1e-4, sigma_res=0.0)
