@@ -1,7 +1,7 @@
 # QSVT programme — where everything lives
 
 Written by the 2026-09-09 audit. The QSVT programme's code is **not** all under
-`QSVT/`: four studies that the paper depends on live elsewhere in this repo, and
+`QSVT/`: six studies that the paper depends on live elsewhere in this repo, and
 one lives in the package repo. Nothing has been moved — moving it would break the
 commit-pinned provenance in a dozen Notion pages — so this file is the map.
 
@@ -33,6 +33,8 @@ commit-pinned provenance in a dozen Notion pages — so this file is the map.
 | `../Block_Encoding/` | Four literature block encodings benchmarked; resource vs accuracy; the hit-level geometry oracle | §11.6, table 7, the `103·T^0.85` per-call price, subnormalisation 2–4, coverage 1.0 | N: Block Encoding I–IV (own Notion project) |
 | `../Toy_Characterisation/Bifurification/` | Denby–Peterson penalty terms: fork and occupancy, and the hit-uniqueness gate | §7, §8, the occupancy proof figure | N: Bifurcation term, DP penalties, hit-uniqueness gate |
 | `../Toy_Characterisation/ERF/` | The erf angular-cost kernel and its exact-evolution arbiter | §8.3 Trotter comparison | N: ERF (Task 5), ERF exact-evolution arbiter |
+| `../Toy_Characterisation/Segment_level_studies/` | The original seven segment-level notebooks (classical + 1BQF, before QSVT existed): solver efficiency, amplitudes, the Hamiltonian spectrum, the false-rate investigation, single-event eigenanalysis, the amplitude atlas; plus `seg_store.py`, the data layer `QSVT/Segment_level_studies/` imports | fig:spectrum (`hamiltonian_spectrum.pdf` is `outputs/hamiltonian_spectrum/spectrum.pdf`, **renamed on copy**), fig:atlas, fig:ladder | N: the Quantum LHCb Toy segment-level pages — no QSVT page names this folder |
+| `../Toy_Characterisation/Epsilon_study_2/` | The acceptance formula: derivation and Monte-Carlo audit | fig:epsilon (panel (b) is recomputed by the factory; the folder is the derivation of record — and Notion records that its `theory.md` carries a wrong step, the Notion page being the correction) | N: epsilon-formula validity page (Quantum LHCb Toy) |
 | `../Toy_Characterisation/Run3_Verification/` | Real Run-3 event loader and segment characterisation | §11.9 | N: Run3_Verification |
 | `../Toy_Characterisation/_shared/qtrk_pipeline/` | Events, Hamiltonians, solvers, metrics — the data layer every study uses | all measured numbers | N: data-pipeline pages |
 | `LHCb_VeLo_Toy_Model` (separate repo) | The package: `QSVT`, response families, phase sequence, refit, resources | the solver itself | N: package centralisation pages |
@@ -50,3 +52,11 @@ Every solver, classical included, is read at the **efficiency-first working
 point**: the lowest threshold that keeps 99% of the true segments. The segment
 false rate is an impurity of the selected sample. A fixed threshold is not used
 anywhere.
+
+## Checks
+
+`python QSVT/Paper_planning/qsvt_velo_paper/check_figures.py` — every graphic in `main.tex`
+must have a heading in `Efficiency_Frontier/FIGURE_DATA_SOURCES.md`, and every hand-copied
+file must hash-match its source folder. Exit status 1 on either failure. Written 2026-09-14
+after `hamiltonian_spectrum.pdf` turned out to be a silently renamed copy and five `xiv_*`
+copies turned out to be a day older than their sources.

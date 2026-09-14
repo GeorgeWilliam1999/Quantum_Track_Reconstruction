@@ -233,9 +233,11 @@ The fixed absolute threshold tau = delta/(gamma+delta) + 0.10 (0.35 at gamma=3) 
 - **Aggregation:** Campaign: mean +- SEM over all valid reps (classical 20 at T in {10,20,50,100,200,400,700,1000}, 10 at {30,75,150,300}, 5 at 550; QSVT 5-10; 1BQF 3-10). Refits: mean +- SEM over reps 0-2.
 - **⚠ Flags:** (1) Two series share degree and Hamiltonian (degree 40, base A) and differ only in how the coefficients were chosen — the label says so; George to rule on which is "the QSVT" in the paper. (2) The driver's own line-comb row is NOT plotted: at T>=400 the 2 mrad events develop tangles (lam_min < 2) and a comb rebuilt on the measured per-rep domain is a different realization from the campaign's. (3) Refit series are 3-rep against 5-20-rep campaign curves; T=300/550 exist only in the campaign series. (4) The fixed-threshold companion (xiv_fig6_fixed_tau) and the fixed-threshold classical data file outputs/06c_classical_fixed_tau.csv were deleted on 2026-09-02.
 
-## NOT YET IN THIS LEDGER (paper figures without an entry — audit to-do)
-- **fig:resources** (paper fig 7; shares `degree_sweep.csv` with fig 22): `qsvt_width_and_P.pdf`, `qsvt_total_depth.pdf` — hand-copied into the paper figures dir 2026-07-18 from notebook 05; no ledger entry, no factory regeneration.
-- **fig:budget** (`xiv_loss_budget.pdf`): produced by 08_writeup_figs.py fig_loss_budget from outputs/05_loss_budget.csv (writer 05_loss_budget.py); one bar per (regime, Hamiltonian) at the degree with the highest median efficiency at false rate <= 1% (stated on the figure since 2026-09-02). Entry to be written during the audit.
+## Paper-copy freshness — see the dated section at the foot (2026-09-14)
+The two figures this note used to list as missing (fig:resources, fig:budget) now have entries
+below, as do the three the 2026-09-14 sweep found without one (fig:spectrum, fig:epsilon,
+fig:hhl1bqf). `qsvt_velo_paper/check_figures.py` asserts every graphic has a heading here and
+hashes every hand-copied file against its source.
 
 ## figures/xiv_degree_scan_moderate.{png,pdf}, figures/xiv_degree_scan_heavy.{png,pdf} (degree_panels, family='fitted_moment')
 - **2026-09-02:** relabelled — legend 'QSVT, <Hamiltonian>', suptitle 'QSVT polynomial degree … (coefficients refit at every degree)', box states the efficiency-first working point. Data unchanged (already efficiency-first).
@@ -342,3 +344,51 @@ The fixed absolute threshold tau = delta/(gamma+delta) + 0.10 (0.35 at gamma=3) 
 6. FIXED in this pass: xiv_responses footer now states the actual KPM orders (K=400; K=300 for the
    occupancy panels); xiv_degree_marginal box now says the scan grid is non-uniformly spaced and
    the clean-omitted claim is median-level.
+
+---
+
+## Entries added by the 2026-09-14 documentation sweep
+
+## figures/hamiltonian_spectrum.pdf (fig:spectrum, section 2) — hand copy, RENAMED on the way in
+- **Data:** Toy_Characterisation/Segment_level_studies/03_hamiltonian_spectrum.ipynb @ 5455cde4, cell 4, which saves `outputs/hamiltonian_spectrum/spectrum.{pdf,png}`. The paper copy is byte-identical (md5 ee965c7b6fceda49ab8908a1846f6bdb) but was **renamed** to `hamiltonian_spectrum.pdf` when copied (commit 9b79f017); until this entry nothing in the repo connected the two names — the 2026-09-14 sweep found it by hashing. Inputs: classical store solutions via `seg_store.solves_index("classical", gamma=3, hit_ineff=0)` (see the seg_store entry), A rebuilt by `seg_store.build_A`, extremes by ARPACK `eigsh` (tol 1e-6), cached in `outputs/hamiltonian_spectrum/spectral_cache.pkl` (63 MB, 2026-06-09).
+- **Configuration:** benchmark family — FIXED eps = 2 mrad, gamma = 3, delta = 1, clean events. T = 10, 20, 50, 100, 200, 400, 700, 1000 with reps 3, 3, 3, 3, 3, **2, 1, 1**.
+- **Per-curve conventions:** mean ± std over reps (error bars); panel (a) lambda_min, lambda_max and the Gershgorin floor min_i(d_i − r_i); (b) kappa; (c) max and mean off-diagonal row sum with n_segments on a twin axis. No thresholds involved.
+- **Aggregation:** per-T mean/std over the reps above.
+- **⚠ Flags:** (i) the caption says "three repetitions per point" — false at T ≥ 400 (2, 1, 1): the T = 700 and 1000 error bars are undefined and the T = 400 one is a std of two. (ii) Hand-copied and renamed; `make_paper_figures.py` neither regenerates nor copies it. (iii) The producing study lives in Toy_Characterisation/Segment_level_studies, outside QSVT/ — added to QSVT/INDEX.md 2026-09-14. Notion: the notebook is named in the Quantum LHCb Toy segment-level pages; no QSVT page names it.
+
+## figures/epsilon_derivation.pdf (fig:epsilon, section 2) — factory figure
+- **Data:** `make_paper_figures.py::fig_epsilon` (regenerated in place). Panel (a) is a schematic, no data. Panel (b): six events at T = 200 generated in-process with `Toy_Characterisation/_shared/helpers.safe_generate` (seeds 90000–90005, measurement_error 0.02 mm, collision_noise 1e-4), all true kinks at the shared plane (3600), against Rayleigh(sigma_p) with sigma_p = sqrt(sigma_scatt² + 6 (sigma_res/dz)²) and eps from `lhcb_velo_toy.analysis.segment_metrics.compute_epsilon` — no fit. Derivation and Monte-Carlo audit: Toy_Characterisation/Epsilon_study_2/{theory.md, gen_epsilon_derivation_figs.py} @ 8653df8a.
+- **Configuration:** the heavy noise pair (sigma_scatt 1e-4, sigma_res 20 um) **without** the 1 % hit drop the frontier's heavy family also carries (the caption correctly omits it). T = 200 only. Not from the store.
+- **Per-curve conventions:** density histogram vs the analytic curve; the acceptance line is the closed form. No working point.
+- **⚠ Flags:** the Notion page on the epsilon-formula validity (Quantum LHCb Toy) records that the in-repo `theory.md` carries a wrong sqrt2 step and that the Notion page is the correction; the figure's docstring points at `theory.md`. The figure computes sigma_p directly, so check that expression against the Notion correction before submission rather than trusting the docstring's reference.
+
+## figures/hhl_onebit_headline.pdf (fig:hhl1bqf, section 3.5) — factory figure
+- **Data:** `make_paper_figures.py::fig_hhl_onebit` reading QSVT/Paper_planning/section3_onebit/outputs/01_hhl_metrics.csv (writer 01_hhl_segment_metrics.py, run complete to T = 1000 at e0e063be). Everything else — events, emulation, gains, validation — is in the "HHL segment-level comparison" entry above; this entry only names the file the sweep found unnamed.
+- **Configuration / conventions / flags:** as that entry (benchmark family, fixed eps = 2 mrad, gamma = 3, clean, reps 0–2, efficiency-first working point via `metrics_at_wp`). Notion: QSVT XV.
+
+## figures/qsvt_width_and_P.pdf + qsvt_total_depth.pdf (fig:resources, section 4.5) — hand copies
+- **Data:** QSVT/Segment_level_studies/05_circuit_depth_and_qubit_scaling.ipynb @ 0c88e6ac (outputs last regenerated at ade63b25), cells 3 and 8; saved to `outputs/depth_and_qubits/`; paper copies byte-identical (md5 a851a0c42b027d258ced8e07e9da2cbf, e65ece2f81c0770f417f5f1a7ce01545), copied at 04b53334 (paper v1). `qsvt_width_and_P`: qubit count and P_anc read from the store's degree-40 comb solution metadata (`seg_store.solves_index("qsvt", 3.0, 0.0)`), analytic width lines ceil(log2 4T²) + 7 / + 6 / + 2, 1BQF P from `fixed_eps_metrics`. `qsvt_total_depth`: `outputs/depth_and_qubits/degree_sweep.csv` (cell 5 — degrees 8, 12, 16, 20, 24, 28, 32, 40, 56; T = 50/100/200/400 reps 0–2, T = 700/1000 rep 0; events regenerated with `qp.ensure_event` clean, A at eps 0.002, gamma 3, delta 1; comb per degree from `design_line_comb_inverse`; classical partner from the store), total calls = d · pi/(4 sqrt P). The same CSV feeds fig 22 (`comb_degrees`, factory line 201).
+- **Configuration:** benchmark family — FIXED eps = 2 mrad, gamma = 3, clean.
+- **Per-curve conventions:** efficiency-first working point, implemented locally in the notebook (`wp99`: threshold at the 1st-percentile true amplitude) — same definition as the package's `metrics_at_wp`, older code. "≈ 0.44/T" in the caption is the overlay already flagged as hardcoded in action item 3.
+- **⚠ Flags:** hand-copied, no factory regeneration; single-rep points at T = 700/1000 drawn like 3-rep points (action item 3); the sweep's events are regenerated, not the store's, so its classical partner and its QSVT rows come from different event objects with the same seeds. Notion: QSVT Resources compendium.
+
+## figures/xiv_loss_budget.pdf (fig:budget, section 10) — hand copy, STALE
+- **Data:** QSVT/Efficiency_Frontier/08_writeup_figs.py::fig_loss_budget reading `outputs/05_loss_budget.csv` (writer 05_loss_budget.py, which reads the amplitude caches of 02_hamiltonian_setouts / 04_heavy_frontier; no solving). Family `fitted_moment`; one bar per (regime, Hamiltonian) at the degree with the highest median efficiency at false rate ≤ 1 %; panel (b) median twin fraction.
+- **Configuration:** Efficiency Frontier family — formula eps, T = 200, moderate + heavy.
+- **Per-curve conventions:** the far ≤ 1 % operating point (tau at the k-th true amplitude); L1 twin loss by the K-probe fingerprint (classical, comb d40, comb d44, highest-degree fit), L2 recovered by another degree of the family, L3 the remainder; L1 + L2 + L3 = 1 − eff by construction. Median over events.
+- **⚠ STALE PAPER COPY:** the paper's `figures/xiv_loss_budget.pdf` is the 2026-09-01 build (421afe8d: labels "mod · occ_a0.05", "far ≤ 1 %"); the source `Efficiency_Frontier/figures/xiv_loss_budget.pdf` was regenerated 2026-09-02 (c0e11309) with plain-English labels and the degree stated on every bar. Four more xiv copies are stale the same way — see the freshness table. Notion: QSVT XIV.
+
+## Paper-copy freshness (2026-09-14, `qsvt_velo_paper/check_figures.py`)
+Fifteen of the paper's 37 graphics are copied in by hand rather than drawn by the factory. Hash against source:
+
+| paper copy | source | state |
+|---|---|---|
+| amplitude_atlas.pdf, chain_amplitude_ladder.pdf | Toy_Characterisation/Segment_level_studies/outputs/amplitude_atlas/ | identical |
+| hamiltonian_spectrum.pdf | …/outputs/hamiltonian_spectrum/spectrum.pdf | identical, renamed |
+| qsvt_width_and_P.pdf, qsvt_total_depth.pdf | QSVT/Segment_level_studies/outputs/depth_and_qubits/ | identical |
+| xiv_fig6_efficiency_first.pdf | QSVT/Efficiency_Frontier/figures/ | identical |
+| xiv_motif_lines_modified.pdf, xiv_responses_modified.pdf | QSVT/Efficiency_Frontier/figures/ | regenerated same day (c0e11309); bytes differ, text identical, no coded labels |
+| **xiv_loss_budget, xiv_metrics_composite, xiv_degree_marginal, xiv_degree_scan_moderate, xiv_degree_scan_heavy** | QSVT/Efficiency_Frontier/figures/ | **STALE — paper copies from 1 Sep (421afe8d / a5c75681) still carry the coded labels George retired on 2 Sep (c0e11309)** |
+| dp_occupancy_proof.png, run3_activation_spectra.png | Bifurification/figures/, QSVT/Run3/outputs/ | deliberate crops by the factory (`fig_occproofcrop`, `fig_run3crop`); not hash-comparable |
+
+The stale five were not refreshed by this sweep: the open to-do "Tag the paper version the group has read before the draft grows any further" comes first, so the swap is filed as its own to-do.
