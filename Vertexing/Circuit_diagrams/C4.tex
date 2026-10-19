@@ -1,0 +1,38 @@
+\input{pre.tex}
+\begin{tikzpicture}[x=1cm,y=1cm]
+% (a) QPE_1
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.2) {(a) One-bit phase estimation $\mathrm{QPE}_1$ (\texttt{phase\_estimation}, one clock qubit)};
+\lab{-0.15}{0.4}{$T$} \lab{-0.15}{-0.5}{$S$}
+\wires{0}{4.2}{0.4,-0.5} \slashwire{0.45}{-0.5}{$n$}
+\gt{1.0}{0.4}{$H$} \ct{2.1}{0.4} \vl{2.1}{0.4}{-0.5} \gt{2.1}{-0.5}{$G$} \gt{3.2}{0.4}{$H$}
+\node[font=\small,anchor=west,text width=6.3cm] at (4.5,-0.2) {$|0\rangle_T|u_j\rangle\mapsto e^{-i\lambda_jt/2}\big(c_j|0\rangle+i\,s_j|1\rangle\big)_T|u_j\rangle$\\[2pt] $c_j=\cos(\lambda_jt/2)$, $s_j=\sin(\lambda_jt/2)$; the second $H$ is the one-qubit IQFT. Written for $e^{-iAt}$ as in 7.9; the built $G\approx e^{+iAt}$ flips the sign of $s_j$, which cancels in every probability};
+% (b) flag
+\begin{scope}[shift={(11.6,0)}]
+\node[anchor=west,font=\small\bfseries] at (-1.6,1.2) {(b) Flag $F$ (\texttt{x}, \texttt{cx}, \texttt{x})};
+\lab{-0.15}{0.4}{$T$} \lab{-0.15}{-0.5}{$A$}
+\wires{0}{3.6}{0.4,-0.5}
+\gt{0.8}{0.4}{$X$} \ct{1.8}{0.4} \vl{1.8}{0.4}{-0.5} \tg{1.8}{-0.5} \gt{2.8}{0.4}{$X$}
+\node at (4.05,0) {$=$};
+\wires{4.5}{5.7}{0.4,-0.5} \oc{5.1}{0.4} \vl{5.1}{0.32}{-0.5} \tg{5.1}{-0.5}
+\node[font=\small,anchor=west,text width=4.2cm] at (6.0,0) {$|0\rangle_T|0\rangle_A\mapsto|0\rangle_T|1\rangle_A$\\ flag $=1$ marks the cosine branch};
+\end{scope}
+% (c) uncompute
+\begin{scope}[shift={(0,-3.2)}]
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.2) {(c) Uncompute $\mathrm{QPE}_1^{\dagger}$ (\texttt{uncompute\_phase\_estimation})};
+\lab{-0.15}{0.4}{$T$} \lab{-0.15}{-0.5}{$S$}
+\wires{0}{4.2}{0.4,-0.5} \slashwire{0.45}{-0.5}{$n$}
+\gt{1.0}{0.4}{$H$} \ct{2.1}{0.4} \vl{2.1}{0.4}{-0.5} \gt{2.1}{-0.5}{$G^\dagger$} \gt{3.2}{0.4}{$H$}
+\node[font=\small,anchor=west,text width=6.3cm] at (4.5,0) {QFT on one qubit $=H$; $c\text{-}G^\dagger$ as in C2c. On each branch of the flag it undoes the mode phase, but because $F$ acted in between the clock is left in $c_j|0\rangle-i\,s_j|1\rangle$ or $s_j|0\rangle+i\,c_j|1\rangle$ (7.9, stage 4)};
+\end{scope}
+% (d) measurement
+\begin{scope}[shift={(11.6,-3.2)}]
+\node[anchor=west,font=\small\bfseries] at (-1.6,1.2) {(d) Readout};
+\lab{-0.15}{0.6}{$T$} \lab{-0.15}{-0.1}{$S$} \lab{-0.15}{-0.8}{$A$}
+\wires{0}{1.6}{0.6} \wires{0}{1.0}{-0.1,-0.8} \slashwire{0.45}{-0.1}{$n$}
+\node[font=\footnotesize,anchor=west,text=black!65] at (1.7,0.6) {not measured (traced out)};
+\meas{1.3}{-0.1} \meas{1.3}{-0.8}
+\node[font=\small,anchor=west,text width=7.2cm] at (2.0,-0.45) {$\Pr(\text{flag}=1)=P=\sum_j\beta_j^2c_j^2$\\ $\Pr(i,\text{flag}=1)=\big[\cos^2(\tfrac{At}{2})u\big]_i^2+\big[\tfrac12\sin(At)u\big]_i^2$};
+\end{scope}
+\node[font=\footnotesize,anchor=west,text=black!65,text width=19cm] at (-1.9,-5.0) {The 1BQF is (a), (b), (c), (d) in that order after $H^{\otimes n}$ on $S$ (C7, C8). With $t=\pi/s$, $c_j=0$ exactly on $\lambda=s$: isolated segments (and isolated hits under $A_1=sI-A_{\rm hit}$) never set the flag. Registers: $T$ clock (\texttt{time}), $S$ system (\texttt{b}), $A$ flag (\texttt{ancilla}).};
+\end{tikzpicture}
+\end{document}

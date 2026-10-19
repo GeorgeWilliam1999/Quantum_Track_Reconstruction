@@ -1,0 +1,41 @@
+\input{pre.tex}
+\begin{tikzpicture}[x=1cm,y=1cm]
+% (a) block encoding
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.2) {(a) Block encoding $U$ of $X$ (dilation; \texttt{QSVT.\_walk\_power})};
+\lab{-0.15}{0.4}{$B$} \lab{-0.15}{-0.5}{$S$}
+\wires{0}{2.6}{0.4,-0.5} \slashwire{0.45}{-0.5}{$n_s$}
+\mb{1.5}{0.4}{-0.5}{0.9}{$U$}
+\node[font=\small,anchor=west,text width=8.6cm] at (2.9,-0.1) {$U=\begin{pmatrix}X&\sqrt{I-X^2}\\ \sqrt{I-X^2}&-X\end{pmatrix},\quad (\langle0|_B\otimes I)\,U\,(|0\rangle_B\otimes I)=X$\\[3pt] $X=\dfrac{2A-(d_{lo}+d_{hi})I}{d_{hi}-d_{lo}}$, spectrum in $[-1,1]$; $x_j=\cos\theta_j$};
+\node[font=\footnotesize,anchor=west,text=black!65,text width=12.5cm] at (-1.9,-2.05) {Exact and real symmetric, but dense: the package builds it as a matrix (a \texttt{UnitaryGate}). A deployable circuit would come from sparse-access oracles; 7.3 and paper 10.8 price that as a model ($103\,T^{0.85}$ two-qubit gates per call), not a built circuit.};
+% (b) walk
+\begin{scope}[shift={(13.2,0)}]
+\node[anchor=west,font=\small\bfseries] at (-1.6,1.2) {(b) Walk step $W=(Z_B\otimes I)\,U$};
+\lab{-0.15}{0.4}{$B$} \lab{-0.15}{-0.5}{$S$}
+\wires{0}{2.6}{0.4,-0.5} \slashwire{0.35}{-0.5}{$n_s$}
+\mb{1.0}{0.4}{-0.5}{0.7}{$U$} \gt{1.95}{0.4}{$Z$}
+\node[font=\small,anchor=west,text width=6.2cm] at (2.8,-0.05) {In each plane $\{|0\rangle_B|v_j\rangle,|1\rangle_B|v_j\rangle\}$, $W$ is a rotation by $\theta_j$:\\[2pt] $W^k|0\rangle_B|b\rangle=|0\rangle_B\,T_k(X)|b\rangle-|1\rangle_B\,S_k|b\rangle$};
+\end{scope}
+% (c) SELECT
+\begin{scope}[shift={(0,-4.9)}]
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.75) {(c) $\mathrm{SELECT}=\sum_k|k\rangle\langle k|_L\otimes W^k$ by binary powering ($m=3$ drawn)};
+\lab{-0.15}{1.1}{$L_2$} \lab{-0.15}{0.55}{$L_1$} \lab{-0.15}{0}{$L_0$} \lab{-0.15}{-0.7}{$B$} \lab{-0.15}{-1.4}{$S$}
+\wires{0}{5.0}{1.1,0.55,0,-0.7,-1.4} \slashwire{0.35}{-1.4}{$n_s$}
+\ct{1.2}{0} \vl{1.2}{0}{-1.1} \mb{1.2}{-0.7}{-1.4}{0.8}{$W$}
+\ct{2.5}{0.55} \vl{2.5}{0.55}{-1.1} \mb{2.5}{-0.7}{-1.4}{0.8}{$W^2$}
+\ct{3.8}{1.1} \vl{3.8}{1.1}{-1.1} \mb{3.8}{-0.7}{-1.4}{0.8}{$W^4$}
+\node[font=\small,anchor=west,text width=6.6cm,align=left] at (5.4,-0.1) {$c\text{-}W^{2^j}$ from index qubit $L_j$ (\texttt{\_walk\_power(1<<j)}). $|k\rangle_L$ then carries $W^k$ for $k=\sum_jk_j2^j$: $2^m-1$ walk steps in all ($d$ with an optimal SELECT).};
+\end{scope}
+% (d) LCU sandwich
+\begin{scope}[shift={(13.2,-4.9)}]
+\node[anchor=west,font=\small\bfseries] at (-1.6,1.75) {(d) LCU: $\mathrm{PREP}$, $\mathrm{SELECT}$, $\mathrm{PREP}^\dagger$, post-select};
+\lab{-0.15}{0.6}{$|0\rangle_L^{\otimes m}$} \lab{-0.15}{-0.3}{$|0\rangle_B$} \lab{-0.15}{-1.1}{$|b\rangle_S$}
+\wires{0}{5.4}{0.6,-0.3} \wires{0}{4.6}{-1.1} \slashwire{0.35}{0.6}{$m$} \slashwire{0.35}{-1.1}{$n_s$}
+\wg{1.2}{0.6}{11mm}{$\mathrm{PREP}_L$} \gt{2.25}{0.6}{$D_s$}
+\mb{3.35}{0.6}{-1.1}{0.95}{\small SEL}
+\wg{4.6}{0.6}{11mm}{$\mathrm{PREP}_L^\dagger$}
+\node[font=\small,anchor=west] at (5.45,0.6) {$\langle0|$}; \node[font=\small,anchor=west] at (5.45,-0.3) {$\langle0|$};
+\node[font=\small,anchor=west,text width=9cm] at (-1.6,-2.5) {$(\langle0|_L\langle0|_B)\,|\Phi\rangle=\dfrac{1}{\lVert c\rVert_1}\displaystyle\sum_kc_kT_k(X)|b\rangle=\dfrac{p(X)|b\rangle}{\lVert c\rVert_1}$\\[4pt] $P=\lVert p(X)b\rVert^2/\lVert c\rVert_1^2$};
+\end{scope}
+\node[font=\footnotesize,anchor=west,text=black!65,text width=26cm] at (-1.9,-8.9) {Registers as in \texttt{QSVT.build\_circuit} (little-endian): system $S$ ($n_s$) \textbar\ block-encoding ancilla $B$ (1) \textbar\ index $L$ ($m=\lceil\log_2(d+1)\rceil$). $\mathrm{PREP}_L$ and $D_s$ are C1c. The package code applies $\mathrm{PREP}_L^\dagger$ without $D_s^\dagger$: on the post-selected $|0\rangle_L$ branch the sign is already folded into $c_k$. \texttt{solve\_statevector} computes the same post-selected state by the recursion $T_{k+1}=2XT_k-T_{k-1}$ (agrees with \texttt{run\_circuit} to $2\times10^{-15}$).};
+\end{tikzpicture}
+\end{document}

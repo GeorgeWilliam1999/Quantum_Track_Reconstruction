@@ -1,0 +1,34 @@
+\input{pre.tex}
+\begin{tikzpicture}[x=1cm,y=1cm]
+% (a) H^n
+\node[anchor=west,font=\small\bfseries] at (-1.6,1.0) {(a) $\mathrm{PREP}_S^{\rm 1BQF}=H^{\otimes n}$};
+\lab{-0.15}{0}{$|0\rangle^{\otimes n}_S$}
+\wires{0}{3.0}{0} \slashwire{0.6}{0}{$n$}
+\gt{1.4}{0}{$H^{\otimes n}$}
+\node[font=\small,anchor=west] at (3.1,0) {$|u\rangle=2^{-n/2}\sum_{i=0}^{2^n-1}|i\rangle$};
+\node[font=\footnotesize,anchor=west,text=black!65,text width=7.2cm] at (-1.6,-0.75) {\texttt{one\_bqf.py}: \texttt{h(b\_qr)}. $\mathbf b=\delta\mathbf 1$ padded with ones to $2^n$, so the padding states are populated; they sit on $\lambda=s$ and the notch removes them.};
+% (b) StatePreparation(b)
+\begin{scope}[shift={(9.2,0)}]
+\node[anchor=west,font=\small\bfseries] at (-1.6,1.0) {(b) $\mathrm{PREP}_S^{\rm QSVT}$};
+\lab{-0.15}{0}{$|0\rangle^{\otimes n_s}_S$}
+\wires{0}{3.0}{0} \slashwire{0.6}{0}{$n_s$}
+\wg{1.4}{0}{14mm}{$\mathrm{PREP}_b$}
+\node[font=\small,anchor=west] at (3.1,0) {$|b\rangle=N^{-1/2}\sum_{i=0}^{N-1}|i\rangle$};
+\node[font=\footnotesize,anchor=west,text=black!65,text width=7.2cm] at (-1.6,-0.75) {\texttt{QSVT.build\_circuit}: \texttt{StatePreparation(b\_pad)}, $\mathbf b$ zero-padded: the $2^{n_s}-N$ padding states are never populated.};
+\end{scope}
+% (c) LCU PREP and sign diagonal, m=3 drawn
+\begin{scope}[shift={(0,-3.6)}]
+\node[anchor=west,font=\small\bfseries] at (-1.6,1.55) {(c) $\mathrm{PREP}_L$ and the sign diagonal $D_s$ on the index register ($m$ qubits; $m=3$ drawn)};
+\lab{-0.15}{0.8}{$|0\rangle_{L_2}$} \lab{-0.15}{0}{$|0\rangle_{L_1}$} \lab{-0.15}{-0.8}{$|0\rangle_{L_0}$}
+\wires{0}{8.6}{0.8,0,-0.8}
+\gt{0.9}{0.8}{$R_y(\theta_\varnothing)$}
+\node[rectangle,draw,fill=black,minimum size=1.6mm,inner sep=0] at (2.5,0.8) {}; \vl{2.5}{0.8}{0} \gt{2.5}{0}{$R_y(\theta_{x_2})$}
+\node[rectangle,draw,fill=black,minimum size=1.6mm,inner sep=0] at (4.2,0.8) {}; \node[rectangle,draw,fill=black,minimum size=1.6mm,inner sep=0] at (4.2,0) {}; \vl{4.2}{0.8}{-0.8} \gt{4.2}{-0.8}{$R_y(\theta_{x_2x_1})$}
+\mb{6.0}{0.8}{-0.8}{1.0}{$D_s$}
+\node[font=\small,anchor=west] at (8.7,0) {$\displaystyle \sum_{k=0}^{2^m-1}\mathrm{sgn}(c_k)\sqrt{\tfrac{|c_k|}{\lVert c\rVert_1}}\;|k\rangle_L$};
+\draw[brace] (0.3,-1.25) -- (5.0,-1.25); \node[blk] at (2.65,-1.38) {$\mathrm{PREP}_L$: binary cascade, $2^m-1$ angles};
+\node[blk] at (6.0,-1.38) {signs};
+\node[font=\footnotesize,anchor=west,text=black!65,text width=16.5cm] at (-1.6,-2.55) {A filled square is a uniform control: one angle per value of the qubits above. $\theta_v=2\arctan\!\big(A(v_{\rm R})/A(v_{\rm L})\big)$ with $A(v)$ the norm of the amplitudes $\sqrt{|c_k|/\lVert c\rVert_1}$ under node $v$ . $D_s|k\rangle=\mathrm{sgn}(c_k)|k\rangle$. The code uses \texttt{StatePreparation(amps)} and \texttt{DiagonalGate(signs)}; the cascade is what that synthesises to. Coefficients with $k>d$ are zero.};
+\end{scope}
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,40 @@
+\input{pre.tex}
+\begin{tikzpicture}[x=1cm,y=1cm]
+% (a) hit operator controlled evolution with r product steps
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.25) {(a) Controlled evolution on the hit register, $c\text{-}G_r$, for $A_1=sI-A_{\rm hit}$};
+\lab{-0.15}{0.4}{$T$} \lab{-0.15}{-0.5}{$H$}
+\wires{0}{1.9}{0.4,-0.5} \slashwire{0.45}{-0.5}{$n$}
+\ct{1.1}{0.4} \vl{1.1}{0.4}{-0.5} \gt{1.1}{-0.5}{$G_r$}
+\node at (2.25,0) {$=$};
+\wires{2.7}{12.6}{0.4,-0.5}
+\draw[dashed,black!50] (3.0,0.85) rectangle (8.25,-1.0);
+\ct{3.6}{0.4} \vl{3.6}{0.4}{-0.5} \wg{3.6}{-0.5}{11mm}{$R_{(0,2)}$}
+\ct{5.0}{0.4} \vl{5.0}{0.4}{-0.5} \wg{5.0}{-0.5}{11mm}{$R_{(0,4)}$}
+\node at (6.1,-0.05) {$\cdots$};
+\ct{7.3}{0.4} \vl{7.3}{0.4}{-0.5} \wg{7.3}{-0.5}{13mm}{$R_{(8,10)}$}
+\node[font=\small] at (8.65,0.65) {$\times\,r$};
+\wg{10.6}{0.4}{16mm}{$P(-st)$}
+\node[font=\small,anchor=west,text width=7.6cm] at (12.9,-0.25) {$s=4$; a proposal (7.10), not in the package\\[2pt] $R_{(i,j)}=e^{-i(t/r)X_{ij}}$, one per edge of $A_{\rm hit}$ (worked event: 20 edges, two $K_5$)\\[2pt] $G_r=e^{-ist}\Big[\prod_{(i,j)}R_{(i,j)}\Big]^{r}\to e^{-ist}e^{-itA_{\rm hit}}=e^{+iA_1t}$ as $r\to\infty$ ($t=\pi/s$)\\[2pt] package as built: $r=1$; 4.7 prices $r=4$ (error 1.48 at $r=1$, 0.43 at $r=4$, 7.13)};
+% (b) pair block (0,9) on n=4
+\begin{scope}[shift={(0,-3.1)}]
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.35) {(b) One pair block $c\text{-}R_{(0,9)}$ written out ($n=4$; $|0\rangle=|0000\rangle$, $|9\rangle=|1001\rangle$, bits $h_3\ldots h_0$)};
+\lab{-0.15}{0.6}{$T$}
+\lab{-0.15}{0}{$h_0$} \lab{-0.15}{-0.6}{$h_1$} \lab{-0.15}{-1.2}{$h_2$} \lab{-0.15}{-1.8}{$h_3$}
+\wires{0}{9.6}{0.6,0,-0.6,-1.2,-1.8}
+\ct{0.9}{0} \vl{0.9}{0}{-1.8} \tg{0.9}{-1.8}
+\gt{2.0}{-0.6}{$X$} \gt{2.0}{-1.2}{$X$} \gt{2.0}{-1.8}{$X$}
+\ct{3.5}{0.6} \ct{3.5}{-0.6} \ct{3.5}{-1.2} \ct{3.5}{-1.8} \vl{3.5}{0.6}{-1.8}
+\wg{3.5}{0}{17mm}{$R_X(2t/r)$}
+\gt{5.0}{-0.6}{$X$} \gt{5.0}{-1.2}{$X$} \gt{5.0}{-1.8}{$X$}
+\ct{6.1}{0} \vl{6.1}{0}{-1.8} \tg{6.1}{-1.8}
+\draw[brace] (0.6,-2.25) -- (1.2,-2.25); \node[blk] at (0.9,-2.38) {pivot $h_0$};
+\draw[brace] (1.7,-2.25) -- (2.3,-2.25); \node[blk] at (2.0,-2.38) {flip};
+\draw[brace] (2.6,-2.25) -- (4.4,-2.25); \node[blk] at (3.5,-2.38) {rotate pair};
+\draw[brace] (4.7,-2.25) -- (6.4,-2.25); \node[blk] at (5.55,-2.38) {undo};
+\node[font=\small,anchor=west,text width=9.4cm] at (9.9,-0.75) {1.\ Pivot $h_0$ (lowest differing bit); CNOT $h_0\to h_3$: $|9\rangle\to|1\rangle=|0001\rangle$, $|0\rangle\to|0\rangle$.\\[3pt]
+2.\ $X$ on $h_1,h_2,h_3$ (zero in $|1\rangle$), so the pair reads $|111\,x\rangle$.\\[3pt]
+3.\ $R_X(2t/r)$ on $h_0$, controlled by $T,h_1,h_2,h_3$: acts on $\mathrm{span}\{|0\rangle,|9\rangle\}$ only.\\[3pt]
+4.\ Undo 2 and 1. The same block shape as the segment case (C2b); only the operator's edges differ. A clique has $m(m-1)/2$ edges, all overlapping, so the terms do not commute and $r>1$ is needed.};
+\end{scope}
+\end{tikzpicture}
+\end{document}

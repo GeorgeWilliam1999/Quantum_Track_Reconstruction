@@ -1,0 +1,46 @@
+\input{pre.tex}
+\newcommand{\stg}[3]{\draw[densely dashed,black!35] (#1,#2) -- (#1,-2.05); \node[st] at (#1,#2) {#3};}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[anchor=west,font=\small\bfseries] at (-6.2,2.45) {Full computation 3: segment register, QSVT polynomial filter. (a) LCU of walk powers, as built in \texttt{QSVT.build\_circuit}};
+\cbox{-6.2}{1.6}{-1.9}{-2.0}{\textbf{Classical}\\[2pt] $A=sI-C$, $\mathbf b=\delta\mathbf 1$\\[2pt] $X=\dfrac{2A-(d_{lo}+d_{hi})I}{d_{hi}-d_{lo}}$\\[2pt] design $p=\sum_{k\le d}c_kT_k$\\ (line comb, $d=40$)\\[2pt] PREP angles, signs}{4.0cm}
+\draw[-latex,black!50] (-1.9,-0.2) -- (-0.95,-0.2);
+\lab{0.6}{0.9}{$|0\rangle^{\otimes m}_L$} \lab{0.6}{-0.2}{$|0\rangle_B$} \lab{0.6}{-1.3}{$|0\rangle^{\otimes n_s}_S$}
+\wires{0.7}{10.8}{0.9,-0.2} \wires{0.7}{10.2}{-1.3} \slashwire{0.9}{0.9}{$m$} \slashwire{0.9}{-1.3}{$n_s$}
+\stg{1.05}{1.35}{$\Phi_0$}
+\wg{1.9}{-1.3}{11mm}{$\mathrm{PREP}_b$}
+\stg{2.75}{1.35}{$\Phi_1$}
+\wg{3.55}{0.9}{11mm}{$\mathrm{PREP}_L$} \gt{4.6}{0.9}{$D_s$}
+\stg{5.25}{1.35}{$\Phi_2$}
+\mb{6.3}{0.9}{-1.3}{1.3}{SELECT}
+\stg{7.25}{1.35}{$\Phi_3$}
+\wg{8.15}{0.9}{11mm}{$\mathrm{PREP}_L^\dagger$}
+\stg{9.0}{1.35}{$\Phi_4$}
+\meas{9.6}{0.9} \meas{9.6}{-0.2} \meas{9.6}{-1.3}
+\node[font=\footnotesize,anchor=west] at (10.85,0.9) {$=0\ldots0$}; \node[font=\footnotesize,anchor=west] at (10.85,-0.2) {$=0$};
+\draw[brace] (1.4,-1.85) -- (2.4,-1.85); \node[blk] at (1.9,-1.98) {C1b};
+\draw[brace] (3.0,-1.85) -- (5.0,-1.85); \node[blk] at (4.0,-1.98) {C1c};
+\draw[brace] (5.6,-1.85) -- (7.0,-1.85); \node[blk] at (6.3,-1.98) {C5a to C5c};
+\draw[brace] (7.6,-1.85) -- (8.7,-1.85); \node[blk] at (8.15,-1.98) {C5d};
+\draw[-latex,black!50] (10.2,-1.3) -- (12.2,-1.3);
+\cbox{12.3}{1.6}{16.3}{-2.0}{\textbf{Classical}\\[2pt] keep shots with $L=0$, $B=0$\\ ($\approx M\ln M/P$ shots)\\ $\hat x_i$, threshold\\ chain segments (\texttt{get\_tracks})}{3.8cm}
+\node[font=\small,anchor=north west,text width=22.5cm] at (-6.2,-2.6) {\raggedright
+$\Phi_1=|0\rangle_L|0\rangle_B|b\rangle$, $|b\rangle=N^{-1/2}\sum_{i<N}|i\rangle$ \qquad
+$\Phi_2=\sum_k\mathrm{sgn}(c_k)\sqrt{|c_k|/\lVert c\rVert_1}\,|k\rangle_L|0\rangle_B|b\rangle$ \qquad
+$\Phi_3=\sum_k\mathrm{sgn}(c_k)\sqrt{|c_k|/\lVert c\rVert_1}\,|k\rangle_L\big(|0\rangle_BT_k(X)-|1\rangle_BS_k\big)|b\rangle$\\[4pt]
+$(\langle0|_L\langle0|_B)\Phi_4=p(X)|b\rangle/\lVert c\rVert_1$, \ $P=\lVert p(X)b\rVert^2/\lVert c\rVert_1^2$; \ item $i$ with probability $[p(X)b]_i^2/\lVert p(X)b\rVert^2$ (7.11)\\[4pt]
+\footnotesize\color{black!65} Worked event: $n_s=5$, $m=6$, 12 qubits; $p(2.382)=0.348$, $p(4.618)=0.183$, $p(4)=-0.0016$; $P=0.176$; readout 0.313 (end), 0.390 (middle), 0.0017 (false). Width $n_s+1+m$; $2^m-1$ walk steps per shot as built.};
+% (b) phase sequence variant
+\begin{scope}[shift={(0,-6.6)}]
+\node[anchor=west,font=\small\bfseries] at (-6.2,1.55) {(b) The same filter by a phase sequence (QSVT proper; \texttt{QSVT.solve\_phase\_sequence}, simulated as linear algebra, not built)};
+\cbox{-6.2}{0.9}{-1.9}{-1.5}{\textbf{Classical}\\[2pt] parity split $q=p/\max|p|=\alpha_eq_e+\alpha_oq_o$\\[2pt] phases $\Phi_e,\Phi_o$\\ (\texttt{find\_phase\_factors})}{4.0cm}
+\draw[-latex,black!50] (-1.9,-0.3) -- (-0.95,-0.3);
+\lab{0.6}{0.5}{$|0\rangle_{ERQB}$} \lab{0.6}{-0.9}{$|0\rangle^{\otimes n_s}_S$}
+\wires{0.7}{7.2}{0.5} \wires{0.7}{6.6}{-0.9} \slashwire{0.9}{0.5}{$4$} \slashwire{0.9}{-0.9}{$n_s$}
+\wg{1.9}{-0.9}{11mm}{$\mathrm{PREP}_b$}
+\mb{4.0}{0.5}{-0.9}{1.9}{\small phase block (C6c)}
+\meas{6.0}{0.5} \meas{6.0}{-0.9}
+\node[font=\footnotesize,anchor=west] at (7.25,0.5) {$=0000$};
+\node[font=\small,anchor=west,text width=10.3cm] at (8.5,-0.2) {\raggedright Post-selected: $q(X)|b\rangle/(\alpha_e+\alpha_o)$, \ $P=\lVert q(X)b\rVert^2/(\alpha_e+\alpha_o)^2$.\\[2pt] Width $n_s+4$, $4d=160$ calls of $U$ per shot at $d=40$; $P$ larger than the LCU's by $(\lVert c\rVert_1/\max|p|)^2$, a factor 2.2 for the production comb (7.4). Not run on the worked event.};
+\end{scope}
+\end{tikzpicture}
+\end{document}

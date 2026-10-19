@@ -1,0 +1,35 @@
+\input{pre.tex}
+\newcommand{\stg}[3]{\draw[densely dashed,black!35] (#1,#2) -- (#1,-2.05); \node[st] at (#1,#2) {#3};}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[anchor=west,font=\small\bfseries] at (-6.2,2.45) {Full computation 2: vertex-conditioned hit register, one circuit per found vertex (proposal; no hit circuit exists in the package)};
+\cbox{-6.2}{1.6}{-1.9}{-2.0}{\textbf{Classical}\\[2pt] focusing scan over $\hat z$ \\ $\to$ vertices $\hat z_1\ldots\hat z_V$\\[2pt] claim hits per vertex\\[2pt] $A^{(v)}_{\rm hit}$: couple $i,j$ if\\ $|\mathbf d_i-\mathbf d_j|<4w$ (3.5)\\[2pt] $A^{(v)}_1=4I-A^{(v)}_{\rm hit}$}{4.0cm}
+\draw[-latex,black!50] (-1.9,-0.2) -- (-0.95,-0.2);
+\draw[rounded corners=4pt,draw=hitp!70,line width=0.7pt] (-0.75,1.95) rectangle (15.6,-2.45);
+\node[font=\footnotesize,anchor=south east,text=hitp] at (15.55,1.97) {for each vertex $v=1\ldots V$};
+\lab{0.6}{0.9}{$|0\rangle_T$} \lab{0.6}{-0.2}{$|0\rangle^{\otimes n_v}_H$} \lab{0.6}{-1.3}{$|0\rangle_A$}
+\wires{0.7}{14.6}{0.9} \wires{0.7}{14.0}{-0.2,-1.3} \slashwire{0.9}{-0.2}{$n_v$}
+\stg{0.95}{1.35}{$\Psi_0$}
+\gt{1.8}{0.9}{$H$} \wg{1.8}{-0.2}{9mm}{$H^{\otimes n_v}$}
+\stg{2.55}{1.35}{$\Psi_1$}
+\ct{3.3}{0.9} \vl{3.3}{0.9}{-0.2} \gt{3.3}{-0.2}{$G_r$} \gt{4.3}{0.9}{$H$}
+\stg{5.0}{1.35}{$\Psi_2$}
+\gt{5.7}{0.9}{$X$} \ct{6.6}{0.9} \vl{6.6}{0.9}{-1.3} \tg{6.6}{-1.3} \gt{7.5}{0.9}{$X$}
+\stg{8.2}{1.35}{$\Psi_3$}
+\gt{8.9}{0.9}{$H$} \ct{9.9}{0.9} \vl{9.9}{0.9}{-0.2} \gt{9.9}{-0.2}{$G_r^\dagger$} \gt{10.9}{0.9}{$H$}
+\stg{11.6}{1.35}{$\Psi_4$}
+\meas{12.5}{-0.2} \meas{12.5}{-1.3}
+\stg{13.3}{1.35}{$\Psi_5$}
+\node[font=\footnotesize,anchor=west,text=black!65] at (14.65,0.9) {traced out};
+\draw[brace] (1.3,-1.85) -- (2.3,-1.85); \node[blk] at (1.8,-1.98) {prep};
+\draw[brace] (2.8,-1.85) -- (4.7,-1.85); \node[blk] at (3.75,-1.98) {$\mathrm{QPE}_1$ (C3)};
+\draw[brace] (5.3,-1.85) -- (7.9,-1.85); \node[blk] at (6.6,-1.98) {flag};
+\draw[brace] (8.5,-1.85) -- (11.3,-1.85); \node[blk] at (9.9,-1.98) {$\mathrm{QPE}_1^\dagger$};
+\draw[brace] (12.0,-1.85) -- (13.0,-1.85); \node[blk] at (12.5,-1.98) {readout};
+\draw[-latex,black!50] (13.0,-0.75) -- (16.1,-0.75);
+\cbox{16.2}{1.6}{19.9}{-2.0}{\textbf{Classical}\\[2pt] repeat: $\approx M\ln M/P$ shots\\ hits seen with flag $=1$\\ group by the edges of $A^{(v)}_{\rm hit}$ (connected components)\\ $\to$ tracks of vertex $v$}{3.5cm}
+\node[font=\small,anchor=north west,text width=26cm,align=left] at (-6.2,-2.85) {\raggedright 
+Same stages as C7 with $A\to A_1=4I-A_{\rm hit}$ and $c\text{-}G\to c\text{-}G_r$ (C3). A clique $K_m$ sits on $\lambda=5-m$ and keeps amplitude $f_m=\cos\!\big(\pi(5-m)/8\big)$: $f_5=1$, $f_4=0.924$, $f_3=0.707$, $f_2=0.383$, $f_1=0$ (7.10).\\[3pt]
+Worked event (one vertex): $n=4$, 6 qubits, 20 pairs. $\Psi_1$ has weight $10/16$ on $\lambda=0$ (the two $K_5$) and $6/16$ on $\lambda=4$ (noise hit and padding); $\Psi_2=|0\rangle_A\big(\sqrt{10/16}\,|0\rangle_T|\bar K\rangle+\sqrt{6/16}\,|1\rangle_T|\bar R\rangle\big)$; ideal $P=0.625$, 0.1 on each true hit, 0 on the noise hit.\\[3pt]
+\footnotesize\color{black!65} Gates: 1033 CX at $r=1$ ($P=0.394$, 7.13); $r=4$ is needed for $P$ within 3\,\% (4.7). Alternative filter: replace $\mathrm{QPE}_1$, flag and $\mathrm{QPE}_1^\dagger$ by the QSVT block of C9 on $X=(A_{\rm hit}-1.5)/3$ (degree-5 proposal, 8 qubits, $P=0.441$; 7.11). Both the choice $A_1=4I-A_{\rm hit}$ and the degree-5 polynomial are proposals awaiting George's agreement.};
+\end{tikzpicture}
+\end{document}

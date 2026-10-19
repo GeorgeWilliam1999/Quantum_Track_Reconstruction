@@ -1,0 +1,45 @@
+\input{pre.tex}
+\begin{tikzpicture}[x=1cm,y=1cm]
+% (a) projector-controlled phase
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.2) {(a) Projector-controlled phase $\Pi_\phi=e^{i\phi(2\Pi-I)}$, $\Pi=|0\rangle\langle0|_B$};
+\lab{-0.15}{0.4}{$Q$} \lab{-0.15}{-0.4}{$B$}
+\wires{0}{1.6}{0.4,-0.4}
+\mb{0.8}{0.4}{-0.4}{0.8}{$\Pi_\phi$}
+\node at (2.0,0) {$=$};
+\wires{2.5}{6.4}{0.4,-0.4}
+\oc{3.1}{-0.4} \vl{3.1}{-0.32}{0.4} \tg{3.1}{0.4}
+\wg{4.45}{0.4}{14mm}{$R_z(2\phi)$}
+\oc{5.8}{-0.4} \vl{5.8}{-0.32}{0.4} \tg{5.8}{0.4}
+\node[font=\small,anchor=west,text width=5.6cm,align=left] at (6.7,0) {$Q$ starts and ends in $|0\rangle$; phase $e^{+i\phi}$ when $B=0$, $e^{-i\phi}$ when $B=1$. For the one-qubit dilation this is just $e^{i\phi Z_B}$, which is what \texttt{apply\_phase\_sequence} applies.};
+% (b) one sequence
+\begin{scope}[shift={(0,-3.0)}]
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.2) {(b) One phase sequence $U_\Phi$ of degree $d$ ($d=3$ drawn)};
+\lab{-0.15}{0.4}{$Q$} \lab{-0.15}{-0.4}{$B$} \lab{-0.15}{-1.2}{$S$}
+\wires{0}{9.4}{0.4,-0.4,-1.2} \slashwire{0.3}{-1.2}{$n_s$}
+\mb{1.0}{0.4}{-0.4}{0.75}{$\Pi_{\phi_0}$}
+\mb{2.1}{-0.4}{-1.2}{0.75}{$U$}
+\mb{3.2}{0.4}{-0.4}{0.75}{$\Pi_{\phi_1}$}
+\mb{4.3}{-0.4}{-1.2}{0.75}{$U^\dagger$}
+\mb{5.4}{0.4}{-0.4}{0.75}{$\Pi_{\phi_2}$}
+\mb{6.5}{-0.4}{-1.2}{0.75}{$U$}
+\mb{7.6}{0.4}{-0.4}{0.75}{$\Pi_{\phi_3}$}
+\node[font=\small,anchor=west,text width=8.8cm,align=left] at (9.7,-0.3) {In every eigenplane of $X$, $U$ acts as $R(x_j)=\begin{pmatrix}x_j&\sqrt{1-x_j^2}\\ \sqrt{1-x_j^2}&-x_j\end{pmatrix}$, so\\[2pt] $\langle0|_B\,U_\Phi\,|0\rangle_B=P_\Phi(X)$, \ $P_\Phi(x)=\big[e^{i\phi_0Z}\textstyle\prod_{k=1}^{d}R(x)e^{i\phi_kZ}\big]_{00}$\\[2pt] with $\mathrm{Re}\,P_\Phi=q_e$ or $q_o$ (unit-peak even or odd part of $p/\max|p|$). Phases: \texttt{qsp\_phases.find\_phase\_factors}, reflection convention. Here $U^\dagger=U$ (real symmetric).};
+\end{scope}
+% (c) real part and parity
+\begin{scope}[shift={(0,-7.4)}]
+\node[anchor=west,font=\small\bfseries] at (-1.9,1.75) {(c) Real part and parity: the full phase-sequence block (paper 4.2; 4 ancillas $E,R,Q,B$)};
+\lab{-0.15}{1.1}{$|0\rangle_E$} \lab{-0.15}{0.4}{$|0\rangle_R$} \lab{-0.15}{-0.4}{$|0\rangle_{QB}$} \lab{-0.15}{-1.2}{$|u\rangle_S$}
+\wires{0}{11.2}{1.1,0.4} \wires{0}{10.2}{-0.4,-1.2} \slashwire{0.3}{-0.4}{$2$} \slashwire{0.3}{-1.2}{$n_s$}
+\wg{1.05}{1.1}{12mm}{$R_y(\theta_{\rm par})$} \gt{1.05}{0.4}{$H$}
+% four controlled sequences
+\oc{2.6}{1.1} \oc{2.6}{0.4} \vl{2.6}{1.02}{-0.4} \mb{2.6}{-0.4}{-1.2}{0.85}{$U_{\Phi_e}$}
+\oc{3.85}{1.1} \ct{3.85}{0.4} \vl{3.85}{1.02}{-0.4} \mb{3.85}{-0.4}{-1.2}{0.95}{$U_{-\Phi_e}$}
+\ct{5.1}{1.1} \oc{5.1}{0.4} \vl{5.1}{1.1}{-0.4} \mb{5.1}{-0.4}{-1.2}{0.85}{$U_{\Phi_o}$}
+\ct{6.35}{1.1} \ct{6.35}{0.4} \vl{6.35}{1.1}{-0.4} \mb{6.35}{-0.4}{-1.2}{0.95}{$U_{-\Phi_o}$}
+\gt{7.55}{0.4}{$H$} \wg{8.75}{1.1}{13mm}{$R_y(\theta_{\rm par})^\dagger$}
+\node[font=\small,anchor=west] at (11.25,1.1) {$\langle0|$}; \node[font=\small,anchor=west] at (11.25,0.4) {$\langle0|$}; \node[font=\small,anchor=west] at (10.25,-0.4) {$\langle00|$};
+\node[font=\small,anchor=west,text width=7.6cm,align=left] at (11.9,-0.1) {$R$: $H$, sequence with $\pm\Phi$, $H$ gives $\tfrac12(P_\Phi+P_\Phi^{*})=\mathrm{Re}\,P_\Phi$.\\[2pt] $E$: $R_y(\theta_{\rm par})|0\rangle=\sqrt{\tfrac{\alpha_e}{\alpha_e+\alpha_o}}|0\rangle+\sqrt{\tfrac{\alpha_o}{\alpha_e+\alpha_o}}|1\rangle$ selects even or odd.\\[2pt] Post-selected: $\dfrac{\alpha_eq_e(X)+\alpha_oq_o(X)}{\alpha_e+\alpha_o}|u\rangle=\dfrac{q(X)|u\rangle}{\alpha_e+\alpha_o}$\\[2pt] $P=\lVert q(X)u\rVert^2/(\alpha_e+\alpha_o)^2$; width $n_s+4$; $4d$ calls of $U$ as drawn};
+\end{scope}
+\node[font=\footnotesize,anchor=west,text=black!65,text width=26cm] at (-1.9,-10.2) {The package does not build this circuit: \texttt{QSVT.solve\_phase\_sequence} (centralise-2.1) runs (b) for the even and odd parts as dense linear algebra (\texttt{apply\_phase\_sequence}) and recombines $\alpha_e\,\mathrm{Re}\,\psi_e+\alpha_o\,\mathrm{Re}\,\psi_o$; (c) is the circuit that computes the same post-selected state. It was not run for the worked event (7.11).};
+\end{tikzpicture}
+\end{document}
