@@ -1,0 +1,53 @@
+Run 3 simulated events: 103 (Gauss v56r9 Sim10, 2024 W40-42 md, nu = 7.6, min bias)
+  VELO hits / event: median 1862 (range 177-5723)
+  reconstructible tracks (>= 3 hits): median 235; hits per track median 6; prompt 0.78; electrons 0.13
+  PVs / event: 7.7 (reconstructible, >= 4 tracks: 5.5)
+  segments / event: median 65698 (max 621148); true 1460
+  toy comparison point: T = 200, 5 vertices, 5 events, 154209 segments
+
+Track reconstruction (EventValidator, purity >= 0.7, reconstructible = >= 3 hits), pooled:
+method                                          eff  ghost  clone purity | toy T=200,5 PV eff / ghost
+classical, 99 % true segments (paper)         0.000  1.000  0.000  0.000 | 0.479 / 0.262
+classical, <= 1 % false segments              0.017  0.035  0.020  0.378 | 0.939 / 0.006
+classical, all coupled segments (truth-free)  0.327  0.114  0.023  0.994 | -
+one-bit filter, 99 % true segments (paper)    0.000  1.000  0.000  0.000 | 0.479 / 0.262
+one-bit filter, <= 1 % false segments         0.029  0.011  0.069  0.602 | 0.939 / 0.006
+QSVT comb, <= 1 % false segments (paper)      0.128  0.009  0.053  0.737 | 0.939 / 0.006
+QSVT comb, above isolated value (truth-free)  0.575  0.066  0.139  0.994 | -
+hit register at scan peaks (as specified)     0.585  0.031  0.146  0.986 | 0.919 / 0.000
+hit register at refitted vertices             0.553  0.027  0.148  0.958 | -
+hit register at truth vertices                0.581  0.025  0.154  0.988 | -
+hit register at truth vertices, 0.5 rad window  0.594  0.025  0.152  0.988 | -
+
+Track efficiency by category (per truth track):
+category                                      share classicalI      qsvtI       qsvt        hit       hitR       hitT      hitTW
+all reconstructible                           1.000      0.327      0.575      0.128      0.585      0.553      0.581      0.594
+prompt, not electron, >= 4 hits, p > 2 GeV    0.504      0.314      0.765      0.177      0.897      0.879      0.917      0.931
+3 hits                                        0.156      0.346      0.027      0.001      0.029      0.012      0.014      0.014
+|t| > 0.25                                    0.208      0.437      0.301      0.055      0.013      0.016      0.027      0.086
+p < 1 GeV                                     0.221      0.300      0.290      0.058      0.133      0.090      0.099      0.103
+not prompt (secondaries)                      0.221      0.190      0.309      0.058      0.278      0.223      0.235      0.236
+electrons                                     0.134      0.106      0.186      0.030      0.364      0.305      0.319      0.320
+
+Segment level (pooled over events):
+  classical    segment efficiency 0.998, segment false rate 0.965
+  classicalF   segment efficiency 0.043, segment false rate 0.190
+  classicalI   segment efficiency 0.897, segment false rate 0.180
+  qsvt         segment efficiency 0.157, segment false rate 0.104
+  qsvtI        segment efficiency 0.690, segment false rate 0.074
+  events with no <= 1 % false working point (classical): 0.91
+
+Primary vertices (truth PVs with >= 4 reconstructible tracks; 1 mm match):
+  focusing scan, as specified                        eff 0.800  fakes/event 75.20  merges/event 0.33  dz rms  466 um, robust  491 um  (103 events)
+  scan peaks -> track fit -> z clustering (hold-out) eff 0.690  fakes/event  0.82  merges/event 0.32  dz rms  299 um, robust  234 um  (79 events)
+  track baseline on classical <= 1 % tracks          eff 0.034  fakes/event  0.03  merges/event 0.02  dz rms  316 um, robust  151 um  (103 events)
+  track baseline on QSVT truth-free tracks           eff 0.752  fakes/event  2.17  merges/event 0.36  dz rms  282 um, robust  202 um  (103 events)
+  toy T = 200, 5 PV, focusing scan: eff 0.920, fakes/event 0.00, dz rms 42 um
+  focusing scan efficiency vs distance to the nearest other PV  <2 / 2-5 / 5-10 / >10 mm: 0.66 / 0.84 / 0.84 / 0.83
+
+Resources per event (median; Givens price; rounds = max(1, pi/(4 sqrt P))):
+  real           2-call filter        segment: 19 qubits, P 1.0e-02, 5.63e+06 gates | hit per-vertex: 13 qubits, P 0.18, 2.25e+06 gates | P on all lines 0.36, 1.57e+06 gates
+  real           QSVT phase sequence  segment: 21 qubits, P 1.3e-03, 1.21e+09 gates | hit per-vertex: 15 qubits, P 0.18, 1.80e+08 gates | P on all lines 0.36, 1.26e+08 gates
+  toy T=200 5PV  2-call filter        segment: 20 qubits, P 1.7e-03, 6.84e+06 gates | hit per-vertex: 12 qubits, P 0.94, 5.02e+05 gates
+  toy T=200 5PV  QSVT phase sequence  segment: 22 qubits, P 7.6e-04, 8.18e+08 gates | hit per-vertex: 14 qubits, P 0.94, 4.01e+07 gates
+  real hit register, largest component median 18, coupled pairs 3826; segment register coupled pairs 1321, largest component 30

@@ -1,0 +1,10 @@
+# Gauss output and per-event dumps stay on /data (regenerable from sim/gauss_prod.py)
+sim/job_*/
+sim/dump/
+sim/*.sim
+sim/*.root
+sim/*.xml
+sim/gauss_test.log
+sim/gauss_job.py
+sim/ls_tes.py
+sim/dump_sim.py
