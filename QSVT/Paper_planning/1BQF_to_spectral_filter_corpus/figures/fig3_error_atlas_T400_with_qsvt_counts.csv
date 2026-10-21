@@ -1,0 +1,22 @@
+solver,error_type,n_true,true_kept,n_false,false_kept
+classical,complete track,14900,14900,0,0
+classical,broken track,447,377,0,0
+classical,contaminated track,336,336,109,109
+classical,isolated false segment,0,0,6248499,0
+classical,false pair,0,0,8212,8212
+classical,false triple or bridge,0,0,120,120
+classical,hub,0,0,0,0
+1BQF,complete track,14900,14900,0,0
+1BQF,broken track,447,377,0,0
+1BQF,contaminated track,336,268,109,107
+1BQF,isolated false segment,0,0,6248499,0
+1BQF,false pair,0,0,8212,8212
+1BQF,false triple or bridge,0,0,120,120
+1BQF,hub,0,0,0,0
+QSVT,complete track,14900,14900,0,0
+QSVT,broken track,447,219,0,0
+QSVT,contaminated track,336,186,109,31
+QSVT,isolated false segment,0,0,6248499,0
+QSVT,false pair,0,0,8212,0
+QSVT,false triple or bridge,0,0,120,120
+QSVT,hub,0,0,0,0

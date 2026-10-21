@@ -1,0 +1,8 @@
+epsilon_mrad=1.6985
+sigma_p_mrad=0.4003
+residual_rms_um_T400=4.83
+true_continuations_T400_10reps=11651
+true_outside_window=8.583e-05
+false_candidates_inside_window=2.000e-06
+classical_tau_e990_T400_rep0=0.3333
+classical_far_e990_T400_rep0=0.3592

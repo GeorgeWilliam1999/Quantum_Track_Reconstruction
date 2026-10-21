@@ -1,0 +1,110 @@
+% Three circuits of one lineage, drawn to the same conventions (plain TikZ).
+% Wires run left to right; a filled dot is a control; a box is a gate acting on
+% the wires it spans; the meter is a measurement with post-selection on the
+% value written beside it.  |Psi_k> labels mark the states written out in
+% section 3 (1BQF), section 11.5 (HHL) and section 4 (QSVT).
+\begin{tikzpicture}[x=1cm,y=1cm]
+% ─────────────────────────── (a) HHL ────────────────────────────────────────
+\begin{scope}[shift={(0,0)}]
+\node[anchor=west,font=\small\bfseries] at (-2.2,1.95) {(a) HHL};
+\coordinate (A) at (0,0.9); \coordinate (T) at (0,0); \coordinate (Sy) at (0,-0.9);
+\node[reg] at (-0.15,0.9)  {$|0\rangle_{A}$};
+\node[reg] at (-0.15,0)    {$|0\rangle^{\otimes n_c}_{T}$};
+\node[reg] at (-0.15,-0.9) {$|0\rangle^{\otimes n}_{S}$};
+\draw[wire] (0,0.9) -- (12.6,0.9); \draw[wire] (0,0) -- (12.6,0); \draw[wire] (0,-0.9) -- (12.6,-0.9);
+\slashwire{0.35}{0}{$n_c$} \slashwire{0.35}{-0.9}{$n$}
+% state prep
+\node[gate] at (1.1,-0.9) {$|b\rangle$};
+\vsep{1.85}{-1.45}{1.25}
+% QPE: H, controlled U^{2^j}, QFT^dagger
+\node[gate] at (2.5,0) {$H^{\otimes n_c}$};
+\node[ctrl] at (3.7,0) {}; \draw[wire] (3.7,0) -- (3.7,-0.9); \node[gate] at (3.7,-0.9) {$U^{2^{j}}$};
+\node[font=\scriptsize,anchor=north] at (3.7,-1.22) {$j=0,\dots,n_c{-}1$};
+\node[wgate] at (5.05,0) {$\mathrm{QFT}^{\dagger}$};
+\vsep{5.95}{-1.45}{1.25}
+% rotation keyed on the clock value
+\node[ctrl] at (6.55,0) {}; \draw[wire] (6.55,0) -- (6.55,0.9);
+\node[gate,minimum width=26mm,font=\footnotesize] at (6.55,0.9) {$R_y\!\big(2\arcsin(C/\tilde\lambda)\big)$};
+\vsep{7.5}{-1.45}{1.25}
+% uncompute
+\node[wgate] at (8.3,0) {$\mathrm{QFT}$};
+\node[ctrl] at (9.55,0) {}; \draw[wire] (9.55,0) -- (9.55,-0.9); \node[gate] at (9.55,-0.9) {$U^{-2^{j}}$};
+\node[gate] at (10.7,0) {$H^{\otimes n_c}$};
+\vsep{11.3}{-1.45}{1.25}
+% measurement
+\node[meter] at (11.95,0.9) {}; \draw[wire] (11.7,0.78) arc (160:20:0.27); \draw[wire,-latex] (11.95,0.78) -- (12.15,1.02);
+\node[font=\scriptsize,anchor=west] at (12.3,0.9) {$=1$};
+% block labels and states
+\node[blk] at (1.1,-1.62) {prepare};
+\node[blk] at (3.9,-1.62) {phase estimation};
+\node[blk] at (6.55,-1.62) {rotate};
+\node[blk] at (9.5,-1.62) {uncompute};
+\node[blk] at (11.95,-1.62) {post-select};
+\node[st] at (1.85,1.3) {$|\Psi_1\rangle$}; \node[st] at (5.95,1.3) {$|\Psi_2\rangle$};
+\node[st] at (7.5,1.3) {$|\Psi_3\rangle$}; \node[st] at (11.3,1.3) {$|\Psi_4\rangle$};
+\end{scope}
+% ─────────────────────────── (b) 1BQF ───────────────────────────────────────
+\begin{scope}[shift={(0,-4.55)}]
+\node[anchor=west,font=\small\bfseries] at (-2.2,1.95) {(b) the one-bit quantum filter};
+\node[reg] at (-0.15,0.9)  {$|0\rangle_{A}$};
+\node[reg] at (-0.15,0)    {$|0\rangle_{T}$};
+\node[reg] at (-0.15,-0.9) {$|0\rangle^{\otimes n}_{S}$};
+\draw[wire] (0,0.9) -- (12.6,0.9); \draw[wire] (0,0) -- (12.6,0); \draw[wire] (0,-0.9) -- (12.6,-0.9);
+\slashwire{0.35}{-0.9}{$n$}
+\node[gate] at (1.1,-0.9) {$H^{\otimes n}$};
+\node[font=\scriptsize,anchor=north] at (1.1,-1.24) {$=|u\rangle$};
+\vsep{1.85}{-1.45}{1.25}
+\node[gate] at (2.5,0) {$H$};
+\node[ctrl] at (3.7,0) {}; \draw[wire] (3.7,0) -- (3.7,-0.9); \node[gate] at (3.7,-0.9) {$e^{-iAt}$};
+\node[gate] at (5.05,0) {$H$};
+\node[font=\scriptsize,anchor=south] at (5.05,0.34) {$=\mathrm{QFT}_1^{\dagger}$};
+\vsep{5.95}{-1.45}{1.25}
+\node[octrl] at (6.55,0) {}; \draw[wire] (6.55,0.09) -- (6.55,0.9); \node[targ] at (6.55,0.9) {}; \draw[wire] (6.55,0.74) -- (6.55,1.06);
+\vsep{7.5}{-1.45}{1.25}
+\node[gate] at (8.3,0) {$H$};
+\node[ctrl] at (9.55,0) {}; \draw[wire] (9.55,0) -- (9.55,-0.9); \node[gate] at (9.55,-0.9) {$e^{+iAt}$};
+\node[gate] at (10.7,0) {$H$};
+\vsep{11.3}{-1.45}{1.25}
+\node[meter] at (11.95,0.9) {}; \draw[wire] (11.7,0.78) arc (160:20:0.27); \draw[wire,-latex] (11.95,0.78) -- (12.15,1.02);
+\node[font=\scriptsize,anchor=west] at (12.3,0.9) {$=1$};
+\node[blk] at (1.1,-1.62) {prepare};
+\node[blk] at (3.9,-1.62) {one-bit phase estimation};
+\node[blk] at (6.55,-1.62) {flag};
+\node[blk] at (9.5,-1.62) {uncompute};
+\node[blk] at (11.95,-1.62) {post-select};
+\node[st] at (1.85,1.3) {$|\Psi_1\rangle$}; \node[st] at (5.95,1.3) {$|\Psi_2\rangle$};
+\node[st] at (7.5,1.3) {$|\Psi_3\rangle$}; \node[st] at (11.3,1.3) {$|\Psi_4\rangle$};
+\end{scope}
+% ─────────────────────────── (c) QSVT ───────────────────────────────────────
+\begin{scope}[shift={(0,-9.1)}]
+\node[anchor=west,font=\small\bfseries] at (-2.2,1.95) {(c) the QSVT: block encoding, walk, sum};
+\node[reg] at (-0.15,0.9)  {$|0\rangle^{\otimes m}_{I}$};
+\node[reg] at (-0.15,0)    {$|0\rangle_{D}$};
+\node[reg] at (-0.15,-0.9) {$|0\rangle^{\otimes n}_{S}$};
+\draw[wire] (0,0.9) -- (12.6,0.9); \draw[wire] (0,0) -- (12.6,0); \draw[wire] (0,-0.9) -- (12.6,-0.9);
+\slashwire{0.35}{0.9}{$m$} \slashwire{0.35}{-0.9}{$n$}
+\node[gate] at (1.1,-0.9) {$H^{\otimes n}$};
+\node[gate,minimum width=11mm] at (1.1,0.9) {PREP};
+\vsep{1.85}{-1.45}{1.25}
+% controlled walk powers: W acts on dilation + system
+\node[ctrl] at (3.7,0.9) {}; \draw[wire] (3.7,0.9) -- (3.7,0.32);
+\node[gate,minimum height=19mm,minimum width=12mm] at (3.7,-0.45) {$W^{2^{j}}$};
+\node[font=\scriptsize,anchor=west] at (4.45,-1.2) {$j=0,\dots,m{-}1$};
+\node[font=\scriptsize,anchor=north] at (3.7,-1.42) {};
+\vsep{5.95}{-1.45}{1.25}
+\node[gate,minimum width=13mm] at (6.9,0.9) {PREP$^{\dagger}$};
+\vsep{7.9}{-1.45}{1.25}
+\node[meter] at (8.7,0.9) {}; \draw[wire] (8.45,0.78) arc (160:20:0.27); \draw[wire,-latex] (8.7,0.78) -- (8.9,1.02);
+\node[font=\scriptsize,anchor=west] at (9.05,0.9) {$=0$};
+\node[meter] at (8.7,0) {}; \draw[wire] (8.45,-0.12) arc (160:20:0.27); \draw[wire,-latex] (8.7,-0.12) -- (8.9,0.12);
+\node[font=\scriptsize,anchor=west] at (9.05,0) {$=0$};
+\node[font=\small,anchor=west] at (10.0,-0.9) {$\propto\ p(X)\,|u\rangle$};
+\node[blk] at (1.1,-1.62) {prepare};
+\node[blk] at (3.9,-1.75) {walk, controlled on the index};
+\node[blk] at (6.9,-1.62) {unprepare};
+\node[blk] at (8.7,-1.62) {post-select};
+\node[st] at (1.85,1.3) {$|\Phi_1\rangle$}; \node[st] at (5.95,1.3) {$|\Phi_2\rangle$}; \node[st] at (7.9,1.3) {$|\Phi_3\rangle$};
+% the walk, unpacked
+\node[anchor=west,font=\footnotesize,text=black!65] at (-2.2,-2.75) {one walk step $W=(Z\otimes I)\,U$, with $U=\begin{pmatrix}X&\sqrt{I-X^2}\\ \sqrt{I-X^2}&-X\end{pmatrix}$ the block encoding of $X=(A-c_0I)/c_1$: \ $\langle0|_D\,W^{k}\,|0\rangle_D=T_k(X)$};
+\end{scope}
+\end{tikzpicture}

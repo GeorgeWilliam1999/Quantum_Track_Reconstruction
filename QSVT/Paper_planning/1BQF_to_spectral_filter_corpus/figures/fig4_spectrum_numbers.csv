@@ -1,0 +1,34 @@
+quantity,value
+bright weight within 0.18 of a bright true line: complete track,1.0
+bright weight within 0.18 of a bright true line: broken track,0.0
+bright weight within 0.18 of a bright true line: contaminated track,0.06077273459919095
+bright weight within 0.18 of a bright true line: false pair,0.0
+bright weight within 0.18 of a bright true line: false triple or bridge,0.007094994087504933
+bright weight within 0.18 of a bright true line: hub,0.879713800491481
+QSVT kept factor at bright true line 2.382,0.9945895929334755
+one-bit kept factor at bright true line 2.382,0.5934998670343252
+QSVT kept factor at dark true line 3.382,0.6890263646137598
+one-bit kept factor at dark true line 3.382,0.24032570874817932
+QSVT kept factor at bright true line 4.618,0.5258013000921112
+one-bit kept factor at bright true line 4.618,0.2403257087481792
+QSVT kept factor at dark true line 5.618,0.41520286801748957
+one-bit kept factor at dark true line 5.618,0.5934998670343251
+QSVT kept factor at isolated line 4,0.007230850864044553
+one-bit kept factor at isolated line 4,6.123233995736766e-17
+QSVT kept factor at pair line 3,0.014344202561522936
+one-bit kept factor at pair line 3,0.38268343236508984
+QSVT kept factor at pair line 5,0.04404215189757648
+one-bit kept factor at pair line 5,0.3826834323650897
+QSVT kept factor at triple line 2.586,0.43892410775027807
+one-bit kept factor at triple line 2.586,0.5272495422822986
+QSVT kept factor at triple line 5.414,0.19818774244514806
+one-bit kept factor at triple line 5.414,0.5272495422822986
+QSVT kept factor at hub line 2.268,0.8463362400296844
+one-bit kept factor at hub line 2.268,0.6289289042585838
+QSVT kept factor at hub line 5.732,0.37371746495164243
+one-bit kept factor at hub line 5.732,0.6289289042585837
+complete track: input weight on lambda=2.382,0.947213595499958
+complete track: solution weight on lambda=2.382,0.9853903658475153
+"isolated false segments, T=1000, ten events",39077686.0
+comb domain T1000 rep0 low,0.24032522475023066
+comb domain T1000 rep0 high,7.759674775249769
