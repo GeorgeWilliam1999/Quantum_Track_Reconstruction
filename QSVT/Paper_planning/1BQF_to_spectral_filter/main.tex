@@ -145,9 +145,111 @@ window, the Hamiltonian, the one-bit filter, and what each solver keeps.
 \textit{[Sections on the spectrum, the polynomial, results against multiplicity and cost follow;
 see schematic.tex.]}
 
+\gss{Section~\ref{sec:methods} gives the detector simulation, the acceptance window, the Hamiltonian, the circuits of the one-bit filter and of the polynomial filter, and the cost model. Section~\ref{sec:r1} then builds the problem from a noisy event, section~\ref{sec:r2} designs the polynomial from the spectrum, section~\ref{sec:r3} gives the results against track multiplicity, and section~\ref{sec:r4} the computational cost.}
+
+\section{Methods}\label{sec:methods}
+
+\subsection{Detector simulation and the set of events}\label{sec:m:events}
+Five planes at $z=33,66,99,132$ and $165$\,mm. $T$ tracks per event from the origin, with
+directions uniform in a cone of half-opening $0.2$\,rad. One hit per track per plane. Three effects
+in this order: a multiple-scattering kink with Gaussian projections of width $\sigma_{\rm scatt}=0.15$\,mrad
+at each plane; Gaussian smearing of each hit with $\sigma_{\rm res}=5\,\mu$m in $x$ and $y$; removal of
+each hit with probability $0.01$. $\NEvents$ events for each of $T=10,20,50,100,200,400,700,1000$,
+$\NEventsTotal$ events in all. On the set the measured hit residuals are $\ResidualRms\,\mu$m and the
+hit loss is $\HitLossMean\%$ on average, between $\HitLossMin\%$ and $\HitLossMax\%$ per event.
+Six checks run on every event and the build stops on a failure: the classical solution against an
+iterative solve of the full sparse system; the one-bit amplitudes against the sparse matrix
+exponential; the polynomial against the Chebyshev recursion on the full matrix; every entry of $C$
+against the stored segment directions; the closed-form values $4/11$, $5/11$ and $1/4$ on isolated
+tracks and segments; and the measured noise against its prediction. The largest difference in the
+first three checks is $\CheckMaxDiff$.
+
+\subsection{The acceptance window}\label{sec:m:window}
+Three hits of one track at $x_1,x_2,x_3$ on consecutive planes give the kink projection
+$(x_1-2x_2+x_3)/\Delta z$. With independent position errors of width $\sigma_{\rm res}$ and a
+scattering kink of width $\sigma_{\rm scatt}$ at the middle plane, the projection has variance
+$\sigma_p^2=\sigma_{\rm scatt}^2+6\sigma_{\rm res}^2/\Delta z^2$. The $x$ and $y$ projections are
+independent, so the kink magnitude follows a Rayleigh law with
+$P(\theta>\theta_{\max})=\exp[-\theta_{\max}^2/(2\sigma_p^2)]$. We set $\theta_{\max}=3\sqrt2\sigma_p$,
+which loses $e^{-9}$ of true continuations, and $\varepsilon=1-\cos\theta_{\max}$. On the set the
+measured width of true continuations is $\SigmaPMeas$\,mrad against $\SigmaPPred$\,mrad predicted,
+and $\TrueOutside$ of true continuations fall outside the window.
+
+\subsection{The Hamiltonian and the classical solver}\label{sec:m:hamiltonian}
+A candidate segment is a pair of hits on adjacent planes; with no hit loss there are $N=4T^2$. The
+compatibility matrix $C$ has $C_{ij}=1$ when segments $i$ and $j$ share a hit and their kink is
+below $\theta_{\max}$, and $0$ otherwise. $A=\lambda_cI-C$ with $\lambda_c=\alpha+\beta=4$ and
+$\mathbf{b}=\beta\mathbf{1}$ with $\beta=1$. The connected groups of compatible segments are found
+once per event; every solver works on the same groups. The classical solution is
+$\mathbf{x}=A^{-1}\mathbf{b}$, computed on each group from its eigenvalues and eigenvectors. An
+isolated segment solves to $\beta/\lambda_c$; a chain of $m$ segments solves to
+$\sum_k\langle\mathbf{v}_k,\mathbf{b}\rangle\mathbf{v}_k/\lambda_k$ with
+$\lambda_k=\lambda_c-2\cos(k\pi/(m+1))$ and $v_{k,j}\propto\sin(kj\pi/(m+1))$.
+
+\subsection{The one-bit filter: circuit and state}\label{sec:m:onebit}
+The segment register $S$ has $n=\lceil\log_2N\rceil$ qubits. $A$ is padded to $2^n$ rows with
+diagonal entries $\lambda_c$ and $\mathbf{b}$ with ones, so each padding state is an isolated
+segment and the zero of the filter removes it. The flag $A$ and the phase bit $T$ start in $|0\rangle$.
+The states of figure~\ref{fig:filters}a are
+\begin{align}
+|\Psi_1\rangle&=|0\rangle_A|0\rangle_T|u\rangle,\\
+|\Psi_2\rangle&=|0\rangle_A\otimes\Big[|0\rangle_T\otimes\tfrac12(I+e^{-iAt})|u\rangle+|1\rangle_T\otimes\tfrac12(I-e^{-iAt})|u\rangle\Big],\\
+|\Psi_3\rangle&=|1\rangle_A|0\rangle_T\otimes\tfrac12(I+e^{-iAt})|u\rangle+|0\rangle_A|1\rangle_T\otimes\tfrac12(I-e^{-iAt})|u\rangle,\\
+|\Psi_4\rangle&=|1\rangle_A\otimes\Big[|0\rangle_T\otimes\cos^2\!\big(\tfrac{At}{2}\big)|u\rangle-\tfrac{i}{2}|1\rangle_T\otimes\sin(At)|u\rangle\Big]\nonumber\\
+&\qquad-|0\rangle_A\otimes\Big[|0\rangle_T\otimes\sin^2\!\big(\tfrac{At}{2}\big)|u\rangle+\tfrac{i}{2}|1\rangle_T\otimes\sin(At)|u\rangle\Big],
+\end{align}
+using $\tfrac12(I+e^{-iAt})=e^{-iAt/2}\cos(At/2)$ and $\tfrac12(I-e^{-iAt})=-ie^{-iAt/2}\sin(At/2)$.
+$|\Psi_2\rangle$ follows from the Hadamard, the controlled $e^{-iAt}$ and the Hadamard on $T$;
+$|\Psi_3\rangle$ from the flag, a NOT on $A$ controlled on $T=0$; $|\Psi_4\rangle$ from the same
+three gates with $e^{+iAt}$. Post-selection on $A=1$ succeeds with probability
+$\langle u|\cos^2(At/2)|u\rangle$ and reads segment $i$ with probability
+$p_i=[\cos^2(At/2)\mathbf{u}]_i^2+[\tfrac12\sin(At)\mathbf{u}]_i^2$. With $t=\pi/\lambda_c$ the zero
+of $\cos(\lambda t/2)$ lies at $\lambda=\lambda_c$. The amplitudes in this paper are $\sqrt{p_i}$,
+computed exactly on each group.
+
+\subsection{Polynomial design and phase factors}\label{sec:m:polynomial}
+The target is $g(\lambda)$ of section~\ref{sec:r2}: four Gaussian passes of half-width $h=0.18$ on
+the chain lines $\lambda_c-2\cos(k\pi/5)$, weighted by $1/\lambda$. The fit interval is
+$[\lambda_{\min}-\Delta,\lambda_{\max}+\Delta]$ with $\lambda_{\min}$ and $\lambda_{\max}$ the
+extreme eigenvalues of $A$ from the Lanczos method and $\Delta=0.05(\lambda_{\max}-\lambda_{\min})+0.2$.
+$p$ is the least-squares Chebyshev series of degree 40 to $g$ on that interval, rescaled so that
+$|p|\le0.95$ on it. The phase factors of the even and odd parts are computed by the method of
+ref.~\cite{dong2021}. The design scan of section~\ref{sec:r2} tested $\TeethNDesigns$ designs,
+chosen on events 0 to 4 and reported on events 5 to 9 of each multiplicity.
+
+\subsection{Exact evaluation of the filters}\label{sec:m:evaluation}
+Every amplitude in this paper is computed exactly. The classical solution, the one-bit amplitudes
+and $p(A)\mathbf{b}$ are evaluated on the eigenvalues and eigenvectors of each group, and checked on
+every event against the sparse matrix exponential and the three-term Chebyshev recursion on the full
+matrix (largest difference $\CheckMaxDiff$). No curve in this paper comes from a sampled circuit;
+each is what an exact implementation of the circuit gives after post-selection.
+
+\subsection{Segment efficiency, false rate and working points}\label{sec:m:metrics}
+A segment is kept when its value is at or above the threshold. Efficiency is the number of true
+segments kept divided by the number of true segments. False rate is the number of false segments
+kept divided by the number of segments kept. The first working point is the highest threshold at
+which the efficiency is at least $0.99$. The second is the lowest threshold at which the false rate
+is at most $0.01$; when no threshold reaches it, the efficiency is reported as zero. Every quoted
+number is the median over the $\NEvents$ events of a multiplicity, with the lowest event where
+stated.
+
+\subsection{Cost model}\label{sec:m:cost}
+Width is $\lceil\log_2 4T^2\rceil$ plus the ancillas of each route. Calls per shot are counted
+from the circuits of figure~\ref{fig:filters}. The two-qubit gates per call of $e^{-iAt}$ are the
+transpiled count of the Givens construction, measured at $T\le\MeasuredTMax$ and fitted by
+$\CxEvoPrefactor\,T^{\CxEvoExponent}$; the hit-priced block encoding is the model
+$\CxHitPrefactor\,T^{\CxHitExponent}$ with $\HitOracleAncillas$ workspace qubits. The post-selection
+probability of the one-bit filter is $\sum_ip_i$ and of the polynomial
+$\lVert p(A)\mathbf{u}\rVert^2$, measured on the set of events and taken as the median over events; the walk
+route divides the latter by the squared one-norm of the Chebyshev coefficients. HHL is priced with
+510 calls, nine ancillas and the post-selection probability of the resource model; it is an
+estimate. Amplification rounds are $\pi/(4\sqrt P)$. Gates per event are calls per shot times
+rounds times gates per call.
+
 \section{Results}
 \js{Seems a bit odd to me to start with results. Why do you not start with a description of the methodology?} \gs{This is the format of Communications Physics: Introduction, Results, Discussion, Methods. This journal published the one-bit filter paper, and I target it again. I keep this format. The detector, window and Hamiltonian paragraphs stay short here. The Methods section will give the full derivations.}
 \mm{Agree with JS. It comes across very strange in this paper to have results here, when we still have to explain the Hamiltonian etc. In the Comm. paper there was a specific required setup, that forced us to work in a certain way wrt results and methods. Here it is unnatural. Apologies, should have mentioned this before.}
+\gs{Agreed. The order is now Introduction, Methods, Results, Discussion. The overlap between the Methods subsections and section~\ref{sec:r1} will be merged in the next revision.}
 
 \subsection{From hits to a filter}\label{sec:r1}
 
@@ -160,7 +262,7 @@ are applied throughout: Gaussian smearing of every hit with $\sigma_{\rm res}=5\
 multiple-scattering kink of $\sigma_{\rm scatt}=0.15$\,mrad at every plane, the scattering angle of a
 track of high momentum in one silicon plane, \js{which = ?} \gs{`which' refers to the scattering kink. A kink of $0.15$\,mrad per plane is the multiple-scattering angle of a track of high momentum in one silicon plane. I will rewrite the sentence.  } and the loss of $1\%$ of hits. Every result in this paper is
 computed on one set of events at this configuration: $\NEvents$ events for each of
-$T=10,20,50,100,200,400,700$ and $1000$ tracks (Methods, section~\ref{sec:m:events}). \js{I am not sure all these numbers should be placed here. In a numerical mathematics paper: Intro, Methodology, Numerical Results, Conclusion} \gs{In the Communications Physics format the Results section states the data configuration once. I will keep only the configuration here and move the measured residual and the measured hit loss to Methods.  }
+$T=10,20,50,100,200,400,700$ and $1000$ tracks (section~\ref{sec:m:events}). \js{I am not sure all these numbers should be placed here. In a numerical mathematics paper: Intro, Methodology, Numerical Results, Conclusion} \gs{In the Communications Physics format the Results section states the data configuration once. I will keep only the configuration here and move the measured residual and the measured hit loss to Methods.  }
 
 \paragraph{The acceptance window.}
 As in refs.~\cite{nicotra2023,trackhhl}, the candidate segments are doublets of hits on adjacent
@@ -689,6 +791,7 @@ column.
 %==============================================================================================
 % Communications Physics order: Introduction, Results, Discussion, Methods, Data availability,
 % Code availability, References, Acknowledgements, Author contributions, Competing interests.
+% Reordered 2026-10-21 at the co-authors' request: Introduction, Methods, Results, Discussion.
 \section{Discussion}\label{sec:discussion}
 
 The one-bit filter removes exactly the isolated false segments. Its response is one cosine with
@@ -719,105 +822,6 @@ blocks of one event is the first practical target.
 
 Detector noise moves false weight onto known lines and requires a refit of the polynomial. The
 real LHCb vertex detector turns the lines into bands. Both are the subject of the sequels.
-
-\section{Methods}\label{sec:methods}
-
-\subsection{Detector simulation and the set of events}\label{sec:m:events}
-Five planes at $z=33,66,99,132$ and $165$\,mm. $T$ tracks per event from the origin, with
-directions uniform in a cone of half-opening $0.2$\,rad. One hit per track per plane. Three effects
-in this order: a multiple-scattering kink with Gaussian projections of width $\sigma_{\rm scatt}=0.15$\,mrad
-at each plane; Gaussian smearing of each hit with $\sigma_{\rm res}=5\,\mu$m in $x$ and $y$; removal of
-each hit with probability $0.01$. $\NEvents$ events for each of $T=10,20,50,100,200,400,700,1000$,
-$\NEventsTotal$ events in all. On the set the measured hit residuals are $\ResidualRms\,\mu$m and the
-hit loss is $\HitLossMean\%$ on average, between $\HitLossMin\%$ and $\HitLossMax\%$ per event.
-Six checks run on every event and the build stops on a failure: the classical solution against an
-iterative solve of the full sparse system; the one-bit amplitudes against the sparse matrix
-exponential; the polynomial against the Chebyshev recursion on the full matrix; every entry of $C$
-against the stored segment directions; the closed-form values $4/11$, $5/11$ and $1/4$ on isolated
-tracks and segments; and the measured noise against its prediction. The largest difference in the
-first three checks is $\CheckMaxDiff$.
-
-\subsection{The acceptance window}\label{sec:m:window}
-Three hits of one track at $x_1,x_2,x_3$ on consecutive planes give the kink projection
-$(x_1-2x_2+x_3)/\Delta z$. With independent position errors of width $\sigma_{\rm res}$ and a
-scattering kink of width $\sigma_{\rm scatt}$ at the middle plane, the projection has variance
-$\sigma_p^2=\sigma_{\rm scatt}^2+6\sigma_{\rm res}^2/\Delta z^2$. The $x$ and $y$ projections are
-independent, so the kink magnitude follows a Rayleigh law with
-$P(\theta>\theta_{\max})=\exp[-\theta_{\max}^2/(2\sigma_p^2)]$. We set $\theta_{\max}=3\sqrt2\sigma_p$,
-which loses $e^{-9}$ of true continuations, and $\varepsilon=1-\cos\theta_{\max}$. On the set the
-measured width of true continuations is $\SigmaPMeas$\,mrad against $\SigmaPPred$\,mrad predicted,
-and $\TrueOutside$ of true continuations fall outside the window.
-
-\subsection{The Hamiltonian and the classical solver}\label{sec:m:hamiltonian}
-A candidate segment is a pair of hits on adjacent planes; with no hit loss there are $N=4T^2$. The
-compatibility matrix $C$ has $C_{ij}=1$ when segments $i$ and $j$ share a hit and their kink is
-below $\theta_{\max}$, and $0$ otherwise. $A=\lambda_cI-C$ with $\lambda_c=\alpha+\beta=4$ and
-$\mathbf{b}=\beta\mathbf{1}$ with $\beta=1$. The connected groups of compatible segments are found
-once per event; every solver works on the same groups. The classical solution is
-$\mathbf{x}=A^{-1}\mathbf{b}$, computed on each group from its eigenvalues and eigenvectors. An
-isolated segment solves to $\beta/\lambda_c$; a chain of $m$ segments solves to
-$\sum_k\langle\mathbf{v}_k,\mathbf{b}\rangle\mathbf{v}_k/\lambda_k$ with
-$\lambda_k=\lambda_c-2\cos(k\pi/(m+1))$ and $v_{k,j}\propto\sin(kj\pi/(m+1))$.
-
-\subsection{The one-bit filter: circuit and state}\label{sec:m:onebit}
-The segment register $S$ has $n=\lceil\log_2N\rceil$ qubits. $A$ is padded to $2^n$ rows with
-diagonal entries $\lambda_c$ and $\mathbf{b}$ with ones, so each padding state is an isolated
-segment and the zero of the filter removes it. The flag $A$ and the phase bit $T$ start in $|0\rangle$.
-The states of figure~\ref{fig:filters}a are
-\begin{align}
-|\Psi_1\rangle&=|0\rangle_A|0\rangle_T|u\rangle,\\
-|\Psi_2\rangle&=|0\rangle_A\otimes\Big[|0\rangle_T\otimes\tfrac12(I+e^{-iAt})|u\rangle+|1\rangle_T\otimes\tfrac12(I-e^{-iAt})|u\rangle\Big],\\
-|\Psi_3\rangle&=|1\rangle_A|0\rangle_T\otimes\tfrac12(I+e^{-iAt})|u\rangle+|0\rangle_A|1\rangle_T\otimes\tfrac12(I-e^{-iAt})|u\rangle,\\
-|\Psi_4\rangle&=|1\rangle_A\otimes\Big[|0\rangle_T\otimes\cos^2\!\big(\tfrac{At}{2}\big)|u\rangle-\tfrac{i}{2}|1\rangle_T\otimes\sin(At)|u\rangle\Big]\nonumber\\
-&\qquad-|0\rangle_A\otimes\Big[|0\rangle_T\otimes\sin^2\!\big(\tfrac{At}{2}\big)|u\rangle+\tfrac{i}{2}|1\rangle_T\otimes\sin(At)|u\rangle\Big],
-\end{align}
-using $\tfrac12(I+e^{-iAt})=e^{-iAt/2}\cos(At/2)$ and $\tfrac12(I-e^{-iAt})=-ie^{-iAt/2}\sin(At/2)$.
-$|\Psi_2\rangle$ follows from the Hadamard, the controlled $e^{-iAt}$ and the Hadamard on $T$;
-$|\Psi_3\rangle$ from the flag, a NOT on $A$ controlled on $T=0$; $|\Psi_4\rangle$ from the same
-three gates with $e^{+iAt}$. Post-selection on $A=1$ succeeds with probability
-$\langle u|\cos^2(At/2)|u\rangle$ and reads segment $i$ with probability
-$p_i=[\cos^2(At/2)\mathbf{u}]_i^2+[\tfrac12\sin(At)\mathbf{u}]_i^2$. With $t=\pi/\lambda_c$ the zero
-of $\cos(\lambda t/2)$ lies at $\lambda=\lambda_c$. The amplitudes in this paper are $\sqrt{p_i}$,
-computed exactly on each group.
-
-\subsection{Polynomial design and phase factors}\label{sec:m:polynomial}
-The target is $g(\lambda)$ of section~\ref{sec:r2}: four Gaussian passes of half-width $h=0.18$ on
-the chain lines $\lambda_c-2\cos(k\pi/5)$, weighted by $1/\lambda$. The fit interval is
-$[\lambda_{\min}-\Delta,\lambda_{\max}+\Delta]$ with $\lambda_{\min}$ and $\lambda_{\max}$ the
-extreme eigenvalues of $A$ from the Lanczos method and $\Delta=0.05(\lambda_{\max}-\lambda_{\min})+0.2$.
-$p$ is the least-squares Chebyshev series of degree 40 to $g$ on that interval, rescaled so that
-$|p|\le0.95$ on it. The phase factors of the even and odd parts are computed by the method of
-ref.~\cite{dong2021}. The design scan of section~\ref{sec:r2} tested $\TeethNDesigns$ designs,
-chosen on events 0 to 4 and reported on events 5 to 9 of each multiplicity.
-
-\subsection{Exact evaluation of the filters}\label{sec:m:evaluation}
-Every amplitude in this paper is computed exactly. The classical solution, the one-bit amplitudes
-and $p(A)\mathbf{b}$ are evaluated on the eigenvalues and eigenvectors of each group, and checked on
-every event against the sparse matrix exponential and the three-term Chebyshev recursion on the full
-matrix (largest difference $\CheckMaxDiff$). No curve in this paper comes from a sampled circuit;
-each is what an exact implementation of the circuit gives after post-selection.
-
-\subsection{Segment efficiency, false rate and working points}\label{sec:m:metrics}
-A segment is kept when its value is at or above the threshold. Efficiency is the number of true
-segments kept divided by the number of true segments. False rate is the number of false segments
-kept divided by the number of segments kept. The first working point is the highest threshold at
-which the efficiency is at least $0.99$. The second is the lowest threshold at which the false rate
-is at most $0.01$; when no threshold reaches it, the efficiency is reported as zero. Every quoted
-number is the median over the $\NEvents$ events of a multiplicity, with the lowest event where
-stated.
-
-\subsection{Cost model}\label{sec:m:cost}
-Width is $\lceil\log_2 4T^2\rceil$ plus the ancillas of each route. Calls per shot are counted
-from the circuits of figure~\ref{fig:filters}. The two-qubit gates per call of $e^{-iAt}$ are the
-transpiled count of the Givens construction, measured at $T\le\MeasuredTMax$ and fitted by
-$\CxEvoPrefactor\,T^{\CxEvoExponent}$; the hit-priced block encoding is the model
-$\CxHitPrefactor\,T^{\CxHitExponent}$ with $\HitOracleAncillas$ workspace qubits. The post-selection
-probability of the one-bit filter is $\sum_ip_i$ and of the polynomial
-$\lVert p(A)\mathbf{u}\rVert^2$, measured on the set of events and taken as the median over events; the walk
-route divides the latter by the squared one-norm of the Chebyshev coefficients. HHL is priced with
-510 calls, nine ancillas and the post-selection probability of the resource model; it is an
-estimate. Amplification rounds are $\pi/(4\sqrt P)$. Gates per event are calls per shot times
-rounds times gates per call.
 
 \section*{Data availability}
 The $\NEventsTotal$ simulated events, the per-segment values of the three solvers, the segment
