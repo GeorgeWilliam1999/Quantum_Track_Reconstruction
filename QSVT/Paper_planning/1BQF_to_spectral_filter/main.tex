@@ -7,6 +7,7 @@
 \usepackage{amsmath,amssymb}\usepackage{booktabs}\usepackage{graphicx}
 \usepackage[labelfont=bf,font=small,skip=4pt]{caption}
 \usepackage{subcaption}\usepackage{float}\usepackage{xcolor}
+\usepackage[normalem]{ulem}% ulem.sty (CTAN 2019-11-18) copied next to main.tex: TeX Live on stbc lacks it
 \usepackage{tikz}\usetikzlibrary{decorations.pathreplacing,calc}
 \input{figures/circuit_styles.tex}
 \usepackage{microtype}
@@ -26,6 +27,10 @@
 \newcommand{\mm}[1]{{\color{purple} MM: #1 }}
 \newcommand{\gs}[1]{{\color{orange!85!black} GS: #1 }}
 \newcommand{\gss}[1]{{\color{teal} #1}}
+% Redundancy pass (2026-10-27): \gsx = text proposed for removal (grey strike-through); gsxblock = a
+% displayed equation proposed for removal (grey, no strike, since \sout cannot cross a display).
+\newcommand{\gsx}[1]{{\color{gray}\sout{#1}}}
+\newenvironment{gsxblock}{\color{gray}}{}
 \newcommand{\R}{\mathbb{R}}
 
 \title{From one bit to any polynomial:\\ quantum spectral filters for track finding in the LHCb vertex detector}
@@ -165,18 +170,41 @@ tracks and segments; and the measured noise against its prediction. The largest 
 first three checks is $\CheckMaxDiff$.
 
 \subsection{The acceptance window}\label{sec:m:window}
+\gss{A candidate segment is a pair of hits on adjacent planes (figure~\ref{Fig:ToyEvent}a). Each candidate carries a variable $S_i\in\{0,1\}$, $i=1,\dots,N$, with $S_i=1$ for an active segment. The index $i$ runs over all candidates, not over tracks. A segment joins plane $k$ to plane $k+1$, so the plane index is implicit in $i$, and two segments share a hit only when one ends on the plane where the other starts. With no hit loss there are $N=4T^2$ candidates; with hit loss $N\approx4T^2$. A true segment is a candidate whose two hits belong to the same particle; every other candidate is false. A true continuation is a pair of segments of the same track on three consecutive planes $k$, $k+1$ and $k+2$. Without noise it is a straight line; with noise the second segment turns by a small angle, the kink $\theta_{ij}$ (figure~\ref{Fig:ToyEvent}b).}
+
 Three hits of one track at $x_1,x_2,x_3$ on consecutive planes give the kink projection
 $(x_1-2x_2+x_3)/\Delta z$. With independent position errors of width $\sigma_{\rm res}$ and a
 scattering kink of width $\sigma_{\rm scatt}$ at the middle plane, the projection has variance
 $\sigma_p^2=\sigma_{\rm scatt}^2+6\sigma_{\rm res}^2/\Delta z^2$. The $x$ and $y$ projections are
 independent, so the kink magnitude follows a Rayleigh law with
 $P(\theta>\theta_{\max})=\exp[-\theta_{\max}^2/(2\sigma_p^2)]$. We set $\theta_{\max}=3\sqrt2\sigma_p$,
-which loses $e^{-9}$ of true continuations, and $\varepsilon=1-\cos\theta_{\max}$. On the set the
+which loses $e^{-9}$ of true continuations, and $\varepsilon=1-\cos\theta_{\max}$. \gss{At the detector of section~\ref{sec:m:events} this gives $\theta_{\max}=\EpsMrad$\,mrad and $\varepsilon=\EpsCos$. Two segments $i$ and $j$ that share a hit are compatible when their kink is inside the window,
+\begin{equation}
+f(\theta_{ij},\varepsilon)=\begin{cases}1,&\cos\theta_{ij}\ge1-\varepsilon,\\0,&\text{otherwise},\end{cases}
+\end{equation}
+and a false candidate with no compatible neighbour is an isolated false segment (figure~\ref{Fig:ToyEvent}a).}
+\gs{Kept in section~\mbox{\ref{sec:r1}} with figure~\mbox{\ref{fig:hits}}b; marked for removal here.} \gsx{On the set the
 measured width of true continuations is $\SigmaPMeas$\,mrad against $\SigmaPPred$\,mrad predicted,
-and $\TrueOutside$ of true continuations fall outside the window.
+and $\TrueOutside$ of true continuations fall outside the window.}
 
 \subsection{The Hamiltonian and the classical solver}\label{sec:m:hamiltonian}
-A candidate segment is a pair of hits on adjacent planes; with no hit loss there are $N=4T^2$. The
+\gs{Now defined in section~\mbox{\ref{sec:m:window}}; marked for removal here.} \gsx{A candidate segment is a pair of hits on adjacent planes; with no hit loss there are $N=4T^2$.}
+\gss{Track finding is the search for the ground state of the Hamiltonian of refs.~\cite{nicotra2023,trackhhl} over the vector $S\in\{0,1\}^N$,
+\begin{equation}
+\mathcal{H}(S)=\mathcal{H}_{\rm ang}(S,\varepsilon)+\alpha\,\mathcal{H}_{\rm spec}(S)+\beta\,\mathcal{H}_{\rm gap}(S),
+\end{equation}
+\begin{equation}
+\mathcal{H}_{\rm ang}(S,\varepsilon)=-\frac12\sum_{i,j}f(\theta_{ij},\varepsilon)\,S_iS_j,\qquad
+\mathcal{H}_{\rm spec}(S)=\frac12\sum_i S_i^2,\qquad
+\mathcal{H}_{\rm gap}(S)=\frac12\sum_i\big(1-S_i\big)^2 .
+\end{equation}
+The angular term rewards compatible continuations (figure~\ref{Fig:ToyEvent}b), and the two regularisation terms keep the problem well posed. Ref.~\cite{trackhhl} writes $\mathcal{H}_{\rm spec}$ and $\mathcal{H}_{\rm gap}$ without the factor $\frac12$; the factor, which its reference implementation carries, is what gives the diagonal $\alpha+\beta$ and $\mathbf{b}=\beta\,\mathbf{1}$ stated there. The function $f$ acts on the measured angles, which are data fixed before the solve, so the energy is quadratic in $S$. Relaxing $S$ to a real vector $\mathbf{x}\in\R^N$, the minimum is where the gradient, which is linear in $\mathbf{x}$, vanishes:
+\begin{equation}
+\label{eq:Axb:methods}
+\nabla_{\mathbf{x}}\mathcal{H}=A\mathbf{x}-\mathbf{b}=0,
+\end{equation}
+where $\mathbf{1}$ is the vector of $N$ ones. We take $\alpha=3$ and $\beta=1$ (ref.~\cite{trackhhl} used $\alpha=2$).}
+The
 compatibility matrix $C$ has $C_{ij}=1$ when segments $i$ and $j$ share a hit and their kink is
 below $\theta_{\max}$, and $0$ otherwise. $A=\lambda_cI-C$ with $\lambda_c=\alpha+\beta=4$ and
 $\mathbf{b}=\beta\mathbf{1}$ with $\beta=1$. The connected groups of compatible segments are found
@@ -189,7 +217,7 @@ $\lambda_k=\lambda_c-2\cos(k\pi/(m+1))$ and $v_{k,j}\propto\sin(kj\pi/(m+1))$.
 \subsection{The one-bit filter: circuit and state}\label{sec:m:onebit}
 The segment register $S$ has $n=\lceil\log_2N\rceil$ qubits. $A$ is padded to $2^n$ rows with
 diagonal entries $\lambda_c$ and $\mathbf{b}$ with ones, so each padding state is an isolated
-segment and the zero of the filter removes it. The flag $A$ and the phase bit $T$ start in $|0\rangle$.
+segment and the zero of the filter removes it. The flag $A$ and the phase bit $T$ start in $|0\rangle$. \gss{The segment register starts in the uniform state $|u\rangle=\frac{1}{\sqrt N}\sum_{i=1}^{N}|i\rangle$ over the candidate segments, with amplitude vector $\mathbf{u}$, $u_i=1/\sqrt N$.}
 The states of figure~\ref{fig:filters}a are
 \begin{align}
 |\Psi_1\rangle&=|0\rangle_A|0\rangle_T|u\rangle,\\
@@ -205,7 +233,26 @@ three gates with $e^{+iAt}$. Post-selection on $A=1$ succeeds with probability
 $\langle u|\cos^2(At/2)|u\rangle$ and reads segment $i$ with probability
 $p_i=[\cos^2(At/2)\mathbf{u}]_i^2+[\tfrac12\sin(At)\mathbf{u}]_i^2$. With $t=\pi/\lambda_c$ the zero
 of $\cos(\lambda t/2)$ lies at $\lambda=\lambda_c$. The amplitudes in this paper are $\sqrt{p_i}$,
-computed exactly on each group.
+computed exactly on each group. \gss{On an eigencomponent of $A$ with eigenvalue $\lambda$ the amplitude is multiplied by $\cos(\lambda t/2)$, and the probability weight by its square: the sine term carries the same factor, since $\tfrac12\sin(\lambda t)=\cos(\lambda t/2)\sin(\lambda t/2)$. Every isolated segment has the eigenvalue $\lambda_c$ (section~\ref{sec:r1}), so the zero removes it exactly.}
+
+% Moved here from section sec:r1 (redundancy pass, 2026-10-27); caption unchanged.
+\begin{figure}[H]
+\centering
+\resizebox{0.95\textwidth}{!}{\input{figures/fig2_circuits.tex}}\\[6pt]
+\begin{minipage}{0.70\textwidth}\centering
+{\small\bfseries (c)}\\
+\includegraphics[width=\textwidth]{fig2_onebit_response.pdf}
+\end{minipage}
+\caption{\textbf{One zero, and any polynomial.} (a)~The one-bit filter: one bit of phase
+estimation with two calls to the controlled evolution (highlighted) applies $\cos(\lambda t/2)$,
+with a single zero at $\lambda=\lambda_c$. (b)~The quantum singular value transformation: $d$ calls to a
+block encoding $U$ of $A$ (highlighted), with a phase rotation between calls, apply any
+polynomial of degree $d$ bounded by 1 on $[-1,1]$. Here $U$ is the dilation
+$U=\bigl(\begin{smallmatrix}X&\sqrt{I-X^2}\\ \sqrt{I-X^2}&-X\end{smallmatrix}\bigr)$ of
+$X=(A-c_0I)/c_1$; a block encoding priced by detector hits is introduced later. (c)~The factor
+the one-bit filter keeps on the eigenvalues of each segment class.}
+\label{fig:filters}
+\end{figure}
 
 \subsection{Polynomial design and phase factors}\label{sec:m:polynomial}
 The target is $g(\lambda)$ of section~\ref{sec:r2}: four Gaussian passes of half-width $h=0.18$ on
@@ -219,9 +266,9 @@ chosen on events 0 to 4 and reported on events 5 to 9 of each multiplicity.
 
 \subsection{Exact evaluation of the filters}\label{sec:m:evaluation}
 Every amplitude in this paper is computed exactly. The classical solution, the one-bit amplitudes
-and $p(A)\mathbf{b}$ are evaluated on the eigenvalues and eigenvectors of each group, and checked on
+and $p(A)\mathbf{b}$ are evaluated on the eigenvalues and eigenvectors of each group\gss{.} \gs{The checks are already listed in section~\mbox{\ref{sec:m:events}}; marked for removal here.} \gsx{, and checked on
 every event against the sparse matrix exponential and the three-term Chebyshev recursion on the full
-matrix (largest difference $\CheckMaxDiff$). No curve in this paper comes from a sampled circuit;
+matrix (largest difference $\CheckMaxDiff$).} No curve in this paper comes from a sampled circuit;
 each is what an exact implementation of the circuit gives after post-selection.
 
 \subsection{Segment efficiency, false rate and working points}\label{sec:m:metrics}
@@ -232,6 +279,8 @@ which the efficiency is at least $0.99$. The second is the lowest threshold at w
 is at most $0.01$; when no threshold reaches it, the efficiency is reported as zero. Every quoted
 number is the median over the $\NEvents$ events of a multiplicity, with the lowest event where
 stated.
+
+\gss{We sort the segments into classes by the connected group of compatible segments they belong to. There are seven classes. A complete track is a chain of four true segments across the five planes (figure~\ref{Fig:ToyEvent}a). A broken track lost a hit and is split into shorter chains. A contaminated track carries an accidental false segment. An isolated false segment is a false candidate with no compatible neighbour (figure~\ref{Fig:ToyEvent}a). A false pair is two compatible false segments. A false triple is three compatible false segments in a chain. A hub is a group in which several compatible false segments share one hit.}
 
 \subsection{Cost model}\label{sec:m:cost}
 Width is $\lceil\log_2 4T^2\rceil$ plus the ancillas of each route. Calls per shot are counted
@@ -255,47 +304,54 @@ rounds times gates per call.
 
 
 \paragraph{The detector and its noise.}
-We use the simplified vertex detector of refs.~\cite{nicotra2023,trackhhl}: five planes
+We use the simplified vertex detector of refs.~\cite{nicotra2023,trackhhl}: \gs{Parameter list moved to Methods, section~\mbox{\ref{sec:m:events}}; marked for removal.} \gsx{five planes
 $\Delta z=33$\,mm apart, $T$ tracks per event from a common vertex inside a cone of half-opening
-$0.2$\,rad, and one hit per track on each plane (figure~\ref{fig:hits}a). Three detector effects
+$0.2$\,rad, and one hit per track on each plane} (figure~\ref{fig:hits}a). \gsx{Three detector effects
 are applied throughout: Gaussian smearing of every hit with $\sigma_{\rm res}=5\,\mu$m, a
-multiple-scattering kink of $\sigma_{\rm scatt}=0.15$\,mrad at every plane, the scattering angle of a
-track of high momentum in one silicon plane, \js{which = ?} \gs{`which' refers to the scattering kink. A kink of $0.15$\,mrad per plane is the multiple-scattering angle of a track of high momentum in one silicon plane. I will rewrite the sentence.  } and the loss of $1\%$ of hits. Every result in this paper is
+multiple-scattering kink of $\sigma_{\rm scatt}=0.15$\,mrad at every plane,} the scattering angle of a
+track of high momentum in one silicon plane, \js{which = ?} \gs{`which' refers to the scattering kink. A kink of $0.15$\,mrad per plane is the multiple-scattering angle of a track of high momentum in one silicon plane. I will rewrite the sentence.  } \gsx{and the loss of $1\%$ of hits.} Every result in this paper is
 computed on one set of events at this configuration: $\NEvents$ events for each of
 $T=10,20,50,100,200,400,700$ and $1000$ tracks (section~\ref{sec:m:events}). \js{I am not sure all these numbers should be placed here. In a numerical mathematics paper: Intro, Methodology, Numerical Results, Conclusion} \gs{In the Communications Physics format the Results section states the data configuration once. I will keep only the configuration here and move the measured residual and the measured hit loss to Methods.  }
 
 \paragraph{The acceptance window.}
-As in refs.~\cite{nicotra2023,trackhhl}, the candidate segments are doublets of hits on adjacent
+\gs{Definitions and derivation moved to Methods, section~\mbox{\ref{sec:m:window}}; marked for removal.} \gsx{As in refs.~\mbox{\cite{nicotra2023,trackhhl}}, the candidate segments are doublets of hits on adjacent
 planes, each described by a variable $S_i\in\{0,1\}$, $i=1,\dots,N$, where $N\approx4T^2$ is the number of
-candidates (figure~\ref{Fig:ToyEvent}a) \js{$1 \leq i \leq T$ (??)} \gs{No. The index $i$ runs over all candidate doublets, not over tracks. Five planes with $T$ hits each give $N=4T^2$ candidates, and $S\in\{0,1\}^N$. I will state $N$ at this point.  }, and two segments $S_i$ and $S_j$ that share a
-hit are coupled when the angle $\theta_{ij}$ between them passes an angular tolerance $\varepsilon$: \js{Stupid question, just for my understanding, shouldn't $S$ be indexed by $i$ and another index (call it $k$) that refers to the plane where it is measured? And then $\theta_{ij}$ is the angle between $S_i^k$ and $S_j^{k+1}$?} \gs{A segment is identified by its two hits, so the plane index is implicit: a segment joins plane $k$ to plane $k+1$. Two segments share a hit only when one ends on the plane where the other starts. I use one flat index $i$ because the matrix $A$ is indexed in this way. I will add one sentence that says this.  }
+candidates (figure~\mbox{\ref{Fig:ToyEvent}}a)} \js{$1 \leq i \leq T$ (??)} \gs{No. The index $i$ runs over all candidate doublets, not over tracks. Five planes with $T$ hits each give $N=4T^2$ candidates, and $S\in\{0,1\}^N$. I will state $N$ at this point.  }\gsx{, and two segments $S_i$ and $S_j$ that share a
+hit are coupled when the angle $\theta_{ij}$ between them passes an angular tolerance $\varepsilon$:} \js{Stupid question, just for my understanding, shouldn't $S$ be indexed by $i$ and another index (call it $k$) that refers to the plane where it is measured? And then $\theta_{ij}$ is the angle between $S_i^k$ and $S_j^{k+1}$?} \gs{A segment is identified by its two hits, so the plane index is implicit: a segment joins plane $k$ to plane $k+1$. Two segments share a hit only when one ends on the plane where the other starts. I use one flat index $i$ because the matrix $A$ is indexed in this way. I will add one sentence that says this.  }
+\begin{gsxblock}
 \begin{equation} 
 f(\theta_{ij},\varepsilon)=\begin{cases}1,&\cos\theta_{ij}\ge1-\varepsilon,\\0,&\text{otherwise}.\end{cases}
 \end{equation}
-A segment joins plane $k$ to plane $k+1$, so the plane index is implicit in $i$, and two segments
+\end{gsxblock}
+\gsx{A segment joins plane $k$ to plane $k+1$, so the plane index is implicit in $i$, and two segments
 share a hit only when one ends on the plane where the other starts. We set the tolerance from the
 detector. A true continuation is a pair of segments of the same track on three consecutive planes
-(figure~\ref{Fig:ToyEvent}b). Resolution and scattering give it a kink \js{true continuation = straight line?} \gs{A true continuation is a pair of segments of the same track on planes $k$, $k+1$ and $k+2$. Without noise the pair is a straight line. With noise the second segment turns by a small kink angle. I will define the term at its first use.  }, the second difference of the three hit positions divided by $\Delta z$, whose projections on
-the two transverse axes $x$ and $y$ \js{projections onto what?} \gs{The projections of the kink angle on the two transverse axes $x$ and $y$. Each projection is Gaussian with width $\sigma_p$.  } are Gaussian of width
+(figure~\mbox{\ref{Fig:ToyEvent}}b). Resolution and scattering give it a kink} \js{true continuation = straight line?} \gs{A true continuation is a pair of segments of the same track on planes $k$, $k+1$ and $k+2$. Without noise the pair is a straight line. With noise the second segment turns by a small kink angle. I will define the term at its first use.  }\gsx{, the second difference of the three hit positions divided by $\Delta z$, whose projections on
+the two transverse axes $x$ and $y$} \js{projections onto what?} \gs{The projections of the kink angle on the two transverse axes $x$ and $y$. Each projection is Gaussian with width $\sigma_p$.  } \gsx{are Gaussian of width}
+\begin{gsxblock}
 \begin{equation}
 \sigma_p^2=\sigma_{\rm scatt}^2+6\,\big(\sigma_{\rm res}/\Delta z\big)^2 ,
 \end{equation}
-since three independent position errors give the second difference the variance
+\end{gsxblock}
+\gsx{since three independent position errors give the second difference the variance
 $(1+4+1)\,\sigma_{\rm res}^2$. The kink magnitude is the norm of two independent Gaussian components,
-so it follows a Rayleigh distribution \js{This is because if two normally distributed quantities are measured in the Euclidean norm, then this is Rayleigh-distributed, right?} \gs{Yes. The kink magnitude is the Euclidean norm of two independent Gaussian components with the same width. This norm follows a Rayleigh distribution.}, and we accept kinks below
+so it follows a Rayleigh distribution} \js{This is because if two normally distributed quantities are measured in the Euclidean norm, then this is Rayleigh-distributed, right?} \gs{Yes. The kink magnitude is the Euclidean norm of two independent Gaussian components with the same width. This norm follows a Rayleigh distribution.}\gsx{, and we accept kinks below}
+\begin{gsxblock}
 \begin{equation}
 \theta_{\max}=3\sqrt2\,\sigma_p=\EpsMrad\ \text{mrad},\qquad \varepsilon=1-\cos\theta_{\max}=\EpsCos ,
 \end{equation}
-so that the Rayleigh tail $\exp[-\theta_{\max}^2/(2\sigma_p^2)]=e^{-9}\approx1.2\times10^{-4}$ is the
-fraction of true continuations lost, at any noise level. \js{I cannot really follow. Is this physics magic? Or where does it come from? What is 'true continuations'?} \gs{No magic, two steps. First, the kink is the second difference of three hit positions divided by $\Delta z$. Three independent position errors of width $\sigma_{\rm res}$ give the second difference a variance of $(1+4+1)\,\sigma_{\rm res}^2=6\sigma_{\rm res}^2$. This is the factor 6. Second, the Rayleigh tail is $P(\theta>\theta_{\max})=\exp[-\theta_{\max}^2/(2\sigma_p^2)]$. With $\theta_{\max}=3\sqrt2\,\sigma_p$ the exponent is $-9$. A true continuation is defined in my reply above. I will add both steps to the text.  }
+\end{gsxblock}
+\gsx{so that the Rayleigh tail $\exp[-\theta_{\max}^2/(2\sigma_p^2)]=e^{-9}\approx1.2\times10^{-4}$ is the
+fraction of true continuations lost, at any noise level.} \js{I cannot really follow. Is this physics magic? Or where does it come from? What is 'true continuations'?} \gs{No magic, two steps. First, the kink is the second difference of three hit positions divided by $\Delta z$. Three independent position errors of width $\sigma_{\rm res}$ give the second difference a variance of $(1+4+1)\,\sigma_{\rm res}^2=6\sigma_{\rm res}^2$. This is the factor 6. Second, the Rayleigh tail is $P(\theta>\theta_{\max})=\exp[-\theta_{\max}^2/(2\sigma_p^2)]$. With $\theta_{\max}=3\sqrt2\,\sigma_p$ the exponent is $-9$. A true continuation is defined in my reply above. I will add both steps to the text.  }
 Figure~\ref{fig:hits}b shows the kink distributions on the events. The measured kink width is
 $\SigmaPMeas$\,mrad against $\SigmaPPred$\,mrad predicted, a fraction $\TrueOutside$ of true
 continuations falls outside the window, and the false candidates lie at kinks one to three orders
 of magnitude larger. \js{In my opinion, if you talk about results from a figure, start with mentioning the figure and then describing its results.} \gs{Agreed. I will name figure~\ref{fig:hits}b first and then state what it shows.  }
 
 \paragraph{The Hamiltonian.}
-Track finding is the search for the ground state of the Hamiltonian of
-refs.~\cite{nicotra2023,trackhhl} over the vector $S\in\{0,1\}^N$, \js{If I understand it correctly, we go from segment to segment, right? So $S$ is a vector in $\R^T$ rather than $\R^{T^2}$} \gs{$S$ is a vector in $\R^N$ with $N\approx4T^2$, one entry per candidate segment. The Hamiltonian couples only segment pairs that share a hit, so the sum over $i,j$ runs over these pairs.  } 
+\gs{$\mathcal{H}(S)$, its relaxation and $\alpha=3$ moved to Methods, section~\mbox{\ref{sec:m:hamiltonian}}; marked for removal. The block values and the classical false rate stay here.} \gsx{Track finding is the search for the ground state of the Hamiltonian of
+refs.~\mbox{\cite{nicotra2023,trackhhl}} over the vector $S\in\{0,1\}^N$,} \js{If I understand it correctly, we go from segment to segment, right? So $S$ is a vector in $\R^T$ rather than $\R^{T^2}$} \gs{$S$ is a vector in $\R^N$ with $N\approx4T^2$, one entry per candidate segment. The Hamiltonian couples only segment pairs that share a hit, so the sum over $i,j$ runs over these pairs.  } 
+\begin{gsxblock}
 \begin{equation}
 \mathcal{H}(S)=\mathcal{H}_{\rm ang}(S,\varepsilon)+\alpha\,\mathcal{H}_{\rm spec}(S)+\beta\,\mathcal{H}_{\rm gap}(S),
 \end{equation}
@@ -304,22 +360,25 @@ refs.~\cite{nicotra2023,trackhhl} over the vector $S\in\{0,1\}^N$, \js{If I unde
 \mathcal{H}_{\rm spec}(S)=\frac12\sum_i S_i^2,\qquad
 \mathcal{H}_{\rm gap}(S)=\frac12\sum_i\big(1-S_i\big)^2 ,
 \end{equation}
-where the angular term rewards compatible continuations and the two regularisation terms keep
-the problem well posed.\footnote{Ref.~\cite{trackhhl} writes $\mathcal{H}_{\rm spec}$ and
+\end{gsxblock}
+\gsx{where the angular term rewards compatible continuations and the two regularisation terms keep
+the problem well posed.}\footnote{\gsx{Ref.~\mbox{\cite{trackhhl}} writes $\mathcal{H}_{\rm spec}$ and
 $\mathcal{H}_{\rm gap}$ without the factor $\frac12$; the factor, which its reference
 implementation carries, is what gives the diagonal $\alpha+\beta$ and $\mathbf{b}=\beta\,\mathbf{1}$
-stated there.} The function $f$ acts on the measured angles, which are data, so the energy is quadratic in $S$.
+stated there.}} \gsx{The function $f$ acts on the measured angles, which are data, so the energy is quadratic in $S$.
 Relaxing $S$ to a real vector $\mathbf{x}\in\R^N$, the minimum is found by setting the gradient,
-which is linear in $\mathbf{x}$, to zero, \js{Technically, as long as $f$ is a nonlinear function (which in this description, it is) this is not a linear but a nonlinear algebra problem!} \gs{$f$ acts on the measured angles $\theta_{ij}$, not on the unknowns $S$. The angles are data and are fixed before the solve. The energy is quadratic in $S$, so its gradient is linear in $\mathbf{x}$. I will say this in the text.  }
+which is linear in $\mathbf{x}$, to zero,} \js{Technically, as long as $f$ is a nonlinear function (which in this description, it is) this is not a linear but a nonlinear algebra problem!} \gs{$f$ acts on the measured angles $\theta_{ij}$, not on the unknowns $S$. The angles are data and are fixed before the solve. The energy is quadratic in $S$, so its gradient is linear in $\mathbf{x}$. I will say this in the text.  }
+\begin{gsxblock}
 \begin{equation}
 \label{eq:Axb}
 \nabla_{\mathbf{x}}\mathcal{H}=A\mathbf{x}-\mathbf{b}=0,\qquad A=(\alpha+\beta)\,I-C,\qquad \mathbf{b}=\beta\,\mathbf{1},
 \end{equation}
+\end{gsxblock}
 \js{Should we define $\mathbf{1}$?} \gs{Yes. $\mathbf{1}$ is the vector of $N$ ones. I will define it at this equation.  }
-where $\mathbf{1}$ is the vector of $N$ ones and $C_{ij}=f(\theta_{ij},\varepsilon)$ for segments that
+\gsx{where $\mathbf{1}$ is the vector of $N$ ones and $C_{ij}=f(\theta_{ij},\varepsilon)$ for segments that
 share a hit. We take $\alpha=3$ and
-$\beta=1$, so every diagonal entry of $A$ is $\lambda_c=\alpha+\beta=4$ (ref.~\cite{trackhhl} used
-$\alpha=2$, $\lambda_c=3$). Because compatibility is local, $A$ breaks into small blocks, one for
+$\beta=1$, so every diagonal entry of $A$ is $\lambda_c=\alpha+\beta=4$ (ref.~\mbox{\cite{trackhhl}} used
+$\alpha=2$, $\lambda_c=3$).} Because compatibility is local, $A$ breaks into small blocks, one for
 each connected group of compatible segments. Figure~\ref{fig:hits}c shows four such groups cut from
 one 400-track event, each as a graph and as a block of $A$: a complete track (four segments in a
 chain), a false pair, a hub and an isolated false segment \js{Maybe explain the figure just in one or two sentences, this would also simplify understanding the numbers below. Also explain that the figure only covers four tracks I guess ?!} \gs{Figure~\ref{fig:hits}c shows four connected groups cut from one 400-track event, not four tracks: a complete track (four segments in a chain), a false pair, a hub and an isolated false segment. Each group is one block of $A$. I will add this description to the text.  }. The solution on each block depends only on its graph. In these examples, a \js{In this example, a} \gs{Accepted. The values below are exact for the graphs of figure~\ref{fig:hits}c, and they hold for every block with the same graph.  } segment with no compatible neighbour solves to
@@ -351,22 +410,26 @@ a 400-track event with the threshold that keeps $99\%$ of true segments.}
 \paragraph{The one-bit filter.}
 The one-bit filter (figure~\ref{fig:filters}a) prepares the uniform superposition over segments,
 applies one bit of phase estimation to $e^{-iAt}$ with the phase bit $T$, sets the flag qubit $A$ when
-$T$ reads zero, and uncomputes the phase bit. The $A=1$ part of the final state $|\Psi_4\rangle$ of
-figure~\ref{fig:filters}a is \js{$\cos(A)$ is not meaningful in this context. It is a probability, so it should be scalar. And what is $\mathbf{u}$? I need a bit more context to follow. Maybe we can write up the outcome of the 1-bit filter, which should be something like } \gs{Agreed, and I have rewritten this part. $|u\rangle$ is the uniform state over the $N$ candidate segments, $\mathbf{u}$ its vector of amplitudes $u_i=1/\sqrt N$. $p_i$ is a scalar: $[\cdot]_i$ takes component $i$ of the vector in the brackets. The state you wrote is not the state the circuit makes. After the first round, the phase bit $T$ holds $|0\rangle_T\otimes e^{-iAt/2}\cos(At/2)|u\rangle-i\,|1\rangle_T\otimes e^{-iAt/2}\sin(At/2)|u\rangle$. The flag $A$ is set to 1 on the $T=0$ part. The uncompute then gives the state in the equation below, and this state gives $p_i$. I will write the state after each stage of figure~\ref{fig:filters}a in Methods.}
+$T$ reads zero, and uncomputes the phase bit. \gs{State, $|u\rangle$ and $p_i$ moved to Methods, section~\mbox{\ref{sec:m:onebit}}; marked for removal. The kept factors and false rates stay here.} \gsx{The $A=1$ part of the final state $|\Psi_4\rangle$ of
+figure~\mbox{\ref{fig:filters}}a is} \js{$\cos(A)$ is not meaningful in this context. It is a probability, so it should be scalar. And what is $\mathbf{u}$? I need a bit more context to follow. Maybe we can write up the outcome of the 1-bit filter, which should be something like } \gs{Agreed, and I have rewritten this part. $|u\rangle$ is the uniform state over the $N$ candidate segments, $\mathbf{u}$ its vector of amplitudes $u_i=1/\sqrt N$. $p_i$ is a scalar: $[\cdot]_i$ takes component $i$ of the vector in the brackets. The state you wrote is not the state the circuit makes. After the first round, the phase bit $T$ holds $|0\rangle_T\otimes e^{-iAt/2}\cos(At/2)|u\rangle-i\,|1\rangle_T\otimes e^{-iAt/2}\sin(At/2)|u\rangle$. The flag $A$ is set to 1 on the $T=0$ part. The uncompute then gives the state in the equation below, and this state gives $p_i$. I will write the state after each stage of figure~\ref{fig:filters}a in Methods.}
+\begin{gsxblock}
 \begin{equation}
 |1\rangle_A\otimes\Big[|0\rangle_T\otimes\cos^{2}\!\big(\tfrac{At}{2}\big)|u\rangle\;-\;\tfrac{i}{2}\,|1\rangle_T\otimes\sin(At)\,|u\rangle\Big],
 \qquad |u\rangle=\frac{1}{\sqrt N}\sum_{i=1}^{N}|i\rangle ,
 \end{equation}
-where $N$ is the number of candidate segments, so that after post-selection on $A=1$ the
-probability of reading segment $i$ is
+\end{gsxblock}
+\gsx{where $N$ is the number of candidate segments, so that after post-selection on $A=1$ the
+probability of reading segment $i$ is}
 
 \js{with $\psi = \frac 1 {2^n} \sum_{i=0}^{2^n-1} i$ and then continue from there? We could also clarify that $T = 2^n$ ?} \gs{The segment register has $n=\lceil\log_2 N\rceil$ qubits, with $N$ the number of candidate segments. $N$ is not a power of two in general. I will state $n$ at the register in figure~\ref{fig:filters}a and say in Methods how the unused basis states are treated.}
+\begin{gsxblock}
 \begin{equation}
 p_i=\Big[\cos^{2}\!\big(\tfrac{At}{2}\big)\mathbf{u}\Big]_i^{2}+\Big[\tfrac12\sin(At)\,\mathbf{u}\Big]_i^{2},\qquad t=\frac{\pi}{\lambda_c},
 \end{equation}
+\end{gsxblock}
 \js{Btw, this should be the probability when the ancilla is zero, but in the plot it says it should be one.} \gs{Both are correct. The circuit has two ancillas. The phase bit $T$ returns to 0. The flag $A$ is set to 1 when $T=0$ after the first round, and the post-selection reads $A=1$. The text now names both registers.}
-so the amplitude of every eigencomponent of the input is multiplied by $\cos(\lambda t/2)$ \js{should it not be the square?} \gs{The amplitude factor is $\cos(\lambda t/2)$. The probability weight is its square. The sentence now says `amplitude'.}. With $t=\pi/\lambda_c$ the
-zero lies at $\lambda=\lambda_c$, the eigenvalue of every isolated segment \js{what about the $\sin$ contribution in $p_i$?} \gs{The sine term is the $T=1$ part of the same flagged state. Its amplitude on one eigencomponent is $\cos(\lambda t/2)\sin(\lambda t/2)$. It contains the factor $\cos(\lambda t/2)$, so it is also zero at $\lambda=\lambda_c$. The sum of the two terms on one eigencomponent is $\cos^2(\lambda t/2)$.}, and those segments are removed
+\gsx{so the amplitude of every eigencomponent of the input is multiplied by $\cos(\lambda t/2)$} \js{should it not be the square?} \gs{The amplitude factor is $\cos(\lambda t/2)$. The probability weight is its square. The sentence now says `amplitude'.}\gsx{. With $t=\pi/\lambda_c$ the
+zero lies at $\lambda=\lambda_c$,} the eigenvalue of every isolated segment \js{what about the $\sin$ contribution in $p_i$?} \gs{The sine term is the $T=1$ part of the same flagged state. Its amplitude on one eigencomponent is $\cos(\lambda t/2)\sin(\lambda t/2)$. It contains the factor $\cos(\lambda t/2)$, so it is also zero at $\lambda=\lambda_c$. The sum of the two terms on one eigencomponent is $\cos^2(\lambda t/2)$.}, and those segments are removed
 exactly. Every other configuration keeps a factor fixed by where its eigenvalues lie
 (figure~\ref{fig:filters}c): a false pair keeps $\KeptPair$, a false triple $\KeptTriple$, a
 hub with three or five segments $\KeptHubThree$ or $\KeptHubFive$, and a complete track
@@ -376,37 +439,22 @@ broken tracks, and the false pairs, triples and hubs above them all survive: on 
 false rate matches the classical one, $\OneBitFarFourHundred$ at 400 tracks,
 $\OneBitFarSevenHundred$ at 700 and $\OneBitFarThousand$ at 1000.
 
-\begin{figure}[H]
-\centering
-\resizebox{0.95\textwidth}{!}{\input{figures/fig2_circuits.tex}}\\[6pt]
-\begin{minipage}{0.70\textwidth}\centering
-{\small\bfseries (c)}\\
-\includegraphics[width=\textwidth]{fig2_onebit_response.pdf}
-\end{minipage}
-\caption{\textbf{One zero, and any polynomial.} (a)~The one-bit filter: one bit of phase
-estimation with two calls to the controlled evolution (highlighted) applies $\cos(\lambda t/2)$,
-with a single zero at $\lambda=\lambda_c$. (b)~The quantum singular value transformation: $d$ calls to a
-block encoding $U$ of $A$ (highlighted), with a phase rotation between calls, apply any
-polynomial of degree $d$ bounded by 1 on $[-1,1]$. Here $U$ is the dilation
-$U=\bigl(\begin{smallmatrix}X&\sqrt{I-X^2}\\ \sqrt{I-X^2}&-X\end{smallmatrix}\bigr)$ of
-$X=(A-c_0I)/c_1$; a block encoding priced by detector hits is introduced later. (c)~The factor
-the one-bit filter keeps on the eigenvalues of each segment class.}
-\label{fig:filters}
-\end{figure}
+% Figure fig:filters moved to section sec:m:onebit (redundancy pass, 2026-10-27).
+\gs{Figure~\mbox{\ref{fig:filters}} (circuits and one-bit response) moved to Methods, section~\mbox{\ref{sec:m:onebit}}.}
 
 \paragraph{Segment classes kept by each solver.}
-We sort the segments into classes by the connected group they belong to. There are seven classes:
+\gs{Class definitions moved to Methods, section~\mbox{\ref{sec:m:metrics}}; marked for removal. The counts and efficiencies stay here.} \gsx{We sort the segments into classes by the connected group they belong to. There are seven classes:
 complete tracks; broken tracks, which lost a hit; contaminated tracks, which carry an accidental
 false segment; isolated false segments; false pairs, two compatible false segments; false triples,
 three compatible false segments in a chain; and hubs, where several compatible false segments share
-one hit.
+one hit.}
 Figure~\ref{fig:atlas} shows, at 1000 tracks and pooled over $\NEvents$ events, the value of
 every segment of each class relative to each solver's threshold. The classical solver and the
 one-bit filter, read at $99\%$ efficiency, keep all $\AtlasPairs$ false-pair segments and all
 $\AtlasTriples$ false-triple segments. The degree-40 polynomial introduced in section~\ref{sec:r2}, read at the lowest threshold
 with a false rate of at most $1\%$, keeps none of the false-pair segments, keeps
 $\AtlasCompleteKeptQsvt$ of the $\AtlasComplete$ segments of complete tracks, and reaches an
-efficiency of $\AtlasQsvtEff$ at a false rate of $\AtlasQsvtFar$. The true segments it rejects
+efficiency of $\AtlasQsvtEff$ at a false rate of $\AtlasQsvtFar$. \gss{These two values are pooled over the $\NEvents$ events; the median over events is in table~\ref{tab:headline}.} The true segments it rejects
 are the $\AtlasBrokenLostQsvt$ segments of broken tracks and $\AtlasContamLostQsvt$ segments of
 contaminated tracks, whose eigenvalues differ from those of a complete track
 (table~\ref{tab:headline}). Read at the same false rate of at most $1\%$, the classical solver
@@ -640,6 +688,23 @@ implementation of the circuit produces after post-selection.
 %==============================================================================================
 \subsection{Results against track multiplicity}\label{sec:r3}
 
+\paragraph{\gss{Segment-level metrics of each solver.}}
+\gss{Figure~\ref{fig:segmetrics} gives the segment-level metrics of the three solvers against $T$, in the form of the one-bit filter paper~\cite{trackhhl}: the segment efficiency $\eff$, the segment false rate $\far$, the number of candidate segments and the number of false segments kept. A segment is active when its value exceeds the solver's threshold; no efficiency or false-rate level is imposed. The classical solver is read at the fixed threshold $x_i>\beta/\lambda_c+0.10=0.35$ of ref.~\cite{trackhhl}. The one-bit filter sends every isolated segment to zero, so it is read at a threshold just above zero; the QSVT is read in the same way, just above the level of its isolated segments. The number of false candidates grows as $T^2$ and the number of true segments as $T$. All three solvers keep about $99\%$ of the true segments at every $T$. The false rate of the classical solver rises to $0.13$ at 1000 tracks; that of the one-bit filter to $0.77$, because every false pair, triple and hub lies above zero; and that of the QSVT to $0.39$ with a large spread between events, because the false pairs, suppressed to $1\%$ of the track level, still lie above the isolated level. Table~\ref{tab:segmetrics} gives the numbers.}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig8_segment_metrics.pdf}
+\caption{\gss{\textbf{Segment-level metrics against track multiplicity.} (a)~Segment efficiency and (b)~segment false rate of each solver: classical solver at the fixed threshold $0.35$, one-bit filter and QSVT (degree 40) at a threshold just above the level of their isolated segments. (c)~Candidate segments in the event, true and false. (d)~False segments kept by each solver, with the number of true segments in the event for reference. Points are means over the $\NEvents$ events and error bars the standard error of the mean.}}
+\label{fig:segmetrics}
+\end{figure}
+
+\begin{table}[H]
+\centering\footnotesize
+\caption{\gss{\textbf{Segment-level metrics of each solver}, means over the $\NEvents$ events with the standard error of the mean: segment efficiency $\eff$, segment false rate $\far$ and the number of false segments kept, at the thresholds of figure~\ref{fig:segmetrics}.}}
+\label{tab:segmetrics}
+\input{figures/seg_metrics_table.tex}
+\end{table}
+
 \paragraph{Efficiency at a false rate of at most $1\%$.}
 Figure~\ref{fig:mult}a shows the efficiency of each solver at the lowest threshold with a false rate
 of at most $1\%$, against $T$. The polynomial keeps $\QsvtEffTwoHundred$ of true segments at 200
@@ -667,6 +732,7 @@ Figure~\ref{fig:curves} shows efficiency against false rate for the three solver
 and 1000 tracks, pooled over the ten events. The classical and one-bit curves coincide. Both have a
 step at an efficiency of $0.5$: the end segments of complete tracks and the false pairs share a
 level. From 400 tracks on, the polynomial's curve lies above both at every false rate below $10\%$.
+\gss{The classical and one-bit curves coincide at $99\%$ efficiency, but not at low false rate: at a false rate of $1\%$ the one-bit filter stays on the step at $0.5$ from 400 tracks on, while the classical solver keeps $\ClassEffAtOneFourHundred$ at 400 tracks. At 400 tracks the classical and polynomial curves meet at a false rate of $1\%$; from 700 tracks on, the polynomial's curve lies above both at every false rate below $10\%$ (table~\ref{tab:headline}).}
 
 \paragraph{Degree 60.}
 A polynomial of degree 60 with half-width $0.12$, chosen on five events and read on the other five,
@@ -798,7 +864,7 @@ The one-bit filter removes exactly the isolated false segments. Its response is 
 one zero, and its shape is fixed. The false pairs, triples and hubs keep factors set by their
 distance from the zero, and they survive at the level of the broken tracks. At $99\%$ efficiency the
 one-bit filter therefore gives the same false rate as the classical solver on every event we
-simulated.
+simulated. \gss{At $99\%$ efficiency the one-bit filter therefore gives the same false rate as the classical solver on the median event of every multiplicity; on two of the $\NEventsTotal$ events, one at 700 and one at 1000 tracks, its false rate is higher.}
 
 The spectrum of the segment Hamiltonian is a design surface. The four eigenvalues of a complete
 track are fixed by the detector geometry, and only two of them carry weight. A polynomial that
@@ -815,8 +881,8 @@ for the second, and we hold them for the next paper.
 
 The price is depth per call. Calls per shot are constant in $T$, the width grows as the logarithm of
 the event, and the two-qubit gates per call are set by how $A$ enters the circuit. The Chebyshev walk
-costs fewer gates than the phase sequence. A block encoding priced by hits reduces the gates per
-call by two orders of magnitude at 1000 tracks for about $\HitOracleAncillas$ more qubits. No QSVT
+costs fewer gates than the phase sequence. \gss{For the degree-40 polynomial the phase sequence makes $\CallsPhase$ calls per shot, because the even and odd parts and their real parts are applied by separate sequences; the walk makes $\CallsWalk$.} A block encoding priced by hits reduces the gates per
+call by two orders of magnitude at 1000 tracks for about $\HitOracleAncillas$ more qubits. \gss{A block encoding priced by hits reduces the gates per call by a factor of about fifty at 1000 tracks ($\CxHitThousand$ against $\CxEvoThousand$ two-qubit gates per call) for about $\HitOracleAncillas$ more qubits.} No QSVT
 has run on noisy hardware; the algorithm is framed as fault-tolerant, and a per-cluster run on the
 blocks of one event is the first practical target.
 
