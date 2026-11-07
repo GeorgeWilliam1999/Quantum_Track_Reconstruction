@@ -145,10 +145,10 @@ configurations each filter keeps, and why. The price is a deeper circuit and, fo
 that makes it efficient, more qubits. Section~\ref{sec:r4} quantifies both costs: the number of logical qubits and the number of two-qubit gates per solved event.
 
 
-Section~\ref{sec:r1} builds the problem from a noisy event: the detector model, the acceptance
-window, the Hamiltonian, the one-bit filter, and what each solver keeps.
-\textit{[Sections on the spectrum, the polynomial, results against multiplicity and cost follow;
-see schematic.tex.]}
+\gs{The teal roadmap below replaces this sentence and the placeholder; marked for removal.} \gsx{Section~\mbox{\ref{sec:r1}} builds the problem from a noisy event: the detector model, the acceptance
+window, the Hamiltonian, the one-bit filter, and what each solver keeps.}
+\gsx{\textit{[Sections on the spectrum, the polynomial, results against multiplicity and cost follow;
+see schematic.tex.]}}
 
 \gss{Section~\ref{sec:methods} gives the detector simulation, the acceptance window, the Hamiltonian, the circuits of the one-bit filter and of the polynomial filter, and the cost model. Section~\ref{sec:r1} then builds the problem from a noisy event, section~\ref{sec:r2} designs the polynomial from the spectrum, section~\ref{sec:r3} gives the results against track multiplicity, and section~\ref{sec:r4} the computational cost.}
 
@@ -261,7 +261,7 @@ $[\lambda_{\min}-\Delta,\lambda_{\max}+\Delta]$ with $\lambda_{\min}$ and $\lamb
 extreme eigenvalues of $A$ from the Lanczos method and $\Delta=0.05(\lambda_{\max}-\lambda_{\min})+0.2$.
 $p$ is the least-squares Chebyshev series of degree 40 to $g$ on that interval, rescaled so that
 $|p|\le0.95$ on it. The phase factors of the even and odd parts are computed by the method of
-ref.~\cite{dong2021}. The design scan of section~\ref{sec:r2} tested $\TeethNDesigns$ designs,
+ref.~\cite{dong2021}. \gss{We check the phase factors on a small event without detector noise ($T=\CircuitCheckT$, $\CircuitCheckNSeg$ candidate segments). For this check the fit interval is fixed at $[\CircuitCheckLo,\CircuitCheckHi]$. The phase factors are converted to the reflection convention of ref.~\cite{martyn2021}. A dense simulation of the phase-sequence circuit then gives the even and odd parts of $p(A)\mathbf{u}$ in the real part of its output. The largest difference from the exact values is $\CircuitCheckErrEven$ for the even part and $\CircuitCheckErrOdd$ for the odd part.} The design scan of section~\ref{sec:r2} tested $\TeethNDesigns$ designs,
 chosen on events 0 to 4 and reported on events 5 to 9 of each multiplicity.
 
 \subsection{Exact evaluation of the filters}\label{sec:m:evaluation}
@@ -689,12 +689,12 @@ implementation of the circuit produces after post-selection.
 \subsection{Results against track multiplicity}\label{sec:r3}
 
 \paragraph{\gss{Segment-level metrics of each solver.}}
-\gss{Figure~\ref{fig:segmetrics} gives the segment-level metrics of the three solvers against $T$, in the form of the one-bit filter paper~\cite{trackhhl}: the segment efficiency $\eff$, the segment false rate $\far$, the number of candidate segments and the number of false segments kept. A segment is active when its value exceeds the solver's threshold; no efficiency or false-rate level is imposed. The classical solver is read at the fixed threshold $x_i>\beta/\lambda_c+0.10=0.35$ of ref.~\cite{trackhhl}. The one-bit filter sends every isolated segment to zero, so it is read at a threshold just above zero; the QSVT is read in the same way, just above the level of its isolated segments. The number of false candidates grows as $T^2$ and the number of true segments as $T$. All three solvers keep about $99\%$ of the true segments at every $T$. The false rate of the classical solver rises to $0.13$ at 1000 tracks; that of the one-bit filter to $0.77$, because every false pair, triple and hub lies above zero; and that of the QSVT to $0.39$ with a large spread between events, because the false pairs, suppressed to $1\%$ of the track level, still lie above the isolated level. Table~\ref{tab:segmetrics} gives the numbers.}
+\gss{Figure~\ref{fig:segmetrics} gives the segment-level metrics of the three solvers against $T$, in the form of the one-bit filter paper~\cite{trackhhl}: the segment efficiency $\eff$, the segment false rate $\far$, the number of candidate segments and the number of false segments kept. A segment is active when its value exceeds the solver's threshold; no efficiency or false-rate level is imposed. The classical solver is read at the fixed threshold $x_i>\beta/\lambda_c+0.10=\SegClassTau$ of ref.~\cite{trackhhl}. The one-bit filter sends every isolated segment to zero, so it is read at a threshold just above zero; the QSVT is read in the same way, just above the level of its isolated segments. The number of false candidates grows as $T^2$ and the number of true segments as $T$. All three solvers keep about $99\%$ of the true segments at every $T$. The false rate of the classical solver rises to $\SegFarClassThousand$ at 1000 tracks; that of the one-bit filter to $\SegFarOneBitThousand$, because every false pair, triple and hub lies above zero; and that of the QSVT to $\SegFarQsvtThousand$ with a large spread between events, because the false pairs, suppressed to $1\%$ of the track level, still lie above the isolated level. Table~\ref{tab:segmetrics} gives the numbers.}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{fig8_segment_metrics.pdf}
-\caption{\gss{\textbf{Segment-level metrics against track multiplicity.} (a)~Segment efficiency and (b)~segment false rate of each solver: classical solver at the fixed threshold $0.35$, one-bit filter and QSVT (degree 40) at a threshold just above the level of their isolated segments. (c)~Candidate segments in the event, true and false. (d)~False segments kept by each solver, with the number of true segments in the event for reference. Points are means over the $\NEvents$ events and error bars the standard error of the mean.}}
+\caption{\gss{\textbf{Segment-level metrics against track multiplicity.} (a)~Segment efficiency and (b)~segment false rate of each solver: classical solver at the fixed threshold $\SegClassTau$, one-bit filter and QSVT (degree 40) at a threshold just above the level of their isolated segments. (c)~Candidate segments in the event, true and false. (d)~False segments kept by each solver, with the number of true segments in the event for reference. Points are means over the $\NEvents$ events and error bars the standard error of the mean.}}
 \label{fig:segmetrics}
 \end{figure}
 
@@ -729,10 +729,13 @@ above that population or falls below it.
 
 \paragraph{The full curves.}
 Figure~\ref{fig:curves} shows efficiency against false rate for the three solvers at 200, 400, 700
-and 1000 tracks, pooled over the ten events. The classical and one-bit curves coincide. Both have a
+and 1000 tracks, pooled over the ten events. \gs{The two struck sentences do not match the numbers; the teal sentences below replace them.} \gsx{The classical and one-bit curves coincide.} Both have a
 step at an efficiency of $0.5$: the end segments of complete tracks and the false pairs share a
-level. From 400 tracks on, the polynomial's curve lies above both at every false rate below $10\%$.
+level. \gsx{From 400 tracks on, the polynomial's curve lies above both at every false rate below $10\%$.}
 \gss{The classical and one-bit curves coincide at $99\%$ efficiency, but not at low false rate: at a false rate of $1\%$ the one-bit filter stays on the step at $0.5$ from 400 tracks on, while the classical solver keeps $\ClassEffAtOneFourHundred$ at 400 tracks. At 400 tracks the classical and polynomial curves meet at a false rate of $1\%$; from 700 tracks on, the polynomial's curve lies above both at every false rate below $10\%$ (table~\ref{tab:headline}).}
+
+\paragraph{\gss{Other detector configurations.}}
+\gss{We chose the configuration of this paper after a scan of four configurations, with $\ScanNEvents$ events at each multiplicity. Supplementary table~\ref{tab:scan} gives the result. At a resolution of $3\,\mu$m and of $5\,\mu$m, the polynomial keeps at least $\ScanQsvtFiveUmThousand$ of true segments at a false rate of at most $1\%$, up to 1000 tracks. At $10\,\mu$m and a kink of $0.30$\,mrad per plane, it keeps $\ScanQsvtTenUmFourHundred$ at 400 tracks and $\ScanQsvtTenUmSevenHundred$ at 700. At $15\,\mu$m and $0.45$\,mrad, it keeps $\ScanQsvtFifteenUmTwoHundred$ at 200 tracks and $\ScanQsvtFifteenUmThousand$ at 1000. The gain of the polynomial thus holds only while the acceptance window is narrow.}
 
 \paragraph{Degree 60.}
 A polynomial of degree 60 with half-width $0.12$, chosen on five events and read on the other five,
@@ -862,9 +865,9 @@ column.
 
 The one-bit filter removes exactly the isolated false segments. Its response is one cosine with
 one zero, and its shape is fixed. The false pairs, triples and hubs keep factors set by their
-distance from the zero, and they survive at the level of the broken tracks. At $99\%$ efficiency the
+distance from the zero, and they survive at the level of the broken tracks. \gs{Not true on two events; the teal sentence replaces it.} \gsx{At $99\%$ efficiency the
 one-bit filter therefore gives the same false rate as the classical solver on every event we
-simulated. \gss{At $99\%$ efficiency the one-bit filter therefore gives the same false rate as the classical solver on the median event of every multiplicity; on two of the $\NEventsTotal$ events, one at 700 and one at 1000 tracks, its false rate is higher.}
+simulated.} \gss{At $99\%$ efficiency the one-bit filter therefore gives the same false rate as the classical solver on the median event of every multiplicity; on two of the $\NEventsTotal$ events, one at 700 and one at 1000 tracks, its false rate is higher.}
 
 The spectrum of the segment Hamiltonian is a design surface. The four eigenvalues of a complete
 track are fixed by the detector geometry, and only two of them carry weight. A polynomial that
@@ -878,13 +881,15 @@ inside the resolution of degree 40, and a contaminated track lies off every true
 degree with narrower passes moves the first limit; a modified operator or a refit of the
 coefficients to the events, and hit uniqueness as a classical step after readout, are the tools
 for the second, and we hold them for the next paper.
+\gss{The gain also depends on the detector configuration. The polynomial keeps at least $0.9$ of true segments at a false rate of at most $1\%$ up to 1000 tracks at a resolution of $3$ and $5\,\mu$m, up to 400 tracks at $10\,\mu$m, and at no multiplicity at $15\,\mu$m (supplementary table~\ref{tab:scan}).}
 
 The price is depth per call. Calls per shot are constant in $T$, the width grows as the logarithm of
 the event, and the two-qubit gates per call are set by how $A$ enters the circuit. The Chebyshev walk
-costs fewer gates than the phase sequence. \gss{For the degree-40 polynomial the phase sequence makes $\CallsPhase$ calls per shot, because the even and odd parts and their real parts are applied by separate sequences; the walk makes $\CallsWalk$.} A block encoding priced by hits reduces the gates per
-call by two orders of magnitude at 1000 tracks for about $\HitOracleAncillas$ more qubits. \gss{A block encoding priced by hits reduces the gates per call by a factor of about fifty at 1000 tracks ($\CxHitThousand$ against $\CxEvoThousand$ two-qubit gates per call) for about $\HitOracleAncillas$ more qubits.} No QSVT
+costs fewer gates than the phase sequence. \gss{For the degree-40 polynomial the phase sequence makes $\CallsPhase$ calls per shot, because the even and odd parts and their real parts are applied by separate sequences; the walk makes $\CallsWalk$.} \gs{The numbers give a factor of about fifty, not two orders of magnitude; the teal sentence replaces it.} \gsx{A block encoding priced by hits reduces the gates per
+call by two orders of magnitude at 1000 tracks for about $\HitOracleAncillas$ more qubits.} \gss{A block encoding priced by hits reduces the gates per call by a factor of about fifty at 1000 tracks ($\CxHitThousand$ against $\CxEvoThousand$ two-qubit gates per call) for about $\HitOracleAncillas$ more qubits.} No QSVT
 has run on noisy hardware; the algorithm is framed as fault-tolerant, and a per-cluster run on the
 blocks of one event is the first practical target.
+\gss{A classical computer can apply the same polynomial to $A$, with one sparse matrix-vector product for each degree. The quantum content of the method is therefore not the response. It is the width, which grows as the logarithm of the number of candidate segments, and the number of calls per shot, which does not depend on $T$.}
 
 Detector noise moves false weight onto known lines and requires a refit of the polynomial. The
 real LHCb vertex detector turns the lines into bands. Both are the subject of the sequels.
@@ -923,5 +928,38 @@ stated.]}
 
 \section*{Competing interests}
 The authors declare no competing interests.
+
+\section*{\gss{Supplementary information}}
+\gs{New section. The plan puts four items here: the atlas at 400 tracks, the table of the $\TeethNDesigns$ designs, $P$ against $T$, and the configuration scan. Only the configuration scan is here so far.}
+\setcounter{table}{0}\renewcommand{\thetable}{S\arabic{table}}
+
+\begin{table}[H]
+\centering\footnotesize
+\caption{\gss{\textbf{Configuration scan.} Efficiency at a false rate of at most $1\%$ of the three solvers, for four detector configurations. A configuration is the hit resolution, the kink per plane and the half-opening angle of the track cone. Every configuration loses $1\%$ of hits. Each entry is the median over $\ScanNEvents$ events; with two events, the median is the mean. The $5\,\mu$m rows are the configuration of the main text, read on $\ScanNEvents$ events instead of $\NEvents$.}}
+\label{tab:scan}
+\begin{tabular}{lcccc}\toprule
+Configuration & $T$ & Classical & One-bit filter & Polynomial\\\midrule
+$3\,\mu$m, $0.10$\,mrad, $0.2$\,rad & 200 & $\ScanClassThreeUmTwoHundred$ & $\ScanOneBitThreeUmTwoHundred$ & $\ScanQsvtThreeUmTwoHundred$\\
+ & 400 & $\ScanClassThreeUmFourHundred$ & $\ScanOneBitThreeUmFourHundred$ & $\ScanQsvtThreeUmFourHundred$\\
+ & 700 & $\ScanClassThreeUmSevenHundred$ & $\ScanOneBitThreeUmSevenHundred$ & $\ScanQsvtThreeUmSevenHundred$\\
+ & 1000 & $\ScanClassThreeUmThousand$ & $\ScanOneBitThreeUmThousand$ & $\ScanQsvtThreeUmThousand$\\
+\addlinespace
+$5\,\mu$m, $0.15$\,mrad, $0.2$\,rad & 200 & $\ScanClassFiveUmTwoHundred$ & $\ScanOneBitFiveUmTwoHundred$ & $\ScanQsvtFiveUmTwoHundred$\\
+ & 400 & $\ScanClassFiveUmFourHundred$ & $\ScanOneBitFiveUmFourHundred$ & $\ScanQsvtFiveUmFourHundred$\\
+ & 700 & $\ScanClassFiveUmSevenHundred$ & $\ScanOneBitFiveUmSevenHundred$ & $\ScanQsvtFiveUmSevenHundred$\\
+ & 1000 & $\ScanClassFiveUmThousand$ & $\ScanOneBitFiveUmThousand$ & $\ScanQsvtFiveUmThousand$\\
+\addlinespace
+$10\,\mu$m, $0.30$\,mrad, $0.2$\,rad & 200 & $\ScanClassTenUmTwoHundred$ & $\ScanOneBitTenUmTwoHundred$ & $\ScanQsvtTenUmTwoHundred$\\
+ & 400 & $\ScanClassTenUmFourHundred$ & $\ScanOneBitTenUmFourHundred$ & $\ScanQsvtTenUmFourHundred$\\
+ & 700 & $\ScanClassTenUmSevenHundred$ & $\ScanOneBitTenUmSevenHundred$ & $\ScanQsvtTenUmSevenHundred$\\
+ & 1000 & $\ScanClassTenUmThousand$ & $\ScanOneBitTenUmThousand$ & $\ScanQsvtTenUmThousand$\\
+\addlinespace
+$15\,\mu$m, $0.45$\,mrad, $0.4$\,rad & 200 & $\ScanClassFifteenUmTwoHundred$ & $\ScanOneBitFifteenUmTwoHundred$ & $\ScanQsvtFifteenUmTwoHundred$\\
+ & 400 & $\ScanClassFifteenUmFourHundred$ & $\ScanOneBitFifteenUmFourHundred$ & $\ScanQsvtFifteenUmFourHundred$\\
+ & 700 & $\ScanClassFifteenUmSevenHundred$ & $\ScanOneBitFifteenUmSevenHundred$ & $\ScanQsvtFifteenUmSevenHundred$\\
+ & 1000 & $\ScanClassFifteenUmThousand$ & $\ScanOneBitFifteenUmThousand$ & $\ScanQsvtFifteenUmThousand$\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \end{document}
