@@ -31,6 +31,7 @@
 % displayed equation proposed for removal (grey, no strike, since \sout cannot cross a display).
 \newcommand{\gsx}[1]{{\color{gray}\sout{#1}}}
 \newenvironment{gsxblock}{\color{gray}}{}
+\newenvironment{gssblock}{\color{teal}}{}% a teal suggestion that contains displayed equations
 \newcommand{\R}{\mathbb{R}}
 
 \title{From one bit to any polynomial:\\ quantum spectral filters for track finding in the LHCb vertex detector}
@@ -304,12 +305,12 @@ rounds times gates per call.
 
 
 \paragraph{The detector and its noise.}
-We use the simplified vertex detector of refs.~\cite{nicotra2023,trackhhl}: \gs{Parameter list moved to Methods, section~\mbox{\ref{sec:m:events}}; marked for removal.} \gsx{five planes
+We use the simplified vertex detector of refs.~\cite{nicotra2023,trackhhl}: \gss{five planes, $T$ tracks from a common vertex, smeared hits, a scattering kink at every plane and a small loss of hits (section~\ref{sec:m:events})} \gs{Parameter list moved to Methods, section~\mbox{\ref{sec:m:events}}; marked for removal.} \gsx{five planes
 $\Delta z=33$\,mm apart, $T$ tracks per event from a common vertex inside a cone of half-opening
 $0.2$\,rad, and one hit per track on each plane} (figure~\ref{fig:hits}a). \gsx{Three detector effects
 are applied throughout: Gaussian smearing of every hit with $\sigma_{\rm res}=5\,\mu$m, a
-multiple-scattering kink of $\sigma_{\rm scatt}=0.15$\,mrad at every plane,} the scattering angle of a
-track of high momentum in one silicon plane, \js{which = ?} \gs{`which' refers to the scattering kink. A kink of $0.15$\,mrad per plane is the multiple-scattering angle of a track of high momentum in one silicon plane. I will rewrite the sentence.  } \gsx{and the loss of $1\%$ of hits.} Every result in this paper is
+multiple-scattering kink of $\sigma_{\rm scatt}=0.15$\,mrad at every plane,} \gss{The kink per plane, $\sigma_{\rm scatt}$, is} the scattering angle of a
+track of high momentum in one silicon plane\gsx{,}\gss{.} \js{which = ?} \gs{`which' refers to the scattering kink. A kink of $0.15$\,mrad per plane is the multiple-scattering angle of a track of high momentum in one silicon plane. I will rewrite the sentence.  } \gsx{and the loss of $1\%$ of hits.} Every result in this paper is
 computed on one set of events at this configuration: $\NEvents$ events for each of
 $T=10,20,50,100,200,400,700$ and $1000$ tracks (section~\ref{sec:m:events}). \js{I am not sure all these numbers should be placed here. In a numerical mathematics paper: Intro, Methodology, Numerical Results, Conclusion} \gs{In the Communications Physics format the Results section states the data configuration once. I will keep only the configuration here and move the measured residual and the measured hit loss to Methods.  }
 
@@ -389,7 +390,74 @@ segments in green and false in red, with the threshold as a dashed line, and the
 false count to the right of the line divided by the total count to the right of it. The threshold
 must fall to the level $1/3$ of the broken tracks, tracks that lost a hit and are split into shorter
 chains, and the false pairs share that level.
-\js{We do not talk here AT ALL about eigenvalues, but they are way more important to the discussion, right? Would it not be a good idea to add eigenvalues here, and not talk about individual results?} \gs{Agreed. I will move the block spectrum (the first paragraph of section~\ref{sec:r2}) to this point and give the values $1/4$, $1/3$, $4/11$ and $5/11$ through the eigenvalues and eigenvectors of each block.} 
+\js{We do not talk here AT ALL about eigenvalues, but they are way more important to the discussion, right? Would it not be a good idea to add eigenvalues here, and not talk about individual results?} \gs{Agreed. I will move the block spectrum (the first paragraph of section~\ref{sec:r2}) to this point and give the values $1/4$, $1/3$, $4/11$ and $5/11$ through the eigenvalues and eigenvectors of each block. (Done in this version: see the teal paragraphs below.)}
+
+\begin{gssblock}
+\paragraph{Every block has a spectrum fixed by its graph.}
+The values $1/4$, $1/3$, $4/11$ and $5/11$ follow from the eigenvalues and eigenvectors of each
+block. Because $A=\lambda_cI-C$ is block-diagonal, its eigenvalues are those of the individual blocks.
+On a block of $m$ segments with compatibility graph $G$, they are
+\begin{equation}
+\lambda=\lambda_c-\mu,\qquad \mu\in\operatorname{spec}\big(C_G\big),
+\end{equation}
+where $C_G$ is the adjacency matrix of $G$: $(C_G)_{ij}=1$ when segments $i$ and $j$ are compatible,
+and $0$ otherwise. The graphs that occur are small, and their spectra are known in closed form.
+A complete track is a chain of $m=4$ segments, and a broken track is a chain of $m\le3$ segments.
+We number the segments of a chain $j=1,\dots,m$ along the track. The eigenvectors and eigenvalues of
+the chain are
+\begin{equation}
+\label{eq:chain:r1}
+(\mathbf{v}_k)_j=\sqrt{\frac{2}{m+1}}\,\sin\!\Big(\frac{jk\pi}{m+1}\Big),\qquad
+\lambda_k=\lambda_c-2\cos\!\Big(\frac{k\pi}{m+1}\Big),\qquad k=1,\dots,m .
+\end{equation}
+A complete track therefore has exactly four eigenvalues, $\{2.382,\,3.382,\,4.618,\,5.618\}$ at
+$\lambda_c=4$. We call these fixed eigenvalues the lines of the spectrum. An isolated segment has the
+single eigenvalue $\lambda_c$. A pair of compatible segments has $\lambda_c\mp1$. A triple has
+$\lambda_c$ and $\lambda_c\mp\sqrt2$. A hub, in which $m$ segments leave or enter one hit, has
+$\lambda_c\pm\sqrt m$ and $m-1$ copies of $\lambda_c$. None of these values depends on the event. The
+detector geometry fixes the graph of a complete track, and thus its four lines, for every track in
+every event.
+
+\paragraph{Only some lines carry weight.}
+On one block, the solution of $A\mathbf{x}=\mathbf{b}$ is a sum over the eigenvectors of the block,
+\begin{equation}
+\label{eq:block:solution}
+\mathbf{x}\big|_{\rm block}=\sum_k\frac{\langle\mathbf{v}_k,\mathbf{b}\rangle}{\lambda_k}\,\mathbf{v}_k .
+\end{equation}
+The input $\mathbf{b}=\beta\mathbf{1}$ has the same value on every segment, and some eigenvectors have no
+overlap with it. A relabelling of the segments that keeps the graph is a permutation $P$ with
+$PC_GP^{\mathsf T}=C_G$. It also keeps the input: $P\mathbf{1}=\mathbf{1}$. Let $\mathbf{v}$ be an
+eigenvector with $P\mathbf{v}=-\mathbf{v}$. Then
+$\langle\mathbf{v},\mathbf{1}\rangle=\langle P\mathbf{v},P\mathbf{1}\rangle=-\langle\mathbf{v},\mathbf{1}\rangle$,
+so $\langle\mathbf{v},\mathbf{1}\rangle=0$. We call a mode bright when its overlap with the input is not
+zero, and dark when the overlap is zero. The eigenvalue of a dark mode is in the spectrum of the block,
+but the input has no component along its eigenvector. A function $g(A)$ multiplies each
+eigencomponent by the scalar $g(\lambda_k)$. A zero component thus stays zero, and no function of $A$
+applied to $\mathbf{b}$ can give a dark mode any weight.
+
+For a chain, the reflection $j\mapsto m+1-j$ is the only relabelling that keeps the graph. It maps
+$\sin(jk\pi/(m+1))$ to $-(-1)^k\sin(jk\pi/(m+1))$. The modes with even $k$ are therefore antisymmetric
+and dark, and the modes with odd $k$ are symmetric and bright. A complete track is bright only on
+$\lambda_1=2.382$ and $\lambda_3=4.618$, and it carries $\TrackInputWeightLow\%$ of its input weight on
+the first ($\TrackSolutionWeightLow\%$ of its solution). A pair is bright only on $\lambda_c-1$, a triple
+on $\lambda_c\mp\sqrt2$, and a hub of any size only on $\lambda_c\pm\sqrt m$.
+
+\paragraph{The classical values, from the bright modes.}
+With $\beta=1$ and $\lambda_c=4$, equation~\eqref{eq:block:solution} gives the values of
+figure~\ref{fig:hits}c. An isolated segment has the one eigenvalue $\lambda_c$, so
+$x=\beta/\lambda_c=1/4$. A pair has the bright mode $\mathbf{v}=(1,1)/\sqrt2$ with eigenvalue
+$\lambda_c-1=3$ and overlap $\langle\mathbf{v},\mathbf{b}\rangle=\sqrt2$, so
+$\mathbf{x}=(\sqrt2/3)\,\mathbf{v}=(1/3,\,1/3)$. On a complete track only the bright modes $k=1$ and
+$k=3$ contribute. Both are symmetric, so the solution is symmetric, $\mathbf{x}=(a,c,c,a)$. The first two
+rows of $A\mathbf{x}=\mathbf{b}$ then read
+\begin{equation}
+4a-c=1,\qquad -a+3c=1,
+\end{equation}
+with the solution $a=4/11$ and $c=5/11$. A broken track of two segments has the same block as a false
+pair, so both take the value $1/3$. For this reason, the threshold that keeps $99\%$ of true segments
+falls to the level of the false pairs.
+\end{gssblock}
+ 
 
 
 
@@ -429,7 +497,7 @@ p_i=\Big[\cos^{2}\!\big(\tfrac{At}{2}\big)\mathbf{u}\Big]_i^{2}+\Big[\tfrac12\si
 \end{gsxblock}
 \js{Btw, this should be the probability when the ancilla is zero, but in the plot it says it should be one.} \gs{Both are correct. The circuit has two ancillas. The phase bit $T$ returns to 0. The flag $A$ is set to 1 when $T=0$ after the first round, and the post-selection reads $A=1$. The text now names both registers.}
 \gsx{so the amplitude of every eigencomponent of the input is multiplied by $\cos(\lambda t/2)$} \js{should it not be the square?} \gs{The amplitude factor is $\cos(\lambda t/2)$. The probability weight is its square. The sentence now says `amplitude'.}\gsx{. With $t=\pi/\lambda_c$ the
-zero lies at $\lambda=\lambda_c$,} the eigenvalue of every isolated segment \js{what about the $\sin$ contribution in $p_i$?} \gs{The sine term is the $T=1$ part of the same flagged state. Its amplitude on one eigencomponent is $\cos(\lambda t/2)\sin(\lambda t/2)$. It contains the factor $\cos(\lambda t/2)$, so it is also zero at $\lambda=\lambda_c$. The sum of the two terms on one eigencomponent is $\cos^2(\lambda t/2)$.}, and those segments are removed
+zero lies at $\lambda=\lambda_c$,} \gss{The response of the one-bit filter has its zero at} the eigenvalue of every isolated segment \js{what about the $\sin$ contribution in $p_i$?} \gs{The sine term is the $T=1$ part of the same flagged state. Its amplitude on one eigencomponent is $\cos(\lambda t/2)\sin(\lambda t/2)$. It contains the factor $\cos(\lambda t/2)$, so it is also zero at $\lambda=\lambda_c$. The sum of the two terms on one eigencomponent is $\cos^2(\lambda t/2)$.}, and those segments are removed
 exactly. Every other configuration keeps a factor fixed by where its eigenvalues lie
 (figure~\ref{fig:filters}c): a false pair keeps $\KeptPair$, a false triple $\KeptTriple$, a
 hub with three or five segments $\KeptHubThree$ or $\KeptHubFive$, and a complete track
@@ -507,40 +575,47 @@ track multiplicity.
 %==============================================================================================
 \subsection{The problem as a spectrum, and a polynomial that separates it}\label{sec:r2}
 
-\paragraph{Every block has a spectrum fixed by its graph.}
+\paragraph{\gsx{Every block has a spectrum fixed by its graph.}}
 \js{I think that this should come prior to here} \gs{Agreed, see my reply at the Hamiltonian paragraph. This paragraph moves to section~\ref{sec:r1}.}
-Because $A=\lambda_cI-C$ is block-diagonal, its eigenvalues are those of the individual blocks, and
-on a block of $m$ segments with compatibility graph $G$ they are
-\begin{equation}
+\gs{This paragraph and the next one are now in section~\mbox{\ref{sec:r1}}, with the derivation of the classical values; marked for removal here.}
+\gsx{Because $A=\lambda_cI-C$ is block-diagonal, its eigenvalues are those of the individual blocks, and
+on a block of $m$ segments with compatibility graph $G$ they are}
+\begin{gsxblock}
+\begin{equation*}
 \lambda=\lambda_c-\mu,\qquad \mu\in\operatorname{spec}\big(C_G\big),
-\end{equation}
-where $C_G$ is the adjacency matrix of $G$. The graphs that occur are small and their spectra are
+\end{equation*}
+\end{gsxblock}
+\gsx{where $C_G$ is the adjacency matrix of $G$. The graphs that occur are small and their spectra are
 known in closed form. A chain of $m$ segments, which is what a complete track ($m=4$) or a broken
-track ($m\le3$) is, has
-\begin{equation}
+track ($m\le3$) is, has}
+\begin{gsxblock}
+\begin{equation*}
 \lambda_k=\lambda_c-2\cos\!\Big(\frac{k\pi}{m+1}\Big),\qquad k=1,\dots,m ,
-\end{equation}
-so a complete track has exactly four eigenvalues, $\{2.382,\,3.382,\,4.618,\,5.618\}$ at
+\end{equation*}
+\end{gsxblock}
+\gsx{so a complete track has exactly four eigenvalues, $\{2.382,\,3.382,\,4.618,\,5.618\}$ at
 $\lambda_c=4$. We call these fixed eigenvalues the lines of the spectrum. An isolated segment has the single eigenvalue $\lambda_c$; a pair of compatible
 segments has $\lambda_c\mp1$; a triple has $\lambda_c$ and $\lambda_c\mp\sqrt2$; and a hub, in which
 $m$ segments leave or enter one hit, has $\lambda_c\pm\sqrt m$ together with $m-1$ copies of
 $\lambda_c$. None of these depends on the event: detector geometry fixes the graph of a complete
-track, and hence its four lines, for every track in every event.
+track, and hence its four lines, for every track in every event.}
 
-\paragraph{Only some lines carry weight.}
-The solution to \eqref{eq:Axb} on a block is a sum over its eigenvectors $\mathbf{v}_k$,
-\begin{equation}
+\paragraph{\gsx{Only some lines carry weight.}}
+\gsx{The solution to \mbox{\eqref{eq:Axb}} on a block is a sum over its eigenvectors $\mathbf{v}_k$,}
+\begin{gsxblock}
+\begin{equation*}
 \mathbf{x}\big|_{\rm block}=\sum_k\frac{\langle\mathbf{v}_k,\mathbf{b}\rangle}{\lambda_k}\,\mathbf{v}_k ,
-\end{equation}
-and the uniform input $\mathbf{b}=\beta\mathbf{1}$ reaches only the modes that are symmetric under
+\end{equation*}
+\end{gsxblock}
+\gsx{and the uniform input $\mathbf{b}=\beta\mathbf{1}$ reaches only the modes that are symmetric under
 every relabelling of the block that leaves its graph unchanged; every other mode has
-$\langle\mathbf{v}_k,\mathbf{b}\rangle=0$ exactly \js{I do not understand this} \gs{The input $\mathbf{b}=\beta\mathbf{1}$ is the same on every segment. A relabelling of the segments that keeps the graph is a permutation $P$ with $PCP^{\mathsf T}=C$ and $P\mathbf{1}=\mathbf{1}$. For an eigenvector with $P\mathbf{v}=-\mathbf{v}$ I get $\langle\mathbf{v},\mathbf{1}\rangle=\langle P\mathbf{v},P\mathbf{1}\rangle=-\langle\mathbf{v},\mathbf{1}\rangle$, so the overlap is zero. For the chain, $P$ is the reflection and the modes $v_j=\sin(kj\pi/(m+1))$ with even $k$ are antisymmetric. I will add this argument.}. We call a mode bright when that overlap is non-zero and
-dark when it vanishes. A dark mode is in the spectrum of the block, but the input has no component along it \js{??} \gs{Meaning: the eigenvalue is in the spectrum of the block, but the input vector has zero component along that eigenvector. A function $g(A)$ multiplies each eigencomponent by the scalar $g(\lambda_k)$, so a zero component stays zero. I will rewrite the sentence.  }, and a function of $A$ multiplies each component by a scalar, so no function of $A$ applied to
+$\langle\mathbf{v}_k,\mathbf{b}\rangle=0$ exactly} \js{I do not understand this} \gs{The input $\mathbf{b}=\beta\mathbf{1}$ is the same on every segment. A relabelling of the segments that keeps the graph is a permutation $P$ with $PCP^{\mathsf T}=C$ and $P\mathbf{1}=\mathbf{1}$. For an eigenvector with $P\mathbf{v}=-\mathbf{v}$ I get $\langle\mathbf{v},\mathbf{1}\rangle=\langle P\mathbf{v},P\mathbf{1}\rangle=-\langle\mathbf{v},\mathbf{1}\rangle$, so the overlap is zero. For the chain, $P$ is the reflection and the modes $v_j=\sin(kj\pi/(m+1))$ with even $k$ are antisymmetric. I will add this argument.} \gsx{. We call a mode bright when that overlap is non-zero and
+dark when it vanishes. A dark mode is in the spectrum of the block, but the input has no component along it} \js{??} \gs{Meaning: the eigenvalue is in the spectrum of the block, but the input vector has zero component along that eigenvector. A function $g(A)$ multiplies each eigencomponent by the scalar $g(\lambda_k)$, so a zero component stays zero. I will rewrite the sentence.  } \gsx{, and a function of $A$ multiplies each component by a scalar, so no function of $A$ applied to
 $\mathbf{b}$ can give it one. For a chain the reflection $j\mapsto m+1-j$ is the only such
 relabelling, so its antisymmetric modes are dark: a complete track is bright only on $2.382$ and
 $4.618$, and carries $\TrackInputWeightLow\%$ of its input weight on the first
 ($\TrackSolutionWeightLow\%$ of its solution). A pair is bright only on $\lambda_c-1$, a triple on
-$\lambda_c\mp\sqrt2$, and a hub of any size only on $\lambda_c\pm\sqrt m$. \js{I would need more explanation on this whole paragraph I guess.} \gs{I will expand this paragraph with the argument above and with the explicit chain eigenvectors.}
+$\lambda_c\mp\sqrt2$, and a hub of any size only on $\lambda_c\pm\sqrt m$.} \js{I would need more explanation on this whole paragraph I guess.} \gs{I will expand this paragraph with the argument above and with the explicit chain eigenvectors. (Done in this version: the expanded text is now in section~\mbox{\ref{sec:r1}}.)}
 
 \paragraph{The measured spectrum.}
 Figure~\ref{fig:spectrum}a shows where the input weight lies on the set of events at 1000 tracks,
