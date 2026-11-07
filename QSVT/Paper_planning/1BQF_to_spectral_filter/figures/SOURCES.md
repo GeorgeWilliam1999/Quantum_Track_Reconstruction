@@ -82,3 +82,12 @@ numbers.tex gained the Results 2.3/2.4 macros (13_paper_numbers.py reads figures
 |---|---|---|---|
 | fig8_segment_metrics.pdf | 19_fig_segment_metrics.py (22 Oct: standard thresholds, classical 0.35, quantum just above the isolated level; mean ± s.e.m.) | outputs_5um/amplitudes/T*_rep*.npz | 24f6f520bde4aa6b |
 | seg_metrics_table.tex | 19_fig_segment_metrics.py (generated table, same thresholds) | same | 163fd52f8bfefbbf |
+
+## Added 2026-11-07 (supplement)
+
+| file | script in 1BQF_to_spectral_filter_corpus | data | sha256 of the copy |
+|---|---|---|---|
+| supp_design_table.tex | 20_supp_tables.py | outputs_teeth/teeth_scan.csv | 89c4ada6b20be815 |
+| supp_P_table.tex | 20_supp_tables.py | figures/outputs_5um/fig7_cost_table.csv | 737102749dd07a72 |
+
+Table S1 (configuration scan) uses the Scan* macros of numbers.tex (13_paper_numbers.py reads outputs_scan/scan.csv). Figure S1 is fig3_error_atlas_T400_with_qsvt.pdf (listed above).
