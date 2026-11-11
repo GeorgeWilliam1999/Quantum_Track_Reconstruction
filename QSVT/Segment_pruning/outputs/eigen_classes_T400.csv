@@ -1,0 +1,10 @@
+class,n_eigenvalues,true_weight
+isolated false segment,6248499,0.0
+isolated true segment,70,70.0
+false pair,8212,0.0
+true pair,158,157.99999999999997
+false triple or bridge,120,0.0
+hub,0,0.0
+complete track,14900,14899.999999999998
+broken track,219,218.9999999999999
+contaminated track,445,336.0

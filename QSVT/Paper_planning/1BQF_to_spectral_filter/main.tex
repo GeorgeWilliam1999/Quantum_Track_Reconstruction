@@ -804,6 +804,11 @@ three orders of magnitude smaller, and amplification cancels the difference. The
 costs thirty times fewer gates than the walk. Reading the kept segments after amplification needs of order
 $4T\ln(4T)$ post-selected samples.
 
+\paragraph{\gss{Segment pruning.}}
+\gss{A segment with no compatible neighbour forms a block of size one in $A$. It cannot be part of a track, and a classical pass over the hits finds it before the solve. Because $A$ is block-diagonal and every solver applies a function of $A$ to $\mathbf{b}$, the removal of these segments does not change the value of any other segment. We call this step segment pruning. On the events of this paper it keeps $\PruneKeptFourHundred$ candidates at 400 tracks and $\PruneKeptThousand$ at 1000 (median over events). The segment register falls from $\PruneQubitsFullFourHundred$ to $\PruneQubitsFourHundred$ qubits at 400 tracks and from $\PruneQubitsFullThousand$ to $\PruneQubitsThousand$ at 1000 (largest event). If the pieces of fewer than three segments are also removed, the register has $\PruneQubitsThreeThousand$ qubits at 1000 tracks; this second step also removes broken tracks of one and two segments. Pruning raises the post-selection probability of the polynomial by a factor of $\PrunePGainFourHundred$ at 400 tracks and $\PrunePGainThousand$ at 1000, so amplification needs about $\PruneRoundsGainThousand$ times fewer rounds. The efficiency and the false rate of every solver do not change.}
+
+\gss{Pruning removes the population that the zero of the one-bit filter removes: the isolated segments at $\lambda_c$. After pruning, the evolution time of the one-bit filter can move its zero to another line. With $t$ near $\pi/3$ the zero lies on the false-pair line $\lambda_c-1$, and the one-bit filter keeps $\PruneOneBitEffFourHundred$ of true segments at a false rate of at most $1\%$ at 400 tracks. This is close to the polynomial. At 1000 tracks the best evolution time gives $\PruneOneBitEffThousand$, and only the polynomial, of degree $\PruneMinDegreeThousand$ or higher, keeps more than $0.9$. Pruning thus weakens the case for the polynomial at 400 tracks and below, and strengthens it at high multiplicity.}
+
 \textit{[Classical loading of the hit oracle, $0.4$\,ms and 8\,KB at 400 tracks (chapter 11.6):
 to be re-derived on the corpus and ledgered before it is quoted.]}
 

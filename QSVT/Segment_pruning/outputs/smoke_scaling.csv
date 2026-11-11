@@ -1,0 +1,3 @@
+config,T,rep,event_key,eps,n_hits,n_full,nnz,n_true,n_true_isolated,n_true_in_pairs,n_kept_deg1,n_kept_c3,n_kept_c4,n_false_kept_deg1,n_components,max_component,n_comp_1,n_comp_2,n_comp_3,n_comp_4,n_comp_5plus,qubits_full,qubits_deg1,qubits_c3,t_build
+paper,10,0,ev_00dfb3b3f0b0,0.0016984665146739081,50,400,460,40,0,0,40,40,40,0,370,4,360,0,0,10,0,9,6,6,0.035912513732910156
+paper,50,0,ev_32a7ff5274fd,0.0016984665146739081,248,9900,10196,198,0,0,198,198,192,0,9752,4,9702,0,2,48,0,14,8,8,0.010378122329711914
