@@ -1,0 +1,12 @@
+toy hit onebit8: 52 events; max |exact here - B| = 0.00e+00; max |estimate rule at N=inf - B| = 0.00e+00; mean 0.9453 vs B 0.9453
+toy hit poly6s: 52 events; max |exact here - B| = 0.00e+00; max |estimate rule at N=inf - B| = 0.00e+00; mean 0.9453 vs B 0.9453
+toy hit step2: 52 events; max |exact here - B| = 0.00e+00; max |estimate rule at N=inf - B| = 0.00e+00; mean 0.9057 vs B 0.9057
+toy segment classical: 52/52 events in A; max |exact here - A| = 0.00e+00; mean 0.9881 vs A 0.9881
+toy segment 1bqf: 52/52 events in A; max |exact here - A| = 0.00e+00; mean 0.9879 vs A 0.9879; max |estimate rule at N=inf - exact| = 0.00e+00
+toy segment qsvt: 52/52 events in A; max |exact here - A| = 0.00e+00; mean 0.9815 vs A 0.9815; max |estimate rule at N=inf - exact| = 0.00e+00
+run3 hit onebit8: 103 events; max |exact here - B| = 0.00e+00; max |estimate rule at N=inf - B| = 0.00e+00; mean 0.6406 vs B 0.6406
+run3 hit poly6s: 103 events; max |exact here - B| = 0.00e+00; max |estimate rule at N=inf - B| = 0.00e+00; mean 0.6438 vs B 0.6438
+run3 hit step2: 103 events; max |exact here - B| = 0.00e+00; max |estimate rule at N=inf - B| = 0.00e+00; mean 0.4241 vs B 0.4241
+run3 segment classical: 103/103 events in A; max |exact here - A| = 0.00e+00; mean 0.8619 vs A 0.8619
+run3 segment 1bqf: 103/103 events in A; max |exact here - A| = 0.00e+00; mean 0.8646 vs A 0.8646; max |estimate rule at N=inf - exact| = 0.00e+00
+run3 segment qsvt: 103/103 events in A; max |exact here - A| = 0.00e+00; mean 0.6890 vs A 0.6890; max |estimate rule at N=inf - exact| = 0.00e+00
