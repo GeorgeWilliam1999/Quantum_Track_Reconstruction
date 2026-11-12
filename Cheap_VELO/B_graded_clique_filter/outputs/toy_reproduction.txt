@@ -1,0 +1,7 @@
+events: 52; per-event equality with full_sweep_events.csv: P{3,4} True (max |diff| 1.94e-14), pairs True, Givens price per step True
+T = 1000 mean P{3,4} (this run / published):
+  n_pv =  1: 0.9717 / 0.9717
+  n_pv =  5: 0.9885 / 0.9885
+  n_pv = 10: 0.9549 / 0.9549
+  n_pv = 20: 0.7705 / 0.7705
+REPRODUCTION PASSED

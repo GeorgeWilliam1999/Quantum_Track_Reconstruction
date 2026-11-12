@@ -1,0 +1,4 @@
+events: 103
+P{3,4} at the scan peaks, per-event equality with real_events.csv hitV_P: True (max |diff| 8.33e-16); median 0.1813 / published 0.1813
+P on every line >= 2, per-event equality with hitV_P_all: True (max |diff| 2.78e-15); median 0.3613 / published 0.3613
+REPRODUCTION PASSED

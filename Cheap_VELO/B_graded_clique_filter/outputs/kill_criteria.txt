@@ -1,0 +1,17 @@
+K1 Run 3 best polynomial (degree <= 16), scan vertices: poly16s padded P median 0.411 (mean 0.429) -> pass (>= 0.30)
+   same, symmetric domain only: poly16 0.397
+K1 Run 3 best polynomial (degree <= 16), truth vertices: poly16s padded P median 0.427 (mean 0.449) -> pass (>= 0.30)
+   same, symmetric domain only: poly16 0.416
+K2 Run 3 toy-like efficiency, scan vertices: polynomials 0.929-0.929, one-bit s=4 0.806, s=8 0.922, band 0.932, step 0.646, ideal {3,4} 0.429; focused cells 0.897 -> pass (>= 0.85)
+K2 Run 3 toy-like efficiency, truth vertices: polynomials 0.956-0.956, one-bit s=4 0.834, s=8 0.952, band 0.959, step 0.655, ideal {3,4} 0.454; focused cells 0.897 -> pass (>= 0.85)
+K3 toy 3-hit efficiency, scan vertices, poly6: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0132 -> pass
+K3 toy 3-hit efficiency, scan vertices, poly10: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0132 -> pass
+K3 toy 3-hit efficiency, scan vertices, poly16: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0132 -> pass
+K3 toy 3-hit efficiency, scan vertices, poly6s: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0132 -> pass
+K3 toy 3-hit efficiency, scan vertices, poly10s: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0132 -> pass
+K3 toy 3-hit efficiency, scan vertices, poly16s: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0132 -> pass
+K3 toy 3-hit efficiency, scan vertices, onebit: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0048 -> pass
+K3 toy 3-hit efficiency, scan vertices, onebit8: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0132 -> pass
+K3 toy 3-hit efficiency, scan vertices, step2: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0061 -> pass
+K3 toy 3-hit efficiency, scan vertices, band: T=100/400/1000 0.896/0.960/0.967; max ghost rate over points 0.0132 -> pass
+   reference ideal {3,4} 3-hit efficiency: 0.000-0.000
