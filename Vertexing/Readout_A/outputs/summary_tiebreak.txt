@@ -1,0 +1,39 @@
+=== Run 3, 103 events ===
+classical: noisy == new on 103/103 events; tracks changed old -> new on 103 events, efficiency changed on 72 (per event -0.020 ... +0.065, mean +0.0076)
+1bqf     : noisy == new on 103/103 events; tracks changed old -> new on 103 events, efficiency changed on 78 (per event -0.036 ... +0.065, mean +0.0070)
+qsvt     : noisy == new on 103/103 events; tracks changed old -> new on 103 events, efficiency changed on 79 (per event -0.036 ... +0.065, mean +0.0075)
+control  : noisy == new on 103/103 events; tracks changed old -> new on 0 events, efficiency changed on 0 (per event +0.000 ... +0.000, mean +0.0000)
+classical: old ranking vs A published: max |diff| 0.0e+00 on 103 events
+1bqf     : old ranking vs A published: max |diff| 0.0e+00 on 103 events
+qsvt     : old ranking vs A published: max |diff| 0.0e+00 on 103 events
+control  : old ranking vs A published: max |diff| 0.0e+00 on 103 events
+
+solver     variant  efficiency  ghost  toy-like  3-hit  secondaries  p<1GeV
+classical  old         0.8608  0.0499    0.9901  0.5241       0.6173  0.5733
+classical  new         0.8684  0.0447    0.9914  0.5444       0.6474  0.5774
+1bqf       old         0.8620  0.0562    0.9905  0.5167       0.6244  0.5710
+1bqf       new         0.8700  0.0528    0.9914  0.5416       0.6557  0.5774
+qsvt       old         0.6845  0.0777    0.9090  0.0371       0.4355  0.3401
+qsvt       new         0.6916  0.0743    0.9143  0.0438       0.4482  0.3467
+control    old         0.8549  0.0656    0.9851  0.5073       0.6292  0.5637
+control    new         0.8549  0.0656    0.9851  0.5073       0.6292  0.5637
+
+=== toy, T = 1000, 3 events per point ===
+classical: noisy == new on 12/12 events; tracks changed old -> new on 12 events, efficiency changed on 7 (per event -0.001 ... +0.002, mean +0.0000)
+1bqf     : noisy == new on 12/12 events; tracks changed old -> new on 12 events, efficiency changed on 7 (per event -0.001 ... +0.003, mean +0.0001)
+qsvt     : noisy == new on 12/12 events; tracks changed old -> new on 12 events, efficiency changed on 3 (per event -0.001 ... +0.001, mean +0.0001)
+control  : noisy == new on 12/12 events; tracks changed old -> new on 1 events, efficiency changed on 0 (per event +0.000 ... +0.000, mean +0.0000)
+classical: old ranking vs A published: max |diff| 0.0e+00 on 12 events
+1bqf     : old ranking vs A published: max |diff| 0.0e+00 on 12 events
+qsvt     : old ranking vs A published: max |diff| 0.0e+00 on 12 events
+control  : old ranking vs A published: max |diff| 0.0e+00 on 12 events
+
+solver     variant  efficiency (1 / 5 / 10 / 20 PVs)        ghost rate
+classical  old     0.9857 / 0.9883 / 0.9840 / 0.9893    0.0027 / 0.0024 / 0.0010 / 0.0010
+classical  new     0.9850 / 0.9893 / 0.9843 / 0.9887    0.0020 / 0.0013 / 0.0003 / 0.0010
+1bqf       old     0.9827 / 0.9877 / 0.9837 / 0.9877    0.0017 / 0.0013 / 0.0003 / 0.0024
+1bqf       new     0.9827 / 0.9883 / 0.9833 / 0.9877    0.0010 / 0.0010 / 0.0007 / 0.0017
+qsvt       old     0.9687 / 0.9813 / 0.9650 / 0.9720    0.0021 / 0.0024 / 0.0010 / 0.0003
+qsvt       new     0.9687 / 0.9820 / 0.9650 / 0.9717    0.0017 / 0.0014 / 0.0010 / 0.0007
+control    old     0.9460 / 0.9650 / 0.9550 / 0.9570    0.0067 / 0.0069 / 0.0073 / 0.0066
+control    new     0.9460 / 0.9650 / 0.9550 / 0.9570    0.0067 / 0.0069 / 0.0073 / 0.0066
