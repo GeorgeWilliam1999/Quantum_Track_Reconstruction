@@ -1,0 +1,9 @@
+L4  (eps x4): 1BQF efficiency 0.758, gates per found track 2.71e+06 (0.04x below C's 1.1e5), largest component median 75 / max 3253 -> no
+L2  (eps x2): 1BQF efficiency 0.856, gates per found track 2.37e+05 (0.46x below C's 1.1e5), largest component median 39 / max 224 -> no
+W0  (baseline): 1BQF efficiency 0.870, gates per found track 1.09e+05 (1.01x below C's 1.1e5), largest component median 30 / max 81 -> no
+W1  (W1 0.60/10mm): 1BQF efficiency 0.854, gates per found track 1.02e+05 (1.08x below C's 1.1e5), largest component median 30 / max 81 -> no
+W2  (W2 0.45/3mm): 1BQF efficiency 0.817, gates per found track 9.6e+04 (1.15x below C's 1.1e5), largest component median 30 / max 68 -> no
+W3  (W3 0.35/1mm): 1BQF efficiency 0.761, gates per found track 7.6e+04 (1.45x below C's 1.1e5), largest component median 27 / max 62 -> no
+W4  (W4 0.30/0.3mm): 1BQF efficiency 0.666, gates per found track 4.82e+04 (2.28x below C's 1.1e5), largest component median 17 / max 40 -> no
+W5  (W5 0.25/0.1mm): 1BQF efficiency 0.417, gates per found track 7.61e+03 (14.46x below C's 1.1e5), largest component median 9 / max 17 -> no
+VERDICT: STOP D: no window keeps Run 3 efficiency >= 0.85 while cutting gates per found track >= 2x
