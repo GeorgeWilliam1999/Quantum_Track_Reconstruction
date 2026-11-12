@@ -1,0 +1,126 @@
+Run 3 (Gauss Sim10 min bias, 103 events; EventValidator purity >= 0.7, reco >= 3 hits; pooled)
+
+reading I: truth-free (above isolated value)
+solver     readout                           eff  ghost  clone segeff segfar  maxgrp med/max
+1bqf       coupled                         0.853  0.484  0.077  0.901  0.184      19/43     
+1bqf       coupled + hit uniqueness        0.862  0.056  0.149  0.901  0.184      14/18     
+1bqf       get_tracks (shared hit)         0.327  0.114  0.026  0.901  0.184     341/2576   
+1bqf       get_tracks + hit uniqueness     0.818  0.082  0.123  0.901  0.184      15/26     
+1bqf       get_tracks_layered              0.882  0.437  0.244  0.901  0.184      14/18     
+classical  coupled                         0.853  0.484  0.077  0.897  0.180      18/43     
+classical  coupled + hit uniqueness        0.861  0.050  0.124  0.897  0.180      14/18     
+classical  get_tracks (shared hit)         0.327  0.114  0.026  0.897  0.180     341/2571   
+classical  get_tracks + hit uniqueness     0.823  0.071  0.100  0.897  0.180      15/25     
+classical  get_tracks_layered              0.882  0.434  0.246  0.897  0.180      14/18     
+qsvt       coupled                         0.694  0.126  0.173  0.690  0.074      15/27     
+qsvt       coupled + hit uniqueness        0.685  0.078  0.189  0.690  0.074      12/16     
+qsvt       get_tracks (shared hit)         0.575  0.066  0.149  0.690  0.074      38/730    
+qsvt       get_tracks + hit uniqueness     0.668  0.080  0.170  0.690  0.074      13/17     
+qsvt       get_tracks_layered              0.696  0.134  0.238  0.690  0.074      13/17     
+
+reading F: <= 1 % false segments
+solver     readout                           eff  ghost  clone segeff segfar  maxgrp med/max
+1bqf       coupled                         0.028  0.005  0.075  0.061  0.083       2/15     
+1bqf       coupled + hit uniqueness        0.028  0.003  0.185  0.061  0.083       2/13     
+1bqf       get_tracks (shared hit)         0.029  0.011  0.070  0.061  0.083       3/27     
+1bqf       get_tracks + hit uniqueness     0.028  0.003  0.185  0.061  0.083       2/13     
+1bqf       get_tracks_layered              0.029  0.006  0.237  0.061  0.083       0/13     
+classical  coupled                         0.016  0.002  0.023  0.043  0.190       2/15     
+classical  coupled + hit uniqueness        0.016  0.006  0.128  0.043  0.190       2/13     
+classical  get_tracks (shared hit)         0.017  0.035  0.021  0.043  0.190       2/25     
+classical  get_tracks + hit uniqueness     0.016  0.006  0.128  0.043  0.190       2/13     
+classical  get_tracks_layered              0.017  0.006  0.268  0.043  0.190       0/14     
+qsvt       coupled                         0.128  0.004  0.057  0.157  0.104       5/15     
+qsvt       coupled + hit uniqueness        0.127  0.005  0.056  0.157  0.104       5/14     
+qsvt       get_tracks (shared hit)         0.128  0.009  0.053  0.157  0.104       5/22     
+qsvt       get_tracks + hit uniqueness     0.127  0.006  0.053  0.157  0.104       5/14     
+qsvt       get_tracks_layered              0.128  0.005  0.070  0.157  0.104       5/14     
+
+reading P: paper 1 rule
+solver     readout                           eff  ghost  clone segeff segfar  maxgrp med/max
+1bqf       coupled                         0.853  0.484  0.077  1.000  0.965      19/43     
+1bqf       coupled + hit uniqueness        0.862  0.056  0.149  1.000  0.965      14/18     
+1bqf       get_tracks (shared hit)         0.000  1.000  0.000  1.000  0.965     948/2922   
+1bqf       get_tracks + hit uniqueness     0.197  0.633  0.032  1.000  0.965      26/26     
+classical  coupled                         0.854  0.484  0.077  0.998  0.965      18/43     
+classical  coupled + hit uniqueness        0.861  0.050  0.124  0.998  0.965      14/18     
+classical  get_tracks (shared hit)         0.000  1.000  0.000  0.998  0.965     948/2922   
+classical  get_tracks + hit uniqueness     0.201  0.624  0.030  0.998  0.965      26/26     
+qsvt       coupled                         0.128  0.004  0.057  0.157  0.104       5/15     
+qsvt       coupled + hit uniqueness        0.127  0.005  0.056  0.157  0.104       5/14     
+qsvt       get_tracks (shared hit)         0.128  0.009  0.053  0.157  0.104       5/22     
+qsvt       get_tracks + hit uniqueness     0.127  0.006  0.053  0.157  0.104       5/14     
+
+Merging test (reading I, per event, hits): largest Hamiltonian component median 19 (max 43)
+  classical  gt   largest group median    341  max  2571
+  classical  cc   largest group median     18  max    43
+  classical  ccu  largest group median     14  max    18
+  1bqf       gt   largest group median    341  max  2576
+  1bqf       cc   largest group median     19  max    43
+  1bqf       ccu  largest group median     14  max    18
+  qsvt       gt   largest group median     38  max   730
+  qsvt       cc   largest group median     15  max    27
+  qsvt       ccu  largest group median     12  max    16
+
+Kill criterion, Run 3 (reading I): classical > 0.60 and QSVT > 0.70, ghosts <= 0.10
+  get_tracks (shared hit)        classical 0.327/0.114  qsvt 0.575/0.066  -> fail
+  get_tracks + hit uniqueness    classical 0.823/0.071  qsvt 0.668/0.080  -> fail
+  coupled                        classical 0.853/0.484  qsvt 0.694/0.126  -> fail
+  coupled + hit uniqueness       classical 0.861/0.050  qsvt 0.685/0.078  -> fail
+  get_tracks_layered             classical 0.882/0.434  qsvt 0.696/0.134  -> fail
+
+Toy sweep (78 events; T = [np.int64(100), np.int64(400), np.int64(1000)], n_pv = [np.int64(1), np.int64(2), np.int64(5), np.int64(10), np.int64(15), np.int64(20)])
+Largest efficiency loss against gt at any (T, n_pv) point, per readout x solver x reading (negative = loss):
+  gtu  I classical  min d_eff +0.130 at T=100, n_pv=20; mean +0.664; max gain +0.989
+  gtu  I 1bqf       min d_eff +0.130 at T=100, n_pv=20; mean +0.664; max gain +0.989
+  gtu  I qsvt       min d_eff +0.130 at T=100, n_pv=20; mean +0.363; max gain +0.710
+  gtu  F classical  min d_eff +0.000 at T=100, n_pv=1; mean +0.011; max gain +0.033
+  gtu  F 1bqf       min d_eff +0.000 at T=100, n_pv=1; mean +0.010; max gain +0.027
+  gtu  F qsvt       min d_eff +0.000 at T=100, n_pv=1; mean +0.017; max gain +0.029
+  gtu  P classical  min d_eff +0.140 at T=100, n_pv=10; mean +0.710; max gain +0.989
+  gtu  P 1bqf       min d_eff +0.174 at T=100, n_pv=10; mean +0.722; max gain +0.989
+  gtu  P qsvt       min d_eff +0.000 at T=100, n_pv=1; mean +0.017; max gain +0.029
+  cc   I classical  min d_eff +0.130 at T=100, n_pv=20; mean +0.665; max gain +0.991
+  cc   I 1bqf       min d_eff +0.130 at T=100, n_pv=20; mean +0.665; max gain +0.991
+  cc   I qsvt       min d_eff +0.130 at T=100, n_pv=20; mean +0.365; max gain +0.713
+  cc   F classical  min d_eff +0.000 at T=100, n_pv=1; mean +0.012; max gain +0.033
+  cc   F 1bqf       min d_eff +0.000 at T=100, n_pv=1; mean +0.011; max gain +0.027
+  cc   F qsvt       min d_eff +0.000 at T=100, n_pv=1; mean +0.018; max gain +0.029
+  cc   P classical  min d_eff +0.140 at T=100, n_pv=10; mean +0.713; max gain +0.991
+  cc   P 1bqf       min d_eff +0.174 at T=100, n_pv=10; mean +0.724; max gain +0.990
+  cc   P qsvt       min d_eff +0.000 at T=100, n_pv=1; mean +0.018; max gain +0.029
+  ccu  I classical  min d_eff +0.130 at T=100, n_pv=20; mean +0.666; max gain +0.990
+  ccu  I 1bqf       min d_eff +0.130 at T=100, n_pv=20; mean +0.665; max gain +0.990
+  ccu  I qsvt       min d_eff +0.130 at T=100, n_pv=20; mean +0.365; max gain +0.712
+  ccu  F classical  min d_eff +0.000 at T=100, n_pv=1; mean +0.012; max gain +0.033
+  ccu  F 1bqf       min d_eff +0.000 at T=100, n_pv=1; mean +0.010; max gain +0.027
+  ccu  F qsvt       min d_eff +0.000 at T=100, n_pv=1; mean +0.017; max gain +0.029
+  ccu  P classical  min d_eff +0.140 at T=100, n_pv=10; mean +0.713; max gain +0.990
+  ccu  P 1bqf       min d_eff +0.174 at T=100, n_pv=10; mean +0.724; max gain +0.990
+  ccu  P qsvt       min d_eff +0.000 at T=100, n_pv=1; mean +0.017; max gain +0.029
+  lay  I classical  min d_eff +0.130 at T=100, n_pv=20; mean +0.666; max gain +0.991
+  lay  I 1bqf       min d_eff +0.130 at T=100, n_pv=20; mean +0.666; max gain +0.991
+  lay  I qsvt       min d_eff +0.130 at T=100, n_pv=20; mean +0.366; max gain +0.713
+  lay  F classical  min d_eff +0.000 at T=100, n_pv=1; mean +0.012; max gain +0.034
+  lay  F 1bqf       min d_eff +0.000 at T=100, n_pv=1; mean +0.011; max gain +0.027
+  lay  F qsvt       min d_eff +0.000 at T=100, n_pv=1; mean +0.017; max gain +0.029
+
+Kill criterion, toy: chosen readout loses <= 0.02 against gt at every point (readings I and F)
+  coupled + hit uniqueness       worst +0.000 -> PASS
+
+Resources (unchanged by the readout; Givens price; 1BQF 2 calls, QSVT 160 calls; rounds = max(1, pi/4/sqrt P))
+  Run 3 median: 235 reco tracks, 1BQF 19 qubits 5.63e+06 gates; QSVT 21 qubits 1.21e+09 gates
+  toy T=100: 1BQF 18 qubits 2.03e+06 gates; QSVT 20 qubits 2.36e+08 gates
+  toy T=400: 1BQF 22 qubits 2.48e+07 gates; QSVT 24 qubits 3.05e+09 gates
+  toy T=1000: 1BQF 24 qubits 1.72e+08 gates; QSVT 26 qubits 2.66e+10 gates
+
+Readout time (classical, per event, median s) by readout, Run 3 reading I: gt 0.003, gtu 0.003, cc 0.007, ccu 0.009, lay 0.343
+
+Run 3 per-track efficiency by category (reading I): share | classical:gt classical:ccu 1bqf:gt 1bqf:ccu qsvt:gt qsvt:ccu
+  all reconstructible                    1.000 | 0.327 0.861 0.327 0.862 0.575 0.685
+  prompt, not e, >= 4 hits, p > 2 GeV    0.504 | 0.314 0.990 0.314 0.991 0.765 0.909
+  3 hits                                 0.156 | 0.346 0.524 0.346 0.517 0.027 0.037
+  |t| > 0.25                             0.208 | 0.437 0.661 0.437 0.658 0.301 0.310
+  p < 1 GeV                              0.221 | 0.300 0.573 0.299 0.571 0.290 0.340
+  secondaries                            0.221 | 0.190 0.617 0.189 0.624 0.309 0.436
+  electrons                              0.134 | 0.106 0.498 0.105 0.510 0.186 0.341
