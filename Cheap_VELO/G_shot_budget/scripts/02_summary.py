@@ -30,6 +30,7 @@ Outputs: outputs/summary_toy.csv, outputs/summary_run3.csv, outputs/n90_scaling.
 outputs/reproduction.txt, figures/G0*.{pdf,png}; the printed tables go to outputs/02_summary.log.
 """
 import sys
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -52,6 +53,7 @@ STY = {"onebit8": ("#1f77b4", "+", "-"), "poly6s": ("#1b9e77", "o", "-"), "step2
        "1bqf": ("#1f77b4", "s", "-."), "qsvt": ("#d95f02", "^", "-."), "classical": ("k", None, "--"),
        "control": ("0.5", None, ":")}
 GAP = 0.02
+warnings.filterwarnings("ignore", message="Mean of empty slice")
 
 
 def load(mode):
@@ -83,7 +85,7 @@ def n90(m, e):
         er = ref.loc[(ev, s)]
         target = er.ref_efficiency - GAP
         ok = g[g.efficiency >= target - 1e-12].sort_values("N")
-        row = dict(event=ev, solver=s, rule=r, k=k, exact=er.ref_efficiency, n_items=er.n_items,
+        row = dict(event=ev, solver=s, rule=r, k=k, exact=er.ref_efficiency, n_items=er.n_items, n_kept=er.n_pmin,
                    n_reco=er.n_reco, P_padded=er.P_padded, qubits=er.qubits, gates_per_solved=er.gates_per_solved,
                    inf_efficiency=er[f"inf_{r}_efficiency"], inf_ghost_rate=er[f"inf_{r}_ghost_rate"],
                    eff_1e8=g.sort_values("N").efficiency.iloc[-1])
@@ -184,13 +186,17 @@ for s, g in sel.groupby("solver"):
     for st, gg in [("all", g)] + list(g.groupby("set")):
         if len(gg) < 3 or gg.n_items.nunique() < 2:
             continue
-        a, b = np.polyfit(np.log(gg.n_items), np.log(gg.N90), 1)
-        rows.append(dict(solver=s, set=st, events=len(gg), exponent=a,
+        a, _ = np.polyfit(np.log(gg.n_items), np.log(gg.N90), 1)
+        am, _ = np.polyfit(np.log(gg.n_kept), np.log(gg.N90), 1)
+        rows.append(dict(solver=s, set=st, events=len(gg), exponent_n=a, exponent_m=am,
                          median_N90_over_n=float((gg.N90 / gg.n_items).median()),
-                         median_N90_over_nlogn=float((gg.N90 / (gg.n_items * np.log(gg.n_items))).median())))
+                         median_N90_over_nlogn=float((gg.N90 / (gg.n_items * np.log(gg.n_items))).median()),
+                         median_m=float(gg.n_kept.median()),
+                         median_N90_over_mlogm=float((gg.N90 / (gg.n_kept * np.log(gg.n_kept))).median())))
 SC = pd.DataFrame(rows)
 SC.to_csv(OUT / "n90_scaling.csv", index=False)
-P("\nN90 against register size n (estimate rule, k = 1): fit N90 ~ n^a")
+P("\nN90 against register size n and against m = items kept by the exact reading (estimate rule, k = 1): "
+  "fits N90 ~ n^a and N90 ~ m^a")
 P(SC.to_string(index=False, float_format=fmt))
 
 # ── reproduction ─────────────────────────────────────────────────────────────
@@ -303,10 +309,10 @@ fig, ax = plt.subplots(figsize=(WIDTH * 0.55, 3.2))
 for s in SOLV:
     g = sel[sel.solver == s]
     c, mk, _ = STY[s]
-    ax.scatter(g.n_items, g.N90, s=8, color=c, marker=mk or "o", alpha=0.6, label=LAB[s])
-x = np.logspace(2.3, 6.8, 50)
-ax.plot(x, x * np.log(x), "k--", lw=0.8, label=r"$n \ln n$")
-ax.set(xscale="log", yscale="log", xlabel="register items $n$ (hits or segments)", ylabel="$N_{90}$",
+    ax.scatter(g.n_kept, g.N90, s=8, color=c, marker=mk or "o", alpha=0.6, label=LAB[s])
+x = np.logspace(1.8, 5.5, 50)
+ax.plot(x, x * np.log(x), "k--", lw=0.8, label=r"$m \ln m$")
+ax.set(xscale="log", yscale="log", xlabel="items kept by the exact reading $m$ (hits or segments)", ylabel="$N_{90}$",
        title="toy and Run 3 events, estimate rule, k = 1")
 ax.grid(alpha=0.25, which="both")
 ax.legend(fontsize=5.8)
