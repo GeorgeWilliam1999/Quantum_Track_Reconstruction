@@ -92,8 +92,19 @@ def mcrx(m):
     return float(MCRX_CX[m]) if m in MCRX_CX else MPV.mcrx_cx(m)
 
 
-def rounds(P):
-    return np.where(P > 0, np.maximum(1.0, np.pi / (4 * np.sqrt(np.maximum(P, 1e-300)))), np.nan)
+# Amplification cap for EMPTY components. A component that holds no item of the exact reading
+# can have P ~ 1e-28 (its output cancels), where pi / (4 sqrt P) would be astronomical. It is
+# run with at most R_CAP rounds (P floor 1e-4); nothing is flagged and it is read as empty.
+# A component that holds kept items always gets its full rounds, however small its P (the QSVT
+# comb has many such components). Which components are empty is taken from the exact output:
+# an accounting choice, stated in the README.
+P_FLOOR = 1e-4
+R_CAP = np.pi / (4 * np.sqrt(P_FLOOR))
+
+
+def rounds(P, empty):
+    r = np.maximum(1.0, np.pi / (4 * np.sqrt(np.maximum(P, 1e-300))))
+    return np.where(empty, np.minimum(R_CAP, r), r)
 
 
 def clenshaw(poly, M, v):
@@ -134,12 +145,12 @@ def per_component(M, comps, f_of_lam, probe_ones):
     return y, (np.concatenate(lams) if lams else np.zeros(0)), time.perf_counter() - t0
 
 
-def account(key, comps, price, P_c, Pleak):
+def account(key, comps, price, P_c, Pleak, empty):
     calls, anc, r = PRICE[key]
     m = price["m"]
     ns = price["n_s"]
     Pp = P_c * m / 2.0 ** ns + Pleak
-    g = calls * r * price["cx_step"] * rounds(Pp)
+    g = calls * r * price["cx_step"] * rounds(Pp, empty)
     return dict(m=m, ns=ns, qubits=ns + anc, cx_step=price["cx_step"], P=P_c, P_padded=Pp, gates_solved=g)
 
 
@@ -248,9 +259,10 @@ def run(job):
         d_ind = float(np.max(np.abs(y_whole_from_comp - y_ind)))
         P_c = np.array([float(y_comp_probe[idx] @ y_comp_probe[idx]) for idx in comps])
         leak = np.where(price["m"] > 0, (2.0 ** price["n_s"] - price["m"]) / 2.0 ** price["n_s"] * f0 ** 2, 0.0)
-        acc = account(key, comps, price, P_c, leak)
         weight = np.abs(y_whole_from_comp) * math.sqrt(n)
         exact_on = weight >= tau
+        empty = np.bincount(lab, weights=exact_on.astype(float), minlength=len(comps)) == 0
+        acc = account(key, comps, price, P_c, leak, empty)
         ex = hit_readout(exact_on, weight)
         # estimate rule per component: weight >= tau <=> p_i,c >= tau^2 / (m_c P_c)
         p = np.zeros(n)
@@ -261,7 +273,9 @@ def run(job):
                 p[idx] = y_comp_probe[idx] ** 2 / s_
                 pmin[c] = tau ** 2 / (len(idx) * s_) * (1 - 1e-9)
         circ = acc["m"] > 1
-        E.append(dict(base, register="hit", solver=key, n_items=n, n_comp=len(comps),
+        capped = circ & empty & (acc["P_padded"] < P_FLOOR)
+        kept_in_capped = int(exact_on[capped[lab]].sum())
+        E.append(dict(base, n_comp_capped=int(capped.sum()), kept_in_capped=kept_in_capped, register="hit", solver=key, n_items=n, n_comp=len(comps),
                       n_comp_gt1=int(circ.sum()), max_items=int(acc["m"].max()),
                       max_qubits_sys=int(acc["ns"][circ].max()) if circ.any() else 0,
                       max_qubits=int(acc["qubits"][circ].max()) if circ.any() else 0,
@@ -314,14 +328,23 @@ def run(job):
         xw = sols[key]
         exw = seg_readout(xw >= tau, np.round(xw / xw.max(), 9))
         exw_raw = seg_readout(xw >= tau, xw)
+        # what a measurement sees: tied amplitudes give equal expected counts, so the shots break
+        # ties at random. Exact output with ties broken at random, mean of 5 draws: the target of
+        # the shot curves for segments (02_summary.py).
+        rng_t = np.random.default_rng(seed0 + 7)
+        xr = np.round(x / x.max(), 9)
+        ex_rand = [seg_readout(exact_on, xr + 1e-12 * rng_t.random(N)) for _ in range(5)]
         s_c = np.bincount(lab, weights=x ** 2, minlength=len(comps))
         P_c = s_c / price["m"]
-        acc = account(key, comps, price, P_c, 0.0)
+        empty = np.bincount(lab, weights=exact_on.astype(float), minlength=len(comps)) == 0
+        acc = account(key, comps, price, P_c, 0.0, empty)
         ok = (s_c > 0) & (price["m"] > 1)
         p = np.where(ok[lab], x ** 2 / np.where(ok, s_c, 1.0)[lab], 0.0)
         pmin = np.where(ok, tau ** 2 / np.where(ok, s_c, 1.0) * (1 - 1e-9), 0.0)
         circ = acc["m"] > 1
-        E.append(dict(base, register="segment", solver=key, n_items=N, n_comp=len(comps),
+        capped = circ & empty & (acc["P_padded"] < P_FLOOR)
+        kept_in_capped = int(exact_on[capped[lab]].sum())
+        E.append(dict(base, n_comp_capped=int(capped.sum()), kept_in_capped=kept_in_capped, register="segment", solver=key, n_items=N, n_comp=len(comps),
                       n_comp_gt1=int(circ.sum()), max_items=int(acc["m"].max()),
                       max_qubits_sys=int(acc["ns"][circ].max()) if circ.any() else 0,
                       max_qubits=int(acc["qubits"][circ].max()) if circ.any() else 0,
@@ -333,7 +356,9 @@ def run(job):
                       t_eigh=t_eig if key == "1bqf" else t_eig_q,
                       exact_efficiency=ex["efficiency"], exact_ghost_rate=ex["ghost_rate"],
                       whole_rounded_efficiency=exw["efficiency"], whole_raw_efficiency=exw_raw["efficiency"],
-                      n_on_diff=int(np.sum(exact_on != (xw >= tau))), ref_efficiency=np.nan))
+                      n_on_diff=int(np.sum(exact_on != (xw >= tau))), ref_efficiency=np.nan,
+                      exact_rand_efficiency=float(np.mean([q["efficiency"] for q in ex_rand])),
+                      exact_rand_sd=float(np.std([q["efficiency"] for q in ex_rand]))))
         SZ += size_rows(key, acc["m"])
         CU += shots(key, base, comps, lab, acc, p, pmin, exact_on, seg_readout, seed0)
     t = time.perf_counter() - t0

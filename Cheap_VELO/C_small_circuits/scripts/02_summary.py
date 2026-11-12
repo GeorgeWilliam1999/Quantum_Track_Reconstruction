@@ -7,7 +7,9 @@ estimate rule, k = 1: N90, total gates per event with shots, gates per found tra
 
 Definitions:
   beta90     smallest beta (shots per circuit = ceil(beta m ln m)) with the seed-mean
-             efficiency >= exact - 0.02, per event, solver and hybrid threshold t.
+             efficiency >= target - 0.02, per event, solver and hybrid threshold t. target = the
+             exact-output efficiency; for segments with the amplitude ties broken at random (mean
+             of 5 draws, exact_rand_efficiency), because that is what shots do (README).
   gates      sum over circuit components of shots x gates per solved shot, at beta90.
   per track  gates / (efficiency at beta90 x reconstructible tracks).
   t          components with <= t items are solved classically (t = 1: every component with a
@@ -59,8 +61,9 @@ def beta90(cur, ev):
     rows = []
     for (e, s, t), g in m.groupby(["event", "solver", "t"]):
         r = ex.loc[(e, s)]
-        ok = g[g.efficiency >= r.exact_efficiency - GAP - 1e-12].sort_values("beta")
-        row = dict(event=e, solver=s, t=t, exact=r.exact_efficiency, n_reco=r.n_reco,
+        target = r.exact_rand_efficiency if (s in ("1bqf", "qsvt") and "exact_rand_efficiency" in r) else r.exact_efficiency
+        ok = g[g.efficiency >= target - GAP - 1e-12].sort_values("beta")
+        row = dict(event=e, solver=s, t=t, exact=r.exact_efficiency, target=target, n_reco=r.n_reco,
                    n_circuits=int(g.n_circuits.iloc[0]))
         if len(ok):
             f = ok.iloc[0]
@@ -95,7 +98,8 @@ def table(ev, b9, W, keys):
                        max_qubits_med=e.max_qubits.median(), max_qubits_max=e.max_qubits.max(),
                        whole_qubits=w.qubits.median(), whole_N90=w.N90.median(),
                        whole_gates=w.gates_total.median(), whole_gates_per_track=w.gates_per_track.median(),
-                       t_eigh_med=e.t_eigh.median(), t_eigh_max=e.t_eigh.max())
+                       t_eigh_med=e.t_eigh.median(), t_eigh_max=e.t_eigh.max(),
+                       capped_comp_mean=e.n_comp_capped.mean(), kept_in_capped_max=e.kept_in_capped.max())
             for t in THRESH:
                 b = b9[(b9.solver == s) & (b9.t == t) & b9.event.isin(evs)]
                 row[f"reached_t{t}"] = b.beta90.notna().mean()
@@ -126,7 +130,8 @@ SR.to_csv(OUT / "summary_run3.csv", index=False)
 
 show = ["solver", "exact", "circuits_t1", "circuits_t8", "max_items", "max_qubits_med", "max_qubits_max", "whole_qubits",
         "whole_N90", "shots_t1", "whole_gates", "gates_t1", "gates_t2", "gates_t4", "gates_t8", "ratio_whole_over_comp",
-        "whole_gates_per_track", "gates_per_track_t1", "reached_t1", "t_eigh_med"]
+        "whole_gates_per_track", "gates_per_track_t1", "reached_t1", "t_eigh_med", "capped_comp_mean",
+        "kept_in_capped_max"]
 for T in (100, 400, 1000):
     for npv in (1, 5, 10, 20):
         s = ST[(ST["T"] == T) & (ST.n_pv == npv)]
@@ -212,7 +217,8 @@ def by_T(cols, ylabel, name, logy=True, ylim=None):
         for s in SOLV:
             g = ST[(ST.solver == s) & (ST.n_pv == npv)].sort_values("T")
             for col, ls, suf, mfc in cols:
-                ax.plot(g["T"], g[col], color=COL[s], marker=MK[s], ls=ls, ms=3.2, lw=1.1,
+                yv = g[col].where(g[col] > 0) if logy else g[col]      # 0 gates = no circuit left
+                ax.plot(g["T"], yv, color=COL[s], marker=MK[s], ls=ls, ms=3.2, lw=1.1,
                         mfc=COL[s] if mfc else "w", label=(LAB[s] + suf) if i == 0 else None)
         ax.set(xscale="log", xlabel="tracks per event $T$")
         if logy:
