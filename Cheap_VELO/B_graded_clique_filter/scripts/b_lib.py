@@ -30,12 +30,14 @@ from __future__ import annotations
 
 import importlib.util
 import math
+import os
 import sys
 from pathlib import Path
 
 import numpy as np
 
-PKG = "/data/bfys/gscriven/worktrees/velo-toy-cheap-velo-B/src"
+# VELO_TOY_SRC lets a later study (experiment G) point this at its own package worktree
+PKG = os.environ.get("VELO_TOY_SRC", "/data/bfys/gscriven/worktrees/velo-toy-cheap-velo-B/src")
 PKG_MAIN = "/data/bfys/gscriven/LHCb_VeLo_Toy_Model/src"
 FS = Path("/data/bfys/gscriven/Quantum_Track_Reconstruction/Vertexing/Focusing_scan/scripts")
 RE = Path("/data/bfys/gscriven/Quantum_Track_Reconstruction/Vertexing/Real_events/scripts")
@@ -113,11 +115,12 @@ def rounds(P):
     return max(1.0, math.pi / (4 * math.sqrt(P))) if P > 0 else np.nan
 
 
-def evaluate(ev, vz, tag):
+def evaluate(ev, vz, tag, keep=None):
     """All filters on the per-vertex operator at the vertices vz.
 
-    Returns (row dict with keys f"{tag}_{filter}_{quantity}", {filter: set of matched truth ids},
-    the operator summary dict).
+    Returns (row dict with keys f"{tag}_{filter}_{quantity}", {filter: set of matched truth ids}).
+    If ``keep`` is a dict it receives the operator ("C") and, per filter, the exact output of
+    clique_filters.filter_hit_operator and the readout threshold (keep[filter] = (r, tau)).
     """
     C, i, j = F9.operator_matrix(ev, list(vz))
     n = len(ev.x)
@@ -135,6 +138,8 @@ def evaluate(ev, vz, tag):
            f"{tag}_rho": rho, f"{tag}_alpha": alpha, f"{tag}_lo": lo, f"{tag}_max_comp": sysd["max_comp"],
            f"{tag}_pad": n / 2 ** ns}
     matched = {}
+    if keep is not None:
+        keep["C"] = C
     for key, f in responses(alpha, lo).items():
         r = CF.filter_hit_operator(C, f, sysd=sysd)
         _, calls, anc = FILTERS[key]
@@ -151,6 +156,8 @@ def evaluate(ev, vz, tag):
             row[f"{p}_gates"] = calls * R_STEPS * cx_step * row[f"{p}_rounds"]
         tau = READ_THRESHOLD_IDEAL if calls is None else 0.5 * (abs(row[f"{p}_f1"]) + abs(row[f"{p}_f2"]))
         row[f"{p}_tau"] = tau
+        if keep is not None:
+            keep[key] = (r, tau)
         groups = CF.tracks_from_filtered_hits(C, r["weight"], threshold=tau, min_hits=3)
         met, mt = F7.validate(ev, F7.make_tracks([list(g) for g in groups], ev))
         matched[key] = mt
