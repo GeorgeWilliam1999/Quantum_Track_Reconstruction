@@ -1,0 +1,30 @@
+{
+ "toy": {
+  "d": {
+   "dmax": 0.02,
+   "sigma": 0.1,
+   "cmin": 8.0,
+   "shoulder": 0.1
+  },
+  "t": {
+   "dmax": 0.03,
+   "sigma": 0.1,
+   "cmin": 3.0,
+   "shoulder": 0.1
+  }
+ },
+ "real": {
+  "d": {
+   "dmax": 0.1,
+   "sigma": 0.8,
+   "cmin": 20.0,
+   "shoulder": 0.0
+  },
+  "t": {
+   "dmax": 1.0,
+   "sigma": 0.8,
+   "cmin": 30.0,
+   "shoulder": 0.0
+  }
+ }
+}
